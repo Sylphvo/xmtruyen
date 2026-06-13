@@ -16,7 +16,7 @@ export default function Sidebar() {
     <aside
       style={{
         width: 58,
-        backgroundColor: "#fff",
+        backgroundColor: "#f5f1eb",
         borderRight: "1px solid #ebebeb",
         display: "flex",
         flexDirection: "column",

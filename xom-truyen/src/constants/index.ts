@@ -23,6 +23,11 @@ export const NEW_BOOKS: Book[] = [
   { id: 3, title: "Thế Giới Hoàn Mỹ", images:"Truyen-Tranh-Bia-59-Hinh-02", author: "Thần Đông", coverIndex: 2, genres: ["Huyền Huyễn"], currentChapter: 2014, lastUpdated: "Hôm qua" },
   { id: 4, title: "Đại Chúa Tể", images:"Truyen-Tranh-Bia-69-Hinh-10", author: "Thiên Tằm Thổ Đậu", coverIndex: 3, genres: ["Tiên Hiệp", "Dị Giới"], currentChapter: 1560, lastUpdated: "Hôm qua" },
   { id: 5, title: "Vũ Động Càn Khôn", images:"Truyen-Tranh-Hanh-Dong-TruyenQQ", author: "Thiên Tằm Thổ Đậu", coverIndex: 4, genres: ["Huyền Huyễn", "Dị Giới"], currentChapter: 1308, lastUpdated: "3 ngày trước" },
+  { id: 15, title: "Vũ Động Càn Khôn", images:"Truyen-Tranh-Hanh-Dong-TruyenQQ", author: "Thiên Tằm Thổ Đậu", coverIndex: 4, genres: ["Huyền Huyễn", "Dị Giới"], currentChapter: 1308, lastUpdated: "3 ngày trước" },
+  { id: 16, title: "Vũ Động Càn Khôn", images:"Truyen-Tranh-Hanh-Dong-TruyenQQ", author: "Thiên Tằm Thổ Đậu", coverIndex: 4, genres: ["Huyền Huyễn", "Dị Giới"], currentChapter: 1308, lastUpdated: "3 ngày trước" },
+  { id: 17, title: "Vũ Động Càn Khôn", images:"Truyen-Tranh-Hanh-Dong-TruyenQQ", author: "Thiên Tằm Thổ Đậu", coverIndex: 4, genres: ["Huyền Huyễn", "Dị Giới"], currentChapter: 1308, lastUpdated: "3 ngày trước" },
+  { id: 18, title: "Vũ Động Càn Khôn", images:"Truyen-Tranh-Hanh-Dong-TruyenQQ", author: "Thiên Tằm Thổ Đậu", coverIndex: 4, genres: ["Huyền Huyễn", "Dị Giới"], currentChapter: 1308, lastUpdated: "3 ngày trước" },
+  { id: 19, title: "Vũ Động Càn Khôn", images:"Truyen-Tranh-Hanh-Dong-TruyenQQ", author: "Thiên Tằm Thổ Đậu", coverIndex: 4, genres: ["Huyền Huyễn", "Dị Giới"], currentChapter: 1308, lastUpdated: "3 ngày trước" },
 ];
 
 // Cập nhật mảng Sách Đề Xuất
