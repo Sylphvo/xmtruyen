@@ -1,7 +1,13 @@
 import { ChevronRight } from "lucide-react";
 import { ACCENT } from "../../constants";
 
-export default function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+export default function SectionHeader({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
   return (
     <div
       style={{
@@ -12,19 +18,23 @@ export default function SectionHeader({ title, subtitle }: { title: string; subt
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <h2
+        <h3
           style={{
+            fontSize: "15px",
+            fontWeight: 700,
+            color: "#111827", // Mã màu tối gần như đen giống Figma
             margin: 0,
-            fontSize: 13,
-            fontWeight: 800,
-            color: ACCENT,
-            letterSpacing: "0.03em",
-            textTransform: "uppercase",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis", // Cắt chữ dài thành "..."
+            lineHeight: 1.4,
           }}
         >
           {title}
-        </h2>
-        <span style={{ fontSize: 11, color: "#bbb", fontWeight: 400 }}>{subtitle}</span>
+        </h3>
+        <span style={{ fontSize: 11, color: "#bbb", fontWeight: 400 }}>
+          {subtitle}
+        </span>
       </div>
       <button
         style={{

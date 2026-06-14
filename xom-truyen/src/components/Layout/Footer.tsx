@@ -1,20 +1,22 @@
-
 import { ACCENT } from "../../constants";
 import { BookOpen } from "lucide-react";
 
 export default function Footer() {
   const footerCols = [
-    { title: "Services", items: ["Email Marketing", "Campaigns", "Branding", "Offline"] },
-    { title: "About",    items: ["Our Story", "Benefits", "Team", "Contact us"] },
-    { title: "Contact",  items: ["Contact us"] },
-    { title: "Follow Us",items: ["Facebook", "Twitter", "Instagram"] },
+    {
+      title: "Services",
+      items: ["Email Marketing", "Campaigns", "Branding", "Offline"],
+    },
+    { title: "About", items: ["Our Story", "Benefits", "Team", "Contact us"] },
+    { title: "Contact", items: ["Contact us"] },
+    { title: "Follow Us", items: ["Facebook", "Twitter", "Instagram"] },
   ];
- 
+
   return (
     <footer
       style={{
-        backgroundColor: "#252525",
-        color: "#888",
+        backgroundColor: "#f5f1eb",
+        color: "#000",
         padding: "36px 28px 20px",
         fontSize: 12,
         marginTop: 8,
@@ -29,7 +31,14 @@ export default function Footer() {
       >
         {/* Brand */}
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 12,
+            }}
+          >
             <div
               style={{
                 width: 28,
@@ -41,25 +50,42 @@ export default function Footer() {
                 justifyContent: "center",
               }}
             >
-              <BookOpen size={14} color="#fff" />
+              <BookOpen size={14} color="#000" />
             </div>
-            <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>Đọc Sách</span>
+            <span style={{ color: "#000", fontWeight: 800, fontSize: 14 }}>
+              Đọc Sách
+            </span>
           </div>
-          <p style={{ fontSize: 11, lineHeight: 1.8, margin: 0, color: "#666" }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit,
-            vulputate eu pharetra nec, mattis ac neque.
+          <p
+            style={{ fontSize: 11, lineHeight: 1.8, margin: 0, color: "#666" }}
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam
+            velit, vulputate eu pharetra nec, mattis ac neque.
           </p>
         </div>
- 
+
         {footerCols.map(({ title, items }) => (
           <div key={title}>
-            <p style={{ color: "#ddd", fontWeight: 700, marginBottom: 12, margin: "0 0 12px", fontSize: 12 }}>
+            <p
+              style={{
+                color: "#000",
+                fontWeight: 700,
+                marginBottom: 12,
+                margin: "0 0 12px",
+                fontSize: 12,
+              }}
+            >
               {title}
             </p>
             {items.map((item) => (
               <p
                 key={item}
-                style={{ margin: "0 0 9px", cursor: "pointer", color: "#666", fontSize: 11 }}
+                style={{
+                  margin: "0 0 9px",
+                  cursor: "pointer",
+                  color: "#666",
+                  fontSize: 11,
+                }}
               >
                 {item}
               </p>
@@ -67,7 +93,7 @@ export default function Footer() {
           </div>
         ))}
       </div>
- 
+
       <div
         style={{
           marginTop: 28,

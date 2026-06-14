@@ -1,0 +1,101 @@
+.comic-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f6f0;
+    /* Màu nền hơi vàng nhẹ giống trong hình */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    margin: 0;
+}
+
+.section-title .highlight {
+    color: #e53935;
+    /* Màu đỏ */
+    font-weight: bold;
+}
+
+.section-title .subtitle {
+    color: #888;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.view-more {
+    color: #e53935;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.comic-swiper {
+    padding-bottom: 30px;
+    /* Chừa chỗ cho scrollbar */
+}
+
+.comic-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.image-wrapper {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 240px;
+    /* Chiều cao cố định để các card bằng nhau */
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover img {
+    transform: scale(1.05);
+    /* Hiệu ứng zoom nhẹ khi hover */
+}
+
+.comic-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.comic-author {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+
+/* Tùy chỉnh màu của Swiper Scrollbar */
+
+.swiper-scrollbar {
+    background: #e0e0e0;
+}
+
+.swiper-scrollbar-drag {
+    background: #ccc;
+}
+
+.swiper-free-mode>.swiper-wrapper {
+    padding: 0px 18px;
+}
