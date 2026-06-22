@@ -30,86 +30,85 @@ export default function HistoryItem({ record, onRemove }: HistoryItemProps) {
       position: "relative"
     }}>
       {/* Book Cover */}
-      <div style={{ flexShrink: 0, cursor: "pointer" }} onClick={() => navigate(`/book/${book.id}`)}>
-        <BookCover book={book} width={130} height={173} />
+      <div style={{ flexShrink: 0, cursor: "pointer", width: 190 }} onClick={() => navigate(`/book/${book.id}`)}>
+        <div style={{ width: "100%", aspectRatio: "3 / 4", position: "relative", borderRadius: "6px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+          <BookCover book={book} width="100%" height="100%" />
+        </div>
       </div>
 
       {/* Book Details */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", paddingRight: "60px" }}>
         
         {/* Title and Rating */}
-        <div style={{ marginBottom: "16px" }}>
+        <div style={{ marginBottom: "24px" }}>
           <h2 
             onClick={() => navigate(`/book/${book.id}`)}
             style={{ 
-              fontSize: "18px", 
+              fontSize: "20px", 
               fontWeight: 700, 
-              color: "#1a1a1a", 
-              margin: "0 0 8px 0",
+              color: "var(--text-primary, #1a1a1a)", 
+              margin: "0 0 10px 0",
               cursor: "pointer"
             }}
           >
             {book.title}
           </h2>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ fontSize: "14px", fontWeight: 600 }}>4</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary, #1a1a1a)" }}>4</span>
             <div style={{ display: "flex", gap: "2px" }}>
               {[...Array(4)].map((_, i) => (
-                <Star key={i} size={14} fill="#facc15" color="#facc15" />
+                <Star key={i} size={16} fill="#facc15" color="#facc15" />
               ))}
-              <Star size={14} color="#d1d5db" />
+              <Star size={16} color="#d1d5db" />
             </div>
-            <span style={{ fontSize: "13px", color: "#6b7280" }}>• 1 đánh giá</span>
+            <span style={{ fontSize: "14px", color: "var(--text-muted, #6b7280)", fontWeight: 500 }}>• 1 đánh giá</span>
           </div>
         </div>
 
         {/* Info Grid */}
         <div style={{ 
           display: "grid", 
-          gridTemplateColumns: "repeat(4, 1fr)", 
+          gridTemplateColumns: "1fr 1fr 1.5fr 1fr", 
           gap: "16px", 
-          marginBottom: "20px"
+          flex: 1
         }}>
           <div>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>Tác giả</div>
-            <div style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>{book.author}</div>
+            <div style={{ fontSize: "12px", color: "var(--text-primary, #1a1a1a)", marginBottom: "6px", fontWeight: 700 }}>Tác giả</div>
+            <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-muted, #4b5563)", marginBottom: "24px" }}>{book.author}</div>
+            <button 
+              onClick={() => navigate(`/book/${book.id}/read`)}
+              style={{
+                backgroundColor: "#0ea5e9", // Bright blue
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                padding: "8px 24px",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(14, 165, 233, 0.3)"
+              }}
+            >
+              Đọc sách
+            </button>
           </div>
           <div>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>Thể loại</div>
-            <div style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>{book.genres?.join(", ") || "Ngôn tình"}</div>
+            <div style={{ fontSize: "12px", color: "var(--text-primary, #1a1a1a)", marginBottom: "6px", fontWeight: 700 }}>Thể loại</div>
+            <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-muted, #4b5563)" }}>{book.genres?.join(", ") || "Ngôn tình"}</div>
           </div>
           <div>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>Nhà xuất bản</div>
-            <div style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>Đang cập nhật</div>
+            <div style={{ fontSize: "12px", color: "var(--text-primary, #1a1a1a)", marginBottom: "6px", fontWeight: 700 }}>Nhà xuất bản</div>
+            <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-muted, #4b5563)" }}>Đang cập nhật</div>
           </div>
           <div>
-            <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>Tình trạng ra</div>
-            <div style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>25/50</div>
+            <div style={{ fontSize: "12px", color: "var(--text-primary, #1a1a1a)", marginBottom: "6px", fontWeight: 700 }}>Tình trạng ra</div>
+            <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-muted, #4b5563)" }}>25/50</div>
           </div>
         </div>
 
-        {/* Action Button & Time */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "12px" }}>
-          <button 
-            onClick={() => navigate(`/book/${book.id}/read`)}
-            style={{
-              backgroundColor: "#2196f3",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              padding: "8px 20px",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 2px 4px rgba(33, 150, 243, 0.3)"
-            }}
-          >
-            Đọc sách
-          </button>
-          
-          <div style={{ fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
-            <span style={{ color: "#374151" }}>{actionType}:</span> {readAt}
-          </div>
+        {/* Action Time */}
+        <div style={{ marginTop: "24px", fontSize: "13px", color: "var(--text-muted, #6b7280)", fontWeight: 500 }}>
+          <span style={{ color: "var(--text-primary, #1a1a1a)", fontWeight: 700 }}>{actionType}:</span> {readAt}
         </div>
       </div>
 
@@ -118,16 +117,17 @@ export default function HistoryItem({ record, onRemove }: HistoryItemProps) {
         onClick={() => onRemove(record.id)}
         style={{
           position: "absolute",
-          top: "0",
-          right: "0",
+          top: "50%",
+          transform: "translateY(-50%)",
+          right: "16px",
           background: "none",
           border: "none",
           cursor: "pointer",
-          color: "#4b5563",
+          color: "var(--text-primary, #1a1a1a)",
           padding: "8px"
         }}
       >
-        <X size={20} />
+        <X size={28} strokeWidth={2.5} />
       </button>
 
     </div>

@@ -7,41 +7,41 @@ export default function Sidebar() {
   const navigate = useNavigate();
  
   const navItems = [
-    { icon: <Home size={18} />,          label: "Trang chủ", path: "/" },
-    { icon: <History size={18} />,       label: "Lịch sử", path: "/history" },
-    { icon: <Bookmark size={18} />,      label: "Đánh dấu", path: "/bookmarks" },
-    { icon: <LayoutGrid size={18} />,    label: "Thể loại", path: "/genres" },
-    { icon: <User size={18} />,          label: "Cài đặt tài khoản", path: "/profile" },
+    { icon: <Home size={24} />,          label: "Trang chủ", path: "/" },
+    { icon: <History size={24} />,       label: "Lịch sử", path: "/history" },
+    { icon: <Bookmark size={24} />,      label: "Đánh dấu", path: "/bookmarks" },
+    { icon: <LayoutGrid size={24} />,    label: "Thể loại", path: "/genres" },
+    { icon: <User size={24} />,          label: "Cài đặt tài khoản", path: "/profile" },
   ];
  
   return (
     <aside
       style={{
-        width: 58,
+        width: 90,
         backgroundColor: "var(--bg-primary)",
         borderRight: "1px solid var(--border-color)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: "16px 0",
-        gap: 6,
+        padding: "30px 0",
+        gap: 16,
         flexShrink: 0,
       }}
     >
       {/* Logo */}
       <div
         style={{
-          width: 36,
-          height: 36,
-          borderRadius: 9,
+          width: 50,
+          height: 50,
+          borderRadius: 14,
           backgroundColor: ACCENT,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: 14,
+          marginBottom: 30,
         }}
       >
-        <BookOpen size={18} color="#fff" />
+        <BookOpen size={26} color="#fff" />
       </div>
  
       {navItems.map((item, i) => {
@@ -52,12 +52,12 @@ export default function Sidebar() {
             title={item.label}
             onClick={() => navigate(item.path)}
             style={{
-              width: 38,
-              height: 38,
+              width: 50,
+              height: 50,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              borderRadius: 9,
+              borderRadius: 14,
               border: "none",
               cursor: "pointer",
               backgroundColor: isActive ? "var(--sidebar-active, #fff0ee)" : "transparent",

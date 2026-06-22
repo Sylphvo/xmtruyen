@@ -12,10 +12,12 @@ export default function BookCover({ book, width, height }: { book: Book; width: 
         height: height,
         borderRadius: "6px",
         overflow: "hidden",
-        backgroundColor: "#e5e7eb", // Nền xám dự phòng khi đang tải ảnh
+        backgroundColor: "var(--bg-secondary, #e5e7eb)",
         position: "relative",
-        boxShadow: "-7px 4px 15px 2px rgb(161 161 161)"
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+        transition: "box-shadow 0.3s ease",
       }}
+      className="book-cover-hover"
     >
       <img
         src={imageUrl}
@@ -30,18 +32,6 @@ export default function BookCover({ book, width, height }: { book: Book; width: 
           // Nếu cuốn truyện này chưa có ảnh sẵn, tự động ẩn ảnh lỗi và giữ khung xám tinh tế
           e.currentTarget.style.display = "none";
           e.currentTarget.parentElement!.style.backgroundColor = "#d1d5db";
-        }}
-      />
-      
-      {/* Hiệu ứng dải bóng mờ dọc gáy sách bên trái tạo độ sâu 3D chân thực */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          width: "4px",
-          background: "linear-gradient(to right, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.06) 100%)",
         }}
       />
     </div>

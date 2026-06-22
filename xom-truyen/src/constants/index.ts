@@ -104,7 +104,7 @@ export const RATED_BOOKS: Book[] = [
 // Lắp ráp lại thành SECTIONS
 export const SECTIONS: SectionData[] = [
   { id: "new", title: "Mới Nhất", subtitle: "(Sách Mới)", books: NEW_BOOKS, size: "large" },
-  { id: "recommend", title: "Sách Được Đề Xuất", subtitle: "(Xem Thêm)", books: RECOMMENDED_BOOKS },
-  { id: "exclusive", title: "Sách Độc Quyền", subtitle: "(Đọc Thêm)", books: EXCLUSIVE_BOOKS },
-  { id: "rated", title: "Sách Được Đánh Giá Cao", subtitle: "(Phổ Biến)", books: RATED_BOOKS },
+  { id: "recommend", title: "Sách Được Đề Xuất", subtitle: "(Xem Thêm)", books: RECOMMENDED_BOOKS, size: "large" },
+  { id: "exclusive", title: "Sách Độc Quyền", subtitle: "(Đọc Thêm)", books: EXCLUSIVE_BOOKS, size: "large" },
+  { id: "rated", title: "Sách Được Đánh Giá Cao", subtitle: "(Phổ Biến)", books: RATED_BOOKS, size: "large" },
 ];  

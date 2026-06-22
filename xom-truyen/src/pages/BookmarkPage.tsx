@@ -54,9 +54,9 @@ export default function BookmarkPage() {
         </h1>
 
         <div style={{ 
-          display: "flex", 
-          flexWrap: "wrap", 
-          gap: "32px" 
+          display: "grid", 
+          gridTemplateColumns: "repeat(6, 1fr)", 
+          gap: "28px" 
         }}>
           {bookmarks.length > 0 ? (
             bookmarks.map(record => (

@@ -111,8 +111,8 @@ export default function Header() {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 16,
-        padding: "10px 22px",
+        gap: 24,
+        padding: "16px 30px",
         backgroundColor: "var(--bg-primary)",
         borderBottom: "1px solid var(--border-color, #ebebeb)",
         position: "sticky",
@@ -127,13 +127,13 @@ export default function Header() {
           display: "flex",
           alignItems: "center",
           backgroundColor: "var(--bg-secondary, #fff)",
-          borderRadius: 20,
-          padding: "7px 14px",
-          gap: 8,
+          borderRadius: 30,
+          padding: "10px 20px",
+          gap: 12,
           border: "1px solid var(--border-color, #ddd)",
         }}
       >
-        <Search size={13} color="var(--text-muted, #bbb)" />
+        <Search size={18} color="var(--text-muted, #bbb)" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -142,7 +142,7 @@ export default function Header() {
             border: "none",
             background: "none",
             outline: "none",
-            fontSize: 12,
+            fontSize: 14,
             flex: 1,
             color: "var(--text-primary)",
             fontFamily: "inherit",
@@ -157,8 +157,8 @@ export default function Header() {
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: "8px",
-          padding: "8px 16px",
+          gap: "10px",
+          padding: "10px 20px",
           borderRadius: "9999px",
           border: "2.5px solid #3B9EFF",
           backgroundColor: "#FFFFFF",
@@ -176,13 +176,13 @@ export default function Header() {
       </div>
 
       {/* 4 CIRCULAR BUTTONS (Grid, Messenger, Bell, Profile) */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         
         {/* Grid (Menu) */}
         <button
           style={{
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             borderRadius: "50%",
             backgroundColor: theme.btnBg,
             color: theme.btnText,
@@ -193,14 +193,14 @@ export default function Header() {
             cursor: "pointer",
           }}
         >
-          <Grip size={20} />
+          <Grip size={22} />
         </button>
 
         {/* Messenger */}
         <button
           style={{
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             borderRadius: "50%",
             backgroundColor: theme.btnBg,
             color: theme.btnText,
@@ -211,7 +211,7 @@ export default function Header() {
             cursor: "pointer",
           }}
         >
-          <MessageCircle size={20} />
+          <MessageCircle size={22} />
         </button>
 
         {/* Dark Mode Toggle */}
@@ -219,8 +219,8 @@ export default function Header() {
           onClick={() => setIsDarkMode(!isDarkMode)}
           title={`Chuyển sang chế độ ${isDarkMode ? "sáng" : "tối"}`}
           style={{
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             borderRadius: "50%",
             backgroundColor: theme.btnBg,
             color: theme.btnText,
@@ -231,7 +231,7 @@ export default function Header() {
             cursor: "pointer",
           }}
         >
-          <Moon size={20} />
+          <Moon size={22} />
         </button>
 
         {/* Bell (Thông báo) */}
@@ -239,8 +239,8 @@ export default function Header() {
           <button
             onClick={toggleNotif}
             style={{
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               borderRadius: "50%",
               backgroundColor: showNotifModal ? theme.activeTabBg : theme.btnBg,
               color: showNotifModal ? theme.activeTabText : theme.btnText,
@@ -251,7 +251,7 @@ export default function Header() {
               cursor: "pointer",
             }}
           >
-            <Bell size={20} />
+            <Bell size={22} />
             {/* Chấm đỏ báo có tin mới */}
             <span
               style={{
@@ -484,26 +484,15 @@ export default function Header() {
         <button
           onClick={toggleDropdown}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: "50%",
-            backgroundColor: showDropdown ? theme.activeTabBg : "transparent",
+            backgroundColor: "transparent",
             border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             cursor: "pointer",
             padding: 0,
-            position: "relative",
           }}
         >
-          {isLoggedIn ? (
-            <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
-          ) : (
-            <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
-          )}
-          <div style={{ position: "absolute", bottom: -2, right: -2, width: 16, height: 16, backgroundColor: theme.btnBg, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${theme.bg}` }}>
-            <ChevronDown size={10} color={theme.btnText} />
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", border: `1px solid var(--border-color, #ddd)`, padding: "4px 14px 4px 4px", borderRadius: "30px", backgroundColor: "var(--bg-secondary, #fff)" }}>
+            <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
+            <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>Harleen Quinzel</span>
           </div>
         </button>
 

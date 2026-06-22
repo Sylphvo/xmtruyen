@@ -23,15 +23,15 @@ export default function BookmarkItem({ record }: BookmarkItemProps) {
       style={{ 
         display: "flex", 
         flexDirection: "column", 
-        width: 160, // Fixed width for the grid item
+        width: "100%", 
         cursor: "pointer",
         position: "relative"
       }}
       onClick={() => navigate(`/book/${book.id}`)}
     >
       {/* Cover with Overlay */}
-      <div style={{ position: "relative", marginBottom: "12px" }}>
-        <BookCover book={book} width={160} height={213} />
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3 / 4", marginBottom: "12px", borderRadius: "6px", overflow: "hidden" }}>
+        <BookCover book={book} width="100%" height="100%" />
         
         {/* Overlay Icon */}
         <div style={{

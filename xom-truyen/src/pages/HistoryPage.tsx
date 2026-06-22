@@ -61,7 +61,7 @@ export default function HistoryPage() {
 
   return (
     <main style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "40px 60px", flex: 1, maxWidth: "1000px", width: "100%", margin: "0 auto" }}>
+      <div style={{ padding: "40px 60px", flex: 1, width: "100%" }}>
         
         <h1 style={{ 
           fontSize: "20px", 
