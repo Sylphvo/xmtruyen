@@ -7,16 +7,25 @@ export default function Footer() {
       title: "Services",
       items: ["Email Marketing", "Campaigns", "Branding", "Offline"],
     },
-    { title: "About", items: ["Our Story", "Benefits", "Team", "Contact us"] },
-    { title: "Contact", items: ["Contact us"] },
-    { title: "Follow Us", items: ["Facebook", "Twitter", "Instagram"] },
+    {
+      title: "About",
+      items: ["Our Story", "Benefits", "Team", "Careers"]
+    },
+    {
+      title: "Follow Us",
+      items: [
+        { name: "Facebook" },
+        { name: "Twitter" },
+        { name: "Instagram" }
+      ]
+    },
   ];
 
   return (
     <footer
       style={{
-        backgroundColor: "#f5f1eb",
-        color: "#000",
+        backgroundColor: "var(--bg-primary)",
+        color: "var(--text-primary)",
         padding: "36px 28px 20px",
         fontSize: 12,
         marginTop: 8,
@@ -41,74 +50,75 @@ export default function Footer() {
           >
             <div
               style={{
-                width: 28,
-                height: 28,
-                borderRadius: 7,
-                backgroundColor: ACCENT,
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                border: "1.5px solid var(--text-primary)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <BookOpen size={14} color="#000" />
+              <BookOpen size={18} color="var(--text-primary)" />
             </div>
-            <span style={{ color: "#000", fontWeight: 800, fontSize: 14 }}>
-              Đọc Sách
-            </span>
           </div>
           <p
-            style={{ fontSize: 11, lineHeight: 1.8, margin: 0, color: "#666" }}
+            style={{ fontSize: 11, lineHeight: 1.8, margin: 0, color: "var(--text-muted, #666)", paddingRight: "40px" }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam
-            velit, vulputate eu pharetra nec, mattis ac neque.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
           </p>
         </div>
 
-        {footerCols.map(({ title, items }) => (
-          <div key={title}>
-            <p
-              style={{
-                color: "#000",
-                fontWeight: 700,
-                marginBottom: 12,
-                margin: "0 0 12px",
-                fontSize: 12,
-              }}
-            >
-              {title}
-            </p>
-            {items.map((item) => (
+        <div style={{ display: "flex", gap: "60px", gridColumn: "span 3" }}>
+          {footerCols.map(({ title, items }) => (
+            <div key={title} style={{ flex: 1 }}>
               <p
-                key={item}
                 style={{
-                  margin: "0 0 9px",
-                  cursor: "pointer",
-                  color: "#666",
-                  fontSize: 11,
+                  fontWeight: 500,
+                  margin: "0 0 16px",
+                  fontSize: 12,
+                  color: "#9ca3af"
                 }}
               >
-                {item}
+                {title}
               </p>
-            ))}
-          </div>
-        ))}
+              {items.map((item) => (
+                <p
+                  key={typeof item === 'string' ? item : item.name}
+                  style={{
+                    margin: "0 0 12px",
+                    cursor: "pointer",
+                    color: "var(--text-primary)",
+                    fontSize: 11,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontWeight: 500
+                  }}
+                >
+                  {typeof item !== 'string' && item.icon}
+                  {typeof item === 'string' ? item : item.name}
+                </p>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div
         style={{
-          marginTop: 28,
-          borderTop: "1px solid #333",
-          paddingTop: 14,
+          marginTop: 40,
+          paddingTop: 20,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           fontSize: 10,
-          color: "#4a4a4a",
+          color: "#6b7280",
         }}
       >
-        <span>Copyright © 2024 Loship.vn. All Rights Reserved.</span>
-        <div style={{ display: "flex", gap: 16 }}>
-          <span style={{ cursor: "pointer" }}>Terms &amp; Conditions</span>
+        <span>Copyright © 2020. LogoIpsum. All rights reserved.</span>
+        <div style={{ display: "flex", gap: 24, color: "#4b5563" }}>
+          <span style={{ cursor: "pointer" }}>Terms & Conditions</span>
           <span style={{ cursor: "pointer" }}>Privacy Policy</span>
         </div>
       </div>

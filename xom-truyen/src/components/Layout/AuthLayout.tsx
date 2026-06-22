@@ -29,23 +29,12 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
       }}
     >
       {/* Top bar */}
-      <div
-        style={{
-          background: "#3a3a3a",
-          padding: "6px 20px",
-          fontSize: 12,
-          color: "#ccc",
-        }}
-      >
-        {title}
-      </div>
 
       {/* Main card */}
       <div
         style={{
           flex: 1,
           background: "#fff",
-          margin: "0 16px 16px",
           borderRadius: 12,
           display: "flex",
           overflow: "hidden",
@@ -90,16 +79,16 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
               }}
             >
               <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#222"
-                strokeWidth="2.5"
-                strokeLinecap="round"
+                width='16'
+                height='16'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='#222'
+                strokeWidth='2.5'
+                strokeLinecap='round'
               >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                <path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z' />
+                <path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' />
               </svg>
             </div>
             BookOnline
@@ -184,7 +173,7 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
                   {!isLoggedIn ? (
                     <>
                       <a
-                        href="/login"
+                        href='/login'
                         style={{
                           padding: "12px 16px",
                           textDecoration: "none",
@@ -197,10 +186,10 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
                           fontWeight: 600,
                         }}
                       >
-                        <LogIn size={15} color="#2196f3" /> Đăng nhập
+                        <LogIn size={15} color='#2196f3' /> Đăng nhập
                       </a>
                       <a
-                        href="/register"
+                        href='/register'
                         style={{
                           padding: "12px 16px",
                           textDecoration: "none",
@@ -212,7 +201,7 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
                           fontWeight: 600,
                         }}
                       >
-                        <UserPlus size={15} color="#27ae60" /> Đăng ký
+                        <UserPlus size={15} color='#27ae60' /> Đăng ký
                       </a>
                     </>
                   ) : (

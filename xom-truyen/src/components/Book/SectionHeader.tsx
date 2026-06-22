@@ -15,6 +15,7 @@ export default function SectionHeader({
         alignItems: "center",
         justifyContent: "space-between",
         marginBottom: 14,
+        paddingLeft: 25,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

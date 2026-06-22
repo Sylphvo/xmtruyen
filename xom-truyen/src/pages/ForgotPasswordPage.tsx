@@ -4,7 +4,7 @@ import AuthLayout from "../components/Layout/AuthLayout";
 
 export default function ForgotPasswordPage() {
   return (
-    <AuthLayout title="Quên mật khẩu">
+    <AuthLayout title='Quên mật khẩu'>
       {/* <ForgotPasswordForm /> */}
       <div
         style={{

@@ -1,6 +1,8 @@
 import BookCover from "./BookCover"; // Đảm bảo import đúng đường dẫn
 import type { Book } from "../../types";
 
+import { useNavigate } from "react-router-dom";
+
 export default function BookCard({
   book,
   size = "normal",
@@ -8,6 +10,7 @@ export default function BookCard({
   book: Book;
   size?: "normal" | "large";
 }) {
+  const navigate = useNavigate();
   // Kích thước chuẩn theo thiết kế
   const coverWidth = size === "large" ? 180 : 130;
   const coverHeight = (coverWidth * 4) / 3; // Tỉ lệ 3:4 cho bìa truyện
@@ -24,6 +27,7 @@ export default function BookCard({
         cursor: "pointer",
         transition: "transform 0.2s ease, box-shadow 0.2s ease", // Chuyển động mượt mà
       }}
+      onClick={() => navigate(`/book/${book.id}`)}
       // Xử lý hiệu ứng khi rê chuột vào (Hover)
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-4px)";

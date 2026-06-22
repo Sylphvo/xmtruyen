@@ -1,0 +1,66 @@
+/* src/components/common/Modal.css */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    /* Làm mờ nhẹ trang web phía sau */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    /* Đảm bảo đè lên cả Header dính (sticky) */
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+.modal-container {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalScaleUp 0.2s ease-out;
+    margin: 0 16px;
+}
+
+
+/* Các kích thước chiều rộng linh hoạt */
+
+.modal-sm {
+    max-width: 400px;
+}
+
+.modal-md {
+    max-width: 550px;
+}
+
+.modal-lg {
+    max-width: 800px;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalScaleUp {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

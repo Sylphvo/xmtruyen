@@ -1,23 +1,25 @@
-import { useState } from "react";
-import { Home, Bookmark, AlignJustify, BookOpen, LayoutGrid } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Home, Bookmark, History, LayoutGrid, BookOpen, User } from "lucide-react";
 import { ACCENT } from "../../constants";
 
 export default function Sidebar() {
-  const [active, setActive] = useState(0);
+  const location = useLocation();
+  const navigate = useNavigate();
  
   const navItems = [
-    { icon: <Home size={18} />,          label: "Trang chủ" },
-    { icon: <Bookmark size={18} />,      label: "Đánh dấu" },
-    { icon: <AlignJustify size={18} />,  label: "Danh sách" },
-    { icon: <LayoutGrid size={18} />,    label: "Thể loại" },
+    { icon: <Home size={18} />,          label: "Trang chủ", path: "/" },
+    { icon: <History size={18} />,       label: "Lịch sử", path: "/history" },
+    { icon: <Bookmark size={18} />,      label: "Đánh dấu", path: "/bookmarks" },
+    { icon: <LayoutGrid size={18} />,    label: "Thể loại", path: "/genres" },
+    { icon: <User size={18} />,          label: "Cài đặt tài khoản", path: "/profile" },
   ];
  
   return (
     <aside
       style={{
         width: 58,
-        backgroundColor: "#f5f1eb",
-        borderRight: "1px solid #ebebeb",
+        backgroundColor: "var(--bg-primary)",
+        borderRight: "1px solid var(--border-color)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -42,28 +44,31 @@ export default function Sidebar() {
         <BookOpen size={18} color="#fff" />
       </div>
  
-      {navItems.map((item, i) => (
-        <button
-          key={i}
-          title={item.label}
-          onClick={() => setActive(i)}
-          style={{
-            width: 38,
-            height: 38,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 9,
-            border: "none",
-            cursor: "pointer",
-            backgroundColor: i === active ? "#fff0ee" : "transparent",
-            color: i === active ? ACCENT : "#c0c0c0",
-            transition: "background-color 0.15s, color 0.15s",
-          }}
-        >
-          {item.icon}
-        </button>
-      ))}
+      {navItems.map((item, i) => {
+        const isActive = location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path));
+        return (
+          <button
+            key={i}
+            title={item.label}
+            onClick={() => navigate(item.path)}
+            style={{
+              width: 38,
+              height: 38,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 9,
+              border: "none",
+              cursor: "pointer",
+              backgroundColor: isActive ? "var(--sidebar-active, #fff0ee)" : "transparent",
+              color: isActive ? ACCENT : "var(--text-muted, #c0c0c0)",
+              transition: "background-color 0.15s, color 0.15s",
+            }}
+          >
+            {item.icon}
+          </button>
+        );
+      })}
     </aside>
   );
 }

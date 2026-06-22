@@ -2,7 +2,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f8f6f0;
+    background-color: var(--bg-primary);
     /* Màu nền hơi vàng nhẹ giống trong hình */
 }
 
@@ -72,7 +72,7 @@
 .comic-title {
     font-size: 15px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin: 0 0 4px 0;
     white-space: nowrap;
     overflow: hidden;
@@ -81,7 +81,7 @@
 
 .comic-author {
     font-size: 13px;
-    color: #888;
+    color: var(--text-muted, #888);
     margin: 0;
 }
 

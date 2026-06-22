@@ -1,4 +1,6 @@
 :root {
+  --bg-primary: #f5f1eb;
+  --text-primary: #333333;
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -31,9 +33,14 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
+  /* Default Vite dark scheme */
+}
+
+[data-theme="dark"] {
+  --bg-primary: #18191a;
+  --text-primary: #e4e6eb;
+  --text: #9ca3af;
+  --text-h: #f3f4f6;
     --bg: #16171d;
     --border: #2e303a;
     --code-bg: #1f2028;
@@ -64,6 +71,8 @@
 
 body {
   margin: 0;
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 h1,
