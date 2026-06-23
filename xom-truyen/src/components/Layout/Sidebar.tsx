@@ -5,15 +5,15 @@ import { ACCENT } from "../../constants";
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
- 
+
   const navItems = [
-    { icon: <Home size={24} />,          label: "Trang chủ", path: "/" },
-    { icon: <History size={24} />,       label: "Lịch sử", path: "/history" },
-    { icon: <Bookmark size={24} />,      label: "Đánh dấu", path: "/bookmarks" },
-    { icon: <LayoutGrid size={24} />,    label: "Thể loại", path: "/genres" },
-    { icon: <User size={24} />,          label: "Cài đặt tài khoản", path: "/profile" },
+    { icon: <Home size={24} />, label: "Trang chủ", path: "/" },
+    { icon: <History size={24} />, label: "Lịch sử", path: "/history" },
+    { icon: <Bookmark size={24} />, label: "Đánh dấu", path: "/bookmarks" },
+    // { icon: <LayoutGrid size={24} />,    label: "Thể loại", path: "/genres" },
+    { icon: <User size={24} />, label: "Cài đặt tài khoản", path: "/profile" },
   ];
- 
+
   return (
     <aside
       style={{
@@ -43,7 +43,7 @@ export default function Sidebar() {
       >
         <BookOpen size={26} color="#fff" />
       </div>
- 
+
       {navItems.map((item, i) => {
         const isActive = location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path));
         return (

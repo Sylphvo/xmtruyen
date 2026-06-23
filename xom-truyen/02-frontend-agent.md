@@ -74,3 +74,30 @@ Trước khi xuất ra bất kỳ đoạn code nào để THÊM, SỬA hoặc X�
 - **[ADR-001 | Swiper Auto-Sizing]:** Trong `BookSlider.tsx`, bắt buộc giữ `slidesPerView={'auto'}` và `<SwiperSlide style={{ width: 'auto' }}>`. *Lý do:* Tránh việc Swiper bóp méo width cố định 168px của BookCard.
 - **[ADR-002 | Header Dropdowns]:** Các menu xổ xuống trong `Header.tsx` dùng Hook `useClickOutside` kết hợp `position: absolute right-0`. *Lý do:* Tránh bị z-index của Swiper nuốt mất. Cấm tự ý sửa thành `<dialog>` hay Modal ở giữa màn hình.
 - **[ADR-003 | Drag-to-Scroll]:** Nếu phát sinh danh sách vuốt ngang không dùng Swiper, bắt buộc dùng `useRef` để track tọa độ `scrollLeft`. Cấm dùng `useState` lưu tọa độ chuột gây re-render 60fps làm giật máy người dùng.
+
+# FRONTEND SPECIALIST AGENT: XÓM TRUYỆN CLIENT
+Vị trí làm việc: `/xomtruyen-client/` | Tech Stack: React 18, TypeScript, Tailwind CSS v4, Swiper.
+
+Khi bạn đang đứng sửa code tại thư mục này, hãy gạt bỏ mọi tư duy về C# hay SQL. Tuân thủ tuyệt đối các nguyên tắc UI/UX của "Xóm Truyện":
+
+## 7. QUY HOẠCH VÙNG CẤM (TOPOLOGY STRICTNESS)
+- `src/assets/`: Chỉ chứa ảnh/icon tĩnh. **Cấm** viết code logic hay khai báo biến vào đây.
+- `src/constants/index.ts`: Nơi duy nhất chứa mã màu tĩnh, danh sách `SECTIONS` trang chủ.
+- `src/pages/`: Smart Layer (Nắm State, gọi API).
+- `src/components/`: Dumb Layer (Chỉ nhận Props và render, cấm tự fetch API).
+
+## 8. HIẾN PHÁP UX/UI (ACTIVE ADRs)
+- **ADR-FE-01 [Swiper Auto-Width]:** Trong file `BookSlider.tsx`, bắt buộc bọc item bằng `<SwiperSlide style={{ width: 'auto' }}>` và giữ thuộc tính `slidesPerView={'auto'}`. Cấm tự ý bóp width của slider.
+- **ADR-FE-02 [Thẻ BookCard chuẩn]:** File `BookCard.tsx` có width cố định là `168px`. Khối bọc ngoài phải có hiệu ứng đổ bóng trắng mờ khi hover (`box-shadow`).
+- **ADR-FE-03 [Cấm dùng Modal cho Menu]:** Các menu ở Header (Ngôn ngữ, User, Chuông thông báo) phải dùng `position: absolute` kết hợp hook Click-Outside. Cấm tuyệt đối việc dùng Modal bật ra giữa màn hình gây đứt gãy trải nghiệm đọc.
+- **ADR-FE-04 [Strict TypeScript]:** Nghiêm cấm để sót `interface` rải rác trong component. Nếu component mới cần type mới, phải tự động mở file `src/types/index.ts` ra để khai báo hoặc sửa đổi interface tại đó, đảm bảo type `TBook` tương ứng với Model mới của Backend.
+
+## 9. CHUẨN HÓA DATA FETCHING (DATA FETCHING STANDARDS)
+- **Source of Truth:** Dữ liệu phải được lấy từ API `{{BACKEND_HOST}}` (VD: `/api/stories`).
+- **Client Storage:** Nghiêm cấm tự tạo Mock Data trong Component. Nếu API chưa có, hãy báo cáo và yêu cầu Backend bổ sung.
+- **Type Matching:** Khi nhận dữ liệu từ API (Model C#), phải parse và map sang Interface TS tương ứng (`TBook`, `TUser`) trước khi render.
+
+## 10. CÁC THAY ĐỔI CẤM TUYỆT ĐỐI (CRITICAL ANTI-PATTERNS)
+- **[ANTI-PATTERN 1 | DOM Mutation]:** Nghiêm cấm dùng `element.style.property = '...'` trực tiếp trên DOM. Mọi thay đổi UI phải thông qua React State hoặc Tailwind CSS utility.
+- **[ANTI-PATTERN 2 | Logic in JSX]:** Cấm code quá 5 dòng logic bên trong file `.tsx`. Nếu cần xử lý nhiều, hãy Extract ra một Hook riêng tại thư mục `src/hooks/`.
+- **[ANTI-PATTERN 3 | Unsafe Fetch]:** Tuyệt đối không gọi trực tiếp URL localhost. Luôn luôn dùng biến môi trường `import.meta.env.VITE_API_BASE_URL`.

@@ -34,7 +34,7 @@ export default function Header() {
   // Thay đổi isLoggedIn thành 'true' để test giao diện khi đã đăng nhập
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const userName = "Sylphvo";
-  
+
   // State quản lý việc mở/đóng Menu sổ xuống
   const [showDropdown, setShowDropdown] = useState(false);
   // ─── 1. STATE CHO POPUP NGÔN NGỮ ──────────────────────────────────────────
@@ -72,7 +72,7 @@ export default function Header() {
   const [showNotifModal, setShowNotifModal] = useState(false);
 
   // ─── 3. STATE THEME ───────────────────────────────────────────────────────
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -177,7 +177,7 @@ export default function Header() {
 
       {/* 4 CIRCULAR BUTTONS (Grid, Messenger, Bell, Profile) */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        
+
         {/* Grid (Menu) */}
         <button
           style={{
@@ -270,314 +270,314 @@ export default function Header() {
               3
             </span>
           </button>
-        {showNotifModal && (
-          <div
-            style={{
-              position: "absolute",
-              top: "calc(100% + 14px)",
-              right: "-10px",
-              width: "360px",
-              backgroundColor: theme.bg,
-              borderRadius: "8px",
-              boxShadow: `0 4px 20px ${theme.shadow}`,
-              border: `1px solid ${theme.border}`,
-              zIndex: 100,
-              display: "flex",
-              flexDirection: "column",
-              color: theme.text,
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-          >
-            {/* Header section */}
-            <div style={{ padding: "16px 16px 8px 16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <h3 style={{ margin: 0, fontSize: "24px", fontWeight: 700, color: theme.text }}>
-                  Thông báo
-                </h3>
-                <button style={{ background: "none", border: "none", color: theme.textMuted, cursor: "pointer", display: "flex" }}>
-                  <MoreHorizontal size={20} />
-                </button>
+          {showNotifModal && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 14px)",
+                right: "-10px",
+                width: "360px",
+                backgroundColor: theme.bg,
+                borderRadius: "8px",
+                boxShadow: `0 4px 20px ${theme.shadow}`,
+                border: `1px solid ${theme.border}`,
+                zIndex: 100,
+                display: "flex",
+                flexDirection: "column",
+                color: theme.text,
+                maxHeight: "80vh",
+                overflowY: "auto",
+              }}
+            >
+              {/* Header section */}
+              <div style={{ padding: "16px 16px 8px 16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                  <h3 style={{ margin: 0, fontSize: "24px", fontWeight: 700, color: theme.text }}>
+                    Thông báo
+                  </h3>
+                  <button style={{ background: "none", border: "none", color: theme.textMuted, cursor: "pointer", display: "flex" }}>
+                    <MoreHorizontal size={20} />
+                  </button>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button style={{
+                    backgroundColor: theme.activeTabBg,
+                    color: theme.activeTabText,
+                    padding: "6px 12px",
+                    borderRadius: "16px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    border: "none",
+                    cursor: "pointer"
+                  }}>
+                    Tất cả
+                  </button>
+                  <button style={{
+                    backgroundColor: "transparent",
+                    color: theme.text,
+                    padding: "6px 12px",
+                    borderRadius: "16px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "background 0.2s"
+                  }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                  >
+                    Chưa đọc
+                  </button>
+                </div>
               </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button style={{ 
-                  backgroundColor: theme.activeTabBg, 
-                  color: theme.activeTabText, 
-                  padding: "6px 12px", 
-                  borderRadius: "16px", 
-                  fontSize: "15px", 
-                  fontWeight: 600,
-                  border: "none",
-                  cursor: "pointer"
-                }}>
-                  Tất cả
-                </button>
-                <button style={{ 
-                  backgroundColor: "transparent", 
-                  color: theme.text, 
-                  padding: "6px 12px", 
-                  borderRadius: "16px", 
-                  fontSize: "15px", 
-                  fontWeight: 600,
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "background 0.2s"
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+
+              {/* Content List */}
+              <div style={{ display: "flex", flexDirection: "column", padding: "0 8px 8px 8px" }}>
+
+                {/* Mới */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px 8px" }}>
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Mới</span>
+                  <a href="#" style={{ fontSize: "15px", color: theme.activeTabText, textDecoration: "none" }}>Xem tất cả</a>
+                </div>
+
+                {/* Item 1 */}
+                <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
+                    <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1877f2", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
+                      <Users size={12} color="#fff" />
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      <strong>JOBVUI ĐÂY:</strong> "# 7 nguyên tắc để đi làm dễ thở hơn nè!!! Nếu bạn mới đi làm, hoặc đang cảm thấy..."
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>23 phút</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
+                    <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
+                  </div>
+                </div>
+
+                {/* Item 2 */}
+                <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
+                    <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1877f2", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
+                      <Users size={12} color="#fff" />
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      Bây giờ trong <strong>Cộng đồng NARAKA: BLADEPOINT VIỆT...:</strong> Em lần đầu chơi nên muốn tìm...
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>1 giờ · 5 cảm xúc · 11 bình luận</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
+                    <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
+                  </div>
+                </div>
+
+                {/* Hôm nay */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px 8px" }}>
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Hôm nay</span>
+                </div>
+
+                {/* Item 3 */}
+                <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
+                    <div style={{ width: "100%", height: "100%", borderRadius: "50%", backgroundColor: "#0b2545", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700 }}>
+                      ASP.NET
+                    </div>
+                    <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1877f2", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
+                      <Users size={12} color="#fff" />
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      <strong>ASP.NET Core Việt Nam:</strong> "** [Paracel Tech is hiring] Software Developer (.NET / C# / Oracle..."
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>4 giờ</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
+                    <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
+                  </div>
+                </div>
+
+                {/* Trước đó */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px 8px" }}>
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Trước đó</span>
+                </div>
+
+                {/* Item 4 */}
+                <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
+                    <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-Hien-Dai.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#23d160", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
+                      <MessageCircle size={12} color="#fff" />
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px" }}>
+                      <strong>Tống Thúy Duy</strong> đã bình luận về bài viết bạn chia sẻ.
+                    </div>
+                    <span style={{ fontSize: "13px", color: theme.textMuted }}>12 giờ</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
+                    {/* Read item, no blue dot */}
+                  </div>
+                </div>
+
+                {/* Item 5 - Hover effect */}
+                <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s", backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)"}>
+                  <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
+                    <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-Hien-Dai.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f7b125", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
+                      <Smile size={12} color="#fff" />
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px" }}>
+                      <strong>Tống Thúy Duy</strong> đã bày tỏ cảm xúc về một ảnh.
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>12 giờ</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px", gap: "8px" }}>
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: theme.bg }}>
+                      <MoreHorizontal size={16} color={theme.textMuted} />
+                    </div>
+                    <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer button */}
+              <div style={{ padding: "0 16px 16px 16px", marginTop: "8px" }}>
+                <button
+                  onClick={() => setShowNotifModal(false)}
+                  style={{
+                    width: "100%",
+                    backgroundColor: theme.btnBg,
+                    border: "none",
+                    color: theme.text,
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    padding: "8px 0",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    transition: "background 0.2s"
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.btnBg}
                 >
-                  Chưa đọc
+                  Xem thông báo trước đó
                 </button>
               </div>
-            </div>
-
-            {/* Content List */}
-            <div style={{ display: "flex", flexDirection: "column", padding: "0 8px 8px 8px" }}>
-              
-              {/* Mới */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px 8px" }}>
-                <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Mới</span>
-                <a href="#" style={{ fontSize: "15px", color: theme.activeTabText, textDecoration: "none" }}>Xem tất cả</a>
-              </div>
-              
-              {/* Item 1 */}
-              <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
-                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1877f2", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
-                    <Users size={12} color="#fff" />
-                  </div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    <strong>JOBVUI ĐÂY:</strong> "# 7 nguyên tắc để đi làm dễ thở hơn nè!!! Nếu bạn mới đi làm, hoặc đang cảm thấy..."
-                  </div>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>23 phút</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
-                  <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
-                </div>
-              </div>
-
-              {/* Item 2 */}
-              <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
-                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1877f2", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
-                    <Users size={12} color="#fff" />
-                  </div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    Bây giờ trong <strong>Cộng đồng NARAKA: BLADEPOINT VIỆT...:</strong> Em lần đầu chơi nên muốn tìm...
-                  </div>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>1 giờ · 5 cảm xúc · 11 bình luận</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
-                  <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
-                </div>
-              </div>
-
-              {/* Hôm nay */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px 8px" }}>
-                <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Hôm nay</span>
-              </div>
-              
-              {/* Item 3 */}
-              <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
-                  <div style={{ width: "100%", height: "100%", borderRadius: "50%", backgroundColor: "#0b2545", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700 }}>
-                    ASP.NET
-                  </div>
-                  <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1877f2", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
-                    <Users size={12} color="#fff" />
-                  </div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    <strong>ASP.NET Core Việt Nam:</strong> "** [Paracel Tech is hiring] Software Developer (.NET / C# / Oracle..."
-                  </div>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>4 giờ</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
-                  <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
-                </div>
-              </div>
-
-              {/* Trước đó */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px 8px" }}>
-                <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Trước đó</span>
-              </div>
-              
-              {/* Item 4 */}
-              <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
-                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-Hien-Dai.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#23d160", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
-                    <MessageCircle size={12} color="#fff" />
-                  </div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px" }}>
-                    <strong>Tống Thúy Duy</strong> đã bình luận về bài viết bạn chia sẻ.
-                  </div>
-                  <span style={{ fontSize: "13px", color: theme.textMuted }}>12 giờ</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px" }}>
-                  {/* Read item, no blue dot */}
-                </div>
-              </div>
-
-              {/* Item 5 - Hover effect */}
-              <div style={{ display: "flex", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", position: "relative", transition: "background 0.2s", backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)"}>
-                <div style={{ position: "relative", width: "56px", height: "56px", flexShrink: 0 }}>
-                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-Hien-Dai.jpg" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", bottom: -4, right: -4, width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f7b125", borderRadius: "50%", border: `2px solid ${theme.bg}` }}>
-                    <Smile size={12} color="#fff" />
-                  </div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.3", color: theme.text, marginBottom: "4px" }}>
-                    <strong>Tống Thúy Duy</strong> đã bày tỏ cảm xúc về một ảnh.
-                  </div>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: theme.activeTabText }}>12 giờ</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingRight: "8px", gap: "8px" }}>
-                  <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: theme.bg }}>
-                    <MoreHorizontal size={16} color={theme.textMuted} />
-                  </div>
-                  <div style={{ width: "12px", height: "12px", backgroundColor: "#1877f2", borderRadius: "50%" }} />
-                </div>
-              </div>
 
             </div>
+          )}
+        </div>
 
-            {/* Footer button */}
-            <div style={{ padding: "0 16px 16px 16px", marginTop: "8px" }}>
-              <button 
-                onClick={() => setShowNotifModal(false)}
-                style={{
-                  width: "100%",
-                  backgroundColor: theme.btnBg,
-                  border: "none",
-                  color: theme.text,
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  padding: "8px 0",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  transition: "background 0.2s"
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.btnBg}
-              >
-                Xem thông báo trước đó
-              </button>
-            </div>
-
-          </div>
-        )}
-      </div>
-
-      {/* Profile / User */}
-      <div style={{ position: "relative" }}>
-        <button
-          onClick={toggleDropdown}
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            cursor: "pointer",
-            padding: 0,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", border: `1px solid var(--border-color, #ddd)`, padding: "4px 14px 4px 4px", borderRadius: "30px", backgroundColor: "var(--bg-secondary, #fff)" }}>
-            <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
-            <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>Harleen Quinzel</span>
-          </div>
-        </button>
-
-        {showDropdown && (
-          <div
+        {/* Profile / User */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={toggleDropdown}
             style={{
-              position: "absolute",
-              top: "calc(100% + 14px)",
-              right: 0,
-              width: "360px",
-              backgroundColor: theme.bg,
-              borderRadius: "8px",
-              boxShadow: `0 4px 20px ${theme.shadow}`,
-              border: `1px solid ${theme.border}`,
-              zIndex: 100,
-              display: "flex",
-              flexDirection: "column",
-              color: theme.text,
-              padding: "16px",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
             }}
           >
-            {/* Account Selector Area */}
-            <div style={{ backgroundColor: theme.bg, borderRadius: "8px", boxShadow: `0 2px 12px ${theme.shadow}`, border: `1px solid ${theme.border}`, padding: "12px", marginBottom: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingBottom: "12px", borderBottom: `1px solid ${theme.border}` }}>
-                <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
-                <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Minh Phú</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "12px", paddingBottom: "12px" }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 24, height: 24, borderRadius: "50%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", inset: 0, border: `2px solid ${theme.textMuted}`, borderRadius: "50%", borderTopColor: "transparent", transform: "rotate(45deg)" }} />
-                </div>
-                <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Fuwu</span>
-              </div>
-              <button style={{ width: "100%", backgroundColor: theme.btnBg, color: theme.text, border: "none", padding: "8px 0", borderRadius: "6px", fontSize: "15px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                <Users size={16} /> Xem tất cả trang cá nhân
-              </button>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", border: `1px solid var(--border-color, #ddd)`, padding: "4px 14px 4px 4px", borderRadius: "30px", backgroundColor: "var(--bg-secondary, #fff)" }}>
+              <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
+              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>Harleen Quinzel</span>
             </div>
+          </button>
 
-            {/* Action Items */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              
-              <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Settings size={20} color={theme.text} />
+          {showDropdown && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 14px)",
+                right: 0,
+                width: "360px",
+                backgroundColor: theme.bg,
+                borderRadius: "8px",
+                boxShadow: `0 4px 20px ${theme.shadow}`,
+                border: `1px solid ${theme.border}`,
+                zIndex: 100,
+                display: "flex",
+                flexDirection: "column",
+                color: theme.text,
+                padding: "16px",
+              }}
+            >
+              {/* Account Selector Area */}
+              <div style={{ backgroundColor: theme.bg, borderRadius: "8px", boxShadow: `0 2px 12px ${theme.shadow}`, border: `1px solid ${theme.border}`, padding: "12px", marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingBottom: "12px", borderBottom: `1px solid ${theme.border}` }}>
+                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Minh Phú</span>
                 </div>
-                <span style={{ flex: 1, fontSize: "15px", fontWeight: 600 }}>Cài đặt và quyền riêng tư</span>
-                <ChevronRight size={24} color={theme.textMuted} />
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "12px", paddingBottom: "12px" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                    <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 24, height: 24, borderRadius: "50%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", inset: 0, border: `2px solid ${theme.textMuted}`, borderRadius: "50%", borderTopColor: "transparent", transform: "rotate(45deg)" }} />
+                  </div>
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Fuwu</span>
+                </div>
+                <button style={{ width: "100%", backgroundColor: theme.btnBg, color: theme.text, border: "none", padding: "8px 0", borderRadius: "6px", fontSize: "15px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                  <Users size={16} /> Xem tất cả trang cá nhân
+                </button>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <HelpCircle size={20} color={theme.text} />
+              {/* Action Items */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+
+                <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Settings size={20} color={theme.text} />
+                  </div>
+                  <span style={{ flex: 1, fontSize: "15px", fontWeight: 600 }}>Cài đặt và quyền riêng tư</span>
+                  <ChevronRight size={24} color={theme.textMuted} />
                 </div>
-                <span style={{ flex: 1, fontSize: "15px", fontWeight: 600 }}>Trợ giúp và hỗ trợ</span>
-                <ChevronRight size={24} color={theme.textMuted} />
+
+                <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <HelpCircle size={20} color={theme.text} />
+                  </div>
+                  <span style={{ flex: 1, fontSize: "15px", fontWeight: 600 }}>Trợ giúp và hỗ trợ</span>
+                  <ChevronRight size={24} color={theme.textMuted} />
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <AlertCircle size={20} color={theme.text} />
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: "15px", fontWeight: 600 }}>Báo cáo sự cố</span>
+                    <span style={{ fontSize: "12px", color: theme.textMuted }}>CTRL B</span>
+                  </div>
+                </div>
+
+                {/* The moon toggle was moved out to the main header row */}
+
+                <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <LogOut size={20} color={theme.text} />
+                  </div>
+                  <span style={{ flex: 1, fontSize: "15px", fontWeight: 600 }}>Đăng xuất</span>
+                </div>
+
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <AlertCircle size={20} color={theme.text} />
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                  <span style={{ fontSize: "15px", fontWeight: 600 }}>Báo cáo sự cố</span>
-                  <span style={{ fontSize: "12px", color: theme.textMuted }}>CTRL B</span>
-                </div>
+              <div style={{ marginTop: "16px", fontSize: "12px", color: theme.textMuted, lineHeight: "1.5" }}>
+                Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo · Cookie · Xem thêm
               </div>
-
-              {/* The moon toggle was moved out to the main header row */}
-
-              <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <LogOut size={20} color={theme.text} />
-                </div>
-                <span style={{ flex: 1, fontSize: "15px", fontWeight: 600 }}>Đăng xuất</span>
-              </div>
-
             </div>
-
-            <div style={{ marginTop: "16px", fontSize: "12px", color: theme.textMuted, lineHeight: "1.5" }}>
-              Quyền riêng tư · Điều khoản · Quảng cáo · Lựa chọn quảng cáo · Cookie · Xem thêm
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
       </div>
 
       {/* ========================================================================= */}

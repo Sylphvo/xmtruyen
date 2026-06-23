@@ -5,6 +5,7 @@ import Header from "./components/Layout/Header";
 import HomePage from "./pages";
 import LoginPage from "./pages/LoginPage"; // <-- Nhớ import trang Login vào đây
 import RegisterPage from "./pages/RegisterPage"; // <-- Import thêm trang Register (nếu có)
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import BookDetailPage from "./pages/BookDetailPage";
 import ReadingPage from "./pages/ReadingPage";
 import HistoryPage from "./pages/HistoryPage";
@@ -144,6 +145,9 @@ export default function App() {
 
         {/* 3. Tuyến đường Đăng ký: Hiển thị Full-screen độc lập */}
         <Route path="/register" element={<RegisterPage />} />
+
+        {/* 4. Tuyến đường Quên mật khẩu: Hiển thị Full-screen độc lập */}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Routes>
     </BrowserRouter>
   );

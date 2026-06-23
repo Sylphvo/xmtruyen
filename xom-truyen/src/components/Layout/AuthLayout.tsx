@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LeftPanel from "../Auth/LeftPanel";
-import { ChevronDown, LogIn, UserPlus, LogOut, User } from "lucide-react";
+import { ChevronDown, LogIn, UserPlus, LogOut, User, BookOpen } from "lucide-react";
+import { ACCENT } from "../../constants";
 
 interface AuthLayoutProps {
   title: string;
@@ -9,14 +10,10 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ title, children }: AuthLayoutProps) {
   // ──────────────────────────────────────────────────────────
-  // STATE MÔ PHỎNG ĐĂNG NHẬP (Sau này thay bằng Context/Redux)
-  // Đổi giá trị thành `true` để test trạng thái đã đăng nhập
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const userName = "Sylphvo";
-  // ──────────────────────────────────────────────────────────
-
-  // State quản lý việc mở/đóng Dropdown
-  const [showDropdown, setShowDropdown] = useState(false);
+  // Force light theme in Auth layout
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", "light");
+  }, []);
 
   return (
     <div
@@ -26,6 +23,7 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
         height: "100vh",
         background: "#3a3a3a",
         fontFamily: "'Be Vietnam Pro', 'Segoe UI', Arial, sans-serif",
+        colorScheme: "light",
       }}
     >
       {/* Top bar */}
@@ -61,35 +59,24 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              fontSize: 16,
+              gap: 12,
+              fontSize: 20,
               fontWeight: 800,
               color: "#222",
             }}
           >
             <div
               style={{
-                width: 32,
-                height: 32,
-                border: "2.5px solid #222",
-                borderRadius: 7,
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: ACCENT,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <svg
-                width='16'
-                height='16'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='#222'
-                strokeWidth='2.5'
-                strokeLinecap='round'
-              >
-                <path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z' />
-                <path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' />
-              </svg>
+              <BookOpen size={22} color="#fff" />
             </div>
             BookOnline
           </div>
@@ -106,131 +93,27 @@ export default function AuthLayout({ title, children }: AuthLayoutProps) {
             {/* Nút đổi ngôn ngữ */}
             <div
               style={{
-                display: "flex",
+                display: "inline-flex",
                 alignItems: "center",
-                gap: 5,
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#222",
-                border: "1.5px solid #555",
-                borderRadius: 20,
-                padding: "4px 10px",
+                gap: "10px",
+                padding: "8px 16px",
+                borderRadius: "9999px",
+                border: "2.5px solid #3B9EFF",
+                backgroundColor: "#FFFFFF",
+                fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "#111111",
+                letterSpacing: "0.04em",
                 cursor: "pointer",
+                userSelect: "none",
               }}
             >
-              VN 🇻🇳
-            </div>
-
-            {/* Khối User Dropdown */}
-            <div style={{ position: "relative" }}>
-              {/* Nút bấm hiển thị tên/Khách */}
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  background: "#f9f9f9",
-                  border: "1.5px solid #ccc",
-                  borderRadius: 20,
-                  padding: "4px 12px",
-                  cursor: "pointer",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "#222",
-                  fontFamily: "inherit",
-                  outline: "none",
-                }}
-              >
-                <User size={14} />
-                {isLoggedIn ? userName : "Khách"}
-                <ChevronDown
-                  size={14}
-                  style={{
-                    transform: showDropdown ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "0.2s",
-                  }}
-                />
-              </button>
-
-              {/* Menu Sổ Xuống */}
-              {showDropdown && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 8px)",
-                    right: 0,
-                    background: "#fff",
-                    border: "1px solid #eaeaea",
-                    borderRadius: 8,
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-                    minWidth: 160,
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  {!isLoggedIn ? (
-                    <>
-                      <a
-                        href='/login'
-                        style={{
-                          padding: "12px 16px",
-                          textDecoration: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          fontSize: 13,
-                          color: "#333",
-                          borderBottom: "1px solid #f0f0f0",
-                          fontWeight: 600,
-                        }}
-                      >
-                        <LogIn size={15} color='#2196f3' /> Đăng nhập
-                      </a>
-                      <a
-                        href='/register'
-                        style={{
-                          padding: "12px 16px",
-                          textDecoration: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          fontSize: 13,
-                          color: "#333",
-                          fontWeight: 600,
-                        }}
-                      >
-                        <UserPlus size={15} color='#27ae60' /> Đăng ký
-                      </a>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setIsLoggedIn(false);
-                        setShowDropdown(false);
-                        // Thực hiện logic xóa token ở đây sau này
-                      }}
-                      style={{
-                        padding: "12px 16px",
-                        background: "none",
-                        border: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        fontSize: 13,
-                        color: "#e74c3c",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                        textAlign: "left",
-                      }}
-                    >
-                      <LogOut size={15} /> Đăng xuất
-                    </button>
-                  )}
-                </div>
-              )}
+              <span>VN</span>
+              <svg width="20" height="14" viewBox="0 0 24 16" style={{ borderRadius: 2, display: "block" }}>
+                <rect width="24" height="16" fill="#DA251D" />
+                <polygon points="12,2.5 13.1,5.9 16.7,5.9 13.8,7.9 14.9,11.3 12,9.3 9.1,11.3 10.2,7.9 7.3,5.9 10.9,5.9" fill="#FFFF00" />
+              </svg>
             </div>
           </div>
         </div>
