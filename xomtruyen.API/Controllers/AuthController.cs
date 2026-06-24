@@ -1,88 +1,171 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using XomTruyen.API.Data;
+using System.Security.Claims;
 using XomTruyen.API.Models;
+using XomTruyen.API.Models.Requests;
+using XomTruyen.API.Models.Responses;
+using XomTruyen.API.Services.Interfaces;
 
 namespace XomTruyen.API.Controllers;
 
 public class AuthController : BaseApiController
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IConfiguration _configuration;
+    private readonly IAuthService _authService;
 
-    public AuthController(ApplicationDbContext context, IConfiguration configuration)
+    public AuthController(IAuthService authService)
     {
-        _context = context;
-        _configuration = configuration;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<ActionResult<ApiResponse<string>>> Register([FromBody] RegisterRequest request)
     {
-        if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+        try
         {
-            return BadRequest(ApiResponse<string>.Error("Username already exists"));
+            var result = await _authService.RegisterAsync(request);
+            return Ok(ApiResponse<string>.Ok(result));
         }
-
-        var user = new User
+        catch (Exception ex)
         {
-            Username = request.Username,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
-        };
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        return Ok(ApiResponse<string>.Ok("User registered successfully"));
+            return BadRequest(ApiResponse<string>.Error(ex.Message));
+        }
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<ApiResponse<AuthResponse>>> Login([FromBody] LoginRequest request)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
-
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        try
         {
-            return Unauthorized(ApiResponse<AuthResponse>.Error("Invalid username or password"));
+            var result = await _authService.LoginAsync(request);
+            return Ok(ApiResponse<AuthResponse>.Ok(result));
         }
-
-        var token = GenerateJwtToken(user);
-
-        var response = new AuthResponse
+        catch (Exception ex)
         {
-            Token = token,
-            Username = user.Username
-        };
-
-        return Ok(ApiResponse<AuthResponse>.Ok(response));
+            return Unauthorized(ApiResponse<AuthResponse>.Error(ex.Message));
+        }
     }
 
-    private string GenerateJwtToken(User user)
+    [HttpPost("guest-login")]
+    public async Task<ActionResult<ApiResponse<AuthResponse>>> GuestLogin([FromBody] GuestLoginRequest request)
     {
-        var jwtSettings = _configuration.GetSection("Jwt");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
-
-        var tokenDescriptor = new SecurityTokenDescriptor
+        try
         {
-            Subject = new ClaimsIdentity(new[]
+            var result = await _authService.GuestLoginAsync(request);
+            return Ok(ApiResponse<AuthResponse>.Ok(result));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<AuthResponse>.Error(ex.Message));
+        }
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<ApiResponse<AuthResponse>>> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            var result = await _authService.RefreshTokenAsync(request);
+            return Ok(ApiResponse<AuthResponse>.Ok(result));
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(ApiResponse<AuthResponse>.Error(ex.Message));
+        }
+    }
+
+    [HttpPost("logout")]
+    public async Task<ActionResult<ApiResponse<string>>> Logout([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            await _authService.LogoutAsync(request);
+            return Ok(ApiResponse<string>.Ok("Logged out successfully"));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<string>.Error(ex.Message));
+        }
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<ApiResponse<string>>> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        try
+        {
+            await _authService.ForgotPasswordAsync(request);
+            return Ok(ApiResponse<string>.Ok("If that email is registered, a password reset link has been sent."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<string>.Error(ex.Message));
+        }
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<ApiResponse<string>>> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        try
+        {
+            await _authService.ResetPasswordAsync(request);
+            return Ok(ApiResponse<string>.Ok("Password has been reset successfully."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<string>.Error(ex.Message));
+        }
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<ActionResult<ApiResponse<string>>> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(ApiResponse<string>.Error("Invalid token"));
+
+            await _authService.ChangePasswordAsync(userId, request);
+            return Ok(ApiResponse<string>.Ok("Password changed successfully."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<string>.Error(ex.Message));
+        }
+    }
+
+    [HttpPost("verify-email")]
+    public async Task<ActionResult<ApiResponse<string>>> VerifyEmail([FromBody] VerifyEmailRequest request)
+    {
+        try
+        {
+            await _authService.VerifyEmailAsync(request);
+            return Ok(ApiResponse<string>.Ok("Email verified successfully."));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<string>.Error(ex.Message));
+        }
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<ApiResponse<UserProfileResponse>>> GetProfile()
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username)
-            }),
-            Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpireMinutes"]!)),
-            Issuer = jwtSettings["Issuer"],
-            Audience = jwtSettings["Audience"],
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+                return Unauthorized(ApiResponse<UserProfileResponse>.Error("Invalid token"));
+            }
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return tokenHandler.WriteToken(token);
+            var result = await _authService.GetProfileAsync(userId);
+            return Ok(ApiResponse<UserProfileResponse>.Ok(result));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResponse<UserProfileResponse>.Error(ex.Message));
+        }
     }
 }

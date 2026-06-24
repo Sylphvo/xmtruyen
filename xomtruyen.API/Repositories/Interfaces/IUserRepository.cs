@@ -1,0 +1,18 @@
+using XomTruyen.API.Models;
+
+namespace XomTruyen.API.Repositories.Interfaces;
+
+public interface IUserRepository
+{
+    Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<User?> GetGuestUserByDeviceIdAsync(string deviceId, CancellationToken cancellationToken = default);
+    Task<bool> IsEmailExistsAsync(string email, CancellationToken cancellationToken = default);
+    Task AddUserAsync(User user, CancellationToken cancellationToken = default);
+    Task UpdateUserAsync(User user, CancellationToken cancellationToken = default);
+
+    Task SaveTokenAsync(UserToken token, CancellationToken cancellationToken = default);
+    Task<UserToken?> GetTokenAsync(string tokenStr, string tokenType, CancellationToken cancellationToken = default);
+    Task RevokeTokenAsync(Guid tokenId, CancellationToken cancellationToken = default);
+    Task RevokeAllUserTokensAsync(Guid userId, string tokenType, CancellationToken cancellationToken = default);
+}

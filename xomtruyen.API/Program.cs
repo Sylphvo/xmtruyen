@@ -2,10 +2,13 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using XomTruyen.API.Data;
+using XomTruyen.API.Repositories.Interfaces;
+using XomTruyen.API.Repositories.Implementations;
+using XomTruyen.API.Services.Interfaces;
+using XomTruyen.API.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +19,15 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<XomTruyen.API.Repositories.Interfaces.ISystemRepository, XomTruyen.API.Repositories.Implementations.SystemRepository>();
-builder.Services.AddScoped<XomTruyen.API.Services.Interfaces.ISystemService, XomTruyen.API.Services.Implementations.SystemService>();
+builder.Services.AddScoped<ISystemRepository, SystemRepository>();
+builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+
+builder.Services.AddScoped<ISystemService, SystemService>();
+builder.Services.AddScoped<IReadingService, ReadingService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
