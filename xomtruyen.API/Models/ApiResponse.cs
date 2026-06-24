@@ -1,18 +1,14 @@
 namespace XomTruyen.API.Models;
 
-public class ApiResponse<T>
+public record ApiResponse<T>(bool Success, string Message, T? Data)
 {
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
-    public T? Data { get; set; }
-
     public static ApiResponse<T> Ok(T data, string message = "Success")
     {
-        return new ApiResponse<T> { Success = true, Message = message, Data = data };
+        return new ApiResponse<T>(true, message, data);
     }
 
     public static ApiResponse<T> Error(string message)
     {
-        return new ApiResponse<T> { Success = false, Message = message, Data = default };
+        return new ApiResponse<T>(false, message, default);
     }
 }

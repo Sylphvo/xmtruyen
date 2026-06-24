@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using XomTruyen.API.Models;
 
 namespace XomTruyen.API.Controllers;
 
+[Authorize]
 public class WeatherForecastController : BaseApiController
 {
     private static readonly string[] Summaries = new[]
