@@ -1,6 +1,7 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
-import { Home, ChevronRight, MoreHorizontal, Download, Calendar } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faChevronRight, faEllipsisH, faDownload, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 import {
   contactsChart,
   leadChart,
@@ -17,9 +18,9 @@ export const Dashboard: React.FC = () => {
     <div className="container-fluid p-0">
       {/* Breadcrumb */}
       <div className="d-flex align-items-center mb-4 text-muted small">
-        <Home size={14} className="me-2" />
+        <FontAwesomeIcon icon={faHome} style={{ fontSize: '14px' }} className="me-2" />
         <span>Home</span>
-        <ChevronRight size={14} className="mx-2" />
+        <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '14px' }} className="mx-2" />
         <span className="text-white">Dashboard</span>
       </div>
 
@@ -32,7 +33,7 @@ export const Dashboard: React.FC = () => {
               <div className="card">
                 <div className="card-header border-0 pb-0">
                   <h6 className="text-muted small">Total Contacts</h6>
-                  <MoreHorizontal size={16} className="text-muted cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2">
                   <div className="d-flex align-items-center mb-3">
@@ -44,7 +45,7 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3 text-muted small">
                     <span>Vs last month: 1,195</span>
-                    <ChevronRight size={14} />
+                    <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '14px' }} />
                   </div>
                 </div>
               </div>
@@ -55,7 +56,7 @@ export const Dashboard: React.FC = () => {
               <div className="card">
                 <div className="card-header border-0 pb-0">
                   <h6 className="text-muted small">Lead Analytics</h6>
-                  <MoreHorizontal size={16} className="text-muted cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2">
                   <div className="d-flex align-items-center mb-3">
@@ -106,7 +107,7 @@ export const Dashboard: React.FC = () => {
               <div className="card">
                 <div className="card-header border-0 pb-0">
                   <h6 className="text-muted small">Active Deals</h6>
-                  <MoreHorizontal size={16} className="text-muted cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2 d-flex flex-column justify-content-between">
                   <div className="d-flex align-items-center">
@@ -115,7 +116,7 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="mt-auto d-flex justify-content-between align-items-center text-muted small">
                     <span>Vs last month: 1,195</span>
-                    <ChevronRight size={14} />
+                    <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '14px' }} />
                   </div>
                 </div>
               </div>
@@ -130,7 +131,7 @@ export const Dashboard: React.FC = () => {
                     <button className="btn btn-sm btn-link text-muted text-decoration-none px-3">Today</button>
                     <button className="btn btn-sm btn-link text-muted text-decoration-none px-3">Week</button>
                     <button className="btn btn-sm btn-primary rounded-pill px-3" style={{backgroundColor: '#2a2b36', border: '1px solid rgba(255,255,255,0.1)'}}>Month</button>
-                    <button className="btn btn-sm btn-icon border-0 ms-1" style={{height: '28px', width: '28px'}}><Calendar size={14}/></button>
+                    <button className="btn btn-sm btn-icon border-0 ms-1" style={{height: '28px', width: '28px'}}><FontAwesomeIcon icon={faCalendarAlt} style={{ fontSize: '14px' }}/></button>
                   </div>
                 </div>
                 <div className="card-body pt-0">
@@ -155,7 +156,7 @@ export const Dashboard: React.FC = () => {
               <div className="card">
                 <div className="card-header border-0 pb-0">
                   <h6 className="mb-0 text-white">Traffic Sources</h6>
-                  <MoreHorizontal size={16} className="text-muted cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body">
                   <div style={{ height: '80px', marginBottom: '2rem' }}>
@@ -181,7 +182,7 @@ export const Dashboard: React.FC = () => {
                   <div className="d-flex justify-content-between align-items-center pt-3 border-top" style={{borderColor: 'rgba(255,255,255,0.05)'}}>
                     <span className="text-muted small">Annual report</span>
                     <button className="btn btn-sm btn-link text-primary text-decoration-none d-flex align-items-center px-0">
-                      <Download size={14} className="me-1" /> Download
+                      <FontAwesomeIcon icon={faDownload} style={{ fontSize: '14px' }} className="me-1" /> Download
                     </button>
                   </div>
                 </div>
@@ -193,7 +194,7 @@ export const Dashboard: React.FC = () => {
               <div className="card">
                 <div className="card-header border-0 pb-0">
                   <h6 className="mb-0 text-white">Retention Rate</h6>
-                  <MoreHorizontal size={16} className="text-muted cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2">
                   <div className="d-flex align-items-end mb-3">
@@ -217,7 +218,7 @@ export const Dashboard: React.FC = () => {
               <div className="card card-purple p-2">
                 <div className="card-header">
                   <h6 className="mb-0 text-white">Total Earning</h6>
-                  <MoreHorizontal size={16} className="text-white cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-white cursor-pointer" />
                 </div>
                 <div className="card-body text-center d-flex flex-column align-items-center">
                   <div style={{ height: '180px', width: '100%', marginTop: '-20px' }}>
@@ -270,7 +271,7 @@ export const Dashboard: React.FC = () => {
               <div className="card">
                 <div className="card-header border-0 pb-0">
                   <h6 className="mb-0 text-white">Order By Time</h6>
-                  <MoreHorizontal size={16} className="text-muted cursor-pointer" />
+                  <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body">
                   <div style={{ height: '180px' }}>
