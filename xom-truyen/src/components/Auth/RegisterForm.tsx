@@ -1,13 +1,36 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function RegisterForm() {
+  const navigate = useNavigate();
+  const { register, loading } = useAuth();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+
+  const handleRegister = async () => {
+    if (!fullName || !email || !password) {
+      toast.error("Vui lòng nhập đầy đủ họ tên, email và mật khẩu.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+    const res = await register({ email, password, fullName });
+    if (res.success) {
+      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      navigate("/login");
+    } else {
+      toast.error(res.message || "Đăng ký thất bại");
+    }
+  };
 
   return (
     <div
@@ -123,6 +146,39 @@ export default function RegisterForm() {
         <div style={{ flex: 1, height: 1, background: "#ddd" }} />
         Or
         <div style={{ flex: 1, height: 1, background: "#ddd" }} />
+      </div>
+
+      {/* Full Name */}
+      <div style={{ position: "relative", marginBottom: 16 }}>
+        <label
+          style={{
+            position: "absolute",
+            top: -8,
+            left: 10,
+            fontSize: 11,
+            color: "#666",
+            background: "#fff",
+            padding: "0 4px",
+          }}
+        >
+          Họ và Tên
+        </label>
+        <input
+          type='text'
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "13px 14px",
+            border: "1.5px solid #ccc",
+            borderRadius: 8,
+            fontSize: 13,
+            outline: "none",
+            backgroundColor: "#fff",
+            fontFamily: "inherit",
+            color: "#222",
+          }}
+        />
       </div>
 
       {/* Email */}
@@ -260,20 +316,22 @@ export default function RegisterForm() {
 
       {/* Register button */}
       <button
+        onClick={handleRegister}
+        disabled={loading}
         style={{
           width: "100%",
           padding: 13,
-          background: "#2196f3",
+          background: loading ? "#90caf9" : "#2196f3",
           color: "#fff",
           border: "none",
           borderRadius: 8,
           fontSize: 14,
           fontWeight: 700,
-          cursor: "pointer",
+          cursor: loading ? "not-allowed" : "pointer",
           fontFamily: "inherit",
         }}
       >
-        Đăng ký
+        {loading ? "Đang xử lý..." : "Đăng ký"}
       </button>
 
       {/* Login link */}

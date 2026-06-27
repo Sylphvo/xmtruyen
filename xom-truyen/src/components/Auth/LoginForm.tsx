@@ -1,19 +1,29 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function LoginForm() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@gmail.com");
-  const [password, setPassword] = useState("123456");
+  const { login, loading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [remember, setRemember] = useState(false);
 
-  const handleLogin = () => {
-    if (email === "admin@gmail.com" && password === "123456") {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      toast.error("Vui lòng nhập đầy đủ email và mật khẩu.");
+      return;
+    }
+    const res = await login({ email, password });
+    if (res.success) {
+      localStorage.setItem("user", JSON.stringify(res.data));
+      toast.success("Đăng nhập thành công!");
       navigate("/");
     } else {
-      alert("Sai email hoặc mật khẩu! (Mẫu: admin@gmail.com / 123456)");
+      toast.error(res.message || "Đăng nhập thất bại");
     }
   };
 
@@ -284,20 +294,21 @@ export default function LoginForm() {
       {/* Login button */}
       <button
         onClick={handleLogin}
+        disabled={loading}
         style={{
           width: "100%",
           padding: 13,
-          background: "#2196f3",
+          background: loading ? "#90caf9" : "#2196f3",
           color: "#fff",
           border: "none",
           borderRadius: 8,
           fontSize: 14,
           fontWeight: 700,
-          cursor: "pointer",
+          cursor: loading ? "not-allowed" : "pointer",
           fontFamily: "inherit",
         }}
       >
-        Đăng nhập
+        {loading ? "Đang xử lý..." : "Đăng nhập"}
       </button>
 
       {/* Sign up */}

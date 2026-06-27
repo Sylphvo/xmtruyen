@@ -66,7 +66,6 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
             entity.Property(e => e.Slug).HasMaxLength(255).IsRequired();
-            entity.Property(e => e.BookType).HasMaxLength(50);
             entity.Property(e => e.Author).HasMaxLength(150);
             entity.Property(e => e.AverageRating).HasColumnType("decimal(3,2)");
         });
@@ -92,6 +91,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(255);
+            entity.Property(e => e.ImageUrls).HasColumnType("jsonb");
             
             entity.HasOne(e => e.Book)
                   .WithMany(b => b.Chapters)

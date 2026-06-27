@@ -31,9 +31,10 @@ export default function Header() {
   const navigate = useNavigate(); // <-- Thêm dòng này
 
   // ─── STATE QUẢN LÝ ĐĂNG NHẬP ───
-  // Thay đổi isLoggedIn thành 'true' để test giao diện khi đã đăng nhập
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const userName = "Sylphvo";
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+  const fullName = user?.fullName || "Guest";
+  const isLoggedIn = !!user;
 
   // State quản lý việc mở/đóng Menu sổ xuống
   const [showDropdown, setShowDropdown] = useState(false);
@@ -492,7 +493,7 @@ export default function Header() {
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px", border: `1px solid var(--border-color, #ddd)`, padding: "4px 14px 4px 4px", borderRadius: "30px", backgroundColor: "var(--bg-secondary, #fff)" }}>
               <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
-              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>Harleen Quinzel</span>
+              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{fullName}</span>
             </div>
           </button>
 
@@ -516,20 +517,10 @@ export default function Header() {
             >
               {/* Account Selector Area */}
               <div style={{ backgroundColor: theme.bg, borderRadius: "8px", boxShadow: `0 2px 12px ${theme.shadow}`, border: `1px solid ${theme.border}`, padding: "12px", marginBottom: "16px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingBottom: "12px", borderBottom: `1px solid ${theme.border}` }}>
-                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
-                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Minh Phú</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingBottom: "12px" }}>
+                  <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>{fullName}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "12px", paddingBottom: "12px" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                    <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 24, height: 24, borderRadius: "50%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, border: `2px solid ${theme.textMuted}`, borderRadius: "50%", borderTopColor: "transparent", transform: "rotate(45deg)" }} />
-                  </div>
-                  <span style={{ fontSize: "17px", fontWeight: 600, color: theme.text }}>Fuwu</span>
-                </div>
-                <button style={{ width: "100%", backgroundColor: theme.btnBg, color: theme.text, border: "none", padding: "8px 0", borderRadius: "6px", fontSize: "15px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                  <Users size={16} /> Xem tất cả trang cá nhân
-                </button>
               </div>
 
               {/* Action Items */}
@@ -563,7 +554,7 @@ export default function Header() {
 
                 {/* The moon toggle was moved out to the main header row */}
 
-                <div style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                <div onClick={() => { localStorage.removeItem("user"); navigate("/login"); }} style={{ display: "flex", alignItems: "center", padding: "8px", gap: "12px", borderRadius: "8px", cursor: "pointer", transition: "background 0.2s" }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.hover} onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                   <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: theme.btnBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <LogOut size={20} color={theme.text} />
                   </div>

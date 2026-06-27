@@ -1,0 +1,66 @@
+:root {
+  // Light Mode (Default)
+  --primary: #5955D1;
+  --secondary: #a1a5b7;
+  --success: #198754;
+  --info: #0dcaf0;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --light: #f8f9fa;
+  --dark: #151521;
+  
+  --bg-main: #f5f6fa;
+  --bg-card: #ffffff;
+  --bg-sidebar-icon: #ffffff;
+  --bg-sidebar-menu: #ffffff;
+  --bg-header: #ffffff;
+  
+  --text-main: #5e6278;
+  --text-heading: #181c32;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --border-color-hover: rgba(0, 0, 0, 0.1);
+  --hover-bg: rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] {
+  --light: #2a2b36;
+  --dark: #f8f9fa;
+  
+  --bg-main: #1f2128;
+  --bg-card: #2a2b36;
+  --bg-sidebar-icon: #23252d;
+  --bg-sidebar-menu: #2a2b36;
+  --bg-header: #1f2128;
+  
+  --text-main: #a1a5b7;
+  --text-heading: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-color-hover: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.05);
+}
+
+$primary: #5955D1;
+$secondary: #a1a5b7;
+$success: #198754;
+$info: #0dcaf0;
+$warning: #ffc107;
+$danger: #dc3545;
+
+$app-bg-main: var(--bg-main);
+$app-bg-card: var(--bg-card);
+$app-bg-sidebar-icon: var(--bg-sidebar-icon);
+$app-bg-sidebar-menu: var(--bg-sidebar-menu);
+$app-bg-header: var(--bg-header);
+$app-text-main: var(--text-main);
+$app-text-heading: var(--text-heading);
+$app-border-color: var(--border-color);
+$app-border-color-hover: var(--border-color-hover);
+$app-hover-bg: var(--hover-bg);
+
+// Layout Variables
+$header-height: 70px;
+$sidebar-icon-width: 80px;
+$sidebar-menu-width: 250px;
+
+// Bootstrap Overrides
+$font-family-base: 'Instrument Sans', sans-serif;

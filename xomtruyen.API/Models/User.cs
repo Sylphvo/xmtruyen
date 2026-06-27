@@ -19,4 +19,5 @@ public class User
     public int? DailyReadCount { get; set; }
     public DateOnly? LastReadDate { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public bool IsActive { get; set; } = true;
 }

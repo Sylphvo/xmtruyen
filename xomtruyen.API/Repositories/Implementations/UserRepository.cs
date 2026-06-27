@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using XomTruyen.API.Data;
 using XomTruyen.API.Models;
+using XomTruyen.API.Models.Requests;
 using XomTruyen.API.Repositories.Interfaces;
 
 namespace XomTruyen.API.Repositories.Implementations;
@@ -49,6 +50,68 @@ public class UserRepository : IUserRepository
     {
         _context.Users.Update(user);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteUserAsync(User user, CancellationToken cancellationToken = default)
+    {
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(UserFilterRequest filter, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Users.Include(u => u.CurrentPlan).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filter.SearchKeyword))
+        {
+            var keyword = filter.SearchKeyword.ToLower();
+            query = query.Where(u => 
+                (u.Email != null && u.Email.ToLower().Contains(keyword)) ||
+                (u.FullName != null && u.FullName.ToLower().Contains(keyword)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Provider))
+        {
+            query = query.Where(u => u.Provider == filter.Provider);
+        }
+
+        if (filter.IsActive.HasValue)
+        {
+            query = query.Where(u => u.IsActive == filter.IsActive.Value);
+        }
+
+        if (filter.MinCoinBalance.HasValue)
+        {
+            query = query.Where(u => u.CoinBalance >= filter.MinCoinBalance.Value);
+        }
+
+        if (filter.MaxCoinBalance.HasValue)
+        {
+            query = query.Where(u => u.CoinBalance <= filter.MaxCoinBalance.Value);
+        }
+
+        if (filter.CurrentPlanId.HasValue)
+        {
+            query = query.Where(u => u.CurrentPlanId == filter.CurrentPlanId.Value);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        // Sorting
+        query = filter.SortBy?.ToLower() switch
+        {
+            "email" => filter.IsDescending ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
+            "fullname" => filter.IsDescending ? query.OrderByDescending(u => u.FullName) : query.OrderBy(u => u.FullName),
+            "coinbalance" => filter.IsDescending ? query.OrderByDescending(u => u.CoinBalance) : query.OrderBy(u => u.CoinBalance),
+            _ => filter.IsDescending ? query.OrderByDescending(u => u.CreatedAt) : query.OrderBy(u => u.CreatedAt),
+        };
+
+        var users = await query
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return (users, totalCount);
     }
 
     public async Task SaveTokenAsync(UserToken token, CancellationToken cancellationToken = default)

@@ -1,4 +1,5 @@
 using XomTruyen.API.Models;
+using XomTruyen.API.Models.Requests;
 
 namespace XomTruyen.API.Repositories.Interfaces;
 
@@ -10,6 +11,8 @@ public interface IUserRepository
     Task<bool> IsEmailExistsAsync(string email, CancellationToken cancellationToken = default);
     Task AddUserAsync(User user, CancellationToken cancellationToken = default);
     Task UpdateUserAsync(User user, CancellationToken cancellationToken = default);
+    Task DeleteUserAsync(User user, CancellationToken cancellationToken = default);
+    Task<(IEnumerable<User> Users, int TotalCount)> GetUsersAsync(UserFilterRequest filter, CancellationToken cancellationToken = default);
 
     Task SaveTokenAsync(UserToken token, CancellationToken cancellationToken = default);
     Task<UserToken?> GetTokenAsync(string tokenStr, string tokenType, CancellationToken cancellationToken = default);

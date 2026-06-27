@@ -36,3 +36,43 @@
      - Kiểm tra `User.CoinBalance >= Chapter.CoinPrice`.
      - Đủ xu: Trừ xu (`CoinBalance -= CoinPrice`) -> Insert vào `UserPurchasedChapters` -> Cho đọc.
      - Không đủ xu: Throw Error "Tài khoản không đủ xu, vui lòng nạp thêm".
+## 6. LUỒNG NGHIỆP VỤ LÕI (CORE BUSINESS FLOWS)
+Agent phải tuân thủ nghiêm ngặt các luồng logic nghiệp vụ sau đây khi triển khai các API quản trị (Admin) và Client:
+
+### A. Định nghĩa Phân loại (Enums)
+Bắt buộc sử dụng `Enum` trong C# để quản lý các loại sách, giúp Code an toàn và dễ kiểm soát:
+- **FormatType (Định dạng):** `1 = Text` (Truyện chữ), `2 = Comic` (Truyện tranh/Hình ảnh).
+- **AccessLevel (Quyền truy cập):** `1 = Free` (Miễn phí toàn bộ), `2 = Vip` (Truyện VIP, yêu cầu trả phí hoặc tài khoản VIP mới được đọc các chương bị khóa).
+
+### B. Nghiệp vụ Quản lý Thể loại (Topics / Categories)
+- **Thêm mới (Create):** 
+  - Input: `Name` (Tên thể loại).
+  - Logic: Tự động sinh `Slug` từ Name (VD: "Tiên Hiệp" -> "tien-hiep"). Phải check trùng lặp Slug trước khi `AddAsync` bằng EF Core.
+- **Cập nhật (Update):**
+  - Chỉ cho phép đổi `Name`. `Slug` có thể được giữ nguyên để không làm chết các link SEO cũ (hoặc sinh Slug mới nhưng phải cảnh báo).
+- **Xóa (Delete):**
+  - **Luật thép:** Không được xóa cứng (Hard Delete) nếu Thể loại đó đang có sách (count > 0). Phải ném ra lỗi `BadRequest` ("Không thể xóa thể loại đang chứa truyện").
+- **Đọc (Read):** Dùng Dapper.
+
+### C. Nghiệp vụ Quản lý Sách (Books)
+- **Thêm Sách (Create Book):**
+  - Giao dịch (Transaction) bắt buộc: Khi thêm Sách, phải lưu đồng thời thông tin Sách và danh sách Thể loại (bảng `BookCategories`) vào database cùng một lúc.
+  - Tự động sinh `Slug` từ `Title` kết hợp với một mã random ngắn để tránh trùng (VD: "than-dong-dat-viet-8a2f").
+- **Sửa Sách (Update Book):**
+  - Cho phép cập nhật `Title`, `Description`, `FormatType`, `AccessLevel`...
+  - **Xử lý Thể loại (Topics):** Khi Admin thay đổi danh sách Thể loại, EF Core phải xóa các record cũ trong bảng `BookCategories` và Insert các record mới.
+- **Xóa Sách (Delete Book):**
+  - Xóa sách sẽ kích hoạt `Cascade Delete` (xóa toàn bộ Chương, Đánh giá, Lịch sử đọc liên quan). Phải có bước xác nhận kép (Soft Delete là một điểm cộng nếu mở rộng sau này).
+- **Lấy danh sách (Get List - Admin):** Dùng Dapper, hỗ trợ Filter động (Lọc theo Truyện Tranh/Chữ, Lọc theo VIP/Free, Lọc theo Thể loại, Search theo Tên).
+
+### D. Nghiệp vụ Quản lý Chương (Chapters) - Mở rộng linh hoạt
+Luồng thêm chương sẽ khác nhau hoàn toàn dựa vào `FormatType` của Sách:
+- **Nếu Sách là `Text` (Truyện Chữ):**
+  - Bắt buộc phải có dữ liệu truyền vào cột `Content` (Nội dung chữ, HTML).
+  - Cột `ImageUrls` bỏ trống.
+- **Nếu Sách là `Comic` (Truyện Tranh):**
+  - Bắt buộc phải có danh sách link ảnh truyền vào cột `ImageUrls` (Lưu dưới dạng JSON mảng các đường link).
+  - Cột `Content` bỏ trống.
+- **Cơ chế Khóa VIP (`IsLocked`):**
+  - Nếu Sách có `AccessLevel = Vip`, Admin khi thêm Chương sẽ có quyền chọn `IsLocked = true` (Chương thu phí) hoặc `false` (Đọc thử miễn phí). 
+  - *Luồng Client Đọc Truyện:* Khi Client gọi API lấy chi tiết Chương, Service phải check xem Chương có `IsLocked = true` không. Nếu có, tiếp tục check User hiện tại có đang là tài khoản VIP không. Nếu không, chỉ trả về một phần nội dung (Teaser) hoặc mã lỗi 403 Forbidden ("Bạn cần nâng cấp VIP để đọc chương này").

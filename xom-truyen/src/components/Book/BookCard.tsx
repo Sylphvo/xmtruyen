@@ -113,13 +113,17 @@ export default function BookCard({
           left: 0,
           right: 0,
           backgroundColor: "#a78bfa",
-          padding: "12px",
+          padding: "8px 10px",
+          borderTopLeftRadius: "16px",
+          borderTopRightRadius: "16px",
           transform: isHovered ? "translateY(0)" : "translateY(100%)",
           transition: "transform 0.3s ease-in-out",
           zIndex: 10,
           display: "flex",
           flexDirection: "column",
-          gap: "4px"
+          gap: "2px",
+          height: "22%",
+          justifyContent: "space-between"
         }}
       >
         <h3 style={{ 

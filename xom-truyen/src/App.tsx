@@ -75,10 +75,13 @@ function ReadingLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { Toaster } from "react-hot-toast";
+
 // ─── TRẠM ĐIỀU HƯỚNG TRUNG TÂM ───────────────────────────────────────────────
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <Routes>
         {/* 1. Tuyến đường trang chủ: Cần có Sidebar + Header bao quanh */}
         <Route

@@ -1,4 +1,14 @@
 :root {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+:root {
   --bg-primary: #f5f1eb;
   --text-primary: #333333;
   --text: #6b6375;
@@ -59,7 +69,6 @@
 #root {
   max-width: 100%;
   margin: 0 auto;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -70,6 +79,13 @@ body {
   margin: 0;
   color: var(--text-primary);
   transition: background-color 0.3s, color 0.3s;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 h1,

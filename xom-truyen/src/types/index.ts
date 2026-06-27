@@ -4,6 +4,7 @@ export interface Book {
   author: string;
   images?: string;
   coverIndex: number;
+
   // Các trường dữ liệu mới được bổ sung
   genres: string[]; // ví dụ: ["Thám hiểm", "Hài hước"]
   currentChapter: number; // ví dụ: 121
@@ -16,4 +17,29 @@ export interface SectionData {
   subtitle: string;
   books: Book[];
   size?: "normal" | "large";
+}
+
+// === AUTH TYPES ===
+export interface TLoginRequest {
+  email?: string;
+  password?: string;
+}
+
+export interface TRegisterRequest {
+  email?: string;
+  password?: string;
+  fullName?: string;
+}
+
+export interface TUser {
+  id?: string;
+  email?: string;
+  fullName?: string;
+  token?: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
 }
