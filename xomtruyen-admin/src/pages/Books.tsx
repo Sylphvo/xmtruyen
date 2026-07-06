@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { MOCK_BOOKS, STATUSES } from '../constants/mockData';
 import type { IBook } from '../types/book';
-import { Dropdown, Form } from 'react-bootstrap';
+import { Dropdown, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -17,6 +17,32 @@ export const Books: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newItem, setNewItem] = useState<Partial<IBook>>({});
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>, saveFunc: () => void) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveFunc();
+    }
+  };
+
+  const handleCloseAdd = () => {
+    setIsAddingNew(false);
+    setNewItem({});
+  };
+
+  const handleAddSubmit = () => {
+    const newEntry: any = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...newItem,
+      status: 'New'
+    };
+    setData([newEntry, ...data]);
+    handleCloseAdd();
+  };
+
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: null });
 
   const handleSort = (key: keyof IBook) => {
@@ -85,9 +111,13 @@ export const Books: React.FC = () => {
   };
 
   return (
-    <div className="card border-0 shadow-sm bg-white h-auto">
-      <div className="card-header bg-white border-bottom-0 pt-4 pb-0">
-        <h5 className="mb-0 fw-semibold text-dark">Quản lý Sách</h5>
+    <div className="card border-0 shadow-sm h-auto" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
+      <div className="card-header border-bottom-0 pt-4 pb-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: 'transparent' }}>
+        <h5 className="mb-0 fw-semibold" style={{ color: 'var(--bs-heading-color)' }}>Quản lý Sách</h5>
+        <Button variant="primary" size="sm" onClick={() => setIsAddingNew(true)} className="d-flex align-items-center gap-2 rounded-2">
+          <FontAwesomeIcon icon={faPlus} />
+          Thêm Mới
+        </Button>
       </div>
       
       <div className="card-body d-flex flex-column">
@@ -95,6 +125,7 @@ export const Books: React.FC = () => {
           <div className="d-flex align-items-center gap-2">
             <Form.Select 
               size="sm" 
+              className="bg-transparent text-body border-secondary-subtle"
               style={{ width: '70px' }}
               value={itemsPerPage}
               onChange={(e) => {
@@ -114,6 +145,7 @@ export const Books: React.FC = () => {
             <Form.Control 
               size="sm" 
               type="text" 
+              className="bg-transparent text-body border-secondary-subtle"
               placeholder="Search" 
               value={searchTerm}
               onChange={(e) => {
@@ -124,35 +156,65 @@ export const Books: React.FC = () => {
           </div>
         </div>
 
-        <div className="table-responsive flex-grow-1 bg-white" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse' }}>
-            <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#fff' }}>
-              <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-                <th style={{ cursor: 'pointer', border: 'none', padding: '12px 16px' }} onClick={() => handleSort('title')}>
-                  <span className="text-dark fw-semibold text-nowrap">Title {getSortIcon('title')}</span>
+        <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
+          <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent' }}>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
+              <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                <th style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('title')}>
+                  <span className="fw-semibold text-nowrap">Title {getSortIcon('title')}</span>
                 </th>
-                <th style={{ cursor: 'pointer', border: 'none', padding: '12px 16px' }} onClick={() => handleSort('author')}>
-                  <span className="text-dark fw-semibold text-nowrap">Author {getSortIcon('author')}</span>
+                <th style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('author')}>
+                  <span className="fw-semibold text-nowrap">Author {getSortIcon('author')}</span>
                 </th>
-                <th style={{ cursor: 'pointer', border: 'none', padding: '12px 16px' }} onClick={() => handleSort('category')}>
-                  <span className="text-dark fw-semibold text-nowrap">Category {getSortIcon('category')}</span>
+                <th style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('category')}>
+                  <span className="fw-semibold text-nowrap">Category {getSortIcon('category')}</span>
                 </th>
-                <th style={{ cursor: 'pointer', border: 'none', padding: '12px 16px' }} onClick={() => handleSort('published')}>
-                  <span className="text-dark fw-semibold text-nowrap">Published {getSortIcon('published')}</span>
+                <th style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('published')}>
+                  <span className="fw-semibold text-nowrap">Published {getSortIcon('published')}</span>
                 </th>
-                <th style={{ cursor: 'pointer', border: 'none', padding: '12px 16px' }} onClick={() => handleSort('status')}>
-                  <span className="text-dark fw-semibold text-nowrap">Status {getSortIcon('status')}</span>
+                <th style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('status')}>
+                  <span className="fw-semibold text-nowrap">Status {getSortIcon('status')}</span>
                 </th>
-                <th style={{ border: 'none', padding: '12px 16px', textAlign: 'right' }}>
-                  <span className="text-dark fw-semibold text-nowrap">Action <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: '12px' }} /></span>
+                <th style={{ backgroundColor: 'transparent', padding: '12px 16px', textAlign: 'right' , color: 'var(--bs-heading-color)'}}>
+                  <span className="fw-semibold text-nowrap">Action <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: '12px' }} /></span>
                 </th>
               </tr>
             </thead>
             <tbody>
+              <>
+              {isAddingNew && (
+                <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                  
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <div className="d-flex align-items-center gap-3">
+                      <img src="https://via.placeholder.com/32x48" alt="New" className="rounded" style={{ width: '32px', height: '48px', objectFit: 'cover' }} />
+                      <Form.Control size="sm" value={newItem.title || ''} onChange={(e) => setNewItem({...newItem, title: e.target.value})} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit)} placeholder="Title" className="bg-transparent text-body border-secondary-subtle" />
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <Form.Control size="sm" value={newItem.author || ''} onChange={(e) => setNewItem({...newItem, author: e.target.value})} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit)} placeholder="Author" className="bg-transparent text-body border-secondary-subtle" />
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <Form.Control size="sm" value={newItem.category || ''} onChange={(e) => setNewItem({...newItem, category: e.target.value})} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit)} placeholder="Category" className="bg-transparent text-body border-secondary-subtle" />
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <Form.Control size="sm" value={newItem.published || ''} onChange={(e) => setNewItem({...newItem, published: e.target.value})} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit)} placeholder="YYYY" className="bg-transparent text-body border-secondary-subtle" />
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <span className="badge bg-light text-dark border border-secondary-subtle">New</span>
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <div className="d-flex gap-2 justify-content-end">
+                      <Button variant="success" size="sm" onClick={handleAddSubmit} className="px-3 rounded-2 fw-medium">Lưu</Button>
+                      <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {paginatedData.length > 0 ? (
                 paginatedData.map((book) => (
-                  <tr key={book.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '12px 16px', border: 'none' }}>
+                  <tr key={book.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
                       <div className="d-flex align-items-center gap-3">
                         <img 
                           src={book.cover} 
@@ -160,19 +222,19 @@ export const Books: React.FC = () => {
                           className="rounded"
                           style={{ width: '32px', height: '48px', objectFit: 'cover' }}
                         />
-                        <span className="text-secondary fw-medium">{book.title}</span>
+                        <span className="fw-medium">{book.title}</span>
                       </div>
                     </td>
-                    <td style={{ padding: '12px 16px', border: 'none' }} className="text-secondary">
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
                       {book.author}
                     </td>
-                    <td style={{ padding: '12px 16px', border: 'none' }} className="text-secondary">
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
                       {book.category}
                     </td>
-                    <td style={{ padding: '12px 16px', border: 'none' }} className="text-secondary">
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
                       {book.published}
                     </td>
-                    <td style={{ padding: '12px 16px', border: 'none' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
                       <Dropdown>
                         <Dropdown.Toggle 
                           variant="light" 
@@ -202,10 +264,23 @@ export const Books: React.FC = () => {
                         </Dropdown.Menu>
                       </Dropdown>
                     </td>
-                    <td style={{ padding: '12px 16px', border: 'none', textAlign: 'right' }}>
-                      <button className="btn btn-light btn-sm bg-white border shadow-sm rounded-2 px-2 py-1">
-                        <FontAwesomeIcon icon={faEllipsisH} className="text-secondary" />
-                      </button>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'right' , color: 'var(--bs-body-color)'}}>
+                      <Dropdown align="end">
+                        <Dropdown.Toggle as="div" bsPrefix="p-0 border-0 bg-transparent" style={{ cursor: 'pointer', display: 'inline-block' }}>
+                          <button className="btn btn-light btn-sm bg-white border shadow-sm rounded-2 px-2 py-1">
+                            <FontAwesomeIcon icon={faEllipsisH} />
+                          </button>
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="shadow-sm border-0 py-2">
+                          <Dropdown.Item onClick={() => {}} className="py-2 px-3 text-body" style={{ fontSize: '14px' }}>
+                            Edit
+                          </Dropdown.Item>
+                          <Dropdown.Item onClick={() => {}} className="py-2 px-3 text-danger" style={{ fontSize: '14px' }}>
+                            Delete
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
                     </td>
                   </tr>
                 ))
@@ -216,6 +291,7 @@ export const Books: React.FC = () => {
                   </td>
                 </tr>
               )}
+              </>
             </tbody>
           </table>
         </div>

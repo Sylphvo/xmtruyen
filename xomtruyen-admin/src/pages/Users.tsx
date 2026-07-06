@@ -39,7 +39,7 @@ export const Users: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'createdAt', direction: 'desc' });
 
   // Add User State
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [isAddingNewUser, setIsAddingNewUser] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newUser, setNewUser] = useState<SaveUserRequest>({
     email: '',
@@ -53,6 +53,14 @@ export const Users: React.FC = () => {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<SaveUserRequest>>({});
 
+
+  
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>, saveFunc: () => void) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveFunc();
+    }
+  };
 
   // Debounce search term
   useEffect(() => {
@@ -128,19 +136,22 @@ export const Users: React.FC = () => {
     }
   };
 
-  const handleCloseAddModal = () => {
-    setShowAddModal(false);
+  const handleCloseAdd = () => {
+    setIsAddingNewUser(false);
     setNewUser({ email: '', password: '', fullName: '', isActive: true, coinBalance: 0 });
   };
 
-  const handleAddSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUser.email) return;
+  const handleAddSubmit = async (e?: React.FormEvent | React.KeyboardEvent) => {
+    if (e) e.preventDefault();
+    if (!newUser.email) {
+      alert('Email là bắt buộc');
+      return;
+    }
     
     setIsSubmitting(true);
     try {
       await createUser(newUser);
-      handleCloseAddModal();
+      handleCloseAdd();
       // Reload list from page 1 to see new user (assuming they show up at top depending on sort)
       if (currentPage !== 1) {
         setCurrentPage(1);
@@ -200,7 +211,7 @@ export const Users: React.FC = () => {
     <div className="card border-0 shadow-sm h-auto" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
       <div className="card-header border-bottom-0 pt-4 pb-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: 'transparent' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: 'var(--bs-heading-color)' }}>Quản lý User</h5>
-        <Button variant="primary" size="sm" onClick={() => setShowAddModal(true)} className="d-flex align-items-center gap-2 rounded-2">
+        <Button variant="primary" size="sm" onClick={() => setIsAddingNewUser(true)} className="d-flex align-items-center gap-2 rounded-2">
           <FontAwesomeIcon icon={faPlus} />
           Thêm User
         </Button>
@@ -285,7 +296,80 @@ export const Users: React.FC = () => {
                     <div className="mt-2 text-muted small">Đang tải dữ liệu...</div>
                   </td>
                 </tr>
-              ) : sortedData.length > 0 ? (
+              ) : (
+                <>
+              {isAddingNewUser && (
+                <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <div className="d-flex align-items-center gap-3">
+                      <img 
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(newUser.fullName || newUser.email || 'U')}&background=random`} 
+                        alt="New User" 
+                        className="rounded-circle"
+                        style={{ width: '36px', height: '36px', objectFit: 'cover' }}
+                      />
+                      <Form.Control 
+                        size="sm" 
+                        value={newUser.fullName || ''} 
+                        onChange={(e) => setNewUser({...newUser, fullName: e.target.value})} 
+                        onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                        placeholder="Họ tên"
+                        className="bg-transparent text-body border-secondary-subtle"
+                      />
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <Form.Control 
+                      size="sm" 
+                      value={newUser.email || ''} 
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})} 
+                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                      placeholder="Email"
+                      className="bg-transparent text-body border-secondary-subtle"
+                    />
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <span className="badge bg-light text-dark border border-secondary-subtle">Local</span>
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <Form.Control 
+                      size="sm" 
+                      type="number" 
+                      value={newUser.coinBalance ?? 0} 
+                      onChange={(e) => setNewUser({...newUser, coinBalance: Number(e.target.value)})} 
+                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                      style={{ width: '90px' }}
+                      className="bg-transparent text-warning fw-bold border-secondary-subtle"
+                    />
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <span className="text-muted small">Free</span>
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <span className="fw-medium">0</span> / <span className="text-muted small">0</span>
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    -
+                  </td>
+                  <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <Form.Check 
+                      type="switch"
+                      id="add-status"
+                      checked={newUser.isActive ?? true}
+                      onChange={(e) => setNewUser({...newUser, isActive: e.target.checked})}
+                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                      className="d-inline-block"
+                    />
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <div className="d-flex gap-2 justify-content-end">
+                      <Button variant="success" size="sm" onClick={() => handleAddSubmit()} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
+                      <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {sortedData.length > 0 ? (
                 sortedData.map((user) => (
                   editingUserId === user.id ? (
                     <tr key={user.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
@@ -301,6 +385,7 @@ export const Users: React.FC = () => {
                             size="sm" 
                             value={editFormData.fullName || ''} 
                             onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})} 
+                            onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
                             placeholder="Họ tên"
                             className="bg-transparent text-body border-secondary-subtle"
                           />
@@ -311,6 +396,7 @@ export const Users: React.FC = () => {
                           size="sm" 
                           value={editFormData.email || ''} 
                           onChange={(e) => setEditFormData({...editFormData, email: e.target.value})} 
+                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
                           placeholder="Email"
                           className="bg-transparent text-body border-secondary-subtle"
                         />
@@ -324,6 +410,7 @@ export const Users: React.FC = () => {
                           type="number" 
                           value={editFormData.coinBalance ?? 0} 
                           onChange={(e) => setEditFormData({...editFormData, coinBalance: Number(e.target.value)})} 
+                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
                           style={{ width: '90px' }}
                           className="bg-transparent text-warning fw-bold border-secondary-subtle"
                         />
@@ -347,6 +434,7 @@ export const Users: React.FC = () => {
                           id={`edit-status-${user.id}`}
                           checked={editFormData.isActive ?? true}
                           onChange={(e) => setEditFormData({...editFormData, isActive: e.target.checked})}
+                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
                           className="d-inline-block"
                         />
                       </td>
@@ -448,6 +536,8 @@ export const Users: React.FC = () => {
                   </td>
                 </tr>
               )}
+              </>
+              )}
             </tbody>
           </table>
         </div>
@@ -515,83 +605,7 @@ export const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal Thêm User */}
-      <Modal show={showAddModal} onHide={handleCloseAddModal} centered backdrop="static" contentClassName="bg-body border-0 shadow">
-        <Modal.Header closeButton className="border-bottom-0 pb-0">
-          <Modal.Title className="fs-5 fw-semibold text-body">Thêm User Mới</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleAddSubmit}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label className="small fw-medium text-body">Email <span className="text-danger">*</span></Form.Label>
-              <Form.Control 
-                type="email" 
-                required 
-                placeholder="name@example.com"
-                className="bg-transparent text-body border-secondary-subtle"
-                value={newUser.email}
-                onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label className="small fw-medium text-body">Mật khẩu</Form.Label>
-              <Form.Control 
-                type="password" 
-                placeholder="Nhập mật khẩu (tùy chọn)"
-                className="bg-transparent text-body border-secondary-subtle"
-                value={newUser.password}
-                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-              />
-              <Form.Text className="text-muted small">Để trống nếu chưa cần thiết lập mật khẩu.</Form.Text>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label className="small fw-medium text-body">Họ tên</Form.Label>
-              <Form.Control 
-                type="text" 
-                placeholder="Nguyễn Văn A"
-                className="bg-transparent text-body border-secondary-subtle"
-                value={newUser.fullName}
-                onChange={(e) => setNewUser({...newUser, fullName: e.target.value})}
-              />
-            </Form.Group>
-
-            <div className="d-flex gap-3 mb-2">
-              <Form.Group className="flex-grow-1">
-                <Form.Label className="small fw-medium text-body">Số dư xu</Form.Label>
-                <Form.Control 
-                  type="number" 
-                  min="0"
-                  className="bg-transparent text-body border-secondary-subtle"
-                  value={newUser.coinBalance}
-                  onChange={(e) => setNewUser({...newUser, coinBalance: Number(e.target.value)})}
-                />
-              </Form.Group>
-
-              <Form.Group className="d-flex flex-column justify-content-end pb-2">
-                <Form.Check 
-                  type="switch"
-                  id="active-switch"
-                  label="Tài khoản Active"
-                  className="text-body fw-medium"
-                  checked={newUser.isActive}
-                  onChange={(e) => setNewUser({...newUser, isActive: e.target.checked})}
-                />
-              </Form.Group>
-            </div>
-            
-          </Modal.Body>
-          <Modal.Footer className="border-top-0 pt-0">
-            <Button variant="light" onClick={handleCloseAddModal} disabled={isSubmitting}>
-              Hủy
-            </Button>
-            <Button variant="primary" type="submit" disabled={isSubmitting} className="d-flex align-items-center gap-2">
-              {isSubmitting ? <Spinner size="sm" animation="border" /> : 'Lưu User'}
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      
     </div>
   );
 };
