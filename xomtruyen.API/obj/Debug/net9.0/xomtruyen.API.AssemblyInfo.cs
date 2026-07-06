@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("xomtruyen.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef8726a4b44fa06eb3b35fd45fb746e72737e2b0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+93d365d98b74e308a270559e8d168459bdde0062")]
 [assembly: System.Reflection.AssemblyProductAttribute("xomtruyen.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("xomtruyen.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -6,7 +6,7 @@ using XomTruyen.API.Services.Interfaces;
 
 namespace XomTruyen.API.Controllers;
 
-[Route("api/admin/books")]
+[Route("api/books")]
 // [Authorize(Roles = "Admin")] // Uncomment when roles are implemented
 public class AdminBookController : BaseApiController
 {

@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Book, Hexagon, Tag, List } from 'lucide-react';
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isCollapsed?: boolean;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   const location = useLocation();
   const path = location.pathname;
 
@@ -49,7 +53,7 @@ export const Sidebar: React.FC = () => {
       </aside>
 
       {/* Menu Sidebar */}
-      <aside className="app-sidebar-menu">
+      <aside className="app-sidebar-menu" style={{ display: isCollapsed ? 'none' : 'flex' }}>
         <div className="sidebar-header">
           Xóm Truyện
         </div>

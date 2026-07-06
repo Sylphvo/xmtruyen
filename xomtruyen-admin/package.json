@@ -17,6 +17,7 @@
     "ag-grid-enterprise": "^36.0.0",
     "ag-grid-react": "^36.0.0",
     "apexcharts": "^5.15.2",
+    "axios": "^1.18.1",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
     "datatables.net-dt": "^2.3.8",

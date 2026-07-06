@@ -197,7 +197,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   &::placeholder {
-    color: rgba(255,255,255,0.4);
+    color: var(--text-main);
   }
 }
 
@@ -238,3 +238,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ag-theme-quartz, .ag-theme-quartz-dark { --ag-wrapper-border-width: 0; --ag-borders: none; --ag-data-color: var(--app-text-muted); --ag-font-size: 13px; --ag-header-column-separator-display: none; --ag-header-column-resize-handle-display: none; } .ag-header-cell-text { font-weight: 700; font-size: 13px; color: var(--app-text-heading); } .ag-row { border-bottom: 1px solid var(--app-border-color) !important; }
+
+// Custom Table Styles to match template
+.table {
+  th {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  td {
+    font-size: 14px;
+    vertical-align: middle;
+  }
+}

@@ -5,7 +5,7 @@ using XomTruyen.API.Services.Interfaces;
 
 namespace XomTruyen.API.Controllers;
 
-[Route("api/admin/categories")]
+[Route("api/categories")]
 // [Authorize(Roles = "Admin")] // Uncomment when roles are implemented
 public class AdminCategoryController : BaseApiController
 {

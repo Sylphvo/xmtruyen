@@ -1,4 +1,7 @@
 import type { IUser } from '../types/user';
+import type { IBook } from '../types/book';
+import type { ITopic } from '../types/topic';
+import type { ICategory } from '../types/category';
 
 export const STATUSES = ['Approved', 'Rejected', 'New', 'Pending'];
 
@@ -19,4 +22,22 @@ export const MOCK_USERS: IUser[] = [
   { id: '14', name: 'Michael Taylor', avatar: 'https://i.pravatar.cc/150?u=13', leaveType: 'Paternity Leave', department: 'System Admin', days: '5 Days', start: '01 Nov 2024', end: '05 Nov 2024', status: 'Pending' },
   { id: '15', name: 'Nancy Wilson', avatar: 'https://i.pravatar.cc/150?u=14', leaveType: 'Casual Leave', department: 'Project Manager', days: '2 Days', start: '10 Oct 2024', end: '11 Oct 2024', status: 'Approved' },
   { id: '16', name: 'Oliver Anderson', avatar: 'https://i.pravatar.cc/150?u=15', leaveType: 'Sick Leave', department: 'Marketing', days: '1 Day', start: '02 Sep 2024', end: '02 Sep 2024', status: 'Rejected' }
+];
+
+export const MOCK_BOOKS: IBook[] = [
+  { id: '1', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', category: 'Classic', published: '1925', cover: 'https://i.pravatar.cc/150?u=b1', status: 'Approved' },
+  { id: '2', title: '1984', author: 'George Orwell', category: 'Dystopian', published: '1949', cover: 'https://i.pravatar.cc/150?u=b2', status: 'Pending' },
+  { id: '3', title: 'To Kill a Mockingbird', author: 'Harper Lee', category: 'Classic', published: '1960', cover: 'https://i.pravatar.cc/150?u=b3', status: 'Approved' },
+];
+
+export const MOCK_TOPICS: ITopic[] = [
+  { id: '1', name: 'Science Fiction', description: 'Books about futuristic concepts.', createdAt: '2024-01-01', status: 'Approved' },
+  { id: '2', name: 'Fantasy', description: 'Books containing magical elements.', createdAt: '2024-01-05', status: 'New' },
+  { id: '3', name: 'History', description: 'Historical events and figures.', createdAt: '2024-02-10', status: 'Approved' },
+];
+
+export const MOCK_CATEGORIES: ICategory[] = [
+  { id: '1', name: 'Fiction', description: 'Fictional literature.', createdAt: '2024-01-01', status: 'Approved' },
+  { id: '2', name: 'Non-Fiction', description: 'Factual and informative literature.', createdAt: '2024-01-05', status: 'Pending' },
+  { id: '3', name: 'Educational', description: 'Books for learning and education.', createdAt: '2024-02-10', status: 'Approved' },
 ];

@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Calendar, ChevronsLeft, Moon, Sun, ClipboardList, ChevronDown, User, Settings, ArrowUpCircle, LogOut } from 'lucide-react';
+import { Search, Bell, Calendar, ChevronsLeft, Moon, Sun, ClipboardList, ChevronDown, User, Settings, ArrowUpCircle, LogOut, Lock, ShoppingCart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  toggleSidebar?: () => void;
+  isSidebarCollapsed?: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapsed }) => {
   const [theme, setTheme] = useState(
     document.documentElement.getAttribute('data-bs-theme') || 'light'
   );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-bs-theme', theme);
@@ -16,6 +24,9 @@ export const Header: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
+      }
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setIsNotificationOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -29,8 +40,12 @@ export const Header: React.FC = () => {
   return (
     <header className="app-header justify-content-between position-relative">
       <div className="d-flex align-items-center">
-        <button className="btn btn-icon me-3 text-dark rounded-3 border-0 d-flex justify-content-center align-items-center" style={{ width: '32px', height: '32px', backgroundColor: 'var(--bg-main)' }}>
-          <ChevronsLeft size={16} />
+        <button 
+          onClick={toggleSidebar}
+          className="btn btn-icon me-3 text-dark rounded-3 border-0 d-flex justify-content-center align-items-center" 
+          style={{ width: '32px', height: '32px', backgroundColor: 'var(--bg-main)' }}
+        >
+          <ChevronsLeft size={16} style={{ transform: isSidebarCollapsed ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
         </button>
         <form className="d-none d-md-flex align-items-center position-relative w-100" style={{ maxWidth: '300px' }}>
           <div className="position-absolute ms-3">
@@ -39,9 +54,9 @@ export const Header: React.FC = () => {
           <input type="text" className="form-control form-control-fill" placeholder="Search anything's" />
         </form>
         
-        <div className="ms-4 d-none d-lg-flex align-items-center rounded-pill px-3 py-1 border-0" style={{ backgroundColor: 'var(--bg-main)' }}>
-          <span className="text-muted small me-2">Today New Leads</span>
-          <span className="badge rounded-pill px-2 py-1" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--primary)' }}>27</span>
+        <div className="ms-4 d-none d-lg-flex align-items-center rounded-pill px-3 py-1 border border-secondary-subtle text-nowrap" style={{ backgroundColor: 'transparent' }}>
+          <span className="fw-medium me-2" style={{ fontSize: '13.5px', color: 'var(--text-heading)' }}>Today New Leads</span>
+          <span className="badge rounded-pill px-2 py-1" style={{ backgroundColor: 'var(--hover-bg)', color: 'var(--primary)', fontSize: '12px', fontWeight: '600' }}>27</span>
         </div>
       </div>
       
@@ -56,9 +71,98 @@ export const Header: React.FC = () => {
             <ClipboardList size={18} className="text-muted" />
             <span className="position-absolute top-0 end-0 bg-primary rounded-circle" style={{ width: '6px', height: '6px', marginTop: '4px', marginRight: '4px' }}></span>
           </button>
-          <button className="btn-icon border-0 bg-transparent p-0 d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
-            <Bell size={18} className="text-muted" />
-          </button>
+          <div className="position-relative" ref={notificationRef}>
+            <button 
+              className="btn-icon border-0 bg-transparent p-0 d-flex align-items-center justify-content-center" 
+              style={{ width: '32px', height: '32px' }}
+              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+            >
+              <Bell size={18} className="text-muted" />
+            </button>
+            
+            {isNotificationOpen && (
+              <div className="position-absolute mt-3 rounded-3 shadow-lg" style={{ width: '340px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', zIndex: 1050, left: '50%', transform: 'translateX(-50%)' }}>
+                <div className="p-3 border-bottom d-flex align-items-center gap-2" style={{ borderColor: 'var(--border-color) !important' }}>
+                  <span className="fw-bold" style={{ fontSize: '15px', color: 'var(--text-heading)' }}>Notifications</span>
+                  <span className="badge rounded-pill" style={{ backgroundColor: 'var(--primary)', color: '#fff', fontSize: '12px' }}>9</span>
+                </div>
+                
+                <div className="d-flex flex-column" style={{ maxHeight: '380px', overflowY: 'auto' }}>
+                  <div className="d-flex align-items-start gap-3 p-3 border-bottom" style={{ borderColor: 'var(--border-color) !important', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <div className="position-relative">
+                      <img src="https://i.pravatar.cc/150?u=emma" alt="Emma Smith" className="rounded-circle" style={{ width: '36px', height: '36px', objectFit: 'cover' }} />
+                      <span className="position-absolute bottom-0 end-0 bg-success rounded-circle border border-2" style={{ width: '12px', height: '12px', right: '-2px', bottom: '-2px', borderColor: 'var(--bg-card)' }}></span>
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-1">
+                        <span className="fw-semibold" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Emma Smith</span>
+                        <span className="text-muted" style={{ fontSize: '12px' }}>7 hr ago</span>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: '13px' }}>Need to update the details.</div>
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-start gap-3 p-3 border-bottom" style={{ borderColor: 'var(--border-color) !important', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0" style={{ width: '36px', height: '36px', backgroundColor: '#00a65a', fontSize: '16px' }}>
+                      D
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-1">
+                        <span className="fw-semibold" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Design Team</span>
+                        <span className="text-muted" style={{ fontSize: '12px' }}>6 hr ago</span>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: '13px' }}>Check your shared folder.</div>
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-start gap-3 p-3 border-bottom" style={{ borderColor: 'var(--border-color) !important', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style={{ width: '36px', height: '36px', backgroundColor: '#151521' }}>
+                      <Lock size={16} />
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-1">
+                        <span className="fw-semibold" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Security Update</span>
+                        <span className="text-muted" style={{ fontSize: '12px' }}>5 hr ago</span>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: '13px' }}>Password successfully set.</div>
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-start gap-3 p-3 border-bottom" style={{ borderColor: 'var(--border-color) !important', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style={{ width: '36px', height: '36px', backgroundColor: '#6f42c1' }}>
+                      <ShoppingCart size={16} />
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-1">
+                        <span className="fw-semibold" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Invoice #1432</span>
+                        <span className="text-muted" style={{ fontSize: '12px' }}>5 hr ago</span>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: '13px' }}>has been paid Amount: $899.00</div>
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-start gap-3 p-3" style={{ cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0" style={{ width: '36px', height: '36px', backgroundColor: '#dc3545', fontSize: '16px' }}>
+                      R
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-1">
+                        <span className="fw-semibold" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Emma Smith</span>
+                        <span className="text-muted" style={{ fontSize: '12px' }}>5 hr ago</span>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: '13px' }}>added you to Dashboard Analytics</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 border-top" style={{ borderColor: 'var(--border-color) !important' }}>
+                  <button className="btn w-100 rounded-2 fw-medium text-white border-0" style={{ backgroundColor: 'var(--primary)', padding: '8px 0' }}>
+                    View all notifications
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <button className="btn-icon border-0 bg-transparent p-0 d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
             <Calendar size={18} className="text-muted" />
           </button>
@@ -105,9 +209,9 @@ export const Header: React.FC = () => {
                 </a>
               </div>
               <div className="p-2 border-top" style={{ borderColor: 'var(--border-color) !important' }}>
-                <a href="#" className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded-2 text-danger" onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(220,53,69,0.1)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                <Link to="/login" className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded-2 text-danger" onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(220,53,69,0.1)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                   <LogOut size={16} /> <span style={{ fontSize: '14px' }}>Log Out</span>
-                </a>
+                </Link>
               </div>
             </div>
           )}
