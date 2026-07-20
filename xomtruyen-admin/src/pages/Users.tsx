@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dropdown, Form, Spinner, Modal, Button } from 'react-bootstrap';
+import { Dropdown, Form, Spinner, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import { getUsers, updateUserStatus, createUser, updateUser, type User, type SaveUserRequest } from '../api/userApi';
+import { ResizableHeader } from '../components/ResizableHeader';
 
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -55,10 +56,13 @@ export const Users: React.FC = () => {
 
 
   
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>, saveFunc: () => void) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>, saveFunc: () => void, cancelFunc?: () => void) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       saveFunc();
+    } else if (e.key === 'Escape' && cancelFunc) {
+      e.preventDefault();
+      cancelFunc();
     }
   };
 
@@ -256,36 +260,36 @@ export const Users: React.FC = () => {
 
         {/* Table */}
         <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-          <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent' }}>
+          <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1300px' }}>
             <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('fullName')}>
+                <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('fullName')}>
                   <span className="fw-semibold text-nowrap">Họ tên {getSortIcon('fullName')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('email')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('email')}>
                   <span className="fw-semibold text-nowrap">Email {getSortIcon('email')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('provider')}>
-                  <span className="fw-semibold text-nowrap">Provider {getSortIcon('provider')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('coinBalance')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('provider')}>
+                  <span className="fw-semibold text-nowrap">Nguồn {getSortIcon('provider')}</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('coinBalance')}>
                   <span className="fw-semibold text-nowrap">Xu {getSortIcon('coinBalance')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('currentPlanId')}>
-                  <span className="fw-semibold text-nowrap">Plan {getSortIcon('currentPlanId')}</span>
-                </th>
-                <th style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
-                  <span className="fw-semibold text-nowrap">Reads (Daily/Total)</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('createdAt')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('currentPlanId')}>
+                  <span className="fw-semibold text-nowrap">Gói Cước {getSortIcon('currentPlanId')}</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Lượt Đọc (Ngày/Tổng)</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={130} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('createdAt')}>
                   <span className="fw-semibold text-nowrap">Ngày tham gia {getSortIcon('createdAt')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('isActive')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('isActive')}>
                   <span className="fw-semibold text-nowrap">Trạng thái {getSortIcon('isActive')}</span>
-                </th>
-                <th style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
-                  <span className="fw-semibold text-nowrap">Action</span>
-                </th>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Thao Tác</span>
+                </ResizableHeader>
               </tr>
             </thead>
             <tbody>
@@ -299,7 +303,7 @@ export const Users: React.FC = () => {
               ) : (
                 <>
               {isAddingNewUser && (
-                <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
                   <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                     <div className="d-flex align-items-center gap-3">
                       <img 
@@ -312,9 +316,10 @@ export const Users: React.FC = () => {
                         size="sm" 
                         value={newUser.fullName || ''} 
                         onChange={(e) => setNewUser({...newUser, fullName: e.target.value})} 
-                        onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                        onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
                         placeholder="Họ tên"
-                        className="bg-transparent text-body border-secondary-subtle"
+                        className="inline-edit-input text-body w-100"
+                        autoFocus
                       />
                     </div>
                   </td>
@@ -323,9 +328,9 @@ export const Users: React.FC = () => {
                       size="sm" 
                       value={newUser.email || ''} 
                       onChange={(e) => setNewUser({...newUser, email: e.target.value})} 
-                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
                       placeholder="Email"
-                      className="bg-transparent text-body border-secondary-subtle"
+                      className="inline-edit-input text-body w-100"
                     />
                   </td>
                   <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
@@ -337,13 +342,13 @@ export const Users: React.FC = () => {
                       type="number" 
                       value={newUser.coinBalance ?? 0} 
                       onChange={(e) => setNewUser({...newUser, coinBalance: Number(e.target.value)})} 
-                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
                       style={{ width: '90px' }}
-                      className="bg-transparent text-warning fw-bold border-secondary-subtle"
+                      className="inline-edit-input text-warning fw-bold"
                     />
                   </td>
                   <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                    <span className="text-muted small">Free</span>
+                    <span className="text-muted small">Miễn phí</span>
                   </td>
                   <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                     <span className="fw-medium">0</span> / <span className="text-muted small">0</span>
@@ -357,7 +362,7 @@ export const Users: React.FC = () => {
                       id="add-status"
                       checked={newUser.isActive ?? true}
                       onChange={(e) => setNewUser({...newUser, isActive: e.target.checked})}
-                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit())}
+                      onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
                       className="d-inline-block"
                     />
                   </td>
@@ -372,7 +377,7 @@ export const Users: React.FC = () => {
               {sortedData.length > 0 ? (
                 sortedData.map((user) => (
                   editingUserId === user.id ? (
-                    <tr key={user.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                    <tr key={user.id} className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
                       <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         <div className="d-flex align-items-center gap-3">
                           <img 
@@ -385,9 +390,10 @@ export const Users: React.FC = () => {
                             size="sm" 
                             value={editFormData.fullName || ''} 
                             onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})} 
-                            onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
+                            onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                             placeholder="Họ tên"
-                            className="bg-transparent text-body border-secondary-subtle"
+                            className="inline-edit-input text-body w-100"
+                            autoFocus
                           />
                         </div>
                       </td>
@@ -396,9 +402,9 @@ export const Users: React.FC = () => {
                           size="sm" 
                           value={editFormData.email || ''} 
                           onChange={(e) => setEditFormData({...editFormData, email: e.target.value})} 
-                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
+                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                           placeholder="Email"
-                          className="bg-transparent text-body border-secondary-subtle"
+                          className="inline-edit-input text-body w-100"
                         />
                       </td>
                       <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
@@ -410,16 +416,16 @@ export const Users: React.FC = () => {
                           type="number" 
                           value={editFormData.coinBalance ?? 0} 
                           onChange={(e) => setEditFormData({...editFormData, coinBalance: Number(e.target.value)})} 
-                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
+                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                           style={{ width: '90px' }}
-                          className="bg-transparent text-warning fw-bold border-secondary-subtle"
+                          className="inline-edit-input text-warning fw-bold"
                         />
                       </td>
                       <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         {user.currentPlanName ? (
                           <span className="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">{user.currentPlanName}</span>
                         ) : (
-                          <span className="text-muted small">Free</span>
+                          <span className="text-muted small">Miễn phí</span>
                         )}
                       </td>
                       <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
@@ -434,7 +440,7 @@ export const Users: React.FC = () => {
                           id={`edit-status-${user.id}`}
                           checked={editFormData.isActive ?? true}
                           onChange={(e) => setEditFormData({...editFormData, isActive: e.target.checked})}
-                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id))}
+                          onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                           className="d-inline-block"
                         />
                       </td>
@@ -446,7 +452,7 @@ export const Users: React.FC = () => {
                       </td>
                     </tr>
                   ) : (
-                  <tr key={user.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                  <tr key={user.id} style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }} onDoubleClick={() => handleEditClick(user)}>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                       <div className="d-flex align-items-center gap-3">
                         <img 
@@ -471,7 +477,7 @@ export const Users: React.FC = () => {
                       {user.currentPlanName ? (
                         <span className="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">{user.currentPlanName}</span>
                       ) : (
-                        <span className="text-muted small">Free</span>
+                        <span className="text-muted small">Miễn phí</span>
                       )}
                     </td>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
@@ -481,50 +487,36 @@ export const Users: React.FC = () => {
                       {formatDate(user.createdAt)}
                     </td>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <Dropdown>
-                        <Dropdown.Toggle 
-                          variant="none" 
-                          size="sm" 
-                          className={`fw-medium d-flex align-items-center justify-content-between ${user.isActive ? 'bg-success-subtle text-success border-0' : 'bg-danger-subtle text-danger border-0'}`}
-                          style={{ 
-                            minWidth: '90px',
-                            padding: '6px 12px',
-                            boxShadow: 'none'
-                          }}
-                        >
-                          {user.isActive ? 'Active' : 'Locked'}
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu className="shadow-sm border border-secondary-subtle py-2" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
-                          <Dropdown.Item 
-                            onClick={() => handleStatusChange(user.id, user.isActive)}
-                            className="text-body py-2 px-3 hover-bg-subtle"
-                            style={{ fontSize: '14px', backgroundColor: 'transparent' }}
-                          >
-                            {user.isActive ? 'Khóa tài khoản' : 'Mở khóa'}
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
+                      <div
+                        className={`fw-medium d-flex align-items-center justify-content-center border-0 no-caret ${user.isActive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}
+                        style={{
+                          minWidth: '90px',
+                          padding: '6px 12px',
+                          boxShadow: 'none',
+                          borderRadius: '20px',
+                          gap: '8px',
+                          display: 'inline-flex'
+                        }}
+                      >
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: user.isActive ? '#198754' : '#dc3545' }}></span>
+                        {user.isActive ? 'Hoạt động' : 'Bị khóa'}
+                      </div>
                     </td>
                     <td style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <Dropdown align="end">
-                        <Dropdown.Toggle as={CustomToggle}>
-                          <FontAwesomeIcon icon={faEllipsisH} className="text-muted" />
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu className="shadow-sm border border-secondary-subtle py-2" style={{ backgroundColor: 'var(--bs-body-bg)', minWidth: '120px' }}>
-                          <Dropdown.Item 
-                            onClick={() => handleEditClick(user)} 
-                            className="text-body py-2 px-3 hover-bg-subtle" 
-                            style={{ fontSize: '14px', backgroundColor: 'transparent', cursor: 'pointer' }}
-                          >
-                            Edit
-                          </Dropdown.Item>
-                          <Dropdown.Item href="#" className="text-danger py-2 px-3 hover-bg-subtle" style={{ fontSize: '14px', backgroundColor: 'transparent' }}>
-                            Delete
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
+                      <div className="d-flex gap-2 justify-content-end">
+                        <Button variant="light" size="sm" onClick={() => handleStatusChange(user.id, !user.isActive)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                          <FontAwesomeIcon icon={faExchangeAlt} className="me-2" style={{ color: '#9ca3af' }} />
+                          Change
+                        </Button>
+                        <Button variant="light" size="sm" onClick={() => handleEditClick(user)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                          <FontAwesomeIcon icon={faPen} className="me-2" style={{ color: '#9ca3af' }} />
+                          Sửa
+                        </Button>
+                        <Button variant="light" size="sm" onClick={() => alert('Chức năng đang được phát triển')} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                          <FontAwesomeIcon icon={faTrash} className="me-2" />
+                          Xóa
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                   )
@@ -550,52 +542,50 @@ export const Users: React.FC = () => {
           
           {totalPages > 1 && (
             <div className="d-flex" style={{ gap: '4px' }}>
-              <button 
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 btn-light" 
-                style={{ width: '32px', height: '32px' }}
-                onClick={() => setCurrentPage(1)} 
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === 1 ? '#a9b1c0' : '#5955D1' }}
+                onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
               >
                 <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
               </button>
-              <button 
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 btn-light" 
-                style={{ width: '32px', height: '32px' }}
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === 1 ? '#a9b1c0' : '#5955D1' }}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
               >
                 <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
               </button>
-              
-              {Array.from({ length: totalPages }).map((_, i) => i + 1)
-                .filter(page => page === 1 || page === totalPages || Math.abs(currentPage - page) <= 1)
-                .map((page, i, arr) => (
-                  <React.Fragment key={page}>
-                    {i > 0 && arr[i - 1] !== page - 1 && (
-                      <span className="d-flex align-items-center justify-content-center px-1 text-muted">...</span>
-                    )}
-                    <button 
-                      className={`btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium ${page === currentPage ? 'btn-primary' : 'btn-light'}`} 
-                      style={{ width: '32px', height: '32px', fontSize: '13px' }}
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page}
-                    </button>
-                  </React.Fragment>
-                ))}
-              
-              <button 
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 btn-light" 
-                style={{ width: '32px', height: '32px' }}
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
+                  style={{
+                    width: '32px', height: '32px', fontSize: '13px',
+                    backgroundColor: i + 1 === currentPage ? '#5955D1' : '#f4f5f8',
+                    color: i + 1 === currentPage ? '#fff' : '#5955D1'
+                  }}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === totalPages ? '#a9b1c0' : '#5955D1' }}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
               >
                 <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
               </button>
-              <button 
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 btn-light" 
-                style={{ width: '32px', height: '32px' }}
-                onClick={() => setCurrentPage(totalPages)} 
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === totalPages ? '#a9b1c0' : '#5955D1' }}
+                onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
               >
                 <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />

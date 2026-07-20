@@ -45,6 +45,9 @@ namespace xomtruyen.API.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -57,20 +60,38 @@ namespace xomtruyen.API.Migrations
                     b.Property<bool?>("IsRecommended")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("OwnerId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Active");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
                     b.Property<int?>("ViewCount")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Books");
                 });
@@ -88,6 +109,21 @@ namespace xomtruyen.API.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("BookCategories");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.BookTopic", b =>
+                {
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("BookId", "TopicId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("BookTopics");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Bookmark", b =>
@@ -315,6 +351,29 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("SubscriptionPlans");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.Topic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Topics");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -407,6 +466,24 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.UserBook", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId", "BookId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("UserBooks");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.UserFavorite", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -484,6 +561,16 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("UserTokens");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.Book", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.BookCategory", b =>
                 {
                     b.HasOne("XomTruyen.API.Models.Book", "Book")
@@ -501,6 +588,25 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.BookTopic", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Book", "Book")
+                        .WithMany("BookTopics")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("XomTruyen.API.Models.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Bookmark", b =>
@@ -622,6 +728,25 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("CurrentPlan");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.UserBook", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("XomTruyen.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.UserFavorite", b =>
                 {
                     b.HasOne("XomTruyen.API.Models.Book", "Book")
@@ -674,6 +799,8 @@ namespace xomtruyen.API.Migrations
             modelBuilder.Entity("XomTruyen.API.Models.Book", b =>
                 {
                     b.Navigation("BookCategories");
+
+                    b.Navigation("BookTopics");
 
                     b.Navigation("Chapters");
                 });

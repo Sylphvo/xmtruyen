@@ -19,9 +19,9 @@ export const Dashboard: React.FC = () => {
       {/* Breadcrumb */}
       <div className="d-flex align-items-center mb-4 text-muted small">
         <FontAwesomeIcon icon={faHome} style={{ fontSize: '14px' }} className="me-2" />
-        <span>Home</span>
+        <span>Trang chủ</span>
         <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '14px' }} className="mx-2" />
-        <span className="text-white">Dashboard</span>
+        <span className="text-white">Tổng quan</span>
       </div>
 
       <div className="row g-4">
@@ -32,7 +32,7 @@ export const Dashboard: React.FC = () => {
             <div className="col-sm-6">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="text-muted small">Total Contacts</h6>
+                  <h6 className="text-muted small">Tổng số liên hệ</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2">
@@ -44,7 +44,7 @@ export const Dashboard: React.FC = () => {
                     <Chart options={contactsChart.options} series={contactsChart.series} type="bar" height="100%" />
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3 text-muted small">
-                    <span>Vs last month: 1,195</span>
+                    <span>So với tháng trước: 1,195</span>
                     <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '14px' }} />
                   </div>
                 </div>
@@ -55,7 +55,7 @@ export const Dashboard: React.FC = () => {
             <div className="col-sm-6">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="text-muted small">Lead Analytics</h6>
+                  <h6 className="text-muted small">Phân tích dữ liệu</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2">
@@ -67,7 +67,7 @@ export const Dashboard: React.FC = () => {
                     <Chart options={leadChart.options} series={leadChart.series} type="line" height="100%" />
                   </div>
                   <div className="text-center mt-3 text-muted small">
-                    <span>Compared to Last Month</span>
+                    <span>So với tháng trước</span>
                   </div>
                 </div>
               </div>
@@ -77,22 +77,22 @@ export const Dashboard: React.FC = () => {
             <div className="col-sm-6">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="text-muted small">Tasks Overview</h6>
-                  <span className="text-muted small" style={{fontSize: '10px'}}>Tasks Done <span className="text-white">25</span></span>
+                  <h6 className="text-muted small">Tổng quan Nhiệm vụ</h6>
+                  <span className="text-muted small" style={{fontSize: '10px'}}>Nhiệm vụ xong <span className="text-white">25</span></span>
                 </div>
                 <div className="card-body pt-2 d-flex align-items-center">
                   <div className="flex-grow-1">
                     <div className="d-flex align-items-center mb-2">
                       <div className="bg-primary rounded-circle me-2" style={{width: 8, height: 8}}></div>
-                      <span className="text-muted small">Follow-ups</span>
+                      <span className="text-muted small">Theo dõi</span>
                     </div>
                     <div className="d-flex align-items-center mb-2">
                       <div className="rounded-circle me-2" style={{width: 8, height: 8, backgroundColor: '#423eb3'}}></div>
-                      <span className="text-muted small">In Progress</span>
+                      <span className="text-muted small">Đang tiến hành</span>
                     </div>
                     <div className="d-flex align-items-center">
                       <div className="rounded-circle me-2" style={{width: 8, height: 8, backgroundColor: '#2a2880'}}></div>
-                      <span className="text-muted small">Pending</span>
+                      <span className="text-muted small">Đang chờ</span>
                     </div>
                   </div>
                   <div style={{ width: '80px', height: '80px' }}>
@@ -106,7 +106,7 @@ export const Dashboard: React.FC = () => {
             <div className="col-sm-6">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="text-muted small">Active Deals</h6>
+                  <h6 className="text-muted small">Giao dịch đang mở</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2 d-flex flex-column justify-content-between">
@@ -115,7 +115,7 @@ export const Dashboard: React.FC = () => {
                     <span className="badge badge-soft text-success px-2 py-1" style={{fontSize: '10px'}}>+2.57%</span>
                   </div>
                   <div className="mt-auto d-flex justify-content-between align-items-center text-muted small">
-                    <span>Vs last month: 1,195</span>
+                    <span>So với tháng trước: 1,195</span>
                     <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '14px' }} />
                   </div>
                 </div>
@@ -126,18 +126,18 @@ export const Dashboard: React.FC = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header border-0">
-                  <h6 className="mb-0 text-white">Revenue</h6>
+                  <h6 className="mb-0 text-white">Doanh thu</h6>
                   <div className="d-flex gap-2 rounded-pill p-1" style={{backgroundColor: '#1f2128'}}>
-                    <button className="btn btn-sm btn-link text-muted text-decoration-none px-3">Today</button>
-                    <button className="btn btn-sm btn-link text-muted text-decoration-none px-3">Week</button>
-                    <button className="btn btn-sm btn-primary rounded-pill px-3" style={{backgroundColor: '#2a2b36', border: '1px solid rgba(255,255,255,0.1)'}}>Month</button>
+                    <button className="btn btn-sm btn-link text-muted text-decoration-none px-3">Hôm nay</button>
+                    <button className="btn btn-sm btn-link text-muted text-decoration-none px-3">Tuần</button>
+                    <button className="btn btn-sm btn-primary rounded-pill px-3" style={{backgroundColor: '#2a2b36', border: '1px solid rgba(255,255,255,0.1)'}}>Tháng</button>
                     <button className="btn btn-sm btn-icon border-0 ms-1" style={{height: '28px', width: '28px'}}><FontAwesomeIcon icon={faCalendarAlt} style={{ fontSize: '14px' }}/></button>
                   </div>
                 </div>
                 <div className="card-body pt-0">
                   <div className="d-flex align-items-end mb-4">
                     <h2 className="fw-bold mb-0 me-2 text-white">$2,56,054.50</h2>
-                    <span className="text-success small mb-1">+20% vs last month</span>
+                    <span className="text-success small mb-1">+20% so với tháng trước</span>
                   </div>
                   <div style={{ height: '250px' }}>
                     <Chart options={revenueChart.options} series={revenueChart.series} type="bar" height="100%" />
@@ -155,7 +155,7 @@ export const Dashboard: React.FC = () => {
             <div className="col-12 flex-grow-1">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="mb-0 text-white">Traffic Sources</h6>
+                  <h6 className="mb-0 text-white">Nguồn truy cập</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body">
@@ -164,11 +164,11 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="d-flex flex-column gap-3 mb-4">
                     {[
-                      { name: 'Organic Search', val: '41.50%', color: '#5955D1' },
-                      { name: 'Direct Traffic', val: '27%', color: '#423eb3' },
-                      { name: 'Referral Traffic', val: '18%', color: '#2a2880' },
-                      { name: 'Social Media', val: '10.30%', color: '#1c1b5e' },
-                      { name: 'Email Traffic', val: '3.20%', color: '#1c1b5e' }
+                      { name: 'Tìm kiếm tự nhiên', val: '41.50%', color: '#5955D1' },
+                      { name: 'Truy cập trực tiếp', val: '27%', color: '#423eb3' },
+                      { name: 'Truy cập giới thiệu', val: '18%', color: '#2a2880' },
+                      { name: 'Mạng xã hội', val: '10.30%', color: '#1c1b5e' },
+                      { name: 'Truy cập từ Email', val: '3.20%', color: '#1c1b5e' }
                     ].map((item, i) => (
                       <div key={i} className="d-flex justify-content-between align-items-center text-muted small">
                         <div className="d-flex align-items-center">
@@ -180,9 +180,9 @@ export const Dashboard: React.FC = () => {
                     ))}
                   </div>
                   <div className="d-flex justify-content-between align-items-center pt-3 border-top" style={{borderColor: 'rgba(255,255,255,0.05)'}}>
-                    <span className="text-muted small">Annual report</span>
+                    <span className="text-muted small">Báo cáo năm</span>
                     <button className="btn btn-sm btn-link text-primary text-decoration-none d-flex align-items-center px-0">
-                      <FontAwesomeIcon icon={faDownload} style={{ fontSize: '14px' }} className="me-1" /> Download
+                      <FontAwesomeIcon icon={faDownload} style={{ fontSize: '14px' }} className="me-1" /> Tải về
                     </button>
                   </div>
                 </div>
@@ -193,13 +193,13 @@ export const Dashboard: React.FC = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="mb-0 text-white">Retention Rate</h6>
+                  <h6 className="mb-0 text-white">Tỷ lệ duy trì</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body pt-2">
                   <div className="d-flex align-items-end mb-3">
                     <h2 className="fw-bold mb-0 me-2 text-white">92%</h2>
-                    <span className="text-success small mb-1">+15% vs last month</span>
+                    <span className="text-success small mb-1">+15% so với tháng trước</span>
                   </div>
                   <div style={{ height: '220px' }}>
                     <Chart options={retentionChart.options} series={retentionChart.series} type="bar" height="100%" />
@@ -217,7 +217,7 @@ export const Dashboard: React.FC = () => {
             <div className="col-12 flex-grow-1">
               <div className="card card-purple p-2">
                 <div className="card-header">
-                  <h6 className="mb-0 text-white">Total Earning</h6>
+                  <h6 className="mb-0 text-white">Tổng thu nhập</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-white cursor-pointer" />
                 </div>
                 <div className="card-body text-center d-flex flex-column align-items-center">
@@ -242,15 +242,15 @@ export const Dashboard: React.FC = () => {
                   </div>
 
                   <div className="w-100 text-start mt-auto">
-                    <h6 className="mb-3 text-white">Orders Status</h6>
+                    <h6 className="mb-3 text-white">Trạng thái đơn hàng</h6>
                     <div className="progress progress-dark rounded-pill mb-4" style={{height: '8px'}}>
                       <div className="progress-bar bg-white rounded-pill" style={{width: '70%'}}></div>
                     </div>
                     <div className="d-flex flex-column gap-2">
                       {[
-                        { label: 'Paid', val: '70%' },
-                        { label: 'Cancelled', val: '25%' },
-                        { label: 'Refunded', val: '5%' }
+                        { label: 'Đã thanh toán', val: '70%' },
+                        { label: 'Đã hủy', val: '25%' },
+                        { label: 'Hoàn tiền', val: '5%' }
                       ].map((item, i) => (
                         <div key={i} className="d-flex justify-content-between align-items-center small">
                           <div className="d-flex align-items-center">
@@ -270,7 +270,7 @@ export const Dashboard: React.FC = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header border-0 pb-0">
-                  <h6 className="mb-0 text-white">Order By Time</h6>
+                  <h6 className="mb-0 text-white">Đơn hàng theo thời gian</h6>
                   <FontAwesomeIcon icon={faEllipsisH} style={{ fontSize: '16px' }} className="text-muted cursor-pointer" />
                 </div>
                 <div className="card-body">

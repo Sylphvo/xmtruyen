@@ -86,7 +86,7 @@ export default function BookCard({
           gap: "4px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
         }}>
-          <Star size={10} fill="#fbbf24" color="#fbbf24" /> 4.5
+          <Star size={10} fill="#fbbf24" color="#fbbf24" /> {book.averageRating?.toFixed(1) || 4.5}
         </div>
         <button style={{ 
           backgroundColor: "#8a5cf6", 
@@ -138,11 +138,11 @@ export default function BookCard({
           {book.title}
         </h3>
         <p style={{ color: "rgba(255,255,255,0.9)", margin: 0, fontSize: "11px", fontWeight: 500 }}>
-          {book.genres.length > 0 ? book.genres[0] : "Truyện Tranh"}
+          {book.genres && book.genres.length > 0 ? book.genres[0] : (book.formatType === 1 ? "Truyện Chữ" : "Truyện Tranh")}
         </p>
         
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "4px" }}>
-          <span style={{ color: "#fff", fontSize: "12px", fontWeight: 700 }}>Chap {book.currentChapter}</span>
+          <span style={{ color: "#fff", fontSize: "12px", fontWeight: 700 }}>Chap {book.currentChapter || 1}</span>
           <button style={{ 
             backgroundColor: "#fff", 
             color: "#8a5cf6", 
@@ -189,7 +189,7 @@ export default function BookCard({
           {book.title}
         </h3>
         <p style={{ fontSize: 13, color: "var(--text-muted, #777)", margin: 0, fontWeight: 500 }}>
-          Chương {book.currentChapter}
+          Chương {book.currentChapter || 1}
         </p>
       </div>
     </div>

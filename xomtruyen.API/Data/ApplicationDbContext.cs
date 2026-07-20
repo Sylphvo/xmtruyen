@@ -12,14 +12,17 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Topic> Topics { get; set; }
     public DbSet<Book> Books { get; set; }
     public DbSet<BookCategory> BookCategories { get; set; }
+    public DbSet<BookTopic> BookTopics { get; set; }
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<ChapterImage> ChapterImages { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
     public DbSet<UserPurchasedChapter> UserPurchasedChapters { get; set; }
     public DbSet<ReadingHistory> ReadingHistories { get; set; }
     public DbSet<UserFavorite> UserFavorites { get; set; }
+    public DbSet<UserBook> UserBooks { get; set; }
     public DbSet<Note> Notes { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
@@ -60,6 +63,14 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Slug).HasMaxLength(150).IsRequired();
         });
 
+        // Topic
+        modelBuilder.Entity<Topic>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Slug).HasMaxLength(150).IsRequired();
+        });
+
         // Book
         modelBuilder.Entity<Book>(entity =>
         {
@@ -68,6 +79,12 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Slug).HasMaxLength(255).IsRequired();
             entity.Property(e => e.Author).HasMaxLength(150);
             entity.Property(e => e.AverageRating).HasColumnType("decimal(3,2)");
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
+            
+            entity.HasOne(e => e.Owner)
+                  .WithMany()
+                  .HasForeignKey(e => e.OwnerId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // BookCategory
@@ -83,6 +100,22 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Category)
                   .WithMany()
                   .HasForeignKey(e => e.CategoryId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // BookTopic
+        modelBuilder.Entity<BookTopic>(entity =>
+        {
+            entity.HasKey(e => new { e.BookId, e.TopicId });
+            
+            entity.HasOne(e => e.Book)
+                  .WithMany(b => b.BookTopics)
+                  .HasForeignKey(e => e.BookId)
+                  .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.HasOne(e => e.Topic)
+                  .WithMany()
+                  .HasForeignKey(e => e.TopicId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -165,6 +198,22 @@ public class ApplicationDbContext : DbContext
 
         // UserFavorite
         modelBuilder.Entity<UserFavorite>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.BookId });
+            
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.HasOne(e => e.Book)
+                  .WithMany()
+                  .HasForeignKey(e => e.BookId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // UserBook
+        modelBuilder.Entity<UserBook>(entity =>
         {
             entity.HasKey(e => new { e.UserId, e.BookId });
             

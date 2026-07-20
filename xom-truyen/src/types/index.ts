@@ -1,14 +1,20 @@
 export interface Book {
-  id: number;
+  id: string | number;
   title: string;
   author: string;
   images?: string;
-  coverIndex: number;
+  coverImageUrl?: string;
+  coverIndex?: number;
 
   // Các trường dữ liệu mới được bổ sung
-  genres: string[]; // ví dụ: ["Thám hiểm", "Hài hước"]
-  currentChapter: number; // ví dụ: 121
-  lastUpdated: string; // ví dụ: "2 giờ trước"
+  genres?: string[]; // ví dụ: ["Thám hiểm", "Hài hước"]
+  currentChapter?: number; // ví dụ: 121
+  lastUpdated?: string; // ví dụ: "2 giờ trước"
+  viewCount?: number;
+  averageRating?: number;
+  slug?: string;
+  formatType?: number;
+  accessLevel?: number;
 }
 
 export interface SectionData {

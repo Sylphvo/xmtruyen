@@ -3,6 +3,7 @@ import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
 // import Footer from "./components/Layout/Footer";
 import HomePage from "./pages";
+import ComicPage from "./pages/ComicPage";
 import LoginPage from "./pages/LoginPage"; // <-- Nhớ import trang Login vào đây
 import RegisterPage from "./pages/RegisterPage"; // <-- Import thêm trang Register (nếu có)
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -89,6 +90,16 @@ export default function App() {
           element={
             <MainLayout>
               <HomePage />
+            </MainLayout>
+          }
+        />
+
+        {/* Tuyến đường Truyện Tranh */}
+        <Route
+          path="/comics"
+          element={
+            <MainLayout>
+              <ComicPage />
             </MainLayout>
           }
         />

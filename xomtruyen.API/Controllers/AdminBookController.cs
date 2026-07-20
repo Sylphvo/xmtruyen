@@ -70,6 +70,24 @@ public class AdminBookController : BaseApiController
         }
     }
 
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] BookUpdateRequest request)
+    {
+        try
+        {
+            await _bookService.PartialUpdateBookAsync(id, request);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { Message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -104,6 +122,20 @@ public class AdminBookController : BaseApiController
         try
         {
             await _bookService.ToggleExclusiveAsync(id, isExclusive);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { Message = ex.Message });
+        }
+    }
+
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> ToggleStatus(Guid id, [FromBody] string status)
+    {
+        try
+        {
+            await _bookService.ToggleStatusAsync(id, status);
             return NoContent();
         }
         catch (KeyNotFoundException ex)

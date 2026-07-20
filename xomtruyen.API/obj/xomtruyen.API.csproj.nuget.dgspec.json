@@ -79,6 +79,18 @@
             "Scalar.AspNetCore": {
               "target": "Package",
               "version": "[2.16.5, )"
+            },
+            "SharpCompress": {
+              "target": "Package",
+              "version": "[0.50.0, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[2.1.9, )"
+            },
+            "UglyToad.PdfPig": {
+              "target": "Package",
+              "version": "[1.7.0-custom-5, )"
             }
           },
           "imports": [

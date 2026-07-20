@@ -1,0 +1,88 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/02a2fd23-e810-4aad-8d01-24266b2bbd31/FileRaw/original.levsi1xjrb.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\02a2fd23-e810-4aad-8d01-24266b2bbd31\FileRaw\original.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"levsi1xjrb"},{"Name":"integrity","Value":"sha256-/VOzIzx4uvl6NNGSskwbv\u002Bbd7bk9BdEeJw89Q8CaZqI="},{"Name":"label","Value":"_content/xomtruyen.API/books/02a2fd23-e810-4aad-8d01-24266b2bbd31/FileRaw/original.pdf"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"783854"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u0022/VOzIzx4uvl6NNGSskwbv\u002Bbd7bk9BdEeJw89Q8CaZqI=\u0022"},{"Name":"Last-Modified","Value":"Mon, 20 Jul 2026 17:34:18 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/02a2fd23-e810-4aad-8d01-24266b2bbd31/FileRaw/original.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\02a2fd23-e810-4aad-8d01-24266b2bbd31\FileRaw\original.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-/VOzIzx4uvl6NNGSskwbv\u002Bbd7bk9BdEeJw89Q8CaZqI="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"783854"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u0022/VOzIzx4uvl6NNGSskwbv\u002Bbd7bk9BdEeJw89Q8CaZqI=\u0022"},{"Name":"Last-Modified","Value":"Mon, 20 Jul 2026 17:34:18 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/cover.sonp6x6mw5.webp">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\cover.webp'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"sonp6x6mw5"},{"Name":"integrity","Value":"sha256-LA5jlnVjnP55P7BShiNe0b4TvbB3JSVLRDBDmy6owVY="},{"Name":"label","Value":"_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/cover.webp"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"474"},{"Name":"Content-Type","Value":"image/webp"},{"Name":"ETag","Value":"\u0022LA5jlnVjnP55P7BShiNe0b4TvbB3JSVLRDBDmy6owVY=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/cover.webp">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\cover.webp'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-LA5jlnVjnP55P7BShiNe0b4TvbB3JSVLRDBDmy6owVY="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=3600, must-revalidate"},{"Name":"Content-Length","Value":"474"},{"Name":"Content-Type","Value":"image/webp"},{"Name":"ETag","Value":"\u0022LA5jlnVjnP55P7BShiNe0b4TvbB3JSVLRDBDmy6owVY=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/metadata.bezpxpwncr.json">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\metadata.json'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"bezpxpwncr"},{"Name":"integrity","Value":"sha256-jfuTRnuZfxqzQsKUFPZ/KmE8zRh4OtPssRLLtUjlCPg="},{"Name":"label","Value":"_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/metadata.json"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"135"},{"Name":"Content-Type","Value":"application/json"},{"Name":"ETag","Value":"\u0022jfuTRnuZfxqzQsKUFPZ/KmE8zRh4OtPssRLLtUjlCPg=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/metadata.json">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\metadata.json'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-jfuTRnuZfxqzQsKUFPZ/KmE8zRh4OtPssRLLtUjlCPg="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"135"},{"Name":"Content-Type","Value":"application/json"},{"Name":"ETag","Value":"\u0022jfuTRnuZfxqzQsKUFPZ/KmE8zRh4OtPssRLLtUjlCPg=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/original.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\original.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-9u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"20597"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u00229u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:47 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/original.yp113r8udo.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\original.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"yp113r8udo"},{"Name":"integrity","Value":"sha256-9u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4="},{"Name":"label","Value":"_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/original.pdf"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"20597"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u00229u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:47 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/page_001.4bznn42yre.webp">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\page_001.webp'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"4bznn42yre"},{"Name":"integrity","Value":"sha256-gEYBDzTq\u002BHO4Q5GsyMXRQsO8/\u002BnpBnhUYy4Q8oJGvZ4="},{"Name":"label","Value":"_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/page_001.webp"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1680"},{"Name":"Content-Type","Value":"image/webp"},{"Name":"ETag","Value":"\u0022gEYBDzTq\u002BHO4Q5GsyMXRQsO8/\u002BnpBnhUYy4Q8oJGvZ4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/page_001.webp">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\page_001.webp'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-gEYBDzTq\u002BHO4Q5GsyMXRQsO8/\u002BnpBnhUYy4Q8oJGvZ4="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=3600, must-revalidate"},{"Name":"Content-Length","Value":"1680"},{"Name":"Content-Type","Value":"image/webp"},{"Name":"ETag","Value":"\u0022gEYBDzTq\u002BHO4Q5GsyMXRQsO8/\u002BnpBnhUYy4Q8oJGvZ4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/toc.b9g4ogp5tr.json">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\toc.json'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"b9g4ogp5tr"},{"Name":"integrity","Value":"sha256-T1PNoYwrqgwDVLtfmj7L5e0Sq02OEbqHPC8RFhICuUU="},{"Name":"label","Value":"_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/toc.json"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"2"},{"Name":"Content-Type","Value":"application/json"},{"Name":"ETag","Value":"\u0022T1PNoYwrqgwDVLtfmj7L5e0Sq02OEbqHPC8RFhICuUU=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/books/435de2cc-d444-4a19-82e9-fe6b1cf51ae7/toc.json">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\toc.json'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-T1PNoYwrqgwDVLtfmj7L5e0Sq02OEbqHPC8RFhICuUU="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"2"},{"Name":"Content-Type","Value":"application/json"},{"Name":"ETag","Value":"\u0022T1PNoYwrqgwDVLtfmj7L5e0Sq02OEbqHPC8RFhICuUU=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:48 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/uploads/raw-uploads/ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\raw-uploads\ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-9u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"20597"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u00229u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:47 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/xomtruyen.API/uploads/raw-uploads/ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.yp113r8udo.pdf">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\raw-uploads\ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"yp113r8udo"},{"Name":"integrity","Value":"sha256-9u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4="},{"Name":"label","Value":"_content/xomtruyen.API/uploads/raw-uploads/ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"20597"},{"Name":"Content-Type","Value":"application/pdf"},{"Name":"ETag","Value":"\u00229u3NihtPfLhUhtDGd3\u002BRdOrbxNHQ2eWuunEy8ws0vD4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 15 Jul 2026 16:38:47 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+  </ItemGroup>
+</Project>

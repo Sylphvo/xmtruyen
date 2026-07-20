@@ -131,3 +131,13 @@ C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9
 C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\Scalar.AspNetCore.dll
 C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\Dapper.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\SixLabors.ImageSharp.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\UglyToad.PdfPig.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\UglyToad.PdfPig.Core.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\UglyToad.PdfPig.Fonts.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\UglyToad.PdfPig.Tokenization.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\UglyToad.PdfPig.Tokens.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\xomtruyen.API.staticwebassets.runtime.json
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\obj\Debug\net9.0\compressed\irjjo4j4ci-bezpxpwncr.gz
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\obj\Debug\net9.0\compressed\l5lqd28qgm-b9g4ogp5tr.gz
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\SharpCompress.dll

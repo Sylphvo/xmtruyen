@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Book, Hexagon, Tag, List } from 'lucide-react';
+import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties } from 'lucide-react';
+import { getTables } from '../../api/managerDbApi';
 
 interface SidebarProps {
   isCollapsed?: boolean;
@@ -11,12 +12,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   const path = location.pathname;
 
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [dbTables, setDbTables] = useState<string[]>([]);
 
   useEffect(() => {
-    if (path.startsWith('/books') || path.startsWith('/topics') || path.startsWith('/categories')) {
+    getTables().then(setDbTables).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (path.startsWith('/books') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-files')) {
       setActiveMenu('books');
     } else if (path.startsWith('/users')) {
       setActiveMenu('users');
+    } else if (path.startsWith('/database')) {
+      setActiveMenu('database');
     } else {
       setActiveMenu('dashboard');
     }
@@ -50,6 +58,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
         >
           <Users />
         </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'database' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('database')}
+          style={{ cursor: 'pointer' }}
+        >
+          <Database />
+        </div>
       </aside>
 
       {/* Menu Sidebar */}
@@ -75,13 +90,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                 <Book />
                 <span>Sách</span>
               </NavLink>
+              <NavLink to="/book-files" className="menu-link">
+                <Database />
+                <span>File sách</span>
+              </NavLink>
               <NavLink to="/topics" className="menu-link">
                 <Tag />
-                <span>Topic</span>
+                <span>Chủ đề</span>
               </NavLink>
               <NavLink to="/categories" className="menu-link">
                 <List />
-                <span>Category</span>
+                <span>Thể loại</span>
               </NavLink>
             </>
           )}
@@ -93,6 +112,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                 <Users />
                 <span>User</span>
               </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'database' && (
+            <>
+              <div className="menu-heading">Quản lý Database</div>
+              <NavLink to="/database" className="menu-link" end>
+                <Database />
+                <span>Overview</span>
+              </NavLink>
+              {dbTables.map(table => (
+                <NavLink key={table} to={`/database/${table}`} className="menu-link" style={{ paddingLeft: '42px', fontSize: '13px' }}>
+                  <TableProperties size={16} />
+                  <span>{table}</span>
+                </NavLink>
+              ))}
             </>
           )}
         </div>

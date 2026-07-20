@@ -1,7 +1,5 @@
 import type { IUser } from '../types/user';
 import type { IBook } from '../types/book';
-import type { ITopic } from '../types/topic';
-import type { ICategory } from '../types/category';
 
 export const STATUSES = ['Approved', 'Rejected', 'New', 'Pending'];
 
@@ -25,19 +23,7 @@ export const MOCK_USERS: IUser[] = [
 ];
 
 export const MOCK_BOOKS: IBook[] = [
-  { id: '1', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', category: 'Classic', published: '1925', cover: 'https://i.pravatar.cc/150?u=b1', status: 'Approved' },
-  { id: '2', title: '1984', author: 'George Orwell', category: 'Dystopian', published: '1949', cover: 'https://i.pravatar.cc/150?u=b2', status: 'Pending' },
-  { id: '3', title: 'To Kill a Mockingbird', author: 'Harper Lee', category: 'Classic', published: '1960', cover: 'https://i.pravatar.cc/150?u=b3', status: 'Approved' },
-];
-
-export const MOCK_TOPICS: ITopic[] = [
-  { id: '1', name: 'Science Fiction', description: 'Books about futuristic concepts.', createdAt: '2024-01-01', status: 'Approved' },
-  { id: '2', name: 'Fantasy', description: 'Books containing magical elements.', createdAt: '2024-01-05', status: 'New' },
-  { id: '3', name: 'History', description: 'Historical events and figures.', createdAt: '2024-02-10', status: 'Approved' },
-];
-
-export const MOCK_CATEGORIES: ICategory[] = [
-  { id: '1', name: 'Fiction', description: 'Fictional literature.', createdAt: '2024-01-01', status: 'Approved' },
-  { id: '2', name: 'Non-Fiction', description: 'Factual and informative literature.', createdAt: '2024-01-05', status: 'Pending' },
-  { id: '3', name: 'Educational', description: 'Books for learning and education.', createdAt: '2024-02-10', status: 'Approved' },
+  { id: '1', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', coverImageUrl: 'https://i.pravatar.cc/150?u=b1', status: 'Active', slug: 'the-great-gatsby', formatType: 1, accessLevel: 1, viewCount: 0, averageRating: 0 },
+  { id: '2', title: '1984', author: 'George Orwell', coverImageUrl: 'https://i.pravatar.cc/150?u=b2', status: 'On Hold', slug: '1984', formatType: 1, accessLevel: 1, viewCount: 0, averageRating: 0 },
+  { id: '3', title: 'To Kill a Mockingbird', author: 'Harper Lee', coverImageUrl: 'https://i.pravatar.cc/150?u=b3', status: 'Active', slug: 'to-kill-a-mockingbird', formatType: 1, accessLevel: 1, viewCount: 0, averageRating: 0 },
 ];

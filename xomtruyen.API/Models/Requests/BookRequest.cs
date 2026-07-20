@@ -22,4 +22,6 @@ public class BookRequest
 
     [Required]
     public List<int> CategoryIds { get; set; } = new List<int>();
+
+    public List<int> TopicIds { get; set; } = new List<int>();
 }

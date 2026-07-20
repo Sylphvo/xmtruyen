@@ -18,7 +18,7 @@ public class BookRepository : IBookRepository
         _context = context;
     }
 
-    public async Task<Book> CreateAsync(Book book, List<int> categoryIds)
+    public async Task<Book> CreateAsync(Book book, List<int> categoryIds, List<int> topicIds)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -33,6 +33,15 @@ public class BookRepository : IBookRepository
             }).ToList();
 
             await _context.BookCategories.AddRangeAsync(bookCategories);
+            
+            var bookTopics = topicIds.Select(tid => new BookTopic
+            {
+                BookId = book.Id,
+                TopicId = tid
+            }).ToList();
+            
+            await _context.BookTopics.AddRangeAsync(bookTopics);
+            
             await _context.SaveChangesAsync();
 
             await transaction.CommitAsync();
@@ -49,15 +58,17 @@ public class BookRepository : IBookRepository
     {
         return await _context.Books
             .Include(b => b.BookCategories)
+            .Include(b => b.BookTopics)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public async Task UpdateAsync(Book book, List<int> categoryIds)
+    public async Task UpdateAsync(Book book, List<int> categoryIds, List<int> topicIds)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            _context.Books.Update(book);
+            // EF Core will automatically track changes to the 'book' entity
+            // Removing _context.Books.Update(book) ensures only modified properties are updated in SQL.
 
             var existingCategories = await _context.BookCategories
                 .Where(bc => bc.BookId == book.Id)
@@ -69,8 +80,19 @@ public class BookRepository : IBookRepository
                 BookId = book.Id,
                 CategoryId = cid
             }).ToList();
-            
             await _context.BookCategories.AddRangeAsync(newCategories);
+
+            var existingTopics = await _context.BookTopics
+                .Where(bt => bt.BookId == book.Id)
+                .ToListAsync();
+            _context.BookTopics.RemoveRange(existingTopics);
+
+            var newTopics = topicIds.Select(tid => new BookTopic
+            {
+                BookId = book.Id,
+                TopicId = tid
+            }).ToList();
+            await _context.BookTopics.AddRangeAsync(newTopics);
             
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -139,7 +161,7 @@ public class BookRepository : IBookRepository
 
         var totalCount = await connection.ExecuteScalarAsync<int>(countSql, parameters);
 
-        var orderBy = "ORDER BY b.\"CreatedAt\" DESC";
+        var orderBy = "ORDER BY COALESCE(b.\"UpdatedAt\", b.\"CreatedAt\") DESC";
         if (!string.IsNullOrWhiteSpace(filter.SortBy))
         {
             var sortCol = filter.SortBy.ToLower() switch
@@ -147,7 +169,7 @@ public class BookRepository : IBookRepository
                 "title" => "b.\"Title\"",
                 "viewcount" => "b.\"ViewCount\"",
                 "averagerating" => "b.\"AverageRating\"",
-                _ => "b.\"CreatedAt\""
+                _ => "COALESCE(b.\"UpdatedAt\", b.\"CreatedAt\")"
             };
             var direction = filter.IsDescending ? "DESC" : "ASC";
             orderBy = $"ORDER BY {sortCol} {direction}";
@@ -156,14 +178,20 @@ public class BookRepository : IBookRepository
         var dataSql = $@"
             SELECT 
                 b.""Id"", b.""Title"", b.""Slug"", b.""Author"", b.""Description"", b.""CoverImageUrl"",
-                b.""FormatType"", b.""AccessLevel"", b.""ViewCount"", b.""AverageRating"",
-                b.""IsRecommended"", b.""IsExclusive"", b.""CreatedAt"",
+                b.""FormatType"", b.""AccessLevel"", b.""Status"", b.""ViewCount"", b.""AverageRating"",
+                b.""IsRecommended"", b.""IsExclusive"", b.""CreatedAt"", b.""UpdatedAt"", b.""CreatedBy"", b.""UpdatedBy"",
                 (
-                    SELECT COALESCE(json_agg(json_build_object('Id', c.""Id"", 'Name', c.""Name"", 'Slug', c.""Slug"")), '[]'::json)
+                    SELECT COALESCE(json_agg(json_build_object('Id', c.""Id"", 'Name', c.""Name"")), '[]'::json)
                     FROM ""BookCategories"" bc
                     JOIN ""Categories"" c ON bc.""CategoryId"" = c.""Id""
                     WHERE bc.""BookId"" = b.""Id""
-                ) as ""CategoriesJson""
+                ) as ""CategoriesJson"",
+                (
+                    SELECT COALESCE(json_agg(json_build_object('Id', t.""Id"", 'Name', t.""Name"")), '[]'::json)
+                    FROM ""BookTopics"" bt
+                    JOIN ""Topics"" t ON bt.""TopicId"" = t.""Id""
+                    WHERE bt.""BookId"" = b.""Id""
+                ) as ""TopicsJson""
             FROM ""Books"" b
             {whereClause}
             {orderBy}
@@ -173,7 +201,27 @@ public class BookRepository : IBookRepository
         parameters.Add("PageSize", filter.PageSize);
         parameters.Add("Offset", (filter.Page - 1) * filter.PageSize);
 
-        var books = await connection.QueryAsync<BookListResponse>(dataSql, parameters);
+        var booksRaw = await connection.QueryAsync<dynamic>(dataSql, parameters);
+        
+        var books = booksRaw.Select(b => new BookListResponse
+        {
+            Id = b.Id,
+            Title = b.Title,
+            Slug = b.Slug,
+            Author = b.Author,
+            CoverImageUrl = b.CoverImageUrl,
+            FormatType = (FormatType)b.FormatType,
+            AccessLevel = (AccessLevel)b.AccessLevel,
+            Status = b.Status,
+            ViewCount = b.ViewCount,
+            AverageRating = b.AverageRating,
+            IsRecommended = b.IsRecommended,
+            IsExclusive = b.IsExclusive,
+            CreatedAt = b.CreatedAt,
+            Categories = System.Text.Json.JsonSerializer.Deserialize<List<BookCategoryResponse>>(b.CategoriesJson) ?? new List<BookCategoryResponse>(),
+            Topics = System.Text.Json.JsonSerializer.Deserialize<List<BookTopicResponse>>(b.TopicsJson) ?? new List<BookTopicResponse>()
+        });
+
         return (books, totalCount);
     }
 }

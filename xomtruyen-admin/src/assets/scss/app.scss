@@ -239,7 +239,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .ag-theme-quartz, .ag-theme-quartz-dark { --ag-wrapper-border-width: 0; --ag-borders: none; --ag-data-color: var(--app-text-muted); --ag-font-size: 13px; --ag-header-column-separator-display: none; --ag-header-column-resize-handle-display: none; } .ag-header-cell-text { font-weight: 700; font-size: 13px; color: var(--app-text-heading); } .ag-row { border-bottom: 1px solid var(--app-border-color) !important; }
 
-// Custom Table Styles to match template
+.no-caret::after {
+  display: none !important;
+}
+
 .table {
   th {
     font-size: 13px;
@@ -249,4 +252,50 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
     vertical-align: middle;
   }
+}
+
+// Inline Editing Table Styles
+.inline-edit-row {
+  background-color: #f4f9ff !important;
+  td {
+    background-color: transparent !important;
+  }
+}
+
+.inline-edit-input {
+  background-color: #ffffff !important;
+  border: 1px solid transparent !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  transition: all 0.1s ease-in-out;
+  padding: 4px 8px;
+
+  &:focus {
+    border: 2px solid #0d6efd !important;
+    outline: none !important;
+    padding: 3px 7px;
+  }
+}
+
+.cell-edit-input {
+  width: 100%;
+  height: 75%;
+  min-height: 46px;
+  border: 2px solid #0d6efd !important;
+  outline: none !important;
+  background-color: #ffffff !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+
+table.table tbody tr {
+  height: 46px !important;
+}
+
+.hide-scroll::-webkit-scrollbar { 
+  display: none; 
+} 
+.hide-scroll { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }

@@ -9,11 +9,25 @@ using XomTruyen.API.Repositories.Interfaces;
 using XomTruyen.API.Repositories.Implementations;
 using XomTruyen.API.Services.Interfaces;
 using XomTruyen.API.Services.Implementations;
+using XomTruyen.API.Services.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure max request size (500MB) for file uploads
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 524288000;
+});
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 524288000;
+});
+
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -35,6 +49,7 @@ builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ITopicRepository, TopicRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 
 builder.Services.AddScoped<ISystemService, SystemService>();
@@ -42,9 +57,16 @@ builder.Services.AddScoped<IReadingService, ReadingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICategoryManagementService, CategoryManagementService>();
+builder.Services.AddScoped<ITopicManagementService, TopicManagementService>();
 builder.Services.AddScoped<IBookManagementService, BookManagementService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
+// Register Book Processing Services
+builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx => new BackgroundTaskQueue(100));
+builder.Services.AddScoped<IBookProcessor, PdfBookProcessor>();
+builder.Services.AddScoped<IBookProcessor, ArchiveBookProcessor>();
+builder.Services.AddHostedService<BookProcessingWorker>();
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
@@ -129,6 +151,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(); // Allow serving static files from wwwroot
 
 app.UseCors("AllowAll");
 

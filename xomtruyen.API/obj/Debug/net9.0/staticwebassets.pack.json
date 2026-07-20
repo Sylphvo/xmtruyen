@@ -1,0 +1,53 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileRaw\\original.pdf",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileRaw\\original.pdf"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\cover.webp",
+      "PackagePath": "staticwebassets\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\cover.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\metadata.json",
+      "PackagePath": "staticwebassets\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\metadata.json"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\original.pdf",
+      "PackagePath": "staticwebassets\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\original.pdf"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\page_001.webp",
+      "PackagePath": "staticwebassets\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\page_001.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\toc.json",
+      "PackagePath": "staticwebassets\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\toc.json"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\uploads\\raw-uploads\\ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf",
+      "PackagePath": "staticwebassets\\uploads\\raw-uploads\\ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.xomtruyen.API.props",
+      "PackagePath": "build\\xomtruyen.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.xomtruyen.API.props",
+      "PackagePath": "buildMultiTargeting\\xomtruyen.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildTransitive.xomtruyen.API.props",
+      "PackagePath": "buildTransitive\\xomtruyen.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.xomtruyen.API.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.xomtruyen.API.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -29,16 +29,16 @@ export const Login: React.FC = () => {
                 </Link>
               </div>
               <div className="text-center mb-4">
-                <h5 className="mb-1 fw-bold">Welcome to NexLink</h5>
-                <p className="text-muted" style={{ fontSize: '14px' }}>Sign in to access your secure admin dashboard.</p>
+                <h5 className="mb-1 fw-bold">Chào mừng đến với Xóm Truyện Admin</h5>
+                <p className="text-muted" style={{ fontSize: '14px' }}>Đăng nhập để truy cập trang quản trị.</p>
               </div>
               <form>
                 <div className="mb-4">
-                  <label className="form-label" htmlFor="loginEmail">Email Address</label>
+                  <label className="form-label" htmlFor="loginEmail">Địa chỉ Email</label>
                   <input type="email" className="form-control" id="loginEmail" placeholder="info@example.com" />
                 </div>
                 <div className="mb-4">
-                  <label className="form-label" htmlFor="loginPassword">Password</label>
+                  <label className="form-label" htmlFor="loginPassword">Mật khẩu</label>
                   <div className="password-wrapper position-relative">
                     <input type={showPassword ? "text" : "password"} className="form-control password-input pe-5" id="loginPassword" placeholder="********" />
                     <button
@@ -54,7 +54,7 @@ export const Login: React.FC = () => {
                 </div>
                 <div className="mb-3">
                   <Link to="/" className="btn btn-primary waves-effect waves-light w-100">
-                    Login
+                    Đăng nhập
                   </Link>
                 </div>
               </form>

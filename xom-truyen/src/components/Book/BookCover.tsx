@@ -1,9 +1,8 @@
 import type { Book } from "../../types";
 
 export default function BookCover({ book, width, height }: { book: Book; width: number | string; height: number | string }) {
-  // Đảm bảo đường dẫn này khớp với tên file bạn đã lưu trong public/images/books/
-  // Ví dụ: book-1.jpg, book-2.jpg
-  const imageUrl = `/src/assets/images/${book.images}.jpg`;
+  // Sử dụng ảnh từ API nếu có, ngược lại dùng ảnh local mock
+  const imageUrl = book.coverImageUrl || (book.images ? `/src/assets/images/${book.images}.jpg` : "");
 
   return (
     <div
