@@ -1,6 +1,6 @@
 import React from "react";
 import { Star, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import BookCover from "../Book/BookCover";
 import type { Book } from "../../types";
 
@@ -18,6 +18,7 @@ interface HistoryItemProps {
 
 export default function HistoryItem({ record, onRemove }: HistoryItemProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { book, actionType, readAt } = record;
 
   return (
@@ -30,7 +31,7 @@ export default function HistoryItem({ record, onRemove }: HistoryItemProps) {
       position: "relative"
     }}>
       {/* Book Cover */}
-      <div style={{ flexShrink: 0, cursor: "pointer", width: 190 }} onClick={() => navigate(`/book/${book.id}`)}>
+      <div style={{ flexShrink: 0, cursor: "pointer", width: 190 }} onClick={() => navigate(`/book/${book.id}`, { state: { from: location.pathname } })}>
         <div style={{ width: "100%", aspectRatio: "3 / 4", position: "relative", borderRadius: "6px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
           <BookCover book={book} width="100%" height="100%" />
         </div>
@@ -42,7 +43,7 @@ export default function HistoryItem({ record, onRemove }: HistoryItemProps) {
         {/* Title and Rating */}
         <div style={{ marginBottom: "24px" }}>
           <h2 
-            onClick={() => navigate(`/book/${book.id}`)}
+            onClick={() => navigate(`/book/${book.id}`, { state: { from: location.pathname } })}
             style={{ 
               fontSize: "20px", 
               fontWeight: 700, 

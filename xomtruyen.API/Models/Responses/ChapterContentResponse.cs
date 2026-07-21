@@ -8,3 +8,5 @@ public class ChapterContentResponse
     public List<string> ImageUrls { get; set; } = new List<string>();
     public bool ShowAds { get; set; }
 }
+
+

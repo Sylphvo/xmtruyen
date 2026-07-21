@@ -52,7 +52,7 @@ public class CategoryManagementService : ICategoryManagementService
 
         if (await _categoryRepository.HasBooksAsync(id))
         {
-            throw new InvalidOperationException("Cannot delete category with associated books");
+            throw new InvalidOperationException("Cannot delete category with associated Publications");
         }
 
         await _categoryRepository.DeleteAsync(category);
@@ -68,3 +68,5 @@ public class CategoryManagementService : ICategoryManagementService
         return await _categoryRepository.GetCategoriesAsync(filter);
     }
 }
+
+

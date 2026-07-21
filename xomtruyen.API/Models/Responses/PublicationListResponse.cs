@@ -2,7 +2,7 @@ using XomTruyen.API.Models.Enums;
 
 namespace XomTruyen.API.Models.Responses;
 
-public class BookListResponse
+public class PublicationListResponse
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = null!;
@@ -36,3 +36,5 @@ public class BookTopicResponse
     public int Id { get; set; }
     public string Name { get; set; } = null!;
 }
+
+

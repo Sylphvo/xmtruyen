@@ -1,16 +1,17 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { STATUSES } from '../constants/mockData';
-import { getBooks, createBook, updateBook, deleteBook, uploadBookFile, toggleStatus, type SaveBookRequest } from '../api/bookApi';
+import { getBooks, createBook, updateBook, deleteBook, uploadBookFile, uploadCoverImage, toggleStatus, type SaveBookRequest } from '../api/bookApi';
 import type { IBook } from '../types/book';
 import type { ICategory } from '../types/category';
 import type { ITopic } from '../types/topic';
 import { getCategories } from '../api/categoryApi';
 import { getTopics } from '../api/topicApi';
-import { Dropdown, Form, Button, Modal, ProgressBar } from 'react-bootstrap';
+import { Dropdown, Form, Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select';
 import defaultBookImage from '../assets/images/default.png';
+import toast from 'react-hot-toast';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -22,6 +23,11 @@ interface SortConfig {
 import { ResizableHeader } from '../components/ResizableHeader';
 
 export const Books: React.FC = () => {
+  const getImageUrl = (url?: string) => {
+    if (!url) return defaultBookImage;
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+    return `http://localhost:5172/${url}`;
+  };
   const [data, setData] = useState<IBook[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +48,10 @@ export const Books: React.FC = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [targetCoverBookId, setTargetCoverBookId] = useState<string | null>(null);
 
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [topics, setTopics] = useState<ITopic[]>([]);
@@ -111,6 +121,55 @@ export const Books: React.FC = () => {
     }
   };
 
+  const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      try {
+        setIsUploadingCover(true);
+        let publicationIdParam: string | undefined = undefined;
+        if (targetCoverBookId && targetCoverBookId !== 'NEW') {
+           publicationIdParam = targetCoverBookId;
+        } else if (targetCoverBookId === 'NEW' && newItem.id) {
+           publicationIdParam = newItem.id;
+        }
+
+        const res = await uploadCoverImage(file, publicationIdParam);
+        if (res.success && res.url) {
+          if (targetCoverBookId === 'NEW' && isAddingNew) {
+            setNewItem(prev => ({ ...prev, id: res.publicationId || prev.id, coverImageUrl: res.url }));
+            toast.success('Upload ảnh bìa thành công');
+          } else if (targetCoverBookId && targetCoverBookId === editingBookId) {
+            setEditBookData(prev => ({ ...prev, coverImageUrl: res.url }));
+            toast.success('Upload ảnh bìa thành công');
+          } else if (targetCoverBookId && targetCoverBookId !== 'NEW') {
+            const bookToUpdate = data.find(b => b.id === targetCoverBookId);
+            if (bookToUpdate) {
+              const req: SaveBookRequest = {
+                title: bookToUpdate.title,
+                author: bookToUpdate.author,
+                formatType: bookToUpdate.formatType,
+                accessLevel: bookToUpdate.accessLevel,
+                coverImageUrl: res.url,
+                categoryIds: bookToUpdate.categories?.map(c => c.id) || [],
+                topicIds: bookToUpdate.topics?.map(t => t.id) || []
+              };
+              await updateBook(targetCoverBookId, req);
+              setRefreshTrigger(prev => prev + 1);
+              toast.success('Upload ảnh bìa thành công và đã lưu');
+            }
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Lỗi khi upload ảnh bìa');
+      } finally {
+        setIsUploadingCover(false);
+        setTargetCoverBookId(null);
+        if (coverInputRef.current) coverInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleConfirmUpload = async () => {
     if (!selectedFile || !uploadingBookId) return;
     try {
@@ -127,7 +186,7 @@ export const Books: React.FC = () => {
       setUploadProgress(100);
       
       setTimeout(() => {
-        alert('Upload file thành công. Tệp đang được xử lý ngầm.');
+        toast.success('Upload file thành công. Tệp đang được xử lý ngầm.');
         setRefreshTrigger(prev => prev + 1);
         setShowUploadModal(false);
         setIsLoading(false);
@@ -135,7 +194,7 @@ export const Books: React.FC = () => {
       
     } catch (err) {
       console.error(err);
-      alert('Lỗi khi upload file');
+      toast.error('Lỗi khi upload file');
       setIsLoading(false);
       setUploadProgress(0);
     } finally {
@@ -180,12 +239,13 @@ export const Books: React.FC = () => {
 
   const handleAddSubmit = async () => {
     if (!newItem.title || !newItem.author) {
-      alert('Vui lòng nhập đầy đủ tiêu đề và tác giả');
+      toast.error('Vui lòng nhập đầy đủ tiêu đề và tác giả');
       return;
     }
     try {
       setIsSubmitting(true);
       const request: SaveBookRequest = {
+        id: newItem.id,
         title: newItem.title,
         author: newItem.author,
         formatType: newItem.formatType || 1,
@@ -198,7 +258,7 @@ export const Books: React.FC = () => {
       setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Lỗi khi thêm sách:', error);
-      alert('Không thể thêm sách');
+      toast.error('Không thể thêm sách');
     } finally {
       setIsSubmitting(false);
     }
@@ -211,7 +271,7 @@ export const Books: React.FC = () => {
       setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Lỗi khi cập nhật trạng thái:', error);
-      alert('Không thể cập nhật trạng thái');
+      toast.error('Không thể cập nhật trạng thái');
     }
   };
 
@@ -270,7 +330,7 @@ export const Books: React.FC = () => {
 
   const handleSaveEdit = async (id: string) => {
     if (!editBookData.title || !editBookData.author) {
-      alert('Vui lòng nhập đầy đủ tiêu đề và tác giả');
+      toast.error('Vui lòng nhập đầy đủ tiêu đề và tác giả');
       return;
     }
     try {
@@ -280,7 +340,7 @@ export const Books: React.FC = () => {
       setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Lỗi khi cập nhật sách:', error);
-      alert('Không thể cập nhật sách');
+      toast.error('Không thể cập nhật sách');
     }
   };
 
@@ -291,7 +351,7 @@ export const Books: React.FC = () => {
         setRefreshTrigger(prev => prev + 1);
       } catch (error) {
         console.error('Lỗi khi xóa sách:', error);
-        alert('Không thể xóa sách');
+        toast.error('Không thể xóa sách');
       }
     }
   };
@@ -458,7 +518,23 @@ export const Books: React.FC = () => {
                 <>
                   {isAddingNew && (
                     <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}></td>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
+                        <div className="d-flex flex-column align-items-center gap-2">
+                          <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => { setTargetCoverBookId('NEW'); coverInputRef.current?.click(); }} title="Click để upload ảnh bìa">
+                            <img 
+                              src={getImageUrl(newItem.coverImageUrl)} 
+                              alt="Cover" 
+                              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} 
+                              onError={(e) => { e.currentTarget.src = defaultBookImage; }}
+                            />
+                            {isUploadingCover && targetCoverBookId === 'NEW' && (
+                              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>
+                                <Spinner animation="border" size="sm" variant="primary" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
                       <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         <Form.Control size="sm" value={newItem.title || ''} onChange={(e) => setNewItem({ ...newItem, title: e.target.value })} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit, handleCloseAdd)} placeholder="Tên sách" className="inline-edit-input text-body" />
                       </td>
@@ -514,10 +590,16 @@ export const Books: React.FC = () => {
                           On Hold
                         </div>
                       </td>
-                      <td style={{ padding: '5px 6px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <div className="d-flex gap-2 justify-content-end">
-                          <Button variant="success" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
-                          <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                      <td style={{ padding: '5px 6px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <div className="d-flex gap-2 justify-content-center">
+                          <Button variant="light" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                            <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                            Lưu
+                          </Button>
+                          <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#6c757d', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                            <FontAwesomeIcon icon={faTimes} className="me-2" />
+                            Hủy
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -531,12 +613,21 @@ export const Books: React.FC = () => {
                       <React.Fragment key={book.id}>
                         <tr className={editingBookId === book.id ? "inline-edit-row" : ""} style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
                           <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
-                            <img
-                              src={book.coverImageUrl || defaultBookImage}
-                              alt={book.title}
-                              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
-                              onError={(e) => { e.currentTarget.src = defaultBookImage; }}
-                            />
+                            <div className="d-flex flex-column align-items-center gap-2">
+                              <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => { setTargetCoverBookId(book.id); coverInputRef.current?.click(); }} title="Click để thay đổi ảnh bìa">
+                                <img
+                                  src={getImageUrl(editingBookId === book.id && editBookData.coverImageUrl !== undefined ? editBookData.coverImageUrl : book.coverImageUrl)}
+                                  alt={book.title}
+                                  style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+                                  onError={(e) => { e.currentTarget.src = defaultBookImage; }}
+                                />
+                                {isUploadingCover && targetCoverBookId === book.id && (
+                                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>
+                                    <Spinner animation="border" size="sm" variant="primary" />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </td>
                           <td style={{ padding: editingBookId === book.id && activeEditField === 'title' ? '0 16px' : '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                             <div className="d-flex align-items-center gap-3 h-100">
@@ -715,11 +806,12 @@ export const Books: React.FC = () => {
                                 style={{
                                   ...getStatusStyle(book.status || 'Active'),
                                   minWidth: '100px',
+                                  width: 'fit-content',
                                   padding: '6px 12px',
                                   boxShadow: 'none',
                                   borderRadius: '20px',
                                   gap: '8px',
-                                  display: 'inline-flex'
+                                  margin: '0 auto'
                                 }}
                               >
                                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getStatusStyle(book.status || 'Active').color }}></span>
@@ -730,8 +822,14 @@ export const Books: React.FC = () => {
                           <td style={{ padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--bs-body-color)' }}>
                             {editingBookId === book.id ? (
                               <div className="d-flex gap-2 justify-content-center">
-                                <Button variant="success" size="sm" onClick={() => handleSaveEdit(book.id)} className="px-3 rounded-2 fw-medium">Lưu</Button>
-                                <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                                <Button variant="light" size="sm" onClick={() => handleSaveEdit(book.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                  <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                                  Lưu
+                                </Button>
+                                <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#6c757d', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                  <FontAwesomeIcon icon={faTimes} className="me-2" />
+                                  Hủy
+                                </Button>
                               </div>
                             ) : (
                               <div className="d-flex gap-2 justify-content-center">
@@ -833,6 +931,13 @@ export const Books: React.FC = () => {
         style={{ display: 'none' }} 
         onChange={handleFileChange} 
         accept=".txt,.pdf,.epub,.doc,.docx,.zip,.cbz,.rar,.cbr"
+      />
+      <input 
+        type="file" 
+        ref={coverInputRef} 
+        style={{ display: 'none' }} 
+        onChange={handleCoverImageChange} 
+        accept="image/*"
       />
 
       <Modal show={showUploadModal} onHide={() => !isLoading && setShowUploadModal(false)} centered backdrop="static">

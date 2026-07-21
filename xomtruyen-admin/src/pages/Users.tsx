@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import { getUsers, updateUserStatus, createUser, updateUser, type User, type SaveUserRequest } from '../api/userApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import toast from 'react-hot-toast';
 
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -136,7 +137,7 @@ export const Users: React.FC = () => {
       setData(prev => prev.map(u => u.id === id ? { ...u, isActive: !currentStatus } : u));
     } catch (error) {
       console.error('Lỗi khi cập nhật trạng thái:', error);
-      alert('Không thể cập nhật trạng thái user.');
+      toast.error('Không thể cập nhật trạng thái user.');
     }
   };
 
@@ -148,7 +149,7 @@ export const Users: React.FC = () => {
   const handleAddSubmit = async (e?: React.FormEvent | React.KeyboardEvent) => {
     if (e) e.preventDefault();
     if (!newUser.email) {
-      alert('Email là bắt buộc');
+      toast.error('Email là bắt buộc');
       return;
     }
     
@@ -164,7 +165,7 @@ export const Users: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Lỗi khi tạo user:', error);
-      alert(error.message || 'Không thể tạo user. Vui lòng kiểm tra lại thông tin.');
+      toast.error(error.message || 'Không thể tạo user. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setIsSubmitting(false);
     }
@@ -188,7 +189,7 @@ export const Users: React.FC = () => {
 
   const handleSaveEdit = async (id: string) => {
     if (!editFormData.email) {
-      alert('Email là bắt buộc');
+      toast.error('Email là bắt buộc');
       return;
     }
     try {
@@ -198,7 +199,7 @@ export const Users: React.FC = () => {
       setEditingUserId(null);
     } catch (error: any) {
       console.error('Lỗi khi cập nhật user:', error);
-      alert(error.message || 'Không thể cập nhật user.');
+      toast.error(error.message || 'Không thể cập nhật user.');
     }
   };
 
@@ -512,7 +513,7 @@ export const Users: React.FC = () => {
                           <FontAwesomeIcon icon={faPen} className="me-2" style={{ color: '#9ca3af' }} />
                           Sửa
                         </Button>
-                        <Button variant="light" size="sm" onClick={() => alert('Chức năng đang được phát triển')} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                        <Button variant="light" size="sm" onClick={() => toast.error('Chức năng đang được phát triển')} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                           <FontAwesomeIcon icon={faTrash} className="me-2" />
                           Xóa
                         </Button>

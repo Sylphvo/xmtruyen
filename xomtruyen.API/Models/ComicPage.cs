@@ -1,10 +1,10 @@
 namespace XomTruyen.API.Models;
 
-public class ChapterImage
+public class ComicPage
 {
     public Guid Id { get; set; }
-    public Guid? ChapterId { get; set; }
-    public Chapter? Chapter { get; set; }
+    public Guid? ComicChapterId { get; set; }
+    public ComicChapter? ComicChapter { get; set; }
     
     public string ImageUrl { get; set; } = null!;
     public int OrderIndex { get; set; }

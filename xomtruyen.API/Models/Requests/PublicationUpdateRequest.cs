@@ -2,7 +2,7 @@ using XomTruyen.API.Models.Enums;
 
 namespace XomTruyen.API.Models.Requests;
 
-public class BookUpdateRequest
+public class PublicationUpdateRequest
 {
     public string? Title { get; set; }
     public string? Author { get; set; }
@@ -14,3 +14,5 @@ public class BookUpdateRequest
     public List<int>? TopicIds { get; set; }
     public string? Status { get; set; }
 }
+
+

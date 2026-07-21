@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 
 export const ActionCellRenderer = (params: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,10 +29,10 @@ export const ActionCellRenderer = (params: any) => {
       {isOpen && (
         <div className="position-absolute end-0 rounded-3 shadow-sm border" style={{ top: '100%', minWidth: '120px', zIndex: 9999, backgroundColor: 'var(--app-bg-card)', borderColor: 'var(--app-border-color)' }}>
           <div className="py-1">
-            <button className="dropdown-item px-3 py-2 text-start w-100 border-0 bg-transparent" style={{ fontSize: '13px', color: 'var(--app-text-main)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--app-hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={() => { setIsOpen(false); alert('Edit clicked for ' + params.data.name) }}>
+            <button className="dropdown-item px-3 py-2 text-start w-100 border-0 bg-transparent" style={{ fontSize: '13px', color: 'var(--app-text-main)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--app-hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={() => { setIsOpen(false); toast('Edit clicked for ' + params.data.name) }}>
               Edit
             </button>
-            <button className="dropdown-item px-3 py-2 text-start w-100 border-0 bg-transparent" style={{ fontSize: '13px', color: 'var(--app-text-main)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--app-hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={() => { setIsOpen(false); alert('Delete clicked for ' + params.data.name) }}>
+            <button className="dropdown-item px-3 py-2 text-start w-100 border-0 bg-transparent" style={{ fontSize: '13px', color: 'var(--app-text-main)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--app-hover-bg)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={() => { setIsOpen(false); toast('Delete clicked for ' + params.data.name) }}>
               Delete
             </button>
           </div>

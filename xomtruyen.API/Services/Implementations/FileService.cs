@@ -6,6 +6,9 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using XomTruyen.API.Services.Interfaces;
 
 namespace XomTruyen.API.Services.Implementations
@@ -27,7 +30,7 @@ namespace XomTruyen.API.Services.Implementations
             // Determine the base path (wwwroot). If it doesn't exist, use a default "wwwroot" folder in the current directory.
             var rootPath = _webHostEnvironment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             
-            // The directory where files will be saved (e.g., wwwroot/uploads/books)
+            // The directory where files will be saved (e.g., wwwroot/uploads/Publications)
             var uploadsFolder = Path.Combine(rootPath, "uploads", subDirectory);
 
             // Create the directory if it doesn't exist
@@ -50,13 +53,13 @@ namespace XomTruyen.API.Services.Implementations
             return Path.Combine("uploads", subDirectory, uniqueFileName).Replace("\\", "/");
         }
 
-        public async Task<string> UploadBookFileAsync(IFormFile file, string bookId)
+        public async Task<string> UploadBookFileAsync(IFormFile file, string PublicationId)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is empty or null.");
 
             var rootPath = _webHostEnvironment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            var bookFolder = Path.Combine(rootPath, "books", bookId, "FileRaw");
+            var bookFolder = Path.Combine(rootPath, "Publications", PublicationId, "FileRaw");
 
             if (!Directory.Exists(bookFolder))
             {
@@ -70,7 +73,43 @@ namespace XomTruyen.API.Services.Implementations
                 await file.CopyToAsync(fileStream);
             }
 
-            return $"books/{bookId}/FileRaw/original.pdf";
+            return $"Publications/{PublicationId}/FileRaw/original.pdf";
+        }
+
+        public async Task<string> UploadCoverImageAsync(IFormFile file, string publicationId)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("File is empty or null.");
+
+            var rootPath = _webHostEnvironment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var coverFolder = Path.Combine(rootPath, "Publications", publicationId, "File_cover");
+
+            if (!Directory.Exists(coverFolder))
+            {
+                Directory.CreateDirectory(coverFolder);
+            }
+
+            var uniqueFileName = Guid.NewGuid().ToString() + ".jpg";
+            var filePath = Path.Combine(coverFolder, uniqueFileName);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                using (var image = await Image.LoadAsync(memoryStream))
+                {
+                    image.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Size = new Size(600, 900),
+                        Mode = ResizeMode.Crop
+                    }));
+
+                    await image.SaveAsJpegAsync(filePath, new JpegEncoder { Quality = 85 });
+                }
+            }
+
+            return $"Publications/{publicationId}/File_cover/{uniqueFileName}";
         }
 
         public async Task<List<object>> GetFilesAsync(string subDirectory)
@@ -109,3 +148,5 @@ namespace XomTruyen.API.Services.Implementations
         }
     }
 }
+
+

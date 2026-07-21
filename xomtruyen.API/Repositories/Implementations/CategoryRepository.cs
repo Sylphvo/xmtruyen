@@ -47,7 +47,7 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<bool> HasBooksAsync(int categoryId)
     {
-        return await _context.BookCategories.AnyAsync(bc => bc.CategoryId == categoryId);
+        return await _context.PublicationCategories.AnyAsync(bc => bc.CategoryId == categoryId);
     }
 
     public async Task<(IEnumerable<Category> Categories, int TotalCount)> GetCategoriesAsync(CategoryFilterRequest filter)
@@ -87,3 +87,5 @@ public class CategoryRepository : ICategoryRepository
         return (categories, totalCount);
     }
 }
+
+

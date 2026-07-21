@@ -141,3 +141,5 @@ C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9
 C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\obj\Debug\net9.0\compressed\irjjo4j4ci-bezpxpwncr.gz
 C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\obj\Debug\net9.0\compressed\l5lqd28qgm-b9g4ogp5tr.gz
 C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\bin\Debug\net9.0\SharpCompress.dll
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\obj\Debug\net9.0\compressed\icvfjq32to-oycx5utuui.gz
+C:\Users\Cilse\source\xomtruyen\XomTruyen_Workspace\xomtruyen.API\obj\Debug\net9.0\compressed\nqrtp7xrjn-b9g4ogp5tr.gz

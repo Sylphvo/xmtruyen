@@ -19,3 +19,5 @@ public interface IUserRepository
     Task RevokeTokenAsync(Guid tokenId, CancellationToken cancellationToken = default);
     Task RevokeAllUserTokensAsync(Guid userId, string tokenType, CancellationToken cancellationToken = default);
 }
+
+

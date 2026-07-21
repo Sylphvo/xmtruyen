@@ -13,7 +13,7 @@ namespace XomTruyen.API.Models.BookProcessing
     public class BookProcessingTask
     {
         public string TaskId { get; set; } = string.Empty;
-        public string BookId { get; set; } = string.Empty;
+        public string PublicationId { get; set; } = string.Empty;
         public string? OwnerId { get; set; }
         public string FileName { get; set; } = string.Empty;
         public string SourceUrl { get; set; } = string.Empty;
@@ -40,7 +40,7 @@ namespace XomTruyen.API.Models.BookProcessing
     public class BookProcessingResultMessage
     {
         public string TaskId { get; set; } = string.Empty;
-        public string BookId { get; set; } = string.Empty;
+        public string PublicationId { get; set; } = string.Empty;
         public string Status { get; set; } = "COMPLETED"; // or FAILED
         public string Message { get; set; } = string.Empty;
         public long ProcessingTimeMs { get; set; }

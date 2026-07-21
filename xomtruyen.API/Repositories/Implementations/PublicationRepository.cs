@@ -9,43 +9,43 @@ using XomTruyen.API.Repositories.Interfaces;
 
 namespace XomTruyen.API.Repositories.Implementations;
 
-public class BookRepository : IBookRepository
+public class PublicationRepository : IPublicationRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public BookRepository(ApplicationDbContext context)
+    public PublicationRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async Task<Book> CreateAsync(Book book, List<int> categoryIds, List<int> topicIds)
+    public async Task<Publication> CreateAsync(Publication Publication, List<int> categoryIds, List<int> topicIds)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            await _context.Books.AddAsync(book);
+            await _context.Publications.AddAsync(Publication);
             await _context.SaveChangesAsync();
 
-            var bookCategories = categoryIds.Select(cid => new BookCategory
+            var PublicationCategories = categoryIds.Select(cid => new PublicationCategory
             {
-                BookId = book.Id,
+                PublicationId = Publication.Id,
                 CategoryId = cid
             }).ToList();
 
-            await _context.BookCategories.AddRangeAsync(bookCategories);
+            await _context.PublicationCategories.AddRangeAsync(PublicationCategories);
             
-            var bookTopics = topicIds.Select(tid => new BookTopic
+            var PublicationTopics = topicIds.Select(tid => new PublicationTopic
             {
-                BookId = book.Id,
+                PublicationId = Publication.Id,
                 TopicId = tid
             }).ToList();
             
-            await _context.BookTopics.AddRangeAsync(bookTopics);
+            await _context.PublicationTopics.AddRangeAsync(PublicationTopics);
             
             await _context.SaveChangesAsync();
 
             await transaction.CommitAsync();
-            return book;
+            return Publication;
         }
         catch
         {
@@ -54,45 +54,45 @@ public class BookRepository : IBookRepository
         }
     }
 
-    public async Task<Book?> GetByIdAsync(Guid id)
+    public async Task<Publication?> GetByIdAsync(Guid id)
     {
-        return await _context.Books
-            .Include(b => b.BookCategories)
-            .Include(b => b.BookTopics)
+        return await _context.Publications
+            .Include(b => b.PublicationCategories)
+            .Include(b => b.PublicationTopics)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public async Task UpdateAsync(Book book, List<int> categoryIds, List<int> topicIds)
+    public async Task UpdateAsync(Publication Publication, List<int> categoryIds, List<int> topicIds)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            // EF Core will automatically track changes to the 'book' entity
-            // Removing _context.Books.Update(book) ensures only modified properties are updated in SQL.
+            // EF Core will automatically track changes to the 'Publication' entity
+            // Removing _context.Publications.Update(Publication) ensures only modified properties are updated in SQL.
 
-            var existingCategories = await _context.BookCategories
-                .Where(bc => bc.BookId == book.Id)
+            var existingCategories = await _context.PublicationCategories
+                .Where(bc => bc.PublicationId == Publication.Id)
                 .ToListAsync();
-            _context.BookCategories.RemoveRange(existingCategories);
+            _context.PublicationCategories.RemoveRange(existingCategories);
 
-            var newCategories = categoryIds.Select(cid => new BookCategory
+            var newCategories = categoryIds.Select(cid => new PublicationCategory
             {
-                BookId = book.Id,
+                PublicationId = Publication.Id,
                 CategoryId = cid
             }).ToList();
-            await _context.BookCategories.AddRangeAsync(newCategories);
+            await _context.PublicationCategories.AddRangeAsync(newCategories);
 
-            var existingTopics = await _context.BookTopics
-                .Where(bt => bt.BookId == book.Id)
+            var existingTopics = await _context.PublicationTopics
+                .Where(bt => bt.PublicationId == Publication.Id)
                 .ToListAsync();
-            _context.BookTopics.RemoveRange(existingTopics);
+            _context.PublicationTopics.RemoveRange(existingTopics);
 
-            var newTopics = topicIds.Select(tid => new BookTopic
+            var newTopics = topicIds.Select(tid => new PublicationTopic
             {
-                BookId = book.Id,
+                PublicationId = Publication.Id,
                 TopicId = tid
             }).ToList();
-            await _context.BookTopics.AddRangeAsync(newTopics);
+            await _context.PublicationTopics.AddRangeAsync(newTopics);
             
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -104,13 +104,13 @@ public class BookRepository : IBookRepository
         }
     }
 
-    public async Task DeleteAsync(Book book)
+    public async Task DeleteAsync(Publication Publication)
     {
-        _context.Books.Remove(book);
+        _context.Publications.Remove(Publication);
         await _context.SaveChangesAsync();
     }
 
-    public async Task<(IEnumerable<BookListResponse> Books, int TotalCount)> GetBooksAsync(BookFilterRequest filter)
+    public async Task<(IEnumerable<PublicationListResponse> Publications, int TotalCount)> GetPublicationsAsync(PublicationFilterRequest filter)
     {
         using var connection = _context.Database.GetDbConnection();
         var parameters = new DynamicParameters();
@@ -143,7 +143,7 @@ public class BookRepository : IBookRepository
 
         if (filter.CategoryId.HasValue)
         {
-            whereClause += " AND b.\"Id\" IN (SELECT \"BookId\" FROM \"BookCategories\" WHERE \"CategoryId\" = @CategoryId)";
+            whereClause += " AND b.\"Id\" IN (SELECT \"PublicationId\" FROM \"PublicationCategories\" WHERE \"CategoryId\" = @CategoryId)";
             parameters.Add("CategoryId", filter.CategoryId.Value);
         }
 
@@ -155,7 +155,7 @@ public class BookRepository : IBookRepository
 
         var countSql = $@"
             SELECT COUNT(*)
-            FROM ""Books"" b
+            FROM ""Publications"" b
             {whereClause}
         ";
 
@@ -182,17 +182,17 @@ public class BookRepository : IBookRepository
                 b.""IsRecommended"", b.""IsExclusive"", b.""CreatedAt"", b.""UpdatedAt"", b.""CreatedBy"", b.""UpdatedBy"",
                 (
                     SELECT COALESCE(json_agg(json_build_object('Id', c.""Id"", 'Name', c.""Name"")), '[]'::json)
-                    FROM ""BookCategories"" bc
+                    FROM ""PublicationCategories"" bc
                     JOIN ""Categories"" c ON bc.""CategoryId"" = c.""Id""
-                    WHERE bc.""BookId"" = b.""Id""
+                    WHERE bc.""PublicationId"" = b.""Id""
                 ) as ""CategoriesJson"",
                 (
                     SELECT COALESCE(json_agg(json_build_object('Id', t.""Id"", 'Name', t.""Name"")), '[]'::json)
-                    FROM ""BookTopics"" bt
+                    FROM ""PublicationTopics"" bt
                     JOIN ""Topics"" t ON bt.""TopicId"" = t.""Id""
-                    WHERE bt.""BookId"" = b.""Id""
+                    WHERE bt.""PublicationId"" = b.""Id""
                 ) as ""TopicsJson""
-            FROM ""Books"" b
+            FROM ""Publications"" b
             {whereClause}
             {orderBy}
             LIMIT @PageSize OFFSET @Offset
@@ -203,7 +203,7 @@ public class BookRepository : IBookRepository
 
         var booksRaw = await connection.QueryAsync<dynamic>(dataSql, parameters);
         
-        var books = booksRaw.Select(b => new BookListResponse
+        var Publications = booksRaw.Select(b => new PublicationListResponse
         {
             Id = b.Id,
             Title = b.Title,
@@ -222,6 +222,7 @@ public class BookRepository : IBookRepository
             Topics = System.Text.Json.JsonSerializer.Deserialize<List<BookTopicResponse>>(b.TopicsJson) ?? new List<BookTopicResponse>()
         });
 
-        return (books, totalCount);
+        return (Publications, totalCount);
     }
 }
+

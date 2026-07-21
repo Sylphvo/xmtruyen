@@ -5,6 +5,7 @@ import { Dropdown, Form, Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ResizableHeader } from '../components/ResizableHeader';
+import toast from 'react-hot-toast';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -106,7 +107,7 @@ export const Categories: React.FC = () => {
 
   const handleAddSubmit = async () => {
     if (!newItem.name) {
-      alert('Tên thể loại là bắt buộc');
+      toast.error('Tên thể loại là bắt buộc');
       return;
     }
     setIsSubmitting(true);
@@ -120,7 +121,7 @@ export const Categories: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Lỗi khi tạo category:', error);
-      alert(error.message || 'Không thể tạo category.');
+      toast.error(error.message || 'Không thể tạo category.');
     } finally {
       setIsSubmitting(false);
     }
@@ -138,7 +139,7 @@ export const Categories: React.FC = () => {
 
   const handleSaveEdit = async (id: number) => {
     if (!editData.name) {
-      alert('Tên thể loại là bắt buộc');
+      toast.error('Tên thể loại là bắt buộc');
       return;
     }
     try {
@@ -147,7 +148,7 @@ export const Categories: React.FC = () => {
       setEditingId(null);
     } catch (error: any) {
       console.error('Lỗi khi cập nhật category:', error);
-      alert(error.message || 'Không thể cập nhật category.');
+      toast.error(error.message || 'Không thể cập nhật category.');
     }
   };
 
@@ -158,7 +159,7 @@ export const Categories: React.FC = () => {
       fetchCategories();
     } catch (error: any) {
       console.error('Lỗi khi xóa category:', error);
-      alert(error.message || 'Không thể xóa category.');
+      toast.error(error.message || 'Không thể xóa category.');
     }
   };
 

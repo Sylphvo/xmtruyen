@@ -2,7 +2,7 @@ using XomTruyen.API.Models.Enums;
 
 namespace XomTruyen.API.Models.Requests;
 
-public class BookFilterRequest
+public class PublicationFilterRequest
 {
     public string? SearchKeyword { get; set; } // Title
     public FormatType? FormatType { get; set; }
@@ -17,3 +17,5 @@ public class BookFilterRequest
     public string? SortBy { get; set; } = "CreatedAt";
     public bool IsDescending { get; set; } = true;
 }
+
+

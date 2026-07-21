@@ -1,3 +1,5 @@
+using XomTruyen.API.Models.Enums;
+
 namespace XomTruyen.API.Models;
 
 public class UserPurchasedChapter
@@ -8,7 +10,7 @@ public class UserPurchasedChapter
     public User User { get; set; } = null!;
     
     public Guid ChapterId { get; set; }
-    public Chapter Chapter { get; set; } = null!;
+    public ChapterType ChapterType { get; set; }
     
     public int CoinPaid { get; set; }
     public DateTime? PurchasedAt { get; set; }

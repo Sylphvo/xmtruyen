@@ -13,16 +13,17 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Topic> Topics { get; set; }
-    public DbSet<Book> Books { get; set; }
-    public DbSet<BookCategory> BookCategories { get; set; }
-    public DbSet<BookTopic> BookTopics { get; set; }
-    public DbSet<Chapter> Chapters { get; set; }
-    public DbSet<ChapterImage> ChapterImages { get; set; }
+    public DbSet<Publication> Publications { get; set; }
+    public DbSet<PublicationCategory> PublicationCategories { get; set; }
+    public DbSet<PublicationTopic> PublicationTopics { get; set; }
+    public DbSet<BookChapter> BookChapters { get; set; }
+    public DbSet<ComicChapter> ComicChapters { get; set; }
+    public DbSet<ComicPage> ComicPages { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
     public DbSet<UserPurchasedChapter> UserPurchasedChapters { get; set; }
     public DbSet<ReadingHistory> ReadingHistories { get; set; }
     public DbSet<UserFavorite> UserFavorites { get; set; }
-    public DbSet<UserBook> UserBooks { get; set; }
+    public DbSet<UserPublication> UserPublications { get; set; }
     public DbSet<Note> Notes { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
@@ -71,8 +72,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Slug).HasMaxLength(150).IsRequired();
         });
 
-        // Book
-        modelBuilder.Entity<Book>(entity =>
+        // Publication
+        modelBuilder.Entity<Publication>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
@@ -87,14 +88,14 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.SetNull);
         });
 
-        // BookCategory
-        modelBuilder.Entity<BookCategory>(entity =>
+        // PublicationCategory
+        modelBuilder.Entity<PublicationCategory>(entity =>
         {
-            entity.HasKey(e => new { e.BookId, e.CategoryId });
+            entity.HasKey(e => new { e.PublicationId, e.CategoryId });
             
-            entity.HasOne(e => e.Book)
-                  .WithMany(b => b.BookCategories)
-                  .HasForeignKey(e => e.BookId)
+            entity.HasOne(e => e.Publication)
+                  .WithMany(p => p.PublicationCategories)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
                   
             entity.HasOne(e => e.Category)
@@ -103,14 +104,14 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // BookTopic
-        modelBuilder.Entity<BookTopic>(entity =>
+        // PublicationTopic
+        modelBuilder.Entity<PublicationTopic>(entity =>
         {
-            entity.HasKey(e => new { e.BookId, e.TopicId });
+            entity.HasKey(e => new { e.PublicationId, e.TopicId });
             
-            entity.HasOne(e => e.Book)
-                  .WithMany(b => b.BookTopics)
-                  .HasForeignKey(e => e.BookId)
+            entity.HasOne(e => e.Publication)
+                  .WithMany(p => p.PublicationTopics)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
                   
             entity.HasOne(e => e.Topic)
@@ -119,27 +120,38 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Chapter
-        modelBuilder.Entity<Chapter>(entity =>
+        // BookChapter
+        modelBuilder.Entity<BookChapter>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(255);
-            entity.Property(e => e.ImageUrls).HasColumnType("jsonb");
             
-            entity.HasOne(e => e.Book)
-                  .WithMany(b => b.Chapters)
-                  .HasForeignKey(e => e.BookId)
+            entity.HasOne(e => e.Publication)
+                  .WithMany(p => p.BookChapters)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ChapterImage
-        modelBuilder.Entity<ChapterImage>(entity =>
+        // ComicChapter
+        modelBuilder.Entity<ComicChapter>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).HasMaxLength(255);
+            
+            entity.HasOne(e => e.Publication)
+                  .WithMany(p => p.ComicChapters)
+                  .HasForeignKey(e => e.PublicationId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ComicPage
+        modelBuilder.Entity<ComicPage>(entity =>
         {
             entity.HasKey(e => e.Id);
             
-            entity.HasOne(e => e.Chapter)
-                  .WithMany(c => c.Images)
-                  .HasForeignKey(e => e.ChapterId)
+            entity.HasOne(e => e.ComicChapter)
+                  .WithMany(c => c.Pages)
+                  .HasForeignKey(e => e.ComicChapterId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -152,11 +164,6 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
-                  
-            entity.HasOne(e => e.Chapter)
-                  .WithMany()
-                  .HasForeignKey(e => e.ChapterId)
-                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // UserPurchasedChapter
@@ -168,63 +175,53 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
-                  
-            entity.HasOne(e => e.Chapter)
-                  .WithMany()
-                  .HasForeignKey(e => e.ChapterId)
-                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ReadingHistory
         modelBuilder.Entity<ReadingHistory>(entity =>
         {
-            entity.HasKey(e => new { e.UserId, e.BookId });
+            entity.HasKey(e => new { e.UserId, e.PublicationId });
             
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
                   
-            entity.HasOne(e => e.Book)
+            entity.HasOne(e => e.Publication)
                   .WithMany()
-                  .HasForeignKey(e => e.BookId)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
-                  
-            entity.HasOne(e => e.LastReadChapter)
-                  .WithMany()
-                  .HasForeignKey(e => e.LastReadChapterId)
-                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // UserFavorite
         modelBuilder.Entity<UserFavorite>(entity =>
         {
-            entity.HasKey(e => new { e.UserId, e.BookId });
+            entity.HasKey(e => new { e.UserId, e.PublicationId });
             
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
                   
-            entity.HasOne(e => e.Book)
+            entity.HasOne(e => e.Publication)
                   .WithMany()
-                  .HasForeignKey(e => e.BookId)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // UserBook
-        modelBuilder.Entity<UserBook>(entity =>
+        // UserPublication
+        modelBuilder.Entity<UserPublication>(entity =>
         {
-            entity.HasKey(e => new { e.UserId, e.BookId });
+            entity.HasKey(e => new { e.UserId, e.PublicationId });
             
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
                   
-            entity.HasOne(e => e.Book)
+            entity.HasOne(e => e.Publication)
                   .WithMany()
-                  .HasForeignKey(e => e.BookId)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -236,11 +233,6 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
-                  .OnDelete(DeleteBehavior.Cascade);
-                  
-            entity.HasOne(e => e.Chapter)
-                  .WithMany()
-                  .HasForeignKey(e => e.ChapterId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -254,9 +246,9 @@ public class ApplicationDbContext : DbContext
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
                   
-            entity.HasOne(e => e.Book)
+            entity.HasOne(e => e.Publication)
                   .WithMany()
-                  .HasForeignKey(e => e.BookId)
+                  .HasForeignKey(e => e.PublicationId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

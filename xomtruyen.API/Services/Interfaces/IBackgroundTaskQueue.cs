@@ -10,3 +10,5 @@ namespace XomTruyen.API.Services.Interfaces
         ValueTask<BookProcessingTask> DequeueAsync(CancellationToken cancellationToken);
     }
 }
+
+

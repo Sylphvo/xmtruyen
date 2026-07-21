@@ -11,3 +11,5 @@ public interface ICategoryManagementService
     Task<Category?> GetCategoryByIdAsync(int id);
     Task<(IEnumerable<Category> Categories, int TotalCount)> GetCategoriesAsync(CategoryFilterRequest filter);
 }
+
+

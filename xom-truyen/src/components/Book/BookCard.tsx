@@ -1,7 +1,7 @@
 import BookCover from "./BookCover"; // Đảm bảo import đúng đường dẫn
 import type { Book } from "../../types";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Heart, Star } from "lucide-react";
 
@@ -13,6 +13,7 @@ export default function BookCard({
   size?: "normal" | "large";
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   // Không sử dụng kích thước cố định, thẻ truyện sẽ tự co giãn vừa 100% cột SwiperSlide
 
   const [isHovered, setIsHovered] = useState(false);
@@ -30,7 +31,7 @@ export default function BookCard({
       e.preventDefault();
       return;
     }
-    navigate(`/book/${book.id}`);
+    navigate(`/book/${book.id}`, { state: { from: location.pathname } });
   };
 
   return (

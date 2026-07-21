@@ -3,6 +3,7 @@ import { Button, Spinner, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faFileAlt, faSync } from '@fortawesome/free-solid-svg-icons';
 import { getFiles, deleteFile, type FileItem } from '../api/uploadApi';
+import toast from 'react-hot-toast';
 
 export const BookFiles: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -18,7 +19,7 @@ export const BookFiles: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch files:', error);
-      alert('Không thể tải danh sách file.');
+      toast.error('Không thể tải danh sách file.');
     } finally {
       setIsLoading(false);
     }
@@ -37,7 +38,7 @@ export const BookFiles: React.FC = () => {
         }
       } catch (error: any) {
         console.error(error);
-        alert('Lỗi khi xóa file: ' + (error.message || ''));
+        toast.error('Lỗi khi xóa file: ' + (error.message || ''));
       }
     }
   };

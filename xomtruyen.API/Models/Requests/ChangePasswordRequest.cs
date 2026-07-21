@@ -11,3 +11,5 @@ public class ChangePasswordRequest
     [MinLength(6)]
     public string NewPassword { get; set; } = string.Empty;
 }
+
+

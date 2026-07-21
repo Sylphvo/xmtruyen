@@ -6,3 +6,5 @@ public interface ISystemService
 {
     Task<DatabaseCheckResponse> CheckDatabaseAsync(CancellationToken cancellationToken = default);
 }
+
+

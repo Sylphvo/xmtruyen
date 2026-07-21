@@ -10,3 +10,5 @@ namespace XomTruyen.API.Services.Interfaces
         Task<BookProcessingResultMessage> ProcessAsync(BookProcessingTask task, CancellationToken cancellationToken);
     }
 }
+
+

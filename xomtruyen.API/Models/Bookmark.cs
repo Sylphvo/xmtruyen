@@ -1,3 +1,5 @@
+using XomTruyen.API.Models.Enums;
+
 namespace XomTruyen.API.Models;
 
 public class Bookmark
@@ -8,7 +10,8 @@ public class Bookmark
     public User User { get; set; } = null!;
     
     public Guid? ChapterId { get; set; }
-    public Chapter? Chapter { get; set; }
+    // Polymorphic association (not a hard FK in db)
+    public ChapterType? ChapterType { get; set; }
     
     public DateTime? CreatedAt { get; set; }
 }

@@ -29,7 +29,7 @@ namespace XomTruyen.API.Services.Background
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Book Processing Worker is running.");
+            _logger.LogInformation("Publication Processing Worker is running.");
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -37,7 +37,7 @@ namespace XomTruyen.API.Services.Background
 
                 try
                 {
-                    _logger.LogInformation("Dequeued book processing task {TaskId} for Book {BookId}.", workItem.TaskId, workItem.BookId);
+                    _logger.LogInformation("Dequeued Publication processing task {TaskId} for Publication {PublicationId}.", workItem.TaskId, workItem.PublicationId);
 
                     using (var scope = _serviceProvider.CreateScope())
                     {
@@ -56,10 +56,10 @@ namespace XomTruyen.API.Services.Background
                             workItem.TaskId, 
                             JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
                         
-                        // TODO: Update Database (e.g. change book status from PROCESSING to READY)
+                        // TODO: Update Database (e.g. change Publication status from PROCESSING to READY)
                         // var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                        // var book = await dbContext.Books.FindAsync(workItem.BookId);
-                        // book.Status = "READY";
+                        // var Publication = await dbContext.Publications.FindAsync(workItem.PublicationId);
+                        // Publication.Status = "READY";
                         // await dbContext.SaveChangesAsync();
                     }
                 }
@@ -71,3 +71,5 @@ namespace XomTruyen.API.Services.Background
         }
     }
 }
+
+

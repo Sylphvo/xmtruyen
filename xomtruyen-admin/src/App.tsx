@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { Users } from './pages/Users';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/book-files" element={<BookFiles />} />
         </Route>
       </Routes>
+      <Toaster position="top-right" />
     </Router>
   );
 }

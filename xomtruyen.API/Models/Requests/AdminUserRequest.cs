@@ -24,3 +24,5 @@ public class AdminUserRequest
     
     public bool IsActive { get; set; } = true;
 }
+
+

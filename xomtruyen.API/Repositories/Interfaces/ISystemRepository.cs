@@ -4,3 +4,5 @@ public interface ISystemRepository
 {
     Task<bool> CheckDatabaseConnectionAsync(CancellationToken cancellationToken = default);
 }
+
+

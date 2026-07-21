@@ -10,3 +10,5 @@ public class CategoryFilterRequest
     public string? SortBy { get; set; } = "Name";
     public bool IsDescending { get; set; } = false;
 }
+
+

@@ -7,3 +7,5 @@ namespace XomTruyen.API.Controllers;
 public abstract class BaseApiController : ControllerBase
 {
 }
+
+

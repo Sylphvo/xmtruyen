@@ -3,8 +3,10 @@ using XomTruyen.API.Models.Enums;
 
 namespace XomTruyen.API.Models.Requests;
 
-public class BookRequest
+public class PublicationRequest
 {
+    public Guid? Id { get; set; }
+
     [Required]
     [MaxLength(255)]
     public string Title { get; set; } = null!;
@@ -25,3 +27,5 @@ public class BookRequest
 
     public List<int> TopicIds { get; set; } = new List<int>();
 }
+
+

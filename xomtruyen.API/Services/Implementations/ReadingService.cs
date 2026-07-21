@@ -27,7 +27,7 @@ public class ReadingService : IReadingService
         if (chapter == null)
             throw new Exception("Chapter not found");
 
-        var images = await _chapterRepository.GetChapterImagesAsync(chapterId, cancellationToken);
+        var images = await _chapterRepository.GetComicPagesAsync(chapterId, cancellationToken);
 
         var response = new ChapterContentResponse
         {
@@ -118,3 +118,5 @@ public class ReadingService : IReadingService
         throw new Exception("Tài khoản không đủ xu, vui lòng nạp thêm");
     }
 }
+
+

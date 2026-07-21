@@ -20,3 +20,5 @@ public class UserProfileResponse
     public int? DailyReadCount { get; set; }
     public DateTime? CreatedAt { get; set; }
 }
+
+

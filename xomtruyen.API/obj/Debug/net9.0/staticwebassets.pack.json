@@ -1,8 +1,72 @@
 {
   "Files": [
     {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\cover.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\cover.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\metadata.json",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\metadata.json"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_001.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_001.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_002.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_002.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_003.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_003.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_004.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_004.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_005.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_005.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_006.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_006.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_007.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_007.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_008.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_008.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_009.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_009.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_010.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_010.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_011.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_011.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_012.webp",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\page_012.webp"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\toc.json",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileProcess\\toc.json"
+    },
+    {
       "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileRaw\\original.pdf",
       "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileRaw\\original.pdf"
+    },
+    {
+      "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileRaw\\original.rar",
+      "PackagePath": "staticwebassets\\books\\02a2fd23-e810-4aad-8d01-24266b2bbd31\\FileRaw\\original.rar"
     },
     {
       "Id": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\cover.webp",

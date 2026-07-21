@@ -2,7 +2,7 @@ using XomTruyen.API.Models.Enums;
 
 namespace XomTruyen.API.Models;
 
-public class Book
+public class Publication
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = null!;
@@ -26,7 +26,10 @@ public class Book
     
     public string Status { get; set; } = "Active";
     
-    public ICollection<BookCategory> BookCategories { get; set; } = new List<BookCategory>();
-    public ICollection<BookTopic> BookTopics { get; set; } = new List<BookTopic>();
-    public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();
+    public ICollection<PublicationCategory> PublicationCategories { get; set; } = new List<PublicationCategory>();
+    public ICollection<PublicationTopic> PublicationTopics { get; set; } = new List<PublicationTopic>();
+    
+    // Antigravity Architecture: Relationships to specific content types
+    public ICollection<BookChapter> BookChapters { get; set; } = new List<BookChapter>();
+    public ICollection<ComicChapter> ComicChapters { get; set; } = new List<ComicChapter>();
 }

@@ -4,6 +4,7 @@ import { getTableData, insertRow, updateRow, deleteRow, getTableSchema, type Tab
 import { Button, Form, Modal, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPlus, faEdit, faTrash, faSave, faKey, faLink } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 
 export const DatabaseTableViewer: React.FC = () => {
   const { tableName } = useParams<{ tableName: string }>();
@@ -39,7 +40,7 @@ export const DatabaseTableViewer: React.FC = () => {
       setTotalItems(res.totalCount || 0);
     } catch (error) {
       console.error(error);
-      alert('Không thể tải dữ liệu bảng ' + tableName);
+      toast.error('Không thể tải dữ liệu bảng ' + tableName);
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +84,7 @@ export const DatabaseTableViewer: React.FC = () => {
         loadData();
       } catch (error) {
         console.error(error);
-        alert('Lỗi xóa dữ liệu');
+        toast.error('Lỗi xóa dữ liệu');
       }
     }
   };
@@ -114,7 +115,7 @@ export const DatabaseTableViewer: React.FC = () => {
       loadData();
     } catch (error: any) {
       console.error(error);
-      alert('Lỗi lưu dữ liệu: ' + (error.message || ''));
+      toast.error('Lỗi lưu dữ liệu: ' + (error.message || ''));
     }
   };
 

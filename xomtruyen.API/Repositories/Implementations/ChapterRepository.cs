@@ -14,18 +14,20 @@ public class ChapterRepository : IChapterRepository
         _context = context;
     }
 
-    public async Task<Chapter?> GetChapterByIdAsync(Guid chapterId, CancellationToken cancellationToken = default)
+    public async Task<BookChapter?> GetChapterByIdAsync(Guid ComicChapterId, CancellationToken cancellationToken = default)
     {
-        return await _context.Chapters
-            .FirstOrDefaultAsync(c => c.Id == chapterId, cancellationToken);
+        return await _context.BookChapters
+            .FirstOrDefaultAsync(c => c.Id == ComicChapterId, cancellationToken);
     }
 
-    public async Task<List<string>> GetChapterImagesAsync(Guid chapterId, CancellationToken cancellationToken = default)
+    public async Task<List<string>> GetComicPagesAsync(Guid ComicChapterId, CancellationToken cancellationToken = default)
     {
-        return await _context.ChapterImages
-            .Where(ci => ci.ChapterId == chapterId)
+        return await _context.ComicPages
+            .Where(ci => ci.ComicChapterId == ComicChapterId)
             .OrderBy(ci => ci.OrderIndex)
             .Select(ci => ci.ImageUrl)
             .ToListAsync(cancellationToken);
     }
 }
+
+

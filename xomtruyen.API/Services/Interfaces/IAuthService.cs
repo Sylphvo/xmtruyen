@@ -18,3 +18,5 @@ public interface IAuthService
     Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, CancellationToken cancellationToken = default);
     Task VerifyEmailAsync(VerifyEmailRequest request, CancellationToken cancellationToken = default);
 }
+
+

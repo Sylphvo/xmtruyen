@@ -7,18 +7,22 @@ export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
+  const state = location.state as { from?: string } | null;
+  const fromPath = state?.from;
 
   const [activeMenu, setActiveMenu] = useState('home');
 
   useEffect(() => {
-    if (path.startsWith('/history') || path.startsWith('/bookmarks')) {
+    const checkPath = path.startsWith('/book/') && fromPath ? fromPath : path;
+
+    if (checkPath.startsWith('/history') || checkPath.startsWith('/bookmarks')) {
       setActiveMenu('library');
-    } else if (path.startsWith('/profile')) {
+    } else if (checkPath.startsWith('/profile')) {
       setActiveMenu('profile');
     } else {
       setActiveMenu('home');
     }
-  }, [path]);
+  }, [path, fromPath]);
 
   const iconItemStyle = (isActive: boolean) => ({
     width: 50,
@@ -136,13 +140,17 @@ export default function Sidebar() {
               <div style={{ padding: "0 20px 10px", fontSize: 12, fontWeight: 700, color: ACCENT, textTransform: "uppercase" }}>
                 Khám phá
               </div>
-              <NavLink to="/" style={({ isActive }) => menuLinkStyle(isActive)} end>
+              <NavLink to="/" style={() => menuLinkStyle(path === '/' || (path.startsWith('/book/') && (!fromPath || fromPath === '/')))} end>
                 <Home size={18} style={{ marginRight: 12 }} />
                 <span>Trang chủ</span>
               </NavLink>
-              <NavLink to="/comics" style={({ isActive }) => menuLinkStyle(isActive)}>
+              <NavLink to="/comics" style={() => menuLinkStyle(path === '/comics' || (path.startsWith('/book/') && fromPath === '/comics'))}>
                 <Image size={18} style={{ marginRight: 12 }} />
                 <span>Truyện tranh</span>
+              </NavLink>
+              <NavLink to="/library" style={() => menuLinkStyle(path === '/library' || (path.startsWith('/book/') && fromPath === '/library'))}>
+                <BookOpen size={18} style={{ marginRight: 12 }} />
+                <span>Thư viện sách</span>
               </NavLink>
             </>
           )}
@@ -152,11 +160,11 @@ export default function Sidebar() {
               <div style={{ padding: "0 20px 10px", fontSize: 12, fontWeight: 700, color: ACCENT, textTransform: "uppercase" }}>
                 Tủ sách của bạn
               </div>
-              <NavLink to="/history" style={({ isActive }) => menuLinkStyle(isActive)}>
+              <NavLink to="/history" style={() => menuLinkStyle(path === '/history' || (path.startsWith('/book/') && fromPath === '/history'))}>
                 <History size={18} style={{ marginRight: 12 }} />
                 <span>Lịch sử đọc</span>
               </NavLink>
-              <NavLink to="/bookmarks" style={({ isActive }) => menuLinkStyle(isActive)}>
+              <NavLink to="/bookmarks" style={() => menuLinkStyle(path === '/bookmarks' || (path.startsWith('/book/') && fromPath === '/bookmarks'))}>
                 <Bookmark size={18} style={{ marginRight: 12 }} />
                 <span>Truyện đánh dấu</span>
               </NavLink>

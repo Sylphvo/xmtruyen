@@ -20,10 +20,10 @@ namespace XomTruyen.API.Controllers
             _taskQueue = taskQueue;
         }
 
-        [HttpPost("book-file")]
+        [HttpPost("Publication-file")]
         [RequestSizeLimit(524288000)] // 500 MB
         [RequestFormLimits(MultipartBodyLengthLimit = 524288000)] // 500 MB
-        public async Task<IActionResult> UploadBookFile(IFormFile file, [FromForm] string bookId, [FromForm] string? ownerId)
+        public async Task<IActionResult> UploadBookFile(IFormFile file, [FromForm] string PublicationId, [FromForm] string? ownerId)
         {
             try
             {
@@ -32,13 +32,13 @@ namespace XomTruyen.API.Controllers
                     return BadRequest(new { success = false, message = "No file uploaded." });
                 }
 
-                if (string.IsNullOrEmpty(bookId))
+                if (string.IsNullOrEmpty(PublicationId))
                 {
-                    bookId = Guid.NewGuid().ToString(); // Temporary ID if not provided
+                    PublicationId = Guid.NewGuid().ToString(); // Temporary ID if not provided
                 }
 
-                // 1. Save raw file directly to book folder
-                var fileUrl = await _fileService.UploadBookFileAsync(file, bookId);
+                // 1. Save raw file directly to Publication folder
+                var fileUrl = await _fileService.UploadBookFileAsync(file, PublicationId);
                 
                 var taskId = Guid.NewGuid().ToString();
 
@@ -46,7 +46,7 @@ namespace XomTruyen.API.Controllers
                 var task = new BookProcessingTask
                 {
                     TaskId = taskId,
-                    BookId = bookId,
+                    PublicationId = PublicationId,
                     OwnerId = ownerId,
                     FileName = file.FileName,
                     SourceUrl = fileUrl,
@@ -67,9 +67,42 @@ namespace XomTruyen.API.Controllers
                 {
                     success = true,
                     taskId = taskId,
-                    bookId = bookId,
+                    PublicationId = PublicationId,
                     status = "PROCESSING",
-                    message = "Book uploaded successfully and queued for processing."
+                    message = "Publication uploaded successfully and queued for processing."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("cover-image")]
+        [RequestSizeLimit(10485760)] // 10 MB
+        [RequestFormLimits(MultipartBodyLengthLimit = 10485760)]
+        public async Task<IActionResult> UploadCoverImage(IFormFile file, [FromForm] string? publicationId)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest(new { success = false, message = "No file uploaded." });
+                }
+
+                if (string.IsNullOrEmpty(publicationId) || publicationId == "NEW")
+                {
+                    publicationId = Guid.NewGuid().ToString(); // Generate ID for new book
+                }
+
+                var fileUrl = await _fileService.UploadCoverImageAsync(file, publicationId);
+                
+                return Ok(new 
+                {
+                    success = true,
+                    url = fileUrl,
+                    publicationId = publicationId,
+                    message = "Cover image uploaded and resized successfully."
                 });
             }
             catch (Exception ex)
@@ -109,3 +142,5 @@ namespace XomTruyen.API.Controllers
         }
     }
 }
+
+

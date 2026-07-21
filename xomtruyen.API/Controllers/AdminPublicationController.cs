@@ -6,24 +6,24 @@ using XomTruyen.API.Services.Interfaces;
 
 namespace XomTruyen.API.Controllers;
 
-[Route("api/books")]
+[Route("api/Publications")]
 // [Authorize(Roles = "Admin")] // Uncomment when roles are implemented
-public class AdminBookController : BaseApiController
+public class AdminPublicationController : BaseApiController
 {
-    private readonly IBookManagementService _bookService;
+    private readonly IPublicationManagementService _publicationService;
 
-    public AdminBookController(IBookManagementService bookService)
+    public AdminPublicationController(IPublicationManagementService publicationService)
     {
-        _bookService = bookService;
+        _publicationService = publicationService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] BookFilterRequest filter)
+    public async Task<IActionResult> GetList([FromQuery] PublicationFilterRequest filter)
     {
-        var (books, totalCount) = await _bookService.GetBooksAsync(filter);
+        var (Publications, totalCount) = await _publicationService.GetPublicationsAsync(filter);
         return Ok(new
         {
-            Data = books,
+            Data = Publications,
             TotalCount = totalCount,
             Page = filter.Page,
             PageSize = filter.PageSize
@@ -33,18 +33,18 @@ public class AdminBookController : BaseApiController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var book = await _bookService.GetBookByIdAsync(id);
-        if (book == null) return NotFound(new { Message = "Book not found" });
-        return Ok(book);
+        var Publication = await _publicationService.GetBookByIdAsync(id);
+        if (Publication == null) return NotFound(new { Message = "Publication not found" });
+        return Ok(Publication);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] BookRequest request)
+    public async Task<IActionResult> Create([FromBody] PublicationRequest request)
     {
         try
         {
-            var book = await _bookService.CreateBookAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
+            var Publication = await _publicationService.CreateBookAsync(request);
+            return CreatedAtAction(nameof(GetById), new { id = Publication.Id }, Publication);
         }
         catch (ArgumentException ex)
         {
@@ -53,11 +53,11 @@ public class AdminBookController : BaseApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] BookRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] PublicationRequest request)
     {
         try
         {
-            await _bookService.UpdateBookAsync(id, request);
+            await _publicationService.UpdateBookAsync(id, request);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -71,11 +71,11 @@ public class AdminBookController : BaseApiController
     }
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] BookUpdateRequest request)
+    public async Task<IActionResult> PartialUpdate(Guid id, [FromBody] PublicationUpdateRequest request)
     {
         try
         {
-            await _bookService.PartialUpdateBookAsync(id, request);
+            await _publicationService.PartialUpdateBookAsync(id, request);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -93,7 +93,7 @@ public class AdminBookController : BaseApiController
     {
         try
         {
-            await _bookService.DeleteBookAsync(id);
+            await _publicationService.DeleteBookAsync(id);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -107,7 +107,7 @@ public class AdminBookController : BaseApiController
     {
         try
         {
-            await _bookService.ToggleRecommendedAsync(id, isRecommended);
+            await _publicationService.ToggleRecommendedAsync(id, isRecommended);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -121,7 +121,7 @@ public class AdminBookController : BaseApiController
     {
         try
         {
-            await _bookService.ToggleExclusiveAsync(id, isExclusive);
+            await _publicationService.ToggleExclusiveAsync(id, isExclusive);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -135,7 +135,7 @@ public class AdminBookController : BaseApiController
     {
         try
         {
-            await _bookService.ToggleStatusAsync(id, status);
+            await _publicationService.ToggleStatusAsync(id, status);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -144,3 +144,5 @@ public class AdminBookController : BaseApiController
         }
     }
 }
+
+

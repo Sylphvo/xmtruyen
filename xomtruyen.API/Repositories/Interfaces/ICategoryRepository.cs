@@ -13,3 +13,5 @@ public interface ICategoryRepository
     Task<bool> HasBooksAsync(int categoryId);
     Task<(IEnumerable<Category> Categories, int TotalCount)> GetCategoriesAsync(CategoryFilterRequest filter);
 }
+
+

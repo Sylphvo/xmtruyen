@@ -3,6 +3,7 @@ import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
 // import Footer from "./components/Layout/Footer";
 import HomePage from "./pages";
+import LibraryPage from "./pages/LibraryPage";
 import ComicPage from "./pages/ComicPage";
 import LoginPage from "./pages/LoginPage"; // <-- Nhớ import trang Login vào đây
 import RegisterPage from "./pages/RegisterPage"; // <-- Import thêm trang Register (nếu có)
@@ -90,6 +91,16 @@ export default function App() {
           element={
             <MainLayout>
               <HomePage />
+            </MainLayout>
+          }
+        />
+
+        {/* Tuyến đường Thư viện sách */}
+        <Route
+          path="/library"
+          element={
+            <MainLayout>
+              <LibraryPage />
             </MainLayout>
           }
         />

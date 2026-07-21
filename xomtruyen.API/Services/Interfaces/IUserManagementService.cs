@@ -12,3 +12,5 @@ public interface IUserManagementService
     Task<(IEnumerable<AdminUserResponse> Users, int TotalCount)> GetUsersAsync(UserFilterRequest filter);
     Task ToggleUserStatusAsync(Guid id, bool isActive);
 }
+
+

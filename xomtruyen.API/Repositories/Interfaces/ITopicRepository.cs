@@ -12,3 +12,5 @@ public interface ITopicRepository
     Task DeleteAsync(Topic topic);
     Task<(IEnumerable<Topic> Topics, int TotalCount)> GetTopicsAsync(TopicFilterRequest filter);
 }
+
+

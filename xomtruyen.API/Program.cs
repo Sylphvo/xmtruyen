@@ -50,7 +50,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ITopicRepository, TopicRepository>();
-builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();
 
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IReadingService, ReadingService>();
@@ -58,11 +58,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICategoryManagementService, CategoryManagementService>();
 builder.Services.AddScoped<ITopicManagementService, TopicManagementService>();
-builder.Services.AddScoped<IBookManagementService, BookManagementService>();
+builder.Services.AddScoped<IPublicationManagementService, PublicationManagementService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IFileService, FileService>();
 
-// Register Book Processing Services
+// Register Publication Processing Services
 builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx => new BackgroundTaskQueue(100));
 builder.Services.AddScoped<IBookProcessor, PdfBookProcessor>();
 builder.Services.AddScoped<IBookProcessor, ArchiveBookProcessor>();
