@@ -31,14 +31,14 @@ public class ManagerDBController : BaseApiController
 
     private async Task<string?> GetActualTableName(string tableName)
     {
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         var sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name ILIKE @TableName LIMIT 1";
         return await connection.QuerySingleOrDefaultAsync<string>(sql, new { TableName = tableName });
     }
 
     private async Task<string?> GetSinglePrimaryKeyColumn(string tableName)
     {
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         var sql = @"
             SELECT kcu.column_name
             FROM information_schema.table_constraints tco
@@ -56,7 +56,7 @@ public class ManagerDBController : BaseApiController
         var pkCol = await GetSinglePrimaryKeyColumn(tableName);
         if (pkCol == null) return id;
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         var sql = "SELECT data_type FROM information_schema.columns WHERE table_schema = 'public' AND table_name = @TableName AND column_name = @ColName LIMIT 1";
         var dataType = await connection.QuerySingleOrDefaultAsync<string>(sql, new { TableName = tableName, ColName = pkCol });
 
@@ -78,7 +78,7 @@ public class ManagerDBController : BaseApiController
     [HttpGet("tables")]
     public async Task<IActionResult> GetTables()
     {
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         var sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name != '__EFMigrationsHistory' ORDER BY table_name";
         var tables = await connection.QueryAsync<string>(sql);
         return Ok(tables);
@@ -90,7 +90,7 @@ public class ManagerDBController : BaseApiController
         var actualTableName = await GetActualTableName(tableName);
         if (actualTableName == null) return NotFound(new { message = $"Table {tableName} not found." });
         
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         
         var sqlCols = @"
             SELECT column_name AS Name, 
@@ -155,7 +155,7 @@ public class ManagerDBController : BaseApiController
 
         var sql = $"CREATE TABLE \"{request.TableName}\" ({string.Join(", ", columnDefs)});";
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         try
         {
             await connection.ExecuteAsync(sql);
@@ -174,7 +174,7 @@ public class ManagerDBController : BaseApiController
             return BadRequest(new { message = "Invalid table name format." });
 
         var sql = $"DROP TABLE IF EXISTS \"{tableName}\" CASCADE;";
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         try
         {
             await connection.ExecuteAsync(sql);
@@ -197,14 +197,14 @@ public class ManagerDBController : BaseApiController
         
         var orderBy = pkCol != null ? $"ORDER BY \"{pkCol}\" DESC" : "";
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         var sql = $"SELECT * FROM \"{actualTableName}\" {orderBy} LIMIT @Limit OFFSET @Offset";
         var data = await connection.QueryAsync(sql, new { Limit = pageSize, Offset = offset });
         
         var countSql = $"SELECT COUNT(*) FROM \"{actualTableName}\"";
         var totalCount = await connection.ExecuteScalarAsync<long>(countSql);
         
-        return Ok(new { data, total = totalCount, page, pageSize });
+        return Ok(new { data, totalCount = totalCount, page, pageSize });
     }
 
     [HttpGet("{tableName}/{id}")]
@@ -219,7 +219,7 @@ public class ManagerDBController : BaseApiController
         var typedId = await ParseId(actualTableName, id);
         if (typedId == null) return BadRequest(new { message = "Invalid ID format" });
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         var sql = $"SELECT * FROM \"{actualTableName}\" WHERE \"{pkCol}\" = @Id";
         var data = await connection.QuerySingleOrDefaultAsync(sql, new { Id = typedId });
         
@@ -244,7 +244,7 @@ public class ManagerDBController : BaseApiController
             paramDict.Add(kvp.Key, ParseJsonElement(kvp.Value));
         }
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         try
         {
             var result = await connection.QuerySingleOrDefaultAsync(sql, paramDict);
@@ -282,7 +282,7 @@ public class ManagerDBController : BaseApiController
             paramDict.Add(key, ParseJsonElement(data[key]));
         }
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         try
         {
             var result = await connection.QuerySingleOrDefaultAsync(sql, paramDict);
@@ -309,7 +309,7 @@ public class ManagerDBController : BaseApiController
 
         var sql = $"DELETE FROM \"{actualTableName}\" WHERE \"{pkCol}\" = @Id RETURNING *";
 
-        using var connection = _context.Database.GetDbConnection();
+        var connection = _context.Database.GetDbConnection();
         try
         {
             var result = await connection.QuerySingleOrDefaultAsync(sql, new { Id = typedId });

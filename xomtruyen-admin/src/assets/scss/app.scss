@@ -127,6 +127,8 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 1.5rem;
   z-index: 999;
   border-bottom: 1px solid $app-border-color;
+  position: relative !important;
+  width: 100% !important;
 }
 
 .app-main {

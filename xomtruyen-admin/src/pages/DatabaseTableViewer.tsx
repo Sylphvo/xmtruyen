@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getTableData, insertRow, updateRow, deleteRow, getTableSchema, type TableSchemaColumn } from '../api/managerDbApi';
 import { Button, Form, Modal, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPlus, faEdit, faTrash, faSave, faKey, faLink } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPlus, faEdit, faTrash, faSave, faKey, faLink, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
+import { ResizableHeader } from '../components/ResizableHeader';
 
 export const DatabaseTableViewer: React.FC = () => {
   const { tableName } = useParams<{ tableName: string }>();
@@ -12,11 +13,11 @@ export const DatabaseTableViewer: React.FC = () => {
   
   const [data, setData] = useState<any[]>([]);
   const [schemaColumns, setSchemaColumns] = useState<TableSchemaColumn[]>([]);
-  const [, setTotalItems] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   
-  const [page] = useState(1);
-  const [pageSize] = useState(100);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -93,7 +94,6 @@ export const DatabaseTableViewer: React.FC = () => {
     try {
       const payload = { ...formData };
       
-      // Dynamic Type conversion based on schema
       schemaColumns.forEach(col => {
         const val = payload[col.name];
         if (val !== undefined && val !== null && val !== '') {
@@ -123,6 +123,9 @@ export const DatabaseTableViewer: React.FC = () => {
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (page - 1) * pageSize;
+
   return (
     <div className="card border-0 shadow-sm h-100" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
       <div className="card-header border-bottom-0 pt-4 pb-3 d-flex justify-content-between align-items-center bg-transparent">
@@ -132,47 +135,72 @@ export const DatabaseTableViewer: React.FC = () => {
           </Button>
           <h5 className="mb-0 fw-semibold text-body">Chi tiết bảng: {tableName}</h5>
         </div>
-        <Button variant="primary" size="sm" onClick={handleOpenAdd} className="d-flex align-items-center gap-2">
+        <Button variant="primary" size="sm" onClick={handleOpenAdd} className="d-flex align-items-center gap-2 rounded-2">
           <FontAwesomeIcon icon={faPlus} />
           Thêm dòng
         </Button>
       </div>
 
       <div className="card-body d-flex flex-column" style={{ overflow: 'hidden' }}>
-        {isLoading ? (
-          <div className="text-center py-5"><Spinner animation="border" /></div>
-        ) : (
-          <div className="table-responsive flex-grow-1 border rounded bg-white">
-            <table className="table table-hover table-bordered mb-0 align-middle text-body">
-              <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-                <tr>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="d-flex align-items-center gap-2">
+            <Form.Select
+              size="sm"
+              className="bg-transparent text-body border-secondary-subtle"
+              style={{ width: '70px' }}
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Form.Select>
+            <span className="text-muted small">dòng / trang</span>
+          </div>
+        </div>
+
+        <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
+          {isLoading ? (
+            <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
+          ) : (
+            <table className="table table-bordered mb-0 align-middle text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent' }}>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
+                <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
                   {columns.map(col => {
                     const schemaCol = schemaColumns.find(sc => sc.name === col);
                     return (
-                      <th key={col} className="text-nowrap">
-                        {col}
-                        {schemaCol?.isPrimaryKey && <FontAwesomeIcon icon={faKey} className="text-warning ms-2" title="Primary Key" />}
-                        {schemaCol?.isForeignKey && <FontAwesomeIcon icon={faLink} className="text-secondary ms-2" title="Foreign Key" />}
-                      </th>
+                      <ResizableHeader key={col} initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                        <span className="fw-semibold text-nowrap">
+                          {col}
+                          {schemaCol?.isPrimaryKey && <FontAwesomeIcon icon={faKey} className="text-warning ms-2" title="Primary Key" />}
+                          {schemaCol?.isForeignKey && <FontAwesomeIcon icon={faLink} className="text-secondary ms-2" title="Foreign Key" />}
+                        </span>
+                      </ResizableHeader>
                     );
                   })}
-                  <th className="text-center" style={{ width: '100px' }}>Thao tác</th>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Thao tác</span>
+                  </ResizableHeader>
                 </tr>
               </thead>
               <tbody>
                 {data.length > 0 ? (
                   data.map((row, i) => (
-                    <tr key={i}>
+                    <tr key={i} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
                       {columns.map(col => (
-                        <td key={col} className="text-truncate" style={{ maxWidth: '200px' }}>
+                        <td key={col} className="text-truncate" style={{ maxWidth: '200px', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                           {String(row[col] ?? '')}
                         </td>
                       ))}
-                      <td className="text-center">
-                        <Button variant="light" size="sm" className="me-2 text-primary border" onClick={() => handleOpenEdit(row)}>
+                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <Button variant="light" size="sm" className="me-2 px-2 py-1 bg-white d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#0d6efd', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleOpenEdit(row)}>
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
-                        <Button variant="light" size="sm" className="text-danger border" onClick={() => handleDelete(row)}>
+                        <Button variant="light" size="sm" className="px-2 py-1 bg-white d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleDelete(row)}>
                           <FontAwesomeIcon icon={faTrash} />
                         </Button>
                       </td>
@@ -180,11 +208,80 @@ export const DatabaseTableViewer: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={columns.length + 1} className="text-center py-4">Không có dữ liệu</td>
+                    <td colSpan={columns.length + 1} className="text-center py-5 text-muted" style={{ backgroundColor: 'transparent' }}>Không có dữ liệu</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          )}
+        </div>
+
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top bg-transparent">
+            <div className="text-muted" style={{ fontSize: '13px' }}>
+              Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + pageSize, totalItems)} trong {totalItems} bản ghi
+            </div>
+
+            {totalPages > 1 && (
+              <div className="d-flex" style={{ gap: '4px' }}>
+                <button
+                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                  onClick={() => setPage(1)}
+                  disabled={page === 1}
+                >
+                  <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
+                </button>
+                <button
+                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                  onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                  disabled={page === 1}
+                >
+                  <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
+                </button>
+
+                {[...Array(totalPages)].map((_, i) => {
+                  // Hiển thị tối đa 5 trang xung quanh trang hiện tại để khỏi bị quá dài
+                  if (i + 1 < page - 2 || i + 1 > page + 2) {
+                    if (i + 1 === 1 || i + 1 === totalPages) return null; // vẫn giữ nhưng ẩn bớt nếu cần thiết, thực tế với admin tool để đơn giản mình render vài trang thôi.
+                    if (i + 1 === page - 3 || i + 1 === page + 3) return <span key={i} className="px-1 text-muted">...</span>;
+                    return null;
+                  }
+                  return (
+                    <button
+                      key={i + 1}
+                      className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
+                      style={{
+                        width: '32px', height: '32px', fontSize: '13px',
+                        backgroundColor: i + 1 === page ? '#5955D1' : 'var(--bs-tertiary-bg)',
+                        color: i + 1 === page ? '#fff' : '#5955D1'
+                      }}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  );
+                })}
+
+                <button
+                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                  onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={page === totalPages}
+                >
+                  <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
+                </button>
+                <button
+                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                  onClick={() => setPage(totalPages)}
+                  disabled={page === totalPages}
+                >
+                  <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { Users } from './pages/Users';
 import { Books } from './pages/Books';
+import { BookDetails } from './pages/BookDetails';
 import { Topics } from './pages/Topics';
 import { Categories } from './pages/Categories';
 import { Login } from './pages/Login';
@@ -19,6 +20,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/books" element={<Books />} />
+          <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/topics" element={<Topics />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/users" element={<Users />} />

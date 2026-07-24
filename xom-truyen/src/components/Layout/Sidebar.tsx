@@ -11,6 +11,8 @@ export default function Sidebar() {
   const fromPath = state?.from;
 
   const [activeMenu, setActiveMenu] = useState('home');
+  const [isHovered, setIsHovered] = useState(false);
+  const isReadingPage = path.match(/\/book\/.*\/read/);
 
   useEffect(() => {
     const checkPath = path.startsWith('/book/') && fromPath ? fromPath : path;
@@ -53,7 +55,11 @@ export default function Sidebar() {
   });
 
   return (
-    <div style={{ display: "flex", height: "100vh", zIndex: 1000 }}>
+    <div 
+      style={{ display: "flex", height: "100vh", zIndex: 1000, position: "relative" }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Icon Sidebar */}
       <aside
         style={{
@@ -112,12 +118,22 @@ export default function Sidebar() {
       {/* Menu Sidebar */}
       <aside
         style={{
-          width: 240,
+          width: (!isReadingPage || isHovered) ? 240 : 0,
+          opacity: (!isReadingPage || isHovered) ? 1 : 0,
+          overflow: "hidden",
           backgroundColor: "var(--bg-primary)",
-          borderRight: "1px solid var(--border)",
+          borderRight: (!isReadingPage || isHovered) ? "1px solid var(--border)" : "none",
           display: "flex",
           flexDirection: "column",
           flexShrink: 0,
+          transition: "width 0.3s ease, opacity 0.3s ease",
+          ...(isReadingPage ? {
+            position: "absolute",
+            left: 90,
+            height: "100vh",
+            zIndex: 999,
+            boxShadow: (!isReadingPage || isHovered) ? "4px 0 10px rgba(0,0,0,0.05)" : "none"
+          } : {})
         }}
       >
         <div style={{

@@ -396,6 +396,114 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\books\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\toc.json'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\253406f9-e283-40ca-b879-bf2195fab173.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>xomtruyen.API</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/xomtruyen.API</BasePath>
+      <RelativePath>Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/253406f9-e283-40ca-b879-bf2195fab173.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>47s6jly369</Fingerprint>
+      <Integrity>QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\253406f9-e283-40ca-b879-bf2195fab173.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\2e4562c4-50bd-4645-b985-175de5deef50.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>xomtruyen.API</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/xomtruyen.API</BasePath>
+      <RelativePath>Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/2e4562c4-50bd-4645-b985-175de5deef50.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>47s6jly369</Fingerprint>
+      <Integrity>QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\2e4562c4-50bd-4645-b985-175de5deef50.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>xomtruyen.API</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/xomtruyen.API</BasePath>
+      <RelativePath>Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>47s6jly369</Fingerprint>
+      <Integrity>QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\3ff94715-dd2a-4875-ba91-50176857447a.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>xomtruyen.API</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/xomtruyen.API</BasePath>
+      <RelativePath>Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3ff94715-dd2a-4875-ba91-50176857447a.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>47s6jly369</Fingerprint>
+      <Integrity>QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\3ff94715-dd2a-4875-ba91-50176857447a.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\4317b983-3d23-49cf-84f6-f659099d1992.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>xomtruyen.API</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/xomtruyen.API</BasePath>
+      <RelativePath>Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/4317b983-3d23-49cf-84f6-f659099d1992.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>47s6jly369</Fingerprint>
+      <Integrity>QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\4317b983-3d23-49cf-84f6-f659099d1992.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\54166874-be6c-4419-93a6-f098e0f56367.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>xomtruyen.API</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/xomtruyen.API</BasePath>
+      <RelativePath>Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/54166874-be6c-4419-93a6-f098e0f56367.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>o7qx4h5nc0</Fingerprint>
+      <Integrity>9HoyN6Np6gsDgcstiw2vBOT8JlNhTRPr+2UQeK3qD90=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Publications\64d84975-03e0-402b-94f1-df5c3b298815\File_cover\54166874-be6c-4419-93a6-f098e0f56367.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\raw-uploads\ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf'))">
       <SourceType>Package</SourceType>
       <SourceId>xomtruyen.API</SourceId>

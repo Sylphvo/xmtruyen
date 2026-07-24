@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "skPM4Fomm/ICIAgKhRNSJbtxRmbXaZ/dO06xsEhKbPw=",
+  "Hash": "T+zB7ua05QpBMk3BvzP3dEKSLeK2yfsC6RagAIEI80I=",
   "Source": "xomtruyen.API",
   "BasePath": "_content/xomtruyen.API",
   "Mode": "Default",
@@ -561,6 +561,132 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\books\\435de2cc-d444-4a19-82e9-fe6b1cf51ae7\\toc.json"
+    },
+    {
+      "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\253406f9-e283-40ca-b879-bf2195fab173.jpg",
+      "SourceId": "xomtruyen.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\",
+      "BasePath": "_content/xomtruyen.API",
+      "RelativePath": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/253406f9-e283-40ca-b879-bf2195fab173#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "47s6jly369",
+      "Integrity": "QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\253406f9-e283-40ca-b879-bf2195fab173.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\2e4562c4-50bd-4645-b985-175de5deef50.jpg",
+      "SourceId": "xomtruyen.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\",
+      "BasePath": "_content/xomtruyen.API",
+      "RelativePath": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/2e4562c4-50bd-4645-b985-175de5deef50#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "47s6jly369",
+      "Integrity": "QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\2e4562c4-50bd-4645-b985-175de5deef50.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg",
+      "SourceId": "xomtruyen.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\",
+      "BasePath": "_content/xomtruyen.API",
+      "RelativePath": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3f4b8de8-c5c0-4639-9a5a-455534c4e02b#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "47s6jly369",
+      "Integrity": "QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3ff94715-dd2a-4875-ba91-50176857447a.jpg",
+      "SourceId": "xomtruyen.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\",
+      "BasePath": "_content/xomtruyen.API",
+      "RelativePath": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3ff94715-dd2a-4875-ba91-50176857447a#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "47s6jly369",
+      "Integrity": "QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3ff94715-dd2a-4875-ba91-50176857447a.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\4317b983-3d23-49cf-84f6-f659099d1992.jpg",
+      "SourceId": "xomtruyen.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\",
+      "BasePath": "_content/xomtruyen.API",
+      "RelativePath": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/4317b983-3d23-49cf-84f6-f659099d1992#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "47s6jly369",
+      "Integrity": "QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\4317b983-3d23-49cf-84f6-f659099d1992.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\54166874-be6c-4419-93a6-f098e0f56367.jpg",
+      "SourceId": "xomtruyen.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\",
+      "BasePath": "_content/xomtruyen.API",
+      "RelativePath": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/54166874-be6c-4419-93a6-f098e0f56367#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "o7qx4h5nc0",
+      "Integrity": "9HoyN6Np6gsDgcstiw2vBOT8JlNhTRPr+2UQeK3qD90=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\54166874-be6c-4419-93a6-f098e0f56367.jpg"
     },
     {
       "Identity": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\uploads\\raw-uploads\\ff8cb7f3-be8a-424b-97b9-bf8138036491_pdf-test.pdf",
@@ -3250,6 +3376,498 @@
         {
           "Name": "integrity",
           "Value": "sha256-UMFdkh3yhJLi2b8tpdHNXHjuQWvc9HgHTbY9dtI4HLo="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/253406f9-e283-40ca-b879-bf2195fab173.47s6jly369.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\253406f9-e283-40ca-b879-bf2195fab173.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:31:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "47s6jly369"
+        },
+        {
+          "Name": "label",
+          "Value": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/253406f9-e283-40ca-b879-bf2195fab173.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/253406f9-e283-40ca-b879-bf2195fab173.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\253406f9-e283-40ca-b879-bf2195fab173.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:31:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/2e4562c4-50bd-4645-b985-175de5deef50.47s6jly369.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\2e4562c4-50bd-4645-b985-175de5deef50.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:25:38 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "47s6jly369"
+        },
+        {
+          "Name": "label",
+          "Value": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/2e4562c4-50bd-4645-b985-175de5deef50.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/2e4562c4-50bd-4645-b985-175de5deef50.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\2e4562c4-50bd-4645-b985-175de5deef50.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:25:38 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3f4b8de8-c5c0-4639-9a5a-455534c4e02b.47s6jly369.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:25:51 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "47s6jly369"
+        },
+        {
+          "Name": "label",
+          "Value": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3f4b8de8-c5c0-4639-9a5a-455534c4e02b.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:25:51 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3ff94715-dd2a-4875-ba91-50176857447a.47s6jly369.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3ff94715-dd2a-4875-ba91-50176857447a.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:25:43 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "47s6jly369"
+        },
+        {
+          "Name": "label",
+          "Value": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3ff94715-dd2a-4875-ba91-50176857447a.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/3ff94715-dd2a-4875-ba91-50176857447a.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\3ff94715-dd2a-4875-ba91-50176857447a.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:25:43 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/4317b983-3d23-49cf-84f6-f659099d1992.47s6jly369.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\4317b983-3d23-49cf-84f6-f659099d1992.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:24:08 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "47s6jly369"
+        },
+        {
+          "Name": "label",
+          "Value": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/4317b983-3d23-49cf-84f6-f659099d1992.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/4317b983-3d23-49cf-84f6-f659099d1992.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\4317b983-3d23-49cf-84f6-f659099d1992.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129452"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:24:08 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-QBsQPnGGEnF4QLngptZGBP16pseRePFahbKMvbu6JJQ="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/54166874-be6c-4419-93a6-f098e0f56367.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\54166874-be6c-4419-93a6-f098e0f56367.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "82757"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"9HoyN6Np6gsDgcstiw2vBOT8JlNhTRPr+2UQeK3qD90=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:31:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-9HoyN6Np6gsDgcstiw2vBOT8JlNhTRPr+2UQeK3qD90="
+        }
+      ]
+    },
+    {
+      "Route": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/54166874-be6c-4419-93a6-f098e0f56367.o7qx4h5nc0.jpg",
+      "AssetFile": "C:\\Users\\Cilse\\source\\xomtruyen\\XomTruyen_Workspace\\xomtruyen.API\\wwwroot\\Publications\\64d84975-03e0-402b-94f1-df5c3b298815\\File_cover\\54166874-be6c-4419-93a6-f098e0f56367.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "82757"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"9HoyN6Np6gsDgcstiw2vBOT8JlNhTRPr+2UQeK3qD90=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 21 Jul 2026 17:31:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "o7qx4h5nc0"
+        },
+        {
+          "Name": "label",
+          "Value": "Publications/64d84975-03e0-402b-94f1-df5c3b298815/File_cover/54166874-be6c-4419-93a6-f098e0f56367.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-9HoyN6Np6gsDgcstiw2vBOT8JlNhTRPr+2UQeK3qD90="
         }
       ]
     },

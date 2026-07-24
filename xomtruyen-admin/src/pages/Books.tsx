@@ -21,8 +21,10 @@ interface SortConfig {
 }
 
 import { ResizableHeader } from '../components/ResizableHeader';
+import { useNavigate } from 'react-router-dom';
 
 export const Books: React.FC = () => {
+  const navigate = useNavigate();
   const getImageUrl = (url?: string) => {
     if (!url) return defaultBookImage;
     if (url.startsWith('http') || url.startsWith('data:')) return url;
@@ -482,7 +484,7 @@ export const Books: React.FC = () => {
           </div>
 
           <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-            <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1320px' }}>
+            <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1450px' }}>
               <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
                   <ResizableHeader initialWidth={90} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
@@ -509,7 +511,7 @@ export const Books: React.FC = () => {
                   <ResizableHeader initialWidth={150} minWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('status')}>
                     <span className="fw-semibold text-nowrap">Trạng Thái {getSortIcon('status')}</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={220} minWidth={220} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={350} minWidth={350} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
                     <span className="fw-semibold text-nowrap">Thao Tác <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: '12px' }} /></span>
                   </ResizableHeader>
                 </tr>
@@ -833,15 +835,19 @@ export const Books: React.FC = () => {
                               </div>
                             ) : (
                               <div className="d-flex gap-2 justify-content-center">
-                                <Button variant="light" size="sm" onClick={() => handleUploadClick(book.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#5955D1', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} title="Upload File Sách">
+                                <Button variant="primary" size="sm" onClick={() => navigate(`/books/${book.id}`)} className="text-nowrap" title="Chi tiết Sách">
+                                  <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
+                                  Chi tiết
+                                </Button>
+                                <Button variant="info" size="sm" onClick={() => handleUploadClick(book.id)} className="text-nowrap text-white" title="Upload File Sách">
                                   <FontAwesomeIcon icon={faUpload} className="me-2" />
                                   Up
                                 </Button>
-                                <Button variant="light" size="sm" onClick={() => handleChangeStatus(book)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                                  <FontAwesomeIcon icon={faExchangeAlt} className="me-2" style={{ color: '#9ca3af' }} />
+                                <Button variant="secondary" size="sm" onClick={() => handleChangeStatus(book)} className="text-nowrap text-white">
+                                  <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
                                   Change
                                 </Button>
-                                <Button variant="light" size="sm" onClick={() => handleDelete(book.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <Button variant="danger" size="sm" onClick={() => handleDelete(book.id)} className="text-nowrap">
                                   <FontAwesomeIcon icon={faTrash} className="me-2" />
                                   Xóa
                                 </Button>

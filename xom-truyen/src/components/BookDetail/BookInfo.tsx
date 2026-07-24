@@ -67,7 +67,7 @@ export default function BookInfo({ book }: BookInfoProps) {
         {/* Action Buttons */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
           <button 
-            onClick={() => navigate(`/book/${book.id}/read`)}
+            onClick={() => navigate(`/book/${book.id}/read`, { state: { isComic: book.genres?.includes("Truyện tranh") || book.genres?.includes("Ngôn tình") } })}
             style={{
             display: "flex",
             alignItems: "center",

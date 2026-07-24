@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Dropdown, Form, Button, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH, faSort, faSortUp, faSortDown, faDatabase } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisH, faSort, faSortUp, faSortDown, faDatabase, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 import { getTables } from '../api/managerDbApi';
+import { ResizableHeader } from '../components/ResizableHeader';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -35,13 +36,14 @@ const CustomToggle = React.forwardRef(({ children, onClick }: any, ref: any) => 
   </button>
 ));
 
-
-
 export const Database: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<DatabaseTable[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'asc' });
 
   useEffect(() => {
@@ -55,9 +57,9 @@ export const Database: React.FC = () => {
       const tableData = tables.map((t, i) => ({
         id: String(i + 1),
         name: t,
-        rowCount: 0, // Mock for now as API doesn't return row count
-        size: 'N/A', // Mock
-        lastBackup: new Date().toISOString(), // Mock
+        rowCount: 0,
+        size: 'N/A',
+        lastBackup: new Date().toISOString(),
         status: 'Active' as const
       }));
       setData(tableData);
@@ -68,8 +70,7 @@ export const Database: React.FC = () => {
     }
   };
 
-  // Client-side Sort
-  const sortedData = React.useMemo(() => {
+  const sortedData = useMemo(() => {
     let filterData = data;
     if (searchTerm) {
         filterData = data.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -91,7 +92,12 @@ export const Database: React.FC = () => {
     });
   }, [data, sortConfig, searchTerm]);
 
-  // Handle Sort
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const validCurrentPage = Math.min(currentPage, Math.max(1, totalPages || 1));
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
+
   const handleSort = (key: keyof DatabaseTable) => {
     let direction: SortDirection = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -126,10 +132,24 @@ export const Database: React.FC = () => {
       </div>
       
       <div className="card-body d-flex flex-column">
-        {/* Top Controls */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <div className="d-flex align-items-center gap-2">
-            <span className="text-muted small">Danh sách các bảng trong hệ thống</span>
+            <Form.Select
+              size="sm"
+              className="bg-transparent text-body border-secondary-subtle"
+              style={{ width: '70px' }}
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Form.Select>
+            <span className="text-muted small">dòng / trang</span>
           </div>
           
           <div style={{ width: '250px' }}>
@@ -139,34 +159,36 @@ export const Database: React.FC = () => {
               className="bg-transparent text-body border-secondary-subtle"
               placeholder="Tìm kiếm bảng..." 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
             />
           </div>
         </div>
 
-        {/* Table */}
         <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-          <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent' }}>
+          <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
             <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('name')}>
+                <ResizableHeader initialWidth={250} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('name')}>
                   <span className="fw-semibold text-nowrap">Tên bảng {getSortIcon('name')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('rowCount')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('rowCount')}>
                   <span className="fw-semibold text-nowrap">Số dòng {getSortIcon('rowCount')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('size')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('size')}>
                   <span className="fw-semibold text-nowrap">Kích thước {getSortIcon('size')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('lastBackup')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={150} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('lastBackup')}>
                   <span className="fw-semibold text-nowrap">Lần backup cuối {getSortIcon('lastBackup')}</span>
-                </th>
-                <th style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('status')}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('status')}>
                   <span className="fw-semibold text-nowrap">Trạng thái {getSortIcon('status')}</span>
-                </th>
-                <th style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
                   <span className="fw-semibold text-nowrap">Thao Tác</span>
-                </th>
+                </ResizableHeader>
               </tr>
             </thead>
             <tbody>
@@ -177,11 +199,11 @@ export const Database: React.FC = () => {
                     <div className="mt-2 text-muted small">Đang tải danh sách bảng...</div>
                   </td>
                 </tr>
-              ) : sortedData.length > 0 ? (
-                sortedData.map((table) => (
+              ) : paginatedData.length > 0 ? (
+                paginatedData.map((table) => (
                   <tr key={table.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <div className="fw-medium">{table.name}</div>
+                      <div className="fw-medium text-truncate">{table.name}</div>
                     </td>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                       <span className="text-body">{table.rowCount.toLocaleString()}</span>
@@ -197,7 +219,7 @@ export const Database: React.FC = () => {
                         {table.status}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                       <Dropdown align="end">
                         <Dropdown.Toggle as={CustomToggle}>
                           <FontAwesomeIcon icon={faEllipsisH} className="text-muted" />
@@ -228,6 +250,65 @@ export const Database: React.FC = () => {
               )}
             </tbody>
           </table>
+        </div>
+        
+        <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top bg-transparent">
+          <div className="text-muted" style={{ fontSize: '13px' }}>
+            Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + itemsPerPage, totalItems)} trong {totalItems} bảng
+          </div>
+
+          {totalPages > 1 && (
+            <div className="d-flex" style={{ gap: '4px' }}>
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                onClick={() => setCurrentPage(1)}
+                disabled={validCurrentPage === 1}
+              >
+                <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
+              </button>
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={validCurrentPage === 1}
+              >
+                <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
+                  style={{
+                    width: '32px', height: '32px', fontSize: '13px',
+                    backgroundColor: i + 1 === validCurrentPage ? '#5955D1' : 'var(--bs-tertiary-bg)',
+                    color: i + 1 === validCurrentPage ? '#fff' : '#5955D1'
+                  }}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={validCurrentPage === totalPages}
+              >
+                <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
+              </button>
+              <button
+                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
+                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={validCurrentPage === totalPages}
+              >
+                <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
