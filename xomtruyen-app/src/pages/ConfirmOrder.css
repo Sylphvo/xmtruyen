@@ -1,0 +1,241 @@
+.confirm-order-page {
+  --ion-background-color: #f7f7f7;
+}
+
+.confirm-toolbar {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --background: #f7f7f7;
+}
+
+.confirm-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 24px 24px 12px 24px;
+}
+
+.confirm-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 0 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  cursor: pointer;
+}
+
+.card-icon-left {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.bg-purple-light { background-color: #f0ebff; }
+.text-purple { color: #513b86; }
+
+.bg-purple { background-color: #513b86; }
+.bg-blue { background-color: #2196f3; }
+.bg-yellow { background-color: #ffca28; }
+.text-white { color: #ffffff; }
+
+.card-content {
+  flex: 1;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.card-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.card-content p {
+  font-size: 12px;
+  color: #a0a0a0;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.change-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #513b86;
+}
+
+.card-icon-right {
+  color: #a0a0a0;
+  font-size: 20px;
+}
+
+.summary-block {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 0 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #a0a0a0;
+  margin-bottom: 12px;
+}
+
+.summary-label {
+  font-weight: 500;
+}
+.summary-value {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.summary-sub-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-bottom: 8px;
+  padding-left: 8px;
+}
+
+.summary-divider {
+  height: 1px;
+  background-color: #f5f5f5;
+  margin: 16px 0;
+}
+
+.summary-row.total {
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.see-details {
+  font-size: 12px;
+  color: #513b86;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.order-btn-container {
+  padding: 32px 24px;
+}
+
+.primary-order-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 24px;
+  background-color: #513b86;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* Modals */
+.bottom-sheet-modal {
+  --border-radius: 24px 24px 0 0;
+}
+
+.modal-content {
+  padding: 24px;
+  height: 100%;
+  background: #ffffff;
+}
+
+.modal-drag-handle {
+  width: 40px;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto 24px auto;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 24px 0;
+}
+
+.payment-option-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.payment-option-card:hover {
+  border-color: #513b86;
+}
+
+.date-selector-row, .time-selector-row {
+  display: flex;
+  gap: 12px;
+}
+
+.date-box, .time-box {
+  flex: 1;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.date-box.active, .time-box.active {
+  border-color: #513b86;
+  background-color: #f7f5ff;
+}
+
+.date-label {
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-bottom: 4px;
+}
+
+.date-val, .time-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.date-box.active .date-label,
+.date-box.active .date-val,
+.time-box.active .time-val {
+  color: #513b86;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}

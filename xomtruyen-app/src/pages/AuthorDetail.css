@@ -1,0 +1,110 @@
+.author-detail-page {
+  --ion-background-color: #ffffff;
+}
+
+.author-detail-toolbar {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --background: #ffffff;
+}
+
+.author-detail-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.author-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+}
+
+.author-large-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.author-large-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author-profile-section h2 {
+  margin: 0 0 4px 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.author-role-label {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #757575;
+}
+
+.author-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.author-rating ion-icon {
+  font-size: 16px;
+}
+
+.rating-value {
+  font-size: 14px;
+  color: #1a1a1a;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.author-about-section {
+  padding: 0 24px 24px 24px;
+}
+
+.author-about-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.author-about-section p {
+  font-size: 14px;
+  color: #757575;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.author-products-section {
+  padding: 0 24px 30px 24px;
+}
+
+.author-products-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* Override book card width for grid */
+.products-grid .book-card,
+.products-grid .book-image-container {
+  width: 100%;
+}

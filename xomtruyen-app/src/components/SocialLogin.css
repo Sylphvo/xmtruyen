@@ -1,0 +1,43 @@
+.social-login-container {
+  margin-top: 24px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #a0a0a0;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.divider span {
+  padding: 0 16px;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.social-btn {
+  --border-radius: 12px;
+  --border-color: #e0e0e0;
+  --border-width: 1px;
+  --color: #333;
+  --background: transparent;
+  height: 52px;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}

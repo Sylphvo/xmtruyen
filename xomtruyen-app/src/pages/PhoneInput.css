@@ -1,0 +1,28 @@
+.phone-group {
+  margin-top: 40px;
+}
+
+.phone-wrapper {
+  padding-left: 16px;
+}
+
+.country-code {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 12px;
+  border-right: 1px solid #e0e0e0;
+  color: #513b86;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.phone-icon {
+  font-size: 20px;
+}
+
+.phone-input {
+  --padding-start: 12px;
+  font-weight: 500;
+  color: #1a1a1a;
+}

@@ -1,0 +1,118 @@
+.location-map-page {
+  --ion-background-color: #f7f5ff; /* Soft purple background representing map */
+}
+
+.location-map-toolbar {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --background: #f7f5ff;
+}
+
+.location-map-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.map-container {
+  height: 50vh;
+  position: relative;
+  background-color: #e5dfff;
+  background-image: radial-gradient(#d1c4ff 1px, transparent 1px);
+  background-size: 20px 20px; /* Dotted map pattern effect */
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-marker-pin {
+  background-color: rgba(81, 59, 134, 0.2);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.map-marker-pin ion-icon {
+  font-size: 32px;
+  color: #513b86;
+  background-color: #ffffff;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 4px 10px rgba(81, 59, 134, 0.3);
+}
+
+.current-location-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.current-location-btn ion-icon {
+  font-size: 24px;
+  color: #513b86;
+}
+
+.bottom-sheet-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 24px 24px 0 0;
+  padding: 24px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+}
+
+.address-detail-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+
+.save-address-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+}
+
+.save-address-options {
+  display: flex;
+  gap: 12px;
+}
+
+.address-tag {
+  padding: 8px 24px;
+  border: 1px solid #f0f0f0;
+  border-radius: 24px;
+  font-size: 14px;
+  color: #a0a0a0;
+  font-weight: 600;
+  cursor: pointer;
+}
+.address-tag.active {
+  background-color: #f7f5ff;
+  border-color: #513b86;
+  color: #513b86;
+}

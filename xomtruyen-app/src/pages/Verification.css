@@ -1,0 +1,39 @@
+.verification-page {
+  --ion-background-color: #ffffff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.verification-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+.verification-subtitle {
+  font-size: 15px;
+  color: #757575;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.verification-subtitle strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.resend-text {
+  font-size: 14px;
+  color: #757575;
+  margin-bottom: 40px;
+}
+
+.resend-text strong {
+  color: #513b86;
+  font-weight: 600;
+  cursor: pointer;
+}

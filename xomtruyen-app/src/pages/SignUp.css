@@ -1,0 +1,38 @@
+.password-rules {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.rule.invalid {
+  color: #f44336; /* Red for invalid */
+}
+
+.rule.valid {
+  color: #4caf50; /* Green for valid */
+}
+
+.rule ion-icon {
+  font-size: 16px;
+}
+
+.terms-text {
+  text-align: center;
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-top: 40px;
+  line-height: 1.5;
+}
+
+.terms-text .highlight {
+  color: #513b86;
+  font-weight: 600;
+}

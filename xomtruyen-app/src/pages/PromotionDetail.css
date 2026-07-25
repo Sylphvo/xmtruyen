@@ -1,0 +1,88 @@
+.promotion-detail-page {
+  --ion-background-color: #ffffff;
+}
+
+.promotion-detail-toolbar {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --background: #ffffff;
+}
+
+.promotion-detail-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.promotion-banner {
+  background-color: #f7f5ff; /* Soft purple */
+  border-radius: 16px;
+  display: flex;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.promotion-banner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.promotion-banner-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #513b86;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.promotion-banner-subtitle {
+  font-size: 10px;
+  color: #513b86;
+  margin: 0 0 12px 0;
+}
+
+.promotion-banner-btn {
+  background-color: #513b86;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.promotion-banner-image {
+  width: 80px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: 16px;
+}
+
+.promotion-banner-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.promotion-article-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.4;
+  margin: 0 0 16px 0;
+}
+
+.promotion-article-body p {
+  font-size: 12px;
+  color: #a0a0a0;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}

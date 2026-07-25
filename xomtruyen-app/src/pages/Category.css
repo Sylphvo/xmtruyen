@@ -1,0 +1,69 @@
+.category-page {
+  --ion-background-color: #ffffff;
+}
+
+.category-toolbar {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --background: #ffffff;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.category-tabs {
+  display: flex;
+  overflow-x: auto;
+  padding: 16px 24px;
+  gap: 20px;
+}
+
+.category-tab {
+  font-size: 14px;
+  color: #a0a0a0;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-bottom: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.category-tab.active {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.category-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #513b86;
+  border-radius: 2px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 8px 24px 30px 24px;
+}
+
+/* Force BookCard to fill the grid cell in Category view */
+.category-grid-item .book-card,
+.category-grid-item .book-image-container {
+  width: 100%;
+}
+
+.category-grid-item .book-image-container {
+  aspect-ratio: 3 / 4;
+  height: auto;
+}
