@@ -1,2 +1,23 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
+
+/* Fix Ionic 7 default styling for custom inputs */
+.custom-input {
+  --border-width: 0 !important;
+  --border-style: none !important;
+  --highlight-color-focused: transparent !important;
+  --highlight-color-valid: transparent !important;
+  --highlight-color-invalid: transparent !important;
+  --box-shadow: none !important;
+  font-size: 16px !important;
+  color: #1a1a1a !important;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.custom-input::part(native) {
+  padding: 0 !important;
+  height: 100%;
+}
+

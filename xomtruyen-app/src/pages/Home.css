@@ -1,78 +1,263 @@
-.home-page {
+.new-home-page {
   --ion-background-color: #ffffff;
 }
 
-.home-toolbar {
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  --background: #ffffff;
+.red-header-container {
+  background-color: #ff5c77;
+  padding: 16px 20px 0px 20px; /* Leave bottom padding for the overlap */
+  color: #ffffff;
 }
 
-.home-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
-  text-align: center;
-}
-
-.icon-btn {
-  --color: #333;
-  font-size: 24px;
-  margin: 0;
-  --padding-start: 8px;
-  --padding-end: 8px;
-}
-
-.relative-icon {
-  position: relative;
-  overflow: visible;
-}
-
-.notification-dot {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 8px;
-  height: 8px;
-  background-color: #f44336;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-}
-
-.section-header {
+.red-header-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
-  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.user-greeting h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: #ffffff;
+}
+
+.user-greeting p {
+  font-size: 13px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bell-container ion-icon {
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.avatar-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  overflow: hidden;
+}
+
+.avatar-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.new-home-content {
+  --background: #ffffff;
+  position: relative;
+}
+
+/* Extension of red background to sit behind the card */
+.red-bg-extension {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-color: #ff5c77;
+  z-index: 0;
+}
+
+.progress-card-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 0 20px;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.progress-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-title {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.progress-link {
+  font-size: 13px;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.progress-stats {
+  margin-bottom: 12px;
+}
+
+.progress-bold {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.progress-light {
+  font-size: 13px;
+  color: #999;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #52c41a, #85e052);
+  border-radius: 3px;
+}
+
+/* Sections */
+.home-section {
+  padding: 0 20px;
+  margin-bottom: 32px;
+}
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
 }
 
-.section-header h2 {
-  margin: 0;
-  font-size: 18px;
+.section-title-row h2 {
+  font-size: 16px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #333;
+  margin: 0;
 }
 
-.see-all {
-  font-size: 12px;
-  color: #513b86;
+.section-title-row ion-icon {
+  font-size: 16px;
+  color: #888;
+}
+
+/* Vertical Book List */
+.vertical-book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.v-book-card {
+  display: flex;
+  gap: 16px;
+}
+
+.v-book-cover {
+  width: 90px;
+  height: 130px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.v-book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.v-book-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.v-book-title {
+  font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
+  color: #333;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.horizontal-scroll {
+.v-book-author {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 10px 0;
+}
+
+.v-book-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.star-icon {
+  color: #ff6b00;
+  font-size: 12px;
+}
+
+.star-rating {
+  font-size: 12px;
+  color: #666;
+  margin-left: 4px;
+}
+
+.v-book-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-item ion-icon {
+  font-size: 14px;
+}
+
+.meta-divider {
+  color: #ccc;
+}
+
+/* Horizontal Book List */
+.horizontal-book-list {
   display: flex;
   overflow-x: auto;
-  padding: 0 24px;
   gap: 16px;
+  padding-bottom: 8px;
   scroll-snap-type: x mandatory;
 }
 
-.horizontal-scroll > * {
+.horizontal-book-list > * {
   scroll-snap-align: start;
 }
 
@@ -82,4 +267,123 @@
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.h-book-card {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.h-book-cover-container {
+  width: 110px;
+  height: 160px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 8px;
+}
+
+.h-book-cover {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.rating-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #ff6b00;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rating-pill ion-icon {
+  font-size: 10px;
+}
+
+.h-book-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.h-book-author {
+  font-size: 11px;
+  color: #888;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bottom Promo Banner */
+.promo-banner-container {
+  padding: 0 20px 40px 20px;
+}
+
+.promo-banner {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 114, 255, 0.2);
+}
+
+.promo-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 100px;
+  height: 100px;
+  background-color: #ff5c77;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.8;
+}
+
+.promo-banner h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.promo-banner p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 16px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.promo-btn {
+  background-color: #ff5c77;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 8px rgba(255, 92, 119, 0.4);
 }

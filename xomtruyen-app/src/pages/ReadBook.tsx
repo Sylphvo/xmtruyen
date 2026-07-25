@@ -25,21 +25,15 @@ const ReadBook: React.FC = () => {
   const router = useIonRouter();
   const { id } = useParams<{ id: string }>();
   
-  // Dummy text for reading
-  const chapterText = `
-    Chapter 1: The Beginning\n
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. \n\n
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n
-    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. \n\n
-    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.\n\n
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. \n\n
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n
-    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. \n\n
-    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
-  `;
+  // Dummy comic pages for reading
+  const comicPages = [
+    'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&q=80',
+    'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80',
+    'https://images.unsplash.com/photo-1582653211939-93b567433246?w=800&q=80',
+    'https://images.unsplash.com/photo-1544716278-e513176f20b5?w=800&q=80'
+  ];
 
   const [showBars, setShowBars] = useState(true);
-  const [fontSize, setFontSize] = useState(16);
 
   // Auto hide bars after 3 seconds for immersive reading
   useEffect(() => {
@@ -77,12 +71,9 @@ const ReadBook: React.FC = () => {
         className="read-content-area"
         onClick={toggleBars}
       >
-        <div 
-          className="reading-text-container" 
-          style={{ fontSize: `${fontSize}px` }}
-        >
-          {chapterText.split('\n').map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
+        <div className="reading-comic-container">
+          {comicPages.map((pageUrl, index) => (
+            <img key={index} src={pageUrl} alt={`Page ${index + 1}`} className="comic-page" />
           ))}
         </div>
       </IonContent>

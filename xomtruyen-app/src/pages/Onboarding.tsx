@@ -16,7 +16,7 @@ import './Onboarding.css';
 const Onboarding: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [isLastSlide, setIsLastSlide] = useState(false);
-  const swiperRef = useRef<SwiperCore>();
+  const swiperRef = useRef<SwiperCore | null>(null);
   const router = useIonRouter();
 
   useEffect(() => {

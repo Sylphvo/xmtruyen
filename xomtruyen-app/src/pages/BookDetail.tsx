@@ -6,9 +6,19 @@ import {
   IonToolbar,
   IonButton,
   IonIcon,
+  IonTitle,
   useIonRouter,
 } from '@ionic/react';
-import { chevronBackOutline, heart, removeOutline, addOutline, star } from 'ionicons/icons';
+import { 
+  chevronBackOutline, 
+  ellipsisHorizontal, 
+  heart, 
+  shareOutline, 
+  chatboxEllipsesOutline,
+  documentTextOutline,
+  timeOutline,
+  star
+} from 'ionicons/icons';
 import { useParams } from 'react-router';
 import { mockBooks } from '../data/mockData';
 import './BookDetail.css';
@@ -16,89 +26,170 @@ import './BookDetail.css';
 const BookDetail: React.FC = () => {
   const router = useIonRouter();
   const { id } = useParams<{ id: string }>();
-  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState<'intro' | 'discuss' | 'review'>('intro');
   
   const book = useMemo(() => {
     return mockBooks.find(b => b.id === Number(id)) || mockBooks[0];
   }, [id]);
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) setQuantity(q => q - 1);
-  };
-
-  const increaseQuantity = () => {
-    setQuantity(q => q + 1);
-  };
+  // Use the image from the design or fallback to mock
+  const coverImage = 'https://m.media-amazon.com/images/I/71UypkUjStL._AC_UF1000,1000_QL80_.jpg'; // Think and Grow Rich placeholder
 
   return (
     <IonPage className="book-detail-page">
-      <IonHeader className="ion-no-border">
+      <IonHeader className="ion-no-border book-detail-header">
         <IonToolbar className="book-detail-toolbar">
-          <IonButton fill="clear" slot="start" className="icon-btn back-btn" onClick={() => router.goBack()}>
+          <IonButton fill="clear" slot="start" className="header-icon-btn" onClick={() => router.goBack()}>
             <IonIcon icon={chevronBackOutline} />
+          </IonButton>
+          <IonTitle className="header-title">Chi tiết sách</IonTitle>
+          <IonButton fill="clear" slot="end" className="header-icon-btn">
+            <IonIcon icon={ellipsisHorizontal} />
           </IonButton>
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen>
-        <div className="book-cover-section">
-          <div className="book-cover-large">
-            <img onError={(e) => { (e.target as HTMLImageElement).src = "https://placehold.co/400x600/e0e0e0/513b86?text=No+Image"; }} src={book.image} alt={book.title} />
+      <IonContent fullscreen className="book-detail-content">
+        <div className="top-background-section">
+          {/* Blurred Background */}
+          <div 
+            className="blurred-bg" 
+            style={{ backgroundImage: `url(${coverImage})` }}
+          ></div>
+          <div className="blurred-overlay"></div>
+
+          {/* Book Info Header */}
+          <div className="book-header-info">
+            <div className="book-cover-large">
+              <img src={coverImage} alt="Hệ thống hoạch định" />
+            </div>
+            
+            <h2 className="book-title-main">Hệ thống hoạch định nguồn lực Doanh nghiệp (ERP)</h2>
+            <p className="book-author-main">Vũ Quốc Thông (chủ biên)</p>
+
+            {/* Stats Pill */}
+            <div className="stats-pill">
+              <div className="stat-item">
+                <IonIcon icon={star} className="text-orange" />
+                <span><strong>4.8</strong>/5</span>
+              </div>
+              <div className="stat-divider">|</div>
+              <div className="stat-item">
+                <IonIcon icon={chatboxEllipsesOutline} className="text-gray" />
+                <span><strong>25</strong></span>
+              </div>
+              <div className="stat-divider">|</div>
+              <div className="stat-item">
+                <IonIcon icon={documentTextOutline} className="text-gray" />
+                <span><strong>90</strong></span>
+              </div>
+              <div className="stat-divider">|</div>
+              <div className="stat-item">
+                <IonIcon icon={timeOutline} className="text-gray" />
+                <span><strong>5</strong></span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="book-info-section">
-          <div className="book-title-row">
-            <h2>{book.title}</h2>
-            <IonButton fill="clear" className="like-btn">
-              <IonIcon icon={heart} />
-            </IonButton>
-          </div>
-          
-          <div className="book-vendor-label">
-            <span className="vendor-logo-small">{book.vendor.charAt(0)}</span>
-            <span className="vendor-name-small">{book.vendor}</span>
-          </div>
-
-          <p className="book-description">{book.description}</p>
-
-          <div className="book-review-section">
-            <h3>Review</h3>
-            <div className="book-rating">
-              {[...Array(5)].map((_, i) => (
-                <IonIcon key={i} icon={star} className={i < Math.floor(book.rating) ? 'star-filled' : 'star-empty'} />
-              ))}
-              <span className="rating-value">({book.rating.toFixed(1)})</span>
+        {/* Bottom Sheet Content */}
+        <div className="bottom-sheet-content">
+          {/* Tabs */}
+          <div className="tabs-row">
+            <div 
+              className={`tab-item ${activeTab === 'intro' ? 'active' : ''}`}
+              onClick={() => setActiveTab('intro')}
+            >
+              Giới thiệu
+            </div>
+            <div 
+              className={`tab-item ${activeTab === 'discuss' ? 'active' : ''}`}
+              onClick={() => setActiveTab('discuss')}
+            >
+              Thảo luận
+            </div>
+            <div 
+              className={`tab-item ${activeTab === 'review' ? 'active' : ''}`}
+              onClick={() => setActiveTab('review')}
+            >
+              Đánh giá
             </div>
           </div>
 
-          <div className="book-action-buttons">
-          <button 
-            className="read-book-btn"
-            onClick={() => router.push(`/read-book/${book.id}`, 'forward')}
-          >
-            Read Book
-          </button>
-          <button className="add-to-cart-btn">
-            Add To Cart
-          </button>
-        </div>
+          {activeTab === 'intro' && (
+            <div className="tab-content">
+              <h3 className="section-heading">Thông tin chi tiết</h3>
+              
+              <div className="details-grid">
+                <div className="detail-row">
+                  <span className="detail-label">Tên sách</span>
+                  <span className="detail-value uppercase">HỆ THỐNG HOẠCH ĐỊNH NGUỒN LỰC DOANH NGHIỆP (ERP)</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Tác giả</span>
+                  <span className="detail-value">Vũ Quốc Thông (chủ biên)</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Tác quyền</span>
+                  <span className="detail-value">Trường Đại học Mở TP.HCM</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Nhà xuất bản</span>
+                  <span className="detail-value">Thông tin truyền thông</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Năm xuất bản</span>
+                  <span className="detail-value">2021</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Số trang</span>
+                  <span className="detail-value">400</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Dung lượng</span>
+                  <span className="detail-value">13,69 (MB)</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Thể loại</span>
+                  <span className="detail-value text-blue">Tài chính Doanh nghiệp, Giáo dục</span>
+                </div>
+              </div>
 
-          <div className="book-action-section">
-            <div className="quantity-selector">
-              <button onClick={decreaseQuantity}><IonIcon icon={removeOutline} /></button>
-              <span>{quantity}</span>
-              <button onClick={increaseQuantity}><IonIcon icon={addOutline} /></button>
+              <h3 className="section-heading mt-24">Giới thiệu</h3>
+              <div className="intro-text">
+                <p>
+                  Trong bối cảnh của chuyển đổi số trên toàn cầu cũng như tại Việt Nam, các nhà quản lý mong muốn duy trì lợi thế cạnh tranh và phát triển bền vững cần chú trọng đến hoàn thiện hạ tầng công nghệ thông tin toàn doanh nghiệp.
+                </p>
+                <p>
+                  Quyển học liệu Hệ thống hoạch định nguồn lực doanh nghiệp (ERP) được xuất bản nhằm giúp cho người học trang bị phần kiến thức nền tảng về hệ thống thông tin tích hợp trong tổ chức kinh doanh cùng với những kỹ năng tiếp cận hệ thống ERP, kiểm soát hệ thống, đề xuất quy trình hoạt động, khái lược về một số ứng dụng phân tích dữ liệu...
+                </p>
+                <p>
+                  Đây là quyển học liệu được thiết kế với mục tiêu dùng chung dành cho nhiều đối tượng người học bao gồm học viên kế toán cần hiểu biết về sự liên kết và vai trò hoạt động của các phòng ban để phối hợp làm việc.
+                </p>
+              </div>
             </div>
-            <div className="book-price-large">${book.price}</div>
-          </div>
-
-          <div className="book-buttons-row">
-            <button className="continue-shopping-btn" onClick={() => router.goBack()}>Continue shopping</button>
-            <button className="view-cart-btn" onClick={() => router.push('/tabs/cart', 'forward')}>View cart</button>
-          </div>
+          )}
         </div>
       </IonContent>
+
+      {/* Sticky Bottom Bar */}
+      <div className="bottom-action-bar">
+        <div className="action-icons-left">
+          <div className="action-btn-item">
+            <IonIcon icon={heart} className="text-red" />
+            <span>540</span>
+          </div>
+          <div className="action-btn-item outline">
+            <IonIcon icon={shareOutline} className="text-gray" />
+          </div>
+        </div>
+        <button 
+          className="btn-read-book"
+          onClick={() => router.push(`/read-book/${book.id}`, 'forward')}
+        >
+          ĐỌC SÁCH
+        </button>
+      </div>
     </IonPage>
   );
 };

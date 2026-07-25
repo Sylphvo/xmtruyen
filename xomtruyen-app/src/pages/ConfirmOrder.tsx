@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   IonPage,
   IonContent,
@@ -205,10 +205,16 @@ const ConfirmOrder: React.FC = () => {
                 <span className="date-label">Today</span>
                 <span className="date-val">12 Jan</span>
               </div>
-              <div clas]ÂU¨~©Ï)âè;úi`ëì¥f|n¾íH•´Ê¸5i˜Ý©xª.CSËýj¸­Ææ%¬ý	ë"~
-Üíÿÿ—gnSUsú9Bbõ#êa\ßÙ&™ÈèÌ™ôÂp¾iö¡#äË|mµ©f ¹ÿÚ€äïáÝ3:Ïú)±S•@1ØB…Ifcì=³4âÜ¸:m2„•žßnÌéßY§~UÑ'ˆAXÈ3êKÏô_7ú­Õ ~ñÝìã…á¶MBÅ†4mVœzÛæŠÓÓöxSÅƒ·†[”™¸Ú|ÊÏ#¨‘¶¡0Ú·f0„Xøz-×ë3ñ]ÄTXòÇ¸TÇ§Ú' ².&\CŸãäTHšõ È`»¯^ Ó¯ÓŠÀ³Ò“p"‚ŸGû£5ÁJ´çøS(Éè)Zf x•¶V•ÆÃjÑUÒzƒxz5¡ÅÙdÍâí—mÏ\pWjV±QæÔÌ‰ŒÔÇÄë¹äPãalg
-¦w‰={â)QEÇx…¢ý SÂ®l	„\ÀÿÒš”ÒŠ—Éµl¶–¾NšÞF4ux—Øý4sõò@µKTò‘{«ïycEQùv.IŸJ‡»¬Áö0Å±pá	ã¢‘åúúŸ-KylŽ2W	fÞdî[€#‰9©«œ¢¡W…°;ÓPoª~	í­œŸì þ3(‰7å;ÀQYüÌgMùkPõ¼gÿ¦=}å^y&mìä³Cõ—yœy¼2žÃh~mž.Shòõþ=õþ[¶<<ÄL	WôŸrÀFpë
-LK€Ô,³åK ËvqÒó{ºÕ¸õDÑcna-"¿…ÄfÑà€u…ô[ü«ÒQ†‹ÜÓÄºáP^Y¬¨ÜüËR@}!¨YÄ‹?@¨|á×îõ&°¤.‚ÅŠú€”•úíÊ¬((8ÑÀ‘­ê/ŠIYs´¬.Ç{C+•¨s:Ú…ž:êÔþ™†ÙJ§«µ '7™úAÁ¼T½D= ¼L†“Î–Ñ^#`²ºR»vN.óªòCC4ÅaÔ[¨©™*Ô'!/;˜9wu@©ü6E…vOJðÀPZ—”³o>p‚‚µá1² ¡›„ž,MFV%ž0€Êá(¬áÁh.½$ôJšy˜IÖµ—y7lBñ{Q¤ˆµP*E7ãýãßµëÕB«\›É“,?“òó‚ÿèf¿EoplTÇ ÚLaøþ#õÕÎgèº¥Ôz@ŽvÁÎ'lkiæ®"µ“/lÆ"i_{Uª÷i³X)54j'è&Ç>Ï2ƒHq;þ;Óf~™G--É«Eàš‡'u»_ÐS)w£«®Éaž“!³Ð]
-]ÉÊn˜†ª`´ËU?¾>{Ý?
-ìiƒ–­Ìlc¸“’É°Ïª G„ºžˆ7Ï7{Z%Õ™ïý(eà´*‘g)ÜŸ]ÈIy‰§­Áz¿Å¿È*¯m`dði1H|ÑƒÆüÌiáþÇ	®h3>à)¦ãÆè¨:2WcùS‰'Wù~Ô‘e°kßrßÉ«–Ï3ˆs•ÑiØžöü<:G–.Á]|IÏÞ;Kí¨±ÿ‚°&ÏíÈÿôÁx˜”5O÷±X<|…•TÚÞ˜·¦ë¤3ó…Ó,¿Ý% al4ƒŸÑbtŠ{©®Iº·ù.Í–“6ÏtCÀdY2š,¶à‰á:UC?Š' c'
-¹c æ.l·_p„b‚w-
+              <div className={`date-box ${deliveryDate === 'Tomorrow 13 Jan' ? 'active' : ''}`} onClick={() => setDeliveryDate('Tomorrow 13 Jan')}>
+                <span className="date-label">Tomorrow</span>
+                <span className="date-val">13 Jan</span>
+              </div>
+            </div>
+          </div>
+        </IonModal>
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default ConfirmOrder;

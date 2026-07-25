@@ -10,6 +10,11 @@ export default defineConfig({
     react(),
     legacy()
   ],
+  server: {
+    watch: {
+      ignored: ['**/node_modules_old/**']
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',
