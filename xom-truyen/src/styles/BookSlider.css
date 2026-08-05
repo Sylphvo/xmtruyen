@@ -3,18 +3,6 @@
     margin: 0 auto;
     padding: 20px;
     background-color: var(--bg-primary);
-    /* Màu nền hơi vàng nhẹ giống trong hình */
-}
-
-@keyframes bookCardPopIn {
-    from {
-        opacity: 0;
-        transform: scale(0.96) translateY(4px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
 }
 
 .section-header {
@@ -31,7 +19,6 @@
 
 .section-title .highlight {
     color: #e53935;
-    /* Màu đỏ */
     font-weight: bold;
 }
 
@@ -55,59 +42,296 @@
 .comic-swiper .swiper-slide {
     overflow: visible !important;
     position: relative;
+    transition: z-index 0.2s ease;
 }
 
-.comic-swiper .swiper-slide:hover {
+.comic-swiper .swiper-slide:hover,
+.comic-swiper .swiper-slide:focus-within {
     z-index: 9999 !important;
 }
 
-.comic-card {
-    display: flex;
-    flex-direction: column;
+/* Base Book Card Container */
+.book-card-item {
+    width: 100%;
+    flex-shrink: 0;
+    background-color: transparent;
     cursor: pointer;
+    position: relative;
+    user-select: none;
 }
 
-.image-wrapper {
+.book-card-cover-container {
+    position: relative;
     width: 100%;
+    aspect-ratio: 3 / 4;
+}
+
+.book-card-cover-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform, box-shadow;
+    background-color: var(--border);
 }
 
-.image-wrapper img {
-    width: 100%;
-    height: 240px;
-    /* Chiều cao cố định để các card bằng nhau */
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
+.book-card-item:hover .book-card-cover-wrapper {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
-.image-wrapper:hover img {
-    transform: scale(1.05);
-    /* Hiệu ứng zoom nhẹ khi hover */
+.book-member-badge {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff5200 100%);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 12px 0 0 12px;
+    box-shadow: 0 2px 8px rgba(255, 82, 0, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
 }
 
-.comic-title {
+.book-card-title {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
+    margin: 8px 0 4px 0;
     color: var(--text-primary);
-    margin: 0 0 4px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+}
+
+.book-card-item:hover .book-card-title {
+    color: #00b96b;
+}
+
+.book-card-author {
+    font-size: 13px;
+    color: var(--text-muted, #777);
+    margin: 0;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.comic-author {
-    font-size: 13px;
-    color: var(--text-muted, #888);
-    margin: 0;
+/* Hover Popover Box - Chiều cao khớp hoàn toàn với ảnh bìa */
+.book-card-popover {
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    height: calc(100% + 16px);
+    width: 490px;
+    max-width: 94vw;
+    box-sizing: border-box;
+    background-color: var(--popover-bg);
+    color: var(--popover-text);
+    border-radius: 14px;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    box-shadow: var(--popover-shadow);
+    border: 1px solid var(--popover-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10000;
+    cursor: default;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.96) translateY(4px);
+    pointer-events: none;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.22s ease;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
 }
 
+.book-card-popover.align-left {
+    left: -8px;
+    right: auto;
+    transform-origin: left center;
+}
 
-/* Tùy chỉnh màu của Swiper Scrollbar */
+.book-card-popover.align-right {
+    right: -8px;
+    left: auto;
+    transform-origin: right center;
+}
 
+.book-card-popover.popover-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+.popover-cover {
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.popover-cover:hover {
+    transform: scale(1.02);
+}
+
+.popover-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 2px 0;
+}
+
+.popover-title {
+    color: var(--popover-text);
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+}
+
+.popover-title:hover {
+    color: #00b96b;
+}
+
+.popover-author {
+    color: var(--popover-text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.popover-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: nowrap;
+}
+
+.popover-tag {
+    color: #00b96b;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.popover-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.popover-btn-read {
+    background-color: #00b96b;
+    color: #ffffff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 185, 107, 0.35);
+    transition: background-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s ease;
+}
+
+.popover-btn-read:hover {
+    background-color: #00a35c;
+    transform: translateY(-1px);
+}
+
+.popover-btn-fav {
+    background-color: var(--popover-fav-bg);
+    color: var(--popover-fav-color);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s ease;
+}
+
+.popover-btn-fav:hover {
+    background-color: var(--popover-fav-hover);
+    transform: scale(1.08);
+}
+
+.popover-desc {
+    color: var(--popover-desc);
+    font-size: 12px;
+    line-height: 1.45;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.popover-detail-link {
+    color: #00b96b;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    width: fit-content;
+    margin-top: 4px;
+    transition: opacity 0.2s ease;
+}
+
+.popover-detail-link:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+}
+
+/* Swiper scrollbar customization */
 .swiper-scrollbar {
     background: #e0e0e0;
 }
@@ -116,6 +340,6 @@
     background: #ccc;
 }
 
-.swiper-free-mode>.swiper-wrapper {
+.swiper-free-mode > .swiper-wrapper {
     padding: 0px 18px;
 }

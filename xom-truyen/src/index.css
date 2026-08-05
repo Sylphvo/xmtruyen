@@ -27,6 +27,17 @@
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
+  /* Popover Hover tokens for Light Mode */
+  --popover-bg: #ffffff;
+  --popover-text: #111827;
+  --popover-text-muted: #6b7280;
+  --popover-border: rgba(0, 0, 0, 0.08);
+  --popover-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  --popover-desc: #4b5563;
+  --popover-fav-bg: #f3f4f6;
+  --popover-fav-hover: #e5e7eb;
+  --popover-fav-color: #374151;
+
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
   color-scheme: light dark;
@@ -60,6 +71,17 @@
   --social-bg: rgba(47, 48, 58, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+
+  /* Popover Hover tokens for Dark Mode */
+  --popover-bg: #20232a;
+  --popover-text: #ffffff;
+  --popover-text-muted: #9ca3af;
+  --popover-border: rgba(255, 255, 255, 0.12);
+  --popover-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --popover-desc: #d1d5db;
+  --popover-fav-bg: rgba(255, 255, 255, 0.12);
+  --popover-fav-hover: rgba(255, 255, 255, 0.2);
+  --popover-fav-color: #ffffff;
 }
 
 #social .button-icon {

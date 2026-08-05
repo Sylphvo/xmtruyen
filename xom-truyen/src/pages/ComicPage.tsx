@@ -1,23 +1,23 @@
-import { useState, useEffect } from "react";
-import { SECTIONS } from "../constants";
 import BookSection from "../components/Book/BookSection";
 import Footer from "../components/Layout/Footer";
 import { useBooks } from "../hooks/useBooks";
-import type { SectionData } from "../types";
 
 export default function ComicPage() {
-  const { latestBooks, loading } = useBooks();
-  const [sections, setSections] = useState<SectionData[]>(SECTIONS);
+  const { sections, comicBooks } = useBooks();
 
-  useEffect(() => {
-    if (latestBooks.length > 0) {
-      setSections((prev) =>
-        prev.map((sec) =>
-          sec.id === "new" ? { ...sec, books: latestBooks } : sec
-        )
-      );
-    }
-  }, [latestBooks]);
+  // If comic books are returned from API, prioritize comic section
+  const displaySections = comicBooks.length > 0
+    ? [
+        {
+          id: "comics",
+          title: "Truyện Tranh Mới Cập Nhật",
+          subtitle: "(Xem Thêm)",
+          books: comicBooks,
+          size: "large" as const,
+        },
+        ...sections.filter((s) => s.id !== "new"),
+      ]
+    : sections;
 
   return (
     <main style={{ flex: 1, overflowY: "auto" }}>
@@ -25,7 +25,7 @@ export default function ComicPage() {
         <h2 style={{ marginBottom: "24px", color: "var(--text-h)", fontSize: "28px", fontWeight: 700 }}>
           Truyện Tranh
         </h2>
-        {sections.map((section) => (
+        {displaySections.map((section) => (
           <BookSection key={section.id} {...section} />
         ))}
       </div>

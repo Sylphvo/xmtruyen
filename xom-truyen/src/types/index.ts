@@ -7,7 +7,7 @@ export interface Book {
   coverIndex?: number;
 
   // Các trường dữ liệu mới được bổ sung
-  genres?: string[]; // ví dụ: ["Thám hiểm", "Hài hước"]
+  genres?: string[]; // ví dụ: ["Tiên Hiệp", "Huyền Huyễn"]
   currentChapter?: number; // ví dụ: 121
   lastUpdated?: string; // ví dụ: "2 giờ trước"
   viewCount?: number;
@@ -17,6 +17,23 @@ export interface Book {
   accessLevel?: number;
   description?: string;
   isMember?: boolean;
+  isRecommended?: boolean;
+  isExclusive?: boolean;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PublicationFilter {
+  keyword?: string;
+  categoryId?: string | number;
+  formatType?: number;
+  accessLevel?: number;
+  status?: string;
+  isRecommended?: boolean;
+  isExclusive?: boolean;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface SectionData {

@@ -1,23 +1,9 @@
-import { useState, useEffect } from "react";
-import { SECTIONS } from "../constants";
 import BookSection from "../components/Book/BookSection";
 import Footer from "../components/Layout/Footer";
 import { useBooks } from "../hooks/useBooks";
-import type { SectionData } from "../types";
 
 export default function LibraryPage() {
-  const { latestBooks, loading } = useBooks();
-  const [sections, setSections] = useState<SectionData[]>(SECTIONS);
-
-  useEffect(() => {
-    if (latestBooks.length > 0) {
-      setSections((prev) =>
-        prev.map((sec) =>
-          sec.id === "new" ? { ...sec, books: latestBooks } : sec
-        )
-      );
-    }
-  }, [latestBooks]);
+  const { sections } = useBooks();
 
   return (
     <main style={{ flex: 1, overflowY: "auto" }}>
