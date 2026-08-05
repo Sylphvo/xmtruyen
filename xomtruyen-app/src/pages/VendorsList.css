@@ -1,0 +1,115 @@
+.vendors-list-page {
+  --ion-background-color: #ffffff;
+}
+
+.vendors-toolbar {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --background: #ffffff;
+}
+
+.vendors-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.our-vendors-header {
+  padding: 16px 24px;
+}
+
+.our-vendors-header p {
+  margin: 0;
+  color: #a0a0a0;
+  font-size: 14px;
+}
+
+.our-vendors-header h2 {
+  margin: 4px 0 0 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.vendors-tabs {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 24px;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.vendor-tab {
+  font-size: 14px;
+  color: #a0a0a0;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-bottom: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.vendor-tab.active {
+  color: #513b86;
+  font-weight: 700;
+}
+
+.vendor-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #513b86;
+  border-radius: 2px;
+}
+
+.vendors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 0 24px 30px 24px;
+}
+
+.vendor-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.vendor-logo-wrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.vendor-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.vendor-stars ion-icon {
+  font-size: 12px;
+}
+
+.star-filled {
+  color: #fbc02d;
+}
+
+.star-empty {
+  color: #e0e0e0;
+}

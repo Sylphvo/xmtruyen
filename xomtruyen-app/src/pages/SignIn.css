@@ -1,0 +1,118 @@
+.auth-page {
+  --ion-background-color: #ffffff;
+}
+
+.auth-header {
+  padding: 16px;
+  display: flex;
+}
+
+.back-btn {
+  --color: #333;
+  font-size: 24px;
+  margin: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+.auth-container {
+  padding: 0 24px;
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  color: #757575;
+  margin-top: 0;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.input-wrapper {
+  position: relative;
+  background: #f7f7f7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.input-wrapper:focus-within {
+  border-color: #513b86;
+}
+
+.custom-input {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --background: transparent;
+  font-size: 15px;
+}
+
+.eye-btn {
+  --color: #757575;
+  margin: 0 8px 0 0;
+}
+
+.forgot-password {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 32px;
+}
+
+.forgot-password span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #513b86;
+  cursor: pointer;
+}
+
+.auth-btn {
+  --background: #d1d1d1; /* Disabled state */
+  --color: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: none;
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: none;
+  margin: 0 0 24px 0;
+  height: 52px;
+}
+
+.auth-btn.active {
+  --background: #513b86;
+  --background-hover: #422d72;
+  --background-activated: #34215e;
+}
+
+.auth-footer-text {
+  text-align: center;
+  font-size: 14px;
+  color: #757575;
+}
+
+.auth-footer-text .highlight {
+  color: #513b86;
+  font-weight: 600;
+  cursor: pointer;
+}

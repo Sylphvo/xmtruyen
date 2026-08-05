@@ -25,3 +25,7 @@ dist-ssr
 # Bỏ qua các file cấu hình
 appsettings.json
 appsettings.Development.json
+
+# Build outputs (.NET / C#)
+**/[Bb]in/
+**/[Oo]bj/

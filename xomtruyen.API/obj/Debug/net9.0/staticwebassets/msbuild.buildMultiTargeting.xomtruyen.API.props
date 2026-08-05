@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\xomtruyen.API.props" />
-</Project>

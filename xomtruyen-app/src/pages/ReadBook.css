@@ -1,0 +1,142 @@
+.read-book-page {
+  --ion-background-color: #f9f9f9;
+}
+
+/* Floating headers and footers for immersive reading */
+.read-header, .read-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  transition: transform 0.3s ease-in-out;
+}
+
+.read-header {
+  top: 0;
+}
+
+.read-footer {
+  bottom: 0;
+}
+
+.read-header.show {
+  transform: translateY(0);
+}
+
+.read-header.hide {
+  transform: translateY(-100%);
+}
+
+.read-footer.show {
+  transform: translateY(0);
+}
+
+.read-footer.hide {
+  transform: translateY(100%);
+}
+
+.read-toolbar, .read-footer-toolbar {
+  --background: #ffffff;
+  --border-color: #f0f0f0;
+  --border-width: 0 0 1px 0;
+  --border-style: solid;
+}
+
+.read-footer-toolbar {
+  --border-width: 1px 0 0 0;
+  --padding-top: 12px;
+  --padding-bottom: 24px;
+}
+
+.read-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.read-content-area {
+  --background: #f9f9f9;
+}
+
+.reading-text-container {
+  padding: 80px 24px 100px 24px; /* Space for header and footer */
+  color: #333333;
+  line-height: 1.8;
+  font-family: 'Georgia', serif; /* Standard reading font */
+}
+
+.reading-text-container p {
+  margin-bottom: 24px;
+  text-align: justify;
+}
+
+.reading-comic-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.comic-page {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Progress bar styling */
+.reading-progress-container {
+  padding: 0 16px;
+  margin-bottom: 12px;
+}
+
+.progress-text {
+  display: block;
+  font-size: 10px;
+  color: #a0a0a0;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #513b86;
+  border-radius: 2px;
+}
+
+/* Footer Actions */
+.reading-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.reading-action-btn {
+  --color: #513b86;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.reading-action-btn.disabled {
+  --color: #a0a0a0;
+  opacity: 0.5;
+}
+
+.center-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.icon-btn-small {
+  --color: #1a1a1a;
+  font-size: 20px;
+}

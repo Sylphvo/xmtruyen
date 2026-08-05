@@ -1,0 +1,137 @@
+.order-status-page {
+  --ion-background-color: #f7f5ff; /* Soft purple background */
+}
+
+.order-status-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.receipt-container {
+  background-color: #ffffff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto 0 auto;
+  padding: 32px 24px;
+  box-shadow: 0 10px 30px rgba(81, 59, 134, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.receipt-header h3 {
+  font-size: 14px;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.receipt-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #513b86;
+  margin: 0 0 8px 0;
+}
+
+.receipt-header p {
+  font-size: 12px;
+  color: #a0a0a0;
+  margin: 0;
+}
+
+.cancel-order-text {
+  text-align: center;
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-bottom: 32px;
+}
+
+.cancel-link {
+  color: #513b86;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.receipt-details {
+  flex: 1;
+}
+
+.details-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+}
+
+.receipt-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.item-name { color: #1a1a1a; }
+.item-price { color: #1a1a1a; font-weight: 600; }
+
+.receipt-divider {
+  height: 1px;
+  background-color: #f0f0f0;
+  margin: 16px 0;
+}
+
+.receipt-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.summary-label { color: #1a1a1a; font-weight: 600; }
+.summary-value { color: #1a1a1a; font-weight: 600; }
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.total-label { color: #1a1a1a; }
+.total-value.text-purple { color: #513b86; }
+
+.receipt-delivery-info {
+  margin-bottom: 40px;
+}
+
+.delivery-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.delivery-label { color: #a0a0a0; }
+.delivery-value { color: #1a1a1a; font-weight: 600; }
+
+.order-status-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 24px;
+  background-color: #f7f5ff;
+  color: #513b86;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.order-status-btn:active {
+  opacity: 0.7;
+}

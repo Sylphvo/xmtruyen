@@ -1,0 +1,39 @@
+.custom-keypad-container {
+  background-color: #513b86;
+  padding: 30px 20px 40px;
+  width: 100%;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.keypad-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  color: white;
+  font-size: 24px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 12px;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.keypad-btn:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.delete-btn {
+  font-size: 28px;
+}
