@@ -15,6 +15,8 @@ export interface Book {
   slug?: string;
   formatType?: number;
   accessLevel?: number;
+  description?: string;
+  isMember?: boolean;
 }
 
 export interface SectionData {
