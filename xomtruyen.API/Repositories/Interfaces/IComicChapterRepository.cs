@@ -13,8 +13,10 @@ public interface IComicChapterRepository
     
     Task<List<ComicPage>> GetPagesByChapterIdAsync(Guid chapterId, CancellationToken cancellationToken = default);
     Task<ComicPage> CreatePageAsync(ComicPage page, CancellationToken cancellationToken = default);
+    Task CreatePagesAsync(IEnumerable<ComicPage> pages, CancellationToken cancellationToken = default);
     Task DeletePageAsync(ComicPage page, CancellationToken cancellationToken = default);
     Task<ComicPage?> GetPageByIdAsync(Guid pageId, CancellationToken cancellationToken = default);
     Task DeletePagesAsync(IEnumerable<ComicPage> pages, CancellationToken cancellationToken = default);
     Task UpdatePagesAsync(IEnumerable<ComicPage> pages, CancellationToken cancellationToken = default);
+    Task<ComicChapter?> GetChapterByNumberAsync(Guid publicationId, float chapterNumber, CancellationToken cancellationToken = default);
 }

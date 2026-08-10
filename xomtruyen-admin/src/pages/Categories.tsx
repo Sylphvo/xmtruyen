@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ICategory } from '../types/category';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../api/categoryApi';
-import { Dropdown, Form, Button, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ResizableHeader } from '../components/ResizableHeader';
 import toast from 'react-hot-toast';
 
@@ -13,20 +13,6 @@ interface SortConfig {
   key: keyof ICategory | null;
   direction: SortDirection;
 }
-
-const CustomToggle = React.forwardRef(({ children, onClick }: any, ref: any) => (
-  <button
-    ref={ref}
-    onClick={(e) => {
-      e.preventDefault();
-      onClick(e);
-    }}
-    className="btn btn-sm border border-secondary-subtle rounded-2 px-2 py-1 bg-transparent"
-    style={{ boxShadow: 'none' }}
-  >
-    {children}
-  </button>
-));
 
 export const Categories: React.FC = () => {
   const [data, setData] = useState<ICategory[]>([]);

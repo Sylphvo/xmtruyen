@@ -13,14 +13,14 @@ using XomTruyen.API.Services.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure max request size (500MB) for file uploads
+// Configure max request size (1GB) for file uploads and bulk chapter processing
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 524288000;
+    options.Limits.MaxRequestBodySize = 1073741824; // 1GB
 });
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 524288000;
+    options.MultipartBodyLengthLimit = 1073741824; // 1GB
 });
 
 // Add services to the container.
@@ -155,6 +155,18 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles(); // Allow serving static files from wwwroot
+
+// Serve files from the custom absolute upload path
+var uploadBasePath = builder.Configuration.GetValue<string>("UploadSettings:BasePath") ?? "C:\\Uploads";
+if (!System.IO.Directory.Exists(uploadBasePath))
+{
+    System.IO.Directory.CreateDirectory(uploadBasePath);
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadBasePath),
+    RequestPath = "" // Map it to the root, e.g. /Publications/..., /uploads/...
+});
 
 app.UseCors("AllowAll");
 

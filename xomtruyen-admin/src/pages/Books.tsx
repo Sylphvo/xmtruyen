@@ -1,14 +1,13 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { STATUSES } from '../constants/mockData';
 import { getBooks, createBook, updateBook, deleteBook, uploadBookFile, uploadCoverImage, toggleStatus, type SaveBookRequest } from '../api/bookApi';
 import type { IBook } from '../types/book';
 import type { ICategory } from '../types/category';
 import type { ITopic } from '../types/topic';
 import { getCategories } from '../api/categoryApi';
 import { getTopics } from '../api/topicApi';
-import { Dropdown, Form, Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
+import { Form, Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select';
 import defaultBookImage from '../assets/images/default.png';
 import toast from 'react-hot-toast';
@@ -277,18 +276,7 @@ export const Books: React.FC = () => {
     }
   };
 
-  const handleEditClick = (book: IBook) => {
-    setEditingBookId(book.id);
-    setEditBookData({
-      title: book.title,
-      author: book.author,
-      formatType: book.formatType,
-      accessLevel: book.accessLevel,
-      categoryIds: book.categories?.map(c => c.id) || [],
-      topicIds: book.topics?.map(t => t.id) || [],
-    });
-    setActiveEditField('title');
-  };
+
 
   const handleCellDoubleClick = (book: IBook, field: string) => {
     if (editingBookId !== book.id) {
@@ -396,9 +384,7 @@ export const Books: React.FC = () => {
 
   const startIndex = (validCurrentPage - 1) * itemsPerPage;
 
-  const handleStatusChange = (id: string, newStatus: string) => {
-    setData(prev => prev.map(book => book.id === id ? { ...book, status: newStatus } : book));
-  };
+
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -611,7 +597,7 @@ export const Books: React.FC = () => {
                       <td colSpan={9} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
                     </tr>
                   ) : sortedData.length > 0 ? (
-                    sortedData.map((book, index) => (
+                    sortedData.map((book) => (
                       <React.Fragment key={book.id}>
                         <tr className={editingBookId === book.id ? "inline-edit-row" : ""} style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
                           <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>

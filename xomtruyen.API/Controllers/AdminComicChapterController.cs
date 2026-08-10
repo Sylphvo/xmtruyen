@@ -91,4 +91,63 @@ public class AdminComicChapterController : BaseApiController
             return NotFound(new { success = false, message = ex.Message });
         }
     }
+
+    [HttpDelete("publication/{publicationId}/chapters")]
+    public async Task<IActionResult> DeleteAllChapters(Guid publicationId)
+    {
+        try
+        {
+            await _chapterService.DeleteAllChaptersByPublicationAsync(publicationId);
+            return Ok(new { success = true, message = "Đã xóa toàn bộ chapters." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = $"Lỗi xóa chapters: {ex.Message}" });
+        }
+    }
+
+    [HttpPost("publication/{publicationId}/bulk-upload")]
+    [HttpPost("{publicationId}/bulk-upload")]
+    [RequestSizeLimit(1073741824)] // 1GB
+    [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
+    public async Task<IActionResult> BulkUploadChapters(
+        [FromRoute] Guid publicationId,
+        [FromForm] IFormFile file,
+        [FromForm] bool overwriteExisting = true,
+        [FromForm] int? defaultCoinPrice = 0,
+        [FromForm] bool isLocked = false,
+        [FromForm] int? imagesPerChapter = null)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new { success = false, message = "Vui lòng chọn file nén (.zip, .cbz, .rar, .cbr) để tải lên." });
+        }
+
+        try
+        {
+            var options = new BulkUploadChapterRequest
+            {
+                File = file,
+                OverwriteExisting = overwriteExisting,
+                DefaultCoinPrice = defaultCoinPrice,
+                IsLocked = isLocked,
+                ImagesPerChapter = imagesPerChapter
+            };
+
+            var result = await _chapterService.BulkUploadChaptersAsync(publicationId, file, options);
+            return Ok(new { success = true, message = result.Message, data = result });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = $"Lỗi xử lý file nén: {ex.Message}" });
+        }
+    }
 }

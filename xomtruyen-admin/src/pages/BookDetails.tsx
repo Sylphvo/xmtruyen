@@ -5,9 +5,12 @@ import { faArrowLeft, faPlus, faTrash, faEdit, faImage, faSave, faTimes, faUploa
 import { toast } from 'react-hot-toast';
 import { Modal, Button, ProgressBar } from 'react-bootstrap';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { BulkUploadModal } from '../components/BulkUploadModal';
 import * as bookApi from '../api/bookApi';
 import type { IBook } from '../types/book';
 import { chapterApi, type ComicChapter, type ComicPage } from '../api/chapterApi';
+import { uploadChapterPage } from '../api/uploadApi';
+import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 
 export const BookDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -16,6 +19,15 @@ export const BookDetails = () => {
     const [chapters, setChapters] = useState<ComicChapter[]>([]);
     const [loading, setLoading] = useState(true);
     
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 20; // 20 chapters per page
+    const totalPages = Math.ceil(chapters.length / itemsPerPage);
+    const currentChapters = chapters.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    
+    // Bulk upload modal state
+    const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+
     // Add/Edit chapter modal state
     const [showChapterModal, setShowChapterModal] = useState(false);
     const [editingChapter, setEditingChapter] = useState<ComicChapter | null>(null);
@@ -89,6 +101,21 @@ export const BookDetails = () => {
         }
     };
 
+    const handleDeleteAllChapters = async () => {
+        if (!chapters || chapters.length === 0) return;
+        if (window.confirm('CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ chapter của truyện này? Hành động này không thể hoàn tác!')) {
+            try {
+                await chapterApi.deleteAllChapters(id!);
+                toast.success('Đã xóa toàn bộ chapter thành công');
+                setCurrentPage(1);
+                fetchData();
+            } catch (error) {
+                toast.error('Lỗi khi xóa toàn bộ chapter');
+                console.error(error);
+            }
+        }
+    };
+
     const openChapterModal = (chapter?: ComicChapter) => {
         if (chapter) {
             setEditingChapter(chapter);
@@ -137,20 +164,18 @@ export const BookDetails = () => {
         try {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                // In a real application, you would first upload the file to your storage service
-                // and get a URL back. For now, since we only have the AddPage endpoint that takes an ImageUrl,
-                // we'll mock the upload process or assume the backend has an upload endpoint we can use.
-                // NOTE: The previous UploadController was meant for full book files (Zip/PDF) and cover images.
-                // Let's assume we can upload pages using a similar mechanism or just send the file via form data
-                // if we modify the API. 
-                // Since we only have `chapterApi.addChapterPage` which expects `imageUrl`, we'd normally call 
-                // a generic upload endpoint first.
-                
-                // MOCK UPLOAD for demonstration:
-                const mockImageUrl = `/uploads/chapters/${selectedChapterForPages.id}/${file.name}`;
-                
+                let uploadedUrl = `/uploads/chapters/${selectedChapterForPages.id}/${file.name}`;
+                try {
+                    const uploadRes = await uploadChapterPage(file, selectedChapterForPages.id);
+                    if (uploadRes && uploadRes.url) {
+                        uploadedUrl = uploadRes.url;
+                    }
+                } catch (upErr) {
+                    console.warn('Direct upload failed, using fallback path:', upErr);
+                }
+
                 await chapterApi.addChapterPage(selectedChapterForPages.id, {
-                    imageUrl: mockImageUrl,
+                    imageUrl: uploadedUrl,
                     orderIndex: existingPages.length + i + 1
                 });
                 
@@ -203,10 +228,34 @@ export const BookDetails = () => {
                         <span className="text-muted small">Quản lý Chapters & Hình ảnh</span>
                     </div>
                 </div>
-                <button className="btn btn-primary px-4 fw-medium shadow-sm d-flex align-items-center gap-2" style={{ backgroundColor: '#5955D1', border: 'none', borderRadius: '8px' }} onClick={() => openChapterModal()}>
-                    <FontAwesomeIcon icon={faPlus} />
-                    Thêm Chapter
-                </button>
+                <div className="d-flex align-items-center gap-2">
+                    {chapters.length > 0 && (
+                        <button
+                            className="btn btn-outline-danger px-3 fw-medium shadow-sm d-flex align-items-center gap-2"
+                            style={{ borderRadius: '8px' }}
+                            onClick={handleDeleteAllChapters}
+                        >
+                            <FontAwesomeIcon icon={faTrash} />
+                            Xóa tất cả Chapter
+                        </button>
+                    )}
+                    <button
+                        className="btn btn-outline-primary px-3 fw-medium shadow-sm d-flex align-items-center gap-2"
+                        style={{ borderRadius: '8px' }}
+                        onClick={() => setShowBulkUploadModal(true)}
+                    >
+                        <FontAwesomeIcon icon={faCloudUploadAlt} />
+                        Tải lên hàng loạt (Zip/CBZ)
+                    </button>
+                    <button
+                        className="btn btn-primary px-4 fw-medium shadow-sm d-flex align-items-center gap-2"
+                        style={{ backgroundColor: '#5955D1', border: 'none', borderRadius: '8px' }}
+                        onClick={() => openChapterModal()}
+                    >
+                        <FontAwesomeIcon icon={faPlus} />
+                        Thêm Chapter
+                    </button>
+                </div>
             </div>
 
             <div className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
@@ -214,17 +263,17 @@ export const BookDetails = () => {
                     <table className="table mb-0 table-hover align-middle">
                         <thead>
                             <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #edf2f7' }}>
-                                <ResizableHeader width={80} minWidth={60} title="Chap" className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }} />
-                                <ResizableHeader width={200} minWidth={150} title="Tiêu đề" className="text-muted fw-semibold" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }} />
-                                <ResizableHeader width={120} minWidth={100} title="Số hình ảnh" className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }} />
-                                <ResizableHeader width={100} minWidth={80} title="Giá (Coin)" className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }} />
-                                <ResizableHeader width={100} minWidth={80} title="Lượt xem" className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }} />
-                                <ResizableHeader width={150} minWidth={100} title="Ngày tạo" className="text-muted fw-semibold" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }} />
+                                <ResizableHeader initialWidth={80} minWidth={60} className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }}>Chap</ResizableHeader>
+                                <ResizableHeader initialWidth={200} minWidth={150} className="text-muted fw-semibold" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }}>Tiêu đề</ResizableHeader>
+                                <ResizableHeader initialWidth={120} minWidth={100} className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }}>Số hình ảnh</ResizableHeader>
+                                <ResizableHeader initialWidth={100} minWidth={80} className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }}>Giá (Coin)</ResizableHeader>
+                                <ResizableHeader initialWidth={100} minWidth={80} className="text-muted fw-semibold text-center" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }}>Lượt xem</ResizableHeader>
+                                <ResizableHeader initialWidth={150} minWidth={100} className="text-muted fw-semibold" style={{ fontSize: '13px', textTransform: 'uppercase', padding: '16px' }}>Ngày tạo</ResizableHeader>
                                 <th style={{ width: '200px', backgroundColor: 'transparent', border: 'none', color: '#6c757d', fontSize: '13px', textTransform: 'uppercase', fontWeight: '600', padding: '16px', textAlign: 'center' }}>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {chapters.length > 0 ? chapters.map((chapter) => (
+                            {currentChapters.length > 0 ? currentChapters.map((chapter) => (
                                 <tr key={chapter.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                     <td className="text-center fw-bold text-dark" style={{ padding: '16px' }}>{chapter.chapterNumber}</td>
                                     <td className="fw-medium text-dark" style={{ padding: '16px' }}>{chapter.title || `Chapter ${chapter.chapterNumber}`}</td>
@@ -262,6 +311,30 @@ export const BookDetails = () => {
                             )}
                         </tbody>
                     </table>
+                    
+                    {totalPages > 1 && (
+                        <div className="d-flex justify-content-center align-items-center py-3 bg-white border-top">
+                            <div className="d-flex gap-2">
+                                <button 
+                                    className="btn btn-sm btn-outline-secondary" 
+                                    disabled={currentPage === 1}
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                >
+                                    Trước
+                                </button>
+                                <span className="d-flex align-items-center px-3 small fw-medium">
+                                    Trang {currentPage} / {totalPages}
+                                </span>
+                                <button 
+                                    className="btn btn-sm btn-outline-secondary" 
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                >
+                                    Sau
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -273,7 +346,7 @@ export const BookDetails = () => {
                 <Modal.Body>
                     <div className="mb-3">
                         <label className="form-label fw-medium">Số Chapter</label>
-                        <input type="number" className="form-control" value={chapterForm.chapterNumber} onChange={e => setChapterForm({...chapterForm, chapterNumber: parseFloat(e.target.value)})} />
+                        <input type="number" step="any" className="form-control" value={chapterForm.chapterNumber} onChange={e => setChapterForm({...chapterForm, chapterNumber: parseFloat(e.target.value) || 0})} />
                     </div>
                     <div className="mb-3">
                         <label className="form-label fw-medium">Tiêu đề (Tùy chọn)</label>
@@ -281,7 +354,7 @@ export const BookDetails = () => {
                     </div>
                     <div className="mb-3">
                         <label className="form-label fw-medium">Giá Coin</label>
-                        <input type="number" className="form-control" value={chapterForm.coinPrice} onChange={e => setChapterForm({...chapterForm, coinPrice: parseInt(e.target.value)})} />
+                        <input type="number" className="form-control" value={chapterForm.coinPrice} onChange={e => setChapterForm({...chapterForm, coinPrice: parseInt(e.target.value) || 0})} />
                     </div>
                     <div className="form-check form-switch mb-3">
                         <input className="form-check-input" type="checkbox" role="switch" checked={chapterForm.isLocked} onChange={e => setChapterForm({...chapterForm, isLocked: e.target.checked})} />
@@ -351,10 +424,15 @@ export const BookDetails = () => {
                                     >
                                         <FontAwesomeIcon icon={faTimes} style={{ fontSize: '12px' }} />
                                     </button>
-                                    <div className="bg-light d-flex justify-content-center align-items-center" style={{ height: '120px' }}>
-                                        <FontAwesomeIcon icon={faFileImage} className="text-muted fs-1" />
-                                        {/* In real app, you would show the image here: */}
-                                        {/* <img src={page.imageUrl} className="w-100 h-100 object-fit-cover" /> */}
+                                    <div className="bg-light d-flex justify-content-center align-items-center position-relative overflow-hidden" style={{ height: '120px' }}>
+                                        <FontAwesomeIcon icon={faFileImage} className="text-muted fs-1 position-absolute" style={{ opacity: 0.3 }} />
+                                        <img 
+                                            src={page.imageUrl.startsWith('http') ? page.imageUrl : `http://localhost:5172/${page.imageUrl.startsWith('/') ? page.imageUrl.slice(1) : page.imageUrl}`} 
+                                            alt={`Page ${index + 1}`} 
+                                            className="w-100 h-100 position-relative" 
+                                            style={{ objectFit: 'cover', zIndex: 1 }} 
+                                            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+                                        />
                                     </div>
                                     <div className="card-body p-2 text-center">
                                         <small className="text-muted text-truncate d-block" style={{ fontSize: '11px' }}>
@@ -376,6 +454,17 @@ export const BookDetails = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            {/* Bulk Upload Modal */}
+            <BulkUploadModal
+                show={showBulkUploadModal}
+                onHide={() => setShowBulkUploadModal(false)}
+                publicationId={id!}
+                bookTitle={book?.title}
+                onSuccess={() => {
+                    fetchData();
+                }}
+            />
         </div>
     );
 };

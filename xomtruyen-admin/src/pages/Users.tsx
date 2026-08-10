@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dropdown, Form, Spinner, Button } from 'react-bootstrap';
+import { Form, Spinner, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH, faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import { getUsers, updateUserStatus, createUser, updateUser, type User, type SaveUserRequest } from '../api/userApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import toast from 'react-hot-toast';
-
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -13,20 +12,6 @@ interface SortConfig {
   key: keyof User | null;
   direction: SortDirection;
 }
-
-const CustomToggle = React.forwardRef(({ children, onClick }: any, ref: any) => (
-  <button
-    ref={ref}
-    onClick={(e) => {
-      e.preventDefault();
-      onClick(e);
-    }}
-    className="btn btn-sm border border-secondary-subtle rounded-2 px-2 py-1 bg-transparent"
-    style={{ boxShadow: 'none' }}
-  >
-    {children}
-  </button>
-));
 
 export const Users: React.FC = () => {
   const [data, setData] = useState<User[]>([]);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Calendar, ChevronsLeft, Moon, Sun, ClipboardList, ChevronDown, User, Settings, ArrowUpCircle, LogOut, Lock, ShoppingCart } from 'lucide-react';
+import { Search, Bell, ChevronsLeft, Moon, Sun, ClipboardList, ChevronDown, User, Settings, ArrowUpCircle, LogOut, Lock, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 interface HeaderProps {
@@ -12,10 +12,8 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapse
     document.documentElement.getAttribute('data-bs-theme') || 'light'
   );
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [language, setLanguage] = useState('VI');
   const profileRef = useRef<HTMLDivElement>(null);
-  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-bs-theme', theme);
@@ -25,9 +23,6 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapse
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
-      }
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-        setIsNotificationOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);

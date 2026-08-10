@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisH, faSort, faSortUp, faSortDown, faDatabase, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 import { getTables } from '../api/managerDbApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { getTableInfo } from '../constants/databaseDictionary';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -200,11 +201,23 @@ export const Database: React.FC = () => {
                   </td>
                 </tr>
               ) : paginatedData.length > 0 ? (
-                paginatedData.map((table) => (
-                  <tr key={table.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <div className="fw-medium text-truncate">{table.name}</div>
-                    </td>
+                paginatedData.map((table) => {
+                  const info = getTableInfo(table.name);
+                  return (
+                    <tr key={table.id} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <div className="d-flex flex-column gap-1">
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="fw-bold text-primary font-monospace" style={{ fontSize: '13.5px' }}>{table.name}</span>
+                            <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-1.5 py-0.5" style={{ fontSize: '10.5px' }}>
+                              {info.vietnameseName}
+                            </span>
+                          </div>
+                          <div className="text-secondary small text-truncate" style={{ maxWidth: '280px', fontSize: '12px' }} title={info.summary}>
+                            {info.summary}
+                          </div>
+                        </div>
+                      </td>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                       <span className="text-body">{table.rowCount.toLocaleString()}</span>
                     </td>
@@ -240,7 +253,8 @@ export const Database: React.FC = () => {
                       </Dropdown>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan={6} className="text-center py-5 text-muted" style={{ backgroundColor: 'transparent' }}>

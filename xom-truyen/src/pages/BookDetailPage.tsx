@@ -9,15 +9,15 @@ import type { Book } from "../types";
 export default function BookDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { book } = useBookDetail(id);
+  const { book, loading } = useBookDetail(id);
 
-  // Fallback book if loading or not found
+  // Fallback book if not found
   const displayBook: Book = book || {
-    id: Number(id) || 1,
-    title: "101 cách cua đổ đại lão hàng xóm",
-    author: "Đồng Vũ",
+    id: id || 1,
+    title: loading ? "Đang tải dữ liệu..." : "101 cách cua đổ đại lão hàng xóm",
+    author: loading ? "..." : "Đồng Vũ",
     genres: ["Ngôn tình"],
-    images: "mock-book-cover",
+    images: loading ? undefined : "mock-book-cover",
     coverIndex: 0,
     currentChapter: 25,
     lastUpdated: "Đang cập nhật",

@@ -1,8 +1,39 @@
+import { useState, useEffect } from "react";
 import type { Book } from "../../types";
 
-export default function BookCover({ book, width, height }: { book: Book; width: number | string; height: number | string }) {
-  // Sử dụng ảnh từ API nếu có, ngược lại dùng ảnh local mock
-  const imageUrl = book.coverImageUrl || (book.images ? `/src/assets/images/${book.images}.jpg` : "");
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5172";
+
+export function resolveCoverImageUrl(coverImageUrl?: string, images?: string): string {
+  if (!coverImageUrl) {
+    return images ? `/src/assets/images/${images}.jpg` : "";
+  }
+  if (
+    coverImageUrl.startsWith("http://") ||
+    coverImageUrl.startsWith("https://") ||
+    coverImageUrl.startsWith("data:") ||
+    coverImageUrl.startsWith("/src/")
+  ) {
+    return coverImageUrl;
+  }
+  const cleanPath = coverImageUrl.startsWith("/") ? coverImageUrl.slice(1) : coverImageUrl;
+  return `${API_BASE_URL}/${cleanPath}`;
+}
+
+export default function BookCover({
+  book,
+  width,
+  height,
+}: {
+  book: Book;
+  width: number | string;
+  height: number | string;
+}) {
+  const imageUrl = resolveCoverImageUrl(book?.coverImageUrl, book?.images);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [imageUrl]);
 
   return (
     <div
@@ -18,21 +49,38 @@ export default function BookCover({ book, width, height }: { book: Book; width: 
       }}
       className="book-cover-hover"
     >
-      <img
-        src={imageUrl}
-        alt={`Bìa truyện ${book.title}`}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover", // Ép ảnh khít khung mà không lo méo hình
-          display: "block",
-        }}
-        onError={(e) => {
-          // Nếu cuốn truyện này chưa có ảnh sẵn, tự động ẩn ảnh lỗi và giữ khung xám tinh tế
-          e.currentTarget.style.display = "none";
-          e.currentTarget.parentElement!.style.backgroundColor = "#d1d5db";
-        }}
-      />
+      {imageUrl && !hasError ? (
+        <img
+          key={imageUrl}
+          src={imageUrl}
+          alt={`Bìa truyện ${book?.title || ""}`}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            backgroundColor: "#d1d5db",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#6b7280",
+            fontSize: "13px",
+            fontWeight: 500,
+            textAlign: "center",
+            padding: "12px",
+          }}
+        >
+          {book?.title || "Không có ảnh"}
+        </div>
+      )}
     </div>
   );
 }

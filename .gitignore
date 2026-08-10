@@ -29,3 +29,8 @@ appsettings.Development.json
 # Build outputs (.NET / C#)
 **/[Bb]in/
 **/[Oo]bj/
+
+# Upload Directories
+**/wwwroot/books/
+**/wwwroot/Publications/
+**/wwwroot/uploads/

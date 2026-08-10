@@ -86,4 +86,17 @@ public class ComicChapterRepository : IComicChapterRepository
         _context.ComicPages.UpdateRange(pages);
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task CreatePagesAsync(IEnumerable<ComicPage> pages, CancellationToken cancellationToken = default)
+    {
+        await _context.ComicPages.AddRangeAsync(pages, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<ComicChapter?> GetChapterByNumberAsync(Guid publicationId, float chapterNumber, CancellationToken cancellationToken = default)
+    {
+        return await _context.ComicChapters
+            .Include(c => c.Pages)
+            .FirstOrDefaultAsync(c => c.PublicationId == publicationId && Math.Abs(c.ChapterNumber - chapterNumber) < 0.001f, cancellationToken);
+    }
 }

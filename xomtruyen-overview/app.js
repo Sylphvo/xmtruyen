@@ -1848,30 +1848,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 function highlightSyntax(code) {
   if (!code) return "";
   
-  // Escape HTML characters
-  let escaped = code
+  // Escape HTML characters first
+  let text = code
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  // Regex rules for high-tech code highlighting
-  escaped = escaped
-    // Comments
-    .replace(/(\/\/[^\n]*)/g, '<span class="tok-comment">$1</span>')
-    .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="tok-comment">$1</span>')
-    // Strings
-    .replace(/("(?:\\.|[^"\\])*")/g, '<span class="tok-str">$1</span>')
-    .replace(/('(?:\\.|[^'\\])*')/g, '<span class="tok-str">$1</span>')
-    .replace(/(`(?:\\.|[^`\\])*`)/g, '<span class="tok-str">$1</span>')
-    // Keywords
-    .replace(/\b(public|private|protected|class|interface|async|await|return|import|export|default|function|const|let|var|if|else|try|catch|new|using|namespace|get|set|type|from)\b/g, '<span class="tok-kw">$1</span>')
-    // Types & Decorators
-    .replace(/\b(Task|IActionResult|ActionResult|Guid|string|int|bool|decimal|DateTime|DbSet|DbContext|React|FC|Promise|ApiResponse|User|Publication|ComicPage)\b/g, '<span class="tok-type">$1</span>')
-    .replace(/(\[[A-Za-z0-9_]+(?:\([^)]*\))?\])/g, '<span class="tok-attr">$1</span>')
-    // Numbers
-    .replace(/\b([0-9]+)\b/g, '<span class="tok-num">$1</span>');
+  // Single-pass tokenizer to avoid nested HTML replacement bugs
+  const tokenRegex = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(\[[A-Za-z0-9_]+(?:\([^\]]*\))?\])|\b(public|private|protected|class|interface|async|await|return|import|export|default|function|const|let|var|if|else|try|catch|new|using|namespace|get|set|type|from)\b|\b(Task|IActionResult|ActionResult|Guid|string|int|bool|decimal|DateTime|DbSet|DbContext|React|FC|Promise|ApiResponse|User|Publication|ComicPage)\b|\b(\d+)\b/g;
 
-  return escaped;
+  return text.replace(tokenRegex, (match, comment, str, attr, kw, type, num) => {
+    if (comment) return `<span class="tok-comment">${comment}</span>`;
+    if (str) return `<span class="tok-str">${str}</span>`;
+    if (attr) return `<span class="tok-attr">${attr}</span>`;
+    if (kw) return `<span class="tok-kw">${kw}</span>`;
+    if (type) return `<span class="tok-type">${type}</span>`;
+    if (num) return `<span class="tok-num">${num}</span>`;
+    return match;
+  });
 }
 
 // ==========================================================
@@ -1897,9 +1891,11 @@ class ArchitectureVisualizer {
 
     // Audio synthesizer for tech clicks
     this.audioEnabled = true;
-    this.audioCtx = null;
+    // Theme Engine: slate (default modern dark) | light (paper white) | cyber (neon matrix)
+    this.currentTheme = localStorage.getItem("xomtruyen_overview_theme") || "slate";
 
     this.initElements();
+    this.initTheme();
     this.bindEvents();
     this.renderTable();
     this.renderChangelogTable("all");
@@ -1925,9 +1921,11 @@ class ArchitectureVisualizer {
     this.subnavBtnFlows = document.getElementById("subnav-btn-flows");
     this.subnavBtnChangelog = document.getElementById("subnav-btn-changelog");
     this.subnavBtnDocs = document.getElementById("subnav-btn-docs");
+    this.subnavBtnSettings = document.getElementById("subnav-btn-settings");
     this.paneFlows = document.getElementById("pane-flows");
     this.paneChangelog = document.getElementById("pane-changelog");
     this.paneDocs = document.getElementById("pane-docs");
+    this.paneSettings = document.getElementById("pane-settings");
 
     // User Manual Navigation Elements
     this.docsNavItems = document.querySelectorAll("#docs-nav-menu .docs-nav-item");
@@ -1982,6 +1980,47 @@ class ArchitectureVisualizer {
     this.updateCanvasTransform();
   }
 
+  // Theme Management Engine
+  initTheme() {
+    this.themeToggleBtn = document.getElementById("theme-toggle-btn");
+    this.themeSwitchIcon = document.getElementById("theme-switch-icon");
+    this.themeSwitchLabel = document.getElementById("theme-switch-label");
+    this.applyTheme(this.currentTheme);
+  }
+
+  applyTheme(theme) {
+    this.currentTheme = theme;
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("xomtruyen_overview_theme", theme);
+
+    if (this.themeSwitchIcon && this.themeSwitchLabel) {
+      if (theme === "light") {
+        this.themeSwitchIcon.textContent = "☀️";
+        this.themeSwitchLabel.textContent = "Giao diện Sáng";
+      } else if (theme === "cyber") {
+        this.themeSwitchIcon.textContent = "🌌";
+        this.themeSwitchLabel.textContent = "Cyber Matrix";
+      } else {
+        this.themeSwitchIcon.textContent = "🌙";
+        this.themeSwitchLabel.textContent = "Giao diện Tối";
+      }
+    }
+  }
+
+  cycleTheme() {
+    const themeOrder = ["slate", "light", "cyber"];
+    const currentIndex = themeOrder.indexOf(this.currentTheme);
+    const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
+    this.applyTheme(nextTheme);
+
+    const themeTitles = {
+      slate: "Giao diện Tối (Slate) - Êm mắt, độ tương phản cao",
+      light: "Giao diện Sáng (Paper Light) - Siêu dễ đọc, chuẩn tài liệu",
+      cyber: "Giao diện Cyberpunk Neon"
+    };
+    this.showToast(`Đã đổi sang: ${themeTitles[nextTheme]}`);
+  }
+
   // Sub-Navigation Switcher (Flows vs Changelog vs Docs)
   switchSubnavTab(tab) {
     this.currentSubnavTab = tab;
@@ -1989,10 +2028,12 @@ class ArchitectureVisualizer {
     this.subnavBtnFlows?.classList.toggle("active", tab === "flows");
     this.subnavBtnChangelog?.classList.toggle("active", tab === "changelog");
     this.subnavBtnDocs?.classList.toggle("active", tab === "docs");
+    this.subnavBtnSettings?.classList.toggle("active", tab === "settings");
 
     if (this.paneFlows) this.paneFlows.style.display = tab === "flows" ? "flex" : "none";
     if (this.paneChangelog) this.paneChangelog.style.display = tab === "changelog" ? "flex" : "none";
     if (this.paneDocs) this.paneDocs.style.display = tab === "docs" ? "block" : "none";
+    if (this.paneSettings) this.paneSettings.style.display = tab === "settings" ? "flex" : "none";
 
     if (tab === "changelog") {
       this.renderChangelogTable(this.currentChangelogFilter);
@@ -2117,8 +2158,8 @@ class ArchitectureVisualizer {
         </td>
         <td>
           <div style="display: flex; flex-direction: column; gap: 4px;">
-            <div style="font-weight: 700; color: #ffffff; font-size: 13.5px;">${item.title}</div>
-            <div style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.4;">${item.summary}</div>
+            <div style="font-weight: 700; color: var(--text-primary); font-size: 15px;">${item.title}</div>
+            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">${item.summary}</div>
           </div>
         </td>
         <td>
@@ -2787,6 +2828,12 @@ class ArchitectureVisualizer {
       this.closeInspector();
     });
 
+    // Theme Switcher Button Event
+    this.themeToggleBtn?.addEventListener("click", () => {
+      this.playSound(520, 0.05);
+      this.cycleTheme();
+    });
+
     // Copy Code from Drawer
     this.drawerCodeCopyBtn?.addEventListener("click", () => {
       if (this.currentDrawerRawCode) {
@@ -2827,6 +2874,11 @@ class ArchitectureVisualizer {
     this.subnavBtnDocs?.addEventListener("click", () => {
       this.playSound(400, 0.04);
       this.switchSubnavTab("docs");
+    });
+
+    this.subnavBtnSettings?.addEventListener("click", () => {
+      this.playSound(400, 0.04);
+      this.switchSubnavTab("settings");
     });
 
     // User Manual Sidebar Navigation

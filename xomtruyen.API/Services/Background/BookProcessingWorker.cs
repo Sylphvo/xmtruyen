@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using XomTruyen.API.Services.Interfaces;
 using XomTruyen.API.Models.BookProcessing;
+using XomTruyen.API.Data;
 using System.Linq;
 using System.Text.Json;
 
@@ -56,11 +57,23 @@ namespace XomTruyen.API.Services.Background
                             workItem.TaskId, 
                             JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
                         
-                        // TODO: Update Database (e.g. change Publication status from PROCESSING to READY)
-                        // var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                        // var Publication = await dbContext.Publications.FindAsync(workItem.PublicationId);
-                        // Publication.Status = "READY";
-                        // await dbContext.SaveChangesAsync();
+                        // Update Database: set CoverImageUrl and update Status
+                        if (result.Status == "COMPLETED" && Guid.TryParse(workItem.PublicationId, out var pubGuid))
+                        {
+                            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                            var publication = await dbContext.Publications.FindAsync(new object[] { pubGuid }, stoppingToken);
+                            if (publication != null)
+                            {
+                                if (string.IsNullOrEmpty(publication.CoverImageUrl) || !string.IsNullOrEmpty(result.Output?.ImageUrl))
+                                {
+                                    publication.CoverImageUrl = result.Output?.ImageUrl ?? publication.CoverImageUrl;
+                                }
+                                publication.Status = "Active";
+                                publication.UpdatedAt = DateTime.UtcNow;
+                                await dbContext.SaveChangesAsync(stoppingToken);
+                                _logger.LogInformation("Updated Publication {PublicationId} CoverImageUrl to {CoverImageUrl}", pubGuid, publication.CoverImageUrl);
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
