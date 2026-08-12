@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn Deploy XomTruyen</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            color: #00d4ff;
+            font-size: 2em;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #ff6b9d;
+            font-size: 1.4em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #ffd93d;
+            font-size: 1.1em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        .message {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+        .user-msg {
+            background: #16213e;
+            border-left-color: #00d4ff;
+        }
+        .assistant-msg {
+            background: #1f1f3a;
+            border-left-color: #ff6b9d;
+        }
+        .role {
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .user-msg .role { color: #00d4ff; }
+        .assistant-msg .role { color: #ff6b9d; }
+        pre {
+            background: #0d1117;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            color: #7ee787;
+        }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin-bottom: 8px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        th { background: #16213e; color: #00d4ff; }
+        td { background: #1a1a2e; }
+        .highlight { color: #ffd93d; font-weight: bold; }
+        .warning { color: #ff6b6b; }
+        .success { color: #7ee787; }
+        a { color: #00d4ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .toc {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .toc a { display: block; margin: 5px 0; }
+        hr { border: 1px solid #333; margin: 30px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>📚 Hướng dẫn Deploy XomTruyen - Toàn bộ cuộc trò chuyện</h1>
+
+<div class="toc">
+    <h3>📋 Mục lục</h3>
+    <a href="#part1">1. Deploy Frontend (xom-truyen) lên Vercel</a>
+    <a href="#part2">2. Chọn Root Directory trên Vercel</a>
+    <a href="#part3">3. Fix lỗi Build trên Vercel</a>
+    <a href="#part4">4. Tư vấn chọn hosting cho Backend + Database</a>
+    <a href="#part5">5. Phân tích source - Railway/Render có phù hợp không?</a>
+    <a href="#part6">6. Hướng dẫn setup laptop cũ làm server</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="part1">1. Deploy Frontend (xom-truyen) lên Vercel</h2>
+
+<div class="message user-msg">
+    <div class="role">👤 Người dùng</div>
+    <p>Đọc cấu trúc source và hướng dẫn tôi deploy source ở thư mục xom-truyen lên Vercel</p>
+</div>
+
+<div class="message assistant-msg">
+    <div class="role">🤖 Trợ lý</div>
+    <p>Đây là một <span class="highlight">React + Vite + TypeScript</span> app sử dụng <code>react-router-dom</code> với client-side routing.</p>
+
+    <h3>Bước 1: Tạo file vercel.json để hỗ trợ SPA routing</h3>
+    <p>Vì project dùng react-router-dom (client-side routing), cần thêm file <code>vercel.json</code> trong thư mục <code>xom-truyen</code>:</p>
+    <pre><code>{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}</code></pre>
+
+    <h3>Bước 2: Trên Vercel</h3>
+    <ul>
+        <li>Import GitHub repo</li>
+        <li>Chọn <strong>Root Directory</strong> = <code>xom-truyen</code></li>
+        <li>Framework Preset: Vite (tự detect)</li>
+        <li>Build Command: <code>npm run build</code></li>
+        <li>Output Directory: <code>dist</code></li>
+    </ul>
+
+    <h3>Bước 3: Environment Variables</h3>
+    <ul>
+        <li>Key: <code>VITE_API_BASE_URL</code></li>
+        <li>Value: URL API backend thực tế (không dùng localhost)</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="part2">2. Chọn Root Directory trên Vercel</h2>
+
+<div class="message user-msg">
+    <div class="role">👤 Người dùng</div>
+    <p>Chọn mục nào? (ảnh chụp màn hình Vercel Root Directory)</p>
+</div>
+
+<div class="message assistant-msg">
+    <div class="role">🤖 Trợ lý</div>
+    <p>Chọn <span class="highlight">xom-truyen</span> (mục có icon Vite ⚡) rồi nhấn <strong>Continue</strong>.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="part3">3. Fix lỗi Build trên Vercel</h2>
+
+<div class="message user-msg">
+    <div class="role">👤 Người dùng</div>
+    <p>npm run build bị lỗi:</p>
+    <pre><code>src/components/Layout/Footer.tsx(99,53): error TS2339: Property 'icon' does not exist on type '{ name: string; }'.
+src/components/Layout/Header.tsx(5,3): error TS6133: 'ChevronDown' is declared but its value is never read.
+src/components/Profile/ProfileAvatar.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+... (nhiều lỗi TS6133 tương tự)</code></pre>
+</div>
+
+<div class="message assistant-msg">
+    <div class="role">🤖 Trợ lý</div>
+    <p>Nguyên nhân: <code>tsconfig.app.json</code> bật <code>noUnusedLocals: true</code> và <code>noUnusedParameters: true</code> — bất kỳ biến/import không dùng đều thành error.</p>
+
+    <h3>Fix 1: Sửa tsconfig.app.json</h3>
+    <pre><code>/* Linting */
+"noUnusedLocals": false,
+"noUnusedParameters": false,</code></pre>
+
+    <h3>Fix 2: Bỏ tsc khỏi build command (package.json)</h3>
+    <p>Đổi từ:</p>
+    <pre><code>"build": "tsc -b && vite build"</code></pre>
+    <p>Thành:</p>
+    <pre><code>"build": "vite build"</code></pre>
+
+    <h3>Sau đó commit và push:</h3>
+    <pre><code>cd xom-truyen
+git add package.json tsconfig.app.json vercel.json
+git commit -m "fix: remove tsc from build, add vercel config"
+git push</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="part4">4. Tư vấn chọn hosting cho Backend + Database</h2>
+
+<div class="message user-msg">
+    <div class="role">👤 Người dùng</div>
+    <p>Tôi đã deploy 2 source xom-truyen và xomtruyen-admin lên vercel thì còn xomtruyen.API và database deploy ở đâu?</p>
+</div>
+
+<div class="message assistant-msg">
+    <div class="role">🤖 Trợ lý</div>
+    <p>Thông tin project:</p>
+    <ul>
+        <li><strong>Backend</strong>: ASP.NET Core (.NET 9)</li>
+        <li><strong>Database</strong>: PostgreSQL (Npgsql)</li>
+        <li><strong>ORM</strong>: Dapper + EF Core</li>
+    </ul>
+
+    <h3>Database (PostgreSQL) — Lựa chọn:</h3>
+    <table>
+        <tr><th>Dịch vụ</th><th>Free tier</th><th>Ghi chú</th></tr>
+        <tr><td>Supabase</td><td>500MB, 2 projects</td><td>Recommend — dễ dùng</td></tr>
+        <tr><td>Neon</td><td>512MB</td><td>Serverless PostgreSQL</td></tr>
+        <tr><td>Railway</td><td>$5 credit/tháng</td><td>Dễ setup</td></tr>
+        <tr><td>Render</td><td>90 ngày free</td><td>Sau 90 ngày trả phí</td></tr>
+    </table>
+
+    <h3>Backend .NET API — Lựa chọn:</h3>
+    <table>
+        <tr><th>Dịch vụ</th><th>Free tier</th><th>Ghi chú</th></tr>
+        <tr><td>Railway</td><td>$5 credit/tháng</td><td>Dễ nhất cho .NET</td></tr>
+        <tr><td>Render</td><td>Free (spin down sau 15p)</td><td>Hỗ trợ Docker</td></tr>
+        <tr><td>Azure App Service</td><td>F1 free tier</td><td>Tích hợp .NET tốt nhất</td></tr>
+        <tr><td>Fly.io</td><td>3 shared VMs miễn phí</td><td>Cần Dockerfile</td></tr>
+    </table>
+
+    <h3>Dockerfile cho API (nếu dùng PaaS):</h3>
+    <pre><code>FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY ["xomtruyen.API.csproj", "."]
+RUN dotnet restore
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNET_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "xomtruyen.API.dll"]</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="part5">5. Phân tích source - Railway/Render có phù hợp không?</h2>
+
+<div class="message user-msg">
+    <div class="role">👤 Người dùng</div>
+    <p>Hãy đọc source kiểm tra xem có thể dùng Railway/Render được không? Vì có lúc load truyện rất nặng.</p>
+</div>
+
+<div class="message assistant-msg">
+    <div class="role">🤖 Trợ lý</div>
+
+    <h3 class="warning">⚠️ Railway/Render KHÔNG PHÙ HỢP cho source này</h3>
+
+    <p><strong>Sau khi phân tích toàn bộ backend:</strong></p>
+
+    <h3>Lý do 1: Lưu trữ file hoàn toàn trên local disk</h3>
+    <ul>
+        <li>API lưu tất cả file (PDF, ảnh truyện, cover) vào <code>C:\Uploads</code></li>
+        <li>Static files serve trực tiếp từ thư mục đó</li>
+        <li>Railway/Render dùng ephemeral storage — file <span class="warning">bị xóa</span> mỗi lần deploy/restart</li>
+    </ul>
+
+    <h3>Lý do 2: File upload rất lớn</h3>
+    <ul>
+        <li>Upload sách: tối đa <strong>500MB</strong> mỗi file</li>
+        <li>Kestrel config cho phép tới <strong>1GB</strong> request body</li>
+        <li>Railway free tier chỉ có 512MB RAM</li>
+    </ul>
+
+    <h3>Lý do 3: Xử lý ảnh nặng (CPU-intensive)</h3>
+    <ul>
+        <li>Giải nén ZIP/RAR → chuyển từng ảnh sang WebP (ImageSharp)</li>
+        <li>PDF → render từng trang thành ảnh</li>
+        <li>Resize cover 600x900</li>
+        <li>Tất cả chạy background worker in-process</li>
+    </ul>
+
+    <h3>Lý do 4: API kiêm luôn file server</h3>
+    <ul>
+        <li>Serve ảnh truyện trực tiếp cho client (không qua CDN)</li>
+        <li>Nhiều người đọc cùng lúc → bandwidth + I/O cao</li>
+    </ul>
+
+    <h3 class="success">✅ Recommendation: VPS tự quản (IIS hoặc Kestrel)</h3>
+    <table>
+        <tr><th>Yêu cầu</th><th>VPS</th><th>Railway/Render</th></tr>
+        <tr><td>Persistent disk storage</td><td class="success">✅</td><td class="warning">❌ File mất khi restart</td></tr>
+        <tr><td>Upload 500MB–1GB</td><td class="success">✅</td><td class="warning">❌ Timeout, RAM không đủ</td></tr>
+        <tr><td>Background image processing</td><td class="success">✅ Full CPU</td><td>⚠️ Giới hạn</td></tr>
+        <tr><td>Serve static files</td><td class="success">✅ Từ disk</td><td class="warning">❌ Không persistent</td></tr>
+        <tr><td>PostgreSQL</td><td class="success">✅</td><td class="success">✅</td></tr>
+    </table>
+
+    <h3>Cấu hình VPS khuyến nghị:</h3>
+    <table>
+        <tr><th>Thông số</th><th>Tối thiểu</th><th>Khuyến nghị</th></tr>
+        <tr><td>RAM</td><td>2GB</td><td>4GB+</td></tr>
+        <tr><td>CPU</td><td>2 vCPU</td><td>4 vCPU</td></tr>
+        <tr><td>Disk</td><td>50GB SSD</td><td>100GB+</td></tr>
+    </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="part6">6. Hướng dẫn setup laptop cũ làm server</h2>
+
+<div class="message user-msg">
+    <div class="role">👤 Người dùng</div>
+    <p>Tôi có 1 laptop không dùng, bạn có thể hướng dẫn tôi setup được không?</p>
+</div>
+
+<div class="message assistant-msg">
+    <div class="role">🤖 Trợ lý</div>
+
+    <h3>Yêu cầu tối thiểu laptop:</h3>
+    <ul>
+        <li>RAM: 4GB+</li>
+        <li>Disk: 50GB trống</li>
+        <li>Kết nối mạng có dây (ổn định hơn WiFi)</li>
+        <li>Windows 10/11</li>
+    </ul>
+
+    <h3>Bước 1: Cài đặt phần mềm</h3>
+
+    <h3>1.1 Cài .NET 9 Runtime</h3>
+    <ul>
+        <li>Tải từ: <a href="https://dotnet.microsoft.com/download/dotnet/9.0">https://dotnet.microsoft.com/download/dotnet/9.0</a></li>
+        <li>Chọn <strong>ASP.NET Core Runtime</strong> (Windows x64) + <strong>Hosting Bundle</strong></li>
+    </ul>
+
+    <h3>1.2 Cài PostgreSQL</h3>
+    <ul>
+        <li>Tải từ: <a href="https://www.postgresql.org/download/windows/">https://www.postgresql.org/download/windows/</a></li>
+        <li>Tạo database:</li>
+    </ul>
+    <pre><code>CREATE DATABASE xomtruyen;</code></pre>
+
+    <h3>1.3 Bật IIS</h3>
+    <ol>
+        <li>Control Panel → Programs → Turn Windows features on or off</li>
+        <li>Tick chọn:
+            <ul>
+                <li>✅ Internet Information Services</li>
+                <li>✅ IIS → Web Management Tools → IIS Management Console</li>
+                <li>✅ IIS → World Wide Web Services → Application Development Features → ASP.NET 4.8</li>
+                <li>✅ IIS → World Wide Web Services → Common HTTP Features (tất cả)</li>
+            </ul>
+        </li>
+        <li>Nhấn OK, đợi cài xong</li>
+    </ol>
+
+    <h3>1.4 Cài .NET Hosting Bundle</h3>
+    <p>Tải Hosting Bundle từ trang .NET 9, cài xong restart IIS:</p>
+    <pre><code>iisreset</code></pre>
+
+    <hr>
+
+    <h3>Bước 2: Publish API</h3>
+    <p>Trên máy phát triển, mở terminal tại thư mục <code>xomtruyen.API</code>:</p>
+    <pre><code>dotnet publish -c Release -o ./publish</code></pre>
+    <p>Copy thư mục <code>publish</code> sang laptop server, đặt vào: <code>C:\WebApps\xomtruyen.API\</code></p>
+
+    <hr>
+
+    <h3>Bước 3: Tạo thư mục Upload</h3>
+    <pre><code>C:\Uploads</code></pre>
+    <p>Cấp quyền Full Control cho user <code>IIS_IUSRS</code>:</p>
+    <ol>
+        <li>Chuột phải <code>C:\Uploads</code> → Properties → Security → Edit</li>
+        <li>Add → gõ <code>IIS_IUSRS</code> → Check Names → OK</li>
+        <li>Tick <strong>Full Control</strong> → Apply</li>
+    </ol>
+
+    <hr>
+
+    <h3>Bước 4: Cấu hình IIS</h3>
+
+    <h3>4.1 Tạo website mới</h3>
+    <ol>
+        <li>Mở IIS Manager (gõ <code>inetmgr</code> trong Start)</li>
+        <li>Chuột phải Sites → Add Website:
+            <ul>
+                <li>Site name: <code>XomTruyenAPI</code></li>
+                <li>Physical path: <code>C:\WebApps\xomtruyen.API\</code></li>
+                <li>Port: <code>5172</code></li>
+                <li>Host name: để trống</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3>4.2 Cấu hình Application Pool</h3>
+    <ol>
+        <li>Vào Application Pools → tìm pool <code>XomTruyenAPI</code></li>
+        <li>Advanced Settings → .NET CLR Version = <strong>No Managed Code</strong></li>
+        <li>Start Mode = AlwaysRunning</li>
+    </ol>
+
+    <h3>4.3 File web.config</h3>
+    <p>Tạo tại <code>C:\WebApps\xomtruyen.API\web.config</code>:</p>
+    <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;configuration&gt;
+  &lt;location path="." inheritInChildApplications="false"&gt;
+    &lt;system.webServer&gt;
+      &lt;handlers&gt;
+        &lt;add name="aspNetCore" path="*" verb="*" 
+             modules="AspNetCoreModuleV2" resourceType="Unspecified" /&gt;
+      &lt;/handlers&gt;
+      &lt;aspNetCore processPath="dotnet"
+                  arguments=".\xomtruyen.API.dll"
+                  stdoutLogEnabled="true"
+                  stdoutLogFile=".\logs\stdout"
+                  hostingModel="InProcess"&gt;
+        &lt;environmentVariables&gt;
+          &lt;environmentVariable name="ASPNETCORE_ENVIRONMENT" 
+                               value="Production" /&gt;
+        &lt;/environmentVariables&gt;
+      &lt;/aspNetCore&gt;
+      &lt;security&gt;
+        &lt;requestFiltering&gt;
+          &lt;requestLimits maxAllowedContentLength="1073741824" /&gt;
+        &lt;/requestFiltering&gt;
+      &lt;/security&gt;
+    &lt;/system.webServer&gt;
+  &lt;/location&gt;
+&lt;/configuration&gt;</code></pre>
+
+    <p>Tạo thư mục logs:</p>
+    <pre><code>mkdir C:\WebApps\xomtruyen.API\logs</code></pre>
+
+    <hr>
+
+    <h3>Bước 5: File appsettings.Production.json</h3>
+    <p>Tạo tại <code>C:\WebApps\xomtruyen.API\appsettings.Production.json</code>:</p>
+    <pre><code>{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=127.0.0.1;Port=5432;Database=xomtruyen;Username=postgres;Password=YOUR_PASSWORD"
+  },
+  "Jwt": {
+    "Key": "ThayDoiKeyNayThanhMotChuoiDaiVaPhucTapHon123!@#",
+    "Issuer": "XomTruyenAPI",
+    "Audience": "XomTruyenClient",
+    "ExpireMinutes": 1440
+  },
+  "UploadSettings": {
+    "BasePath": "C:\\Uploads"
+  }
+}</code></pre>
+
+    <hr>
+
+    <h3>Bước 6: Migrate Database</h3>
+    <pre><code>dotnet ef database update --connection "Host=IP_LAPTOP;Port=5432;Database=xomtruyen;Username=postgres;Password=YOUR_PASSWORD"</code></pre>
+
+    <hr>
+
+    <h3>Bước 7: Mở truy cập từ internet</h3>
+
+    <h3>Option A: Ngrok (đơn giản nhất, miễn phí)</h3>
+    <ol>
+        <li>Tải <a href="https://ngrok.com/download">https://ngrok.com/download</a></li>
+        <li>Chạy: <code>ngrok http 5172</code></li>
+        <li>Nhận URL: <code>https://abc123.ngrok-free.app</code></li>
+        <li>Dùng URL này làm <code>VITE_API_BASE_URL</code> trên Vercel</li>
+    </ol>
+
+    <h3>Option B: Cloudflare Tunnel (miễn phí, ổn định hơn)</h3>
+    <ol>
+        <li>Tải cloudflared</li>
+        <li>Chạy: <code>cloudflared tunnel --url http://localhost:5172</code></li>
+        <li>Hoặc cấu hình domain riêng</li>
+    </ol>
+
+    <h3>Option C: Port forwarding trên router</h3>
+    <ol>
+        <li>Vào trang quản trị router (192.168.1.1)</li>
+        <li>Port Forward: port 5172 → IP laptop</li>
+        <li>Cần IP tĩnh hoặc dùng DDNS (No-IP)</li>
+    </ol>
+
+    <hr>
+
+    <h3>Bước 8: Cập nhật Vercel</h3>
+    <ul>
+        <li>Vercel → Project xom-truyen → Settings → Environment Variables</li>
+        <li>Set <code>VITE_API_BASE_URL</code> = URL tunnel</li>
+        <li>Tương tự cho xomtruyen-admin</li>
+        <li>Redeploy</li>
+    </ul>
+
+    <hr>
+
+    <h3>Bước 9: Giữ laptop luôn chạy</h3>
+    <ul>
+        <li>Tắt Sleep: Settings → Power → Sleep → Never</li>
+        <li>Tắt màn hình sau 5 phút (tiết kiệm điện)</li>
+        <li>IIS auto-start khi khởi động (mặc định)</li>
+    </ul>
+
+    <hr>
+
+    <h3>Kiến trúc tổng quan sau deploy:</h3>
+    <pre><code>Người dùng
+    ↓
+[Vercel] xom-truyen (React frontend)
+[Vercel] xomtruyen-admin (React admin)
+    ↓ VITE_API_BASE_URL
+[Ngrok / Cloudflare Tunnel]
+    ↓
+[Laptop Server]
+  ├── IIS → xomtruyen.API (.NET 9)
+  ├── PostgreSQL (database)
+  └── C:\Uploads (file truyện, ảnh)</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<hr>
+<p style="text-align: center; color: #666; margin-top: 40px;">
+    📅 Được tạo ngày: 12/08/2026 | Cuộc trò chuyện hỗ trợ deploy XomTruyen
+</p>
+
+</div>
+</body>
+</html>
