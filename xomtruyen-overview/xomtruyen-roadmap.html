@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen - Lộ trình phát triển 2 tháng</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 15px; overflow-x: auto; margin: 12px 0; font-size: 0.88em; }
+        code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; color: #7ee787; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin-bottom: 6px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px;
+               font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+        .tag-critical { background: #ff4444; color: #fff; }
+        .tag-high { background: #ff9800; color: #fff; }
+        .tag-medium { background: #4caf50; color: #fff; }
+        .sprint-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                         padding: 25px; border-radius: 12px; margin: 30px 0 20px;
+                         border: 1px solid #333; }
+        .sprint-header h2 { margin-top: 0; border: none; padding-left: 0; }
+        .sprint-meta { color: #888; font-size: 0.9em; }
+        .api-block { background: #1a1a2e; padding: 15px; border-radius: 8px;
+                     margin: 10px 0; border-left: 3px solid #a78bfa; }
+        .flow-diagram { background: #0d1117; padding: 20px; border-radius: 8px;
+                        margin: 15px 0; text-align: center; font-family: monospace;
+                        color: #7ee787; line-height: 2; }
+        hr { border: 1px solid #222; margin: 40px 0; }
+        .highlight { color: #ffd93d; }
+        .success { color: #7ee787; }
+        .warning { color: #ff6b6b; }
+        .section-box { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>📋 XomTruyen — Lộ trình phát triển 2 tháng</h1>
+<p class="subtitle">Phân tích chi tiết 4 Sprint | Từ tháng 8 đến tháng 10/2026</p>
+
+<div class="toc">
+    <h3 style="color:#fff; margin-bottom:10px;">📌 Mục lục</h3>
+    <a href="#overview">Tổng quan hiện trạng & Giá trị dự án</a>
+    <a href="#priority">Thứ tự ưu tiên cốt lõi</a>
+    <a href="#sprint1">Sprint 1: MONETIZATION — Nạp xu & Mua gói VIP (Tuần 1-2)</a>
+    <a href="#sprint2">Sprint 2: ENGAGEMENT — Tương tác & Giữ chân user (Tuần 3-4)</a>
+    <a href="#sprint3">Sprint 3: DISCOVERY — Tìm kiếm & SEO (Tuần 5-6)</a>
+    <a href="#sprint4">Sprint 4: MOBILE & DEPLOY — Hoàn thiện (Tuần 7-8)</a>
+    <a href="#summary">Tổng kết & KPI mục tiêu</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="overview">📊 Tổng quan hiện trạng dự án</h2>
+
+<h3>Tech Stack</h3>
+<table>
+    <tr><th>Layer</th><th>Công nghệ</th></tr>
+    <tr><td>Backend API</td><td>.NET 9, EF Core + Dapper, PostgreSQL, JWT Auth</td></tr>
+    <tr><td>Client Web (xom-truyen)</td><td>React + TypeScript, Vite, React Router</td></tr>
+    <tr><td>Admin Panel (xomtruyen-admin)</td><td>React + TypeScript, Vite</td></tr>
+    <tr><td>Mobile App (xomtruyen-app)</td><td>Ionic + Capacitor (iOS/Android)</td></tr>
+</table>
+
+<h3>Tính năng đã hoàn thành (~55%)</h3>
+<table>
+    <tr><th>Module</th><th>Trạng thái</th></tr>
+    <tr><td>Auth đầy đủ (register, login, guest, JWT, quên MK, verify email)</td><td class="success">✅ Hoàn chỉnh</td></tr>
+    <tr><td>Business logic đọc truyện (Free/Guest/Basic/VIP/Coin)</td><td class="success">✅ Hoàn chỉnh</td></tr>
+    <tr><td>Admin CRUD sách, chương comic, thể loại, topic</td><td class="success">✅ Hoàn chỉnh</td></tr>
+    <tr><td>Upload + background processing (ZIP/CBR/PDF → WebP)</td><td class="success">✅ Hoàn chỉnh</td></tr>
+    <tr><td>Client Web: Trang chủ, thư viện, chi tiết, đọc truyện</td><td class="success">✅ Cơ bản xong</td></tr>
+    <tr><td>Admin Panel: Dashboard, quản lý sách/user/DB</td><td class="success">✅ Hoàn chỉnh</td></tr>
+    <tr><td>Database schema 18 entity</td><td class="success">✅ Hoàn chỉnh</td></tr>
+</table>
+
+<h3>Tính năng THIẾU (cần làm trong 2 tháng)</h3>
+<table>
+    <tr><th>Tính năng</th><th>Vấn đề</th></tr>
+    <tr><td class="warning">Nạp xu / Thanh toán</td><td>Không có API, không có UI — user không thể trả tiền</td></tr>
+    <tr><td class="warning">Mua gói VIP</td><td>Model có nhưng không có endpoint mua/kích hoạt</td></tr>
+    <tr><td>Bookmark/Favorite/History API</td><td>Model DB có, chưa có Controller</td></tr>
+    <tr><td>Review/Đánh giá API</td><td>Model có, chưa có Controller</td></tr>
+    <tr><td>Ghi chú (Note) API</td><td>Model có, chưa có Controller</td></tr>
+    <tr><td>Quản lý chương truyện chữ</td><td>Chỉ có AdminComicChapter, thiếu AdminBookChapter</td></tr>
+    <tr><td>Search/Gợi ý thông minh</td><td>Chỉ filter cơ bản</td></tr>
+    <tr><td>Social login (Google/Zalo)</td><td>Provider field có nhưng chưa implement OAuth</td></tr>
+    <tr><td>Mobile App</td><td>90% mock data, chưa kết nối API</td></tr>
+    <tr><td>Role-based authorization</td><td>Admin controller chưa bật [Authorize(Roles)]</td></tr>
+</table>
+
+<h3>Giá trị so với đối thủ trên thị trường</h3>
+<div class="section-box">
+    <h4>Đối thủ trực tiếp tại VN:</h4>
+    <ul>
+        <li><strong>TruyenQQ, NetTruyen, BlogTruyen</strong> — miễn phí, ads nặng, không hệ thống coin/VIP</li>
+        <li><strong>Waka, Fonos</strong> — subscription, tập trung audiobook + ebook</li>
+        <li><strong>MangaToon, WebToon</strong> — comic platform, freemium + coin</li>
+    </ul>
+    <h4>Điểm mạnh XomTruyen:</h4>
+    <ul>
+        <li><span class="success">✅</span> <strong>Hybrid model</strong> (Truyện chữ + Truyện tranh) — ít đối thủ VN nào kết hợp tốt</li>
+        <li><span class="success">✅</span> <strong>Self-hosted content</strong> — kiểm soát hoàn toàn</li>
+        <li><span class="success">✅</span> <strong>Business logic hoàn chỉnh</strong> — phân quyền đọc Guest/Free/Basic/VIP/Coin</li>
+        <li><span class="success">✅</span> <strong>Admin panel mạnh</strong> — quản lý DB trực tiếp, bulk upload</li>
+        <li><span class="success">✅</span> <strong>Multi-platform</strong> — Web + Mobile + Admin</li>
+    </ul>
+    <h4>Điểm yếu:</h4>
+    <ul>
+        <li><span class="warning">❌</span> Không có cách để user trả tiền → monetization = 0</li>
+        <li><span class="warning">❌</span> Chưa có social proof (review, rating, comment)</li>
+        <li><span class="warning">❌</span> Mobile app chưa dùng được</li>
+        <li><span class="warning">❌</span> Không có SEO/discoverability</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="priority">🎯 Thứ tự ưu tiên cốt lõi</h2>
+
+<div class="flow-diagram">
+1. MONETIZATION (Sprint 1) ← Không có thì project = 0 doanh thu<br>
+         ↓<br>
+2. ENGAGEMENT (Sprint 2)   ← Không có thì user đọc xong bỏ đi<br>
+         ↓<br>
+3. DISCOVERY (Sprint 3)    ← Không có thì user không tìm được truyện<br>
+         ↓<br>
+4. MOBILE + DEPLOY (Sprint 4) ← Không có thì không ai xài production
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<div class="sprint-header">
+    <h2 id="sprint1" style="color:#ff4444;">🔴 Sprint 1: MONETIZATION — Nạp xu & Mua gói VIP</h2>
+    <p class="sprint-meta">📅 Tuần 1-2 | ⏱️ ~14 ngày | 🎯 User có thể trả tiền và đọc truyện VIP</p>
+</div>
+
+<h3>Mục tiêu Sprint</h3>
+<p>Hoàn thành flow: <span class="highlight">User chọn gói → Thanh toán → Nhận xu/VIP → Đọc chương bị khóa</span></p>
+
+<h3>Kiến trúc thanh toán</h3>
+<div class="flow-diagram">
+User (Client Web/Mobile)<br>
+    → Chọn gói xu / VIP<br>
+    → POST /api/payment/top-up hoặc /subscribe<br>
+    → API tạo Transaction (status=Pending)<br>
+    → Trả về PaymentUrl (MoMo/VNPay) hoặc QR chuyển khoản<br>
+    → User thanh toán trên cổng<br>
+    → Cổng gọi Webhook → POST /api/payment/callback<br>
+    → API verify chữ ký → Cộng xu / Kích hoạt VIP<br>
+    → Transaction status = Completed<br>
+    → Client poll hoặc redirect → Hiển thị thành công
+</div>
+
+<h3>Danh sách Task chi tiết</h3>
+<table>
+    <tr><th>Task</th><th>Priority</th><th>Effort</th><th>Chi tiết</th></tr>
+    <tr>
+        <td>Task 1.1: Cập nhật Model Transaction</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>0.5 ngày</td>
+        <td>Thêm fields: CoinAmount, PaymentMethod, ExternalTransactionId, SubscriptionPlanId, CompletedAt, Note</td>
+    </tr>
+    <tr>
+        <td>Task 1.2: Tạo Request/Response DTOs</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>0.5 ngày</td>
+        <td>TopUpRequest, PurchaseSubscriptionRequest, PaymentCallbackRequest, PaymentOrderResponse, WalletResponse</td>
+    </tr>
+    <tr>
+        <td>Task 1.3: IPaymentService + Implementation</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>3 ngày</td>
+        <td>CreateTopUpOrder, CreateSubscriptionOrder, ProcessCallback, GetWallet, GetTransactionHistory</td>
+    </tr>
+    <tr>
+        <td>Task 1.4: Tích hợp cổng thanh toán (MoMo hoặc VNPay)</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Gọi API tạo payment URL, verify HMAC signature callback</td>
+    </tr>
+    <tr>
+        <td>Task 1.5: PaymentController</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1 ngày</td>
+        <td>Endpoints: POST /top-up, POST /subscribe, POST /callback, GET /wallet, GET /history</td>
+    </tr>
+    <tr>
+        <td>Task 1.6: SubscriptionPlanController</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>0.5 ngày</td>
+        <td>GET /api/plans (list gói cước cho client hiển thị)</td>
+    </tr>
+    <tr>
+        <td>Task 1.7: Admin — Nạp xu thủ công</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>0.5 ngày</td>
+        <td>POST /api/admin/payment/manual-topup (dùng khi user chuyển khoản tay)</td>
+    </tr>
+    <tr>
+        <td>Task 1.8: Admin — Trang quản lý giao dịch</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>2 ngày</td>
+        <td>List transactions, filter by status/type, tổng doanh thu, approve manual</td>
+    </tr>
+    <tr>
+        <td>Task 1.9: Client — UI Nạp xu</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Trang /wallet: hiển thị số dư, list gói xu, chọn phương thức, redirect thanh toán</td>
+    </tr>
+    <tr>
+        <td>Task 1.10: Client — UI Mua gói VIP</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1.5 ngày</td>
+        <td>Trang /subscription: so sánh gói, nút mua, hiển thị gói hiện tại</td>
+    </tr>
+    <tr>
+        <td>Task 1.11: Client — Hiển thị số xu + gói trên Header/Profile</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>0.5 ngày</td>
+        <td>Badge xu, icon VIP, thông tin gói trên trang Profile</td></tr>
+    <tr>
+        <td>Task 1.12: Migration database</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>0.5 ngày</td>
+        <td>dotnet ef migrations add AddPaymentFields → update</td>
+    </tr>
+</table>
+
+<h3>API Endpoints Sprint 1</h3>
+<div class="api-block">
+    <h4>PaymentController</h4>
+    <pre><code>POST   /api/payment/top-up          → Tạo đơn nạp xu, trả về payment URL
+POST   /api/payment/subscribe       → Tạo đơn mua gói VIP
+POST   /api/payment/callback/momo   → Webhook MoMo gọi sau khi user thanh toán
+POST   /api/payment/callback/vnpay  → Webhook VNPay
+GET    /api/payment/wallet          → Lấy số dư xu + thông tin gói hiện tại
+GET    /api/payment/history         → Lịch sử giao dịch (phân trang)
+GET    /api/payment/status/{orderId}→ Kiểm tra trạng thái đơn hàng</code></pre>
+</div>
+<div class="api-block">
+    <h4>SubscriptionPlanController</h4>
+    <pre><code>GET    /api/plans                   → List tất cả gói cước (Free/Basic/VIP)
+GET    /api/plans/{id}              → Chi tiết 1 gói</code></pre>
+</div>
+<div class="api-block">
+    <h4>Admin PaymentController</h4>
+    <pre><code>GET    /api/admin/payment/transactions     → List giao dịch (filter, paging)
+POST   /api/admin/payment/manual-topup     → Admin nạp xu thủ công cho user
+GET    /api/admin/payment/revenue-summary  → Tổng doanh thu theo ngày/tuần/tháng
+PATCH  /api/admin/payment/{id}/approve     → Duyệt giao dịch chuyển khoản thủ công</code></pre>
+</div>
+
+<h3>Cấu trúc gói xu gợi ý</h3>
+<table>
+    <tr><th>Package ID</th><th>Tên</th><th>Xu nhận</th><th>Giá VNĐ</th><th>Bonus</th></tr>
+    <tr><td>pack_50</td><td>Gói Starter</td><td>50 xu</td><td>10,000đ</td><td>—</td></tr>
+    <tr><td>pack_120</td><td>Gói Tiết kiệm</td><td>120 xu</td><td>20,000đ</td><td>+20 xu free</td></tr>
+    <tr><td>pack_350</td><td>Gói Hot</td><td>350 xu</td><td>50,000đ</td><td>+50 xu free</td></tr>
+    <tr><td>pack_800</td><td>Gói Đại gia</td><td>800 xu</td><td>100,000đ</td><td>+150 xu free</td></tr>
+</table>
+
+<h3>Cấu trúc gói Subscription gợi ý</h3>
+<table>
+    <tr><th>ID</th><th>Tên</th><th>Giá/tháng</th><th>Quyền lợi</th></tr>
+    <tr><td>1</td><td>Free</td><td>0đ</td><td>Đọc truyện Free, quảng cáo, giới hạn 10 chương/ngày (guest)</td></tr>
+    <tr><td>2</td><td>Basic</td><td>29,000đ</td><td>30 chương/ngày, giảm quảng cáo</td></tr>
+    <tr><td>3</td><td>VIP</td><td>59,000đ</td><td>Không giới hạn, không quảng cáo, ưu tiên đọc sớm</td></tr>
+</table>
+
+<h3>Luồng thanh toán MoMo (chi tiết kỹ thuật)</h3>
+<div class="section-box">
+<pre><code>// 1. Client gọi API
+POST /api/payment/top-up
+Body: { packageId: "pack_120", paymentMethod: "Momo", returnUrl: "https://xomtruyen.com/wallet" }
+
+// 2. Backend tạo Transaction (Pending) → Gọi MoMo API
+POST https://payment.momo.vn/v2/gateway/api/create
+Body: {
+  partnerCode: "MOMO_PARTNER",
+  requestId: "{transactionId}",
+  amount: 20000,
+  orderId: "{transactionId}",
+  orderInfo: "Nap 120 xu XomTruyen",
+  redirectUrl: "https://xomtruyen.com/wallet?status=success",
+  ipnUrl: "https://api.xomtruyen.com/api/payment/callback/momo",
+  requestType: "payWithMethod",
+  extraData: base64({userId, packageId, coinAmount})
+}
+
+// 3. MoMo trả về payUrl → Backend trả cho Client
+Response: { paymentUrl: "https://payment.momo.vn/...", orderId: "..." }
+
+// 4. User thanh toán → MoMo gọi ipnUrl
+POST /api/payment/callback/momo
+→ Verify HMAC-SHA256 signature
+→ Nếu hợp lệ: cộng xu cho user, update Transaction status = Completed
+
+// 5. Client redirect về returnUrl, gọi GET /wallet để hiển thị số dư mới</code></pre>
+</div>
+
+<h3>Deliverable Sprint 1</h3>
+<div class="section-box">
+    <p><span class="success">✅</span> User hoàn thành flow: Chọn gói xu → Thanh toán MoMo/VNPay → Xu được cộng vào tài khoản</p>
+    <p><span class="success">✅</span> User mua gói VIP → Đọc tất cả chương VIP không giới hạn</p>
+    <p><span class="success">✅</span> User hết xu → Gặp popup "Nạp thêm xu" khi đọc chương trả phí</p>
+    <p><span class="success">✅</span> Admin duyệt được giao dịch chuyển khoản thủ công</p>
+    <p><span class="success">✅</span> Dashboard admin hiển thị doanh thu</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<div class="sprint-header">
+    <h2 id="sprint2" style="color:#ff9800;">🟠 Sprint 2: ENGAGEMENT — Tương tác & Giữ chân user</h2>
+    <p class="sprint-meta">📅 Tuần 3-4 | ⏱️ ~14 ngày | 🎯 User có lý do quay lại (bookmark, favorite, history, review)</p>
+</div>
+
+<h3>Mục tiêu Sprint</h3>
+<p>User có thể: <span class="highlight">Bookmark chương → Xem lịch sử đọc → Đánh giá sách → Yêu thích truyện</span> — tất cả persist qua API.</p>
+
+<h3>Danh sách Task chi tiết</h3>
+<table>
+    <tr><th>Task</th><th>Priority</th><th>Effort</th><th>Chi tiết</th></tr>
+    <tr>
+        <td>Task 2.1: BookmarkController API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1 ngày</td>
+        <td>POST /bookmark (toggle), GET /bookmarks (list by user), DELETE /bookmark/{id}</td>
+    </tr>
+    <tr>
+        <td>Task 2.2: FavoriteController API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1 ngày</td>
+        <td>POST /favorite/toggle, GET /favorites (list), GET /favorite/check/{pubId}</td>
+    </tr>
+    <tr>
+        <td>Task 2.3: HistoryController API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1.5 ngày</td>
+        <td>Auto-save khi đọc chapter, GET /history (list + last position), DELETE /history/{id}</td>
+    </tr>
+    <tr>
+        <td>Task 2.4: ReviewController API</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>2 ngày</td>
+        <td>POST /review (create), GET /reviews/{pubId} (paging), PATCH (edit), DELETE, update AverageRating on Publication</td>
+    </tr>
+    <tr>
+        <td>Task 2.5: AdminBookChapterController</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>2 ngày</td>
+        <td>CRUD chương truyện chữ (Content HTML), bulk create, reorder</td>
+    </tr>
+    <tr>
+        <td>Task 2.6: Client — Kết nối Bookmark với API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1 ngày</td>
+        <td>Trang /bookmarks load từ API, nút bookmark trong reading page</td>
+    </tr>
+    <tr>
+        <td>Task 2.7: Client — Kết nối Favorite với API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>0.5 ngày</td>
+        <td>Nút ❤️ trên BookDetail toggle API, badge count</td>
+    </tr>
+    <tr>
+        <td>Task 2.8: Client — Reading History tự động</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1 ngày</td>
+        <td>Auto-save progress khi đọc, trang /history load từ API, "Đọc tiếp" button</td>
+    </tr>
+    <tr>
+        <td>Task 2.9: Client — UI Đánh giá + Comment</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>2 ngày</td>
+        <td>Form viết review (rating 1-5 + text), list reviews dưới BookDetail</td>
+    </tr>
+    <tr>
+        <td>Task 2.10: Client — Reading page truyện chữ</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1.5 ngày</td>
+        <td>Fetch content HTML từ API, render rich text, font size control, dark/light mode</td>
+    </tr>
+    <tr>
+        <td>Task 2.11: Bật Role-based Auth</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>0.5 ngày</td>
+        <td>Add Role claim to JWT, [Authorize(Roles="Admin")] on admin controllers</td>
+    </tr>
+</table>
+
+<h3>API Endpoints Sprint 2</h3>
+<div class="api-block">
+    <h4>BookmarkController [Authorize]</h4>
+    <pre><code>POST   /api/bookmark              → Toggle bookmark (chapter + type)
+GET    /api/bookmark              → List bookmarks of current user (paging)
+DELETE /api/bookmark/{id}         → Remove specific bookmark</code></pre>
+</div>
+<div class="api-block">
+    <h4>FavoriteController [Authorize]</h4>
+    <pre><code>POST   /api/favorite/toggle/{publicationId}  → Toggle favorite
+GET    /api/favorite                           → List favorites (paging)
+GET    /api/favorite/check/{publicationId}     → Check if user favorited</code></pre>
+</div>
+<div class="api-block">
+    <h4>HistoryController [Authorize]</h4>
+    <pre><code>POST   /api/history                → Save reading position (auto-called)
+GET    /api/history                → List reading history (sorted by recent)
+DELETE /api/history/{publicationId}→ Remove from history
+DELETE /api/history/clear          → Clear all history</code></pre>
+</div>
+<div class="api-block">
+    <h4>ReviewController</h4>
+    <pre><code>POST   /api/review                          → Create review (rating + content)
+GET    /api/review/publication/{pubId}       → List reviews for a book (paging)
+GET    /api/review/my                        → My reviews
+PATCH  /api/review/{id}                      → Edit my review
+DELETE /api/review/{id}                      → Delete my review</code></pre>
+</div>
+<div class="api-block">
+    <h4>AdminBookChapterController</h4>
+    <pre><code>POST   /api/admin/book-chapter                    → Create text chapter
+GET    /api/admin/book-chapter/publication/{pubId} → List chapters
+PUT    /api/admin/book-chapter/{id}                → Update chapter content
+DELETE /api/admin/book-chapter/{id}                → Delete chapter
+PATCH  /api/admin/book-chapter/reorder             → Reorder chapters</code></pre>
+</div>
+
+<h3>Deliverable Sprint 2</h3>
+<div class="section-box">
+    <p><span class="success">✅</span> User bookmark chương → quay lại đọc tiếp từ đúng vị trí</p>
+    <p><span class="success">✅</span> Trang History hiển thị truyện đã đọc + nút "Đọc tiếp"</p>
+    <p><span class="success">✅</span> User đánh giá sách (1-5 sao + bình luận) → hiển thị dưới BookDetail</p>
+    <p><span class="success">✅</span> Admin quản lý được cả chương truyện chữ (không chỉ comic)</p>
+    <p><span class="success">✅</span> Admin endpoints bảo vệ bởi Role-based auth</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<div class="sprint-header">
+    <h2 id="sprint3" style="color:#4caf50;">🟢 Sprint 3: DISCOVERY — Tìm kiếm & SEO</h2>
+    <p class="sprint-meta">📅 Tuần 5-6 | ⏱️ ~14 ngày | 🎯 User dễ tìm truyện, Google index được, responsive mobile</p>
+</div>
+
+<h3>Mục tiêu Sprint</h3>
+<p>User có thể: <span class="highlight">Search truyện → Xem gợi ý → Lọc theo thể loại/format → Trải nghiệm tốt trên mobile web</span></p>
+
+<h3>Danh sách Task chi tiết</h3>
+<table>
+    <tr><th>Task</th><th>Priority</th><th>Effort</th><th>Chi tiết</th></tr>
+    <tr>
+        <td>Task 3.1: Full-text search API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>PostgreSQL tsvector trên Title+Author+Description, hoặc ILIKE fallback. Endpoint: GET /api/publications/search?q=</td>
+    </tr>
+    <tr>
+        <td>Task 3.2: Trending/Popular endpoint</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>Sort by viewCount (7 ngày gần nhất), top rated, mới cập nhật. GET /api/publications/trending</td>
+    </tr>
+    <tr>
+        <td>Task 3.3: "Sách tương tự" endpoint</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>Query publications cùng category/topic, exclude current. GET /api/publications/{id}/similar</td>
+    </tr>
+    <tr>
+        <td>Task 3.4: Category page API</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>GET /api/publications?categorySlug=tien-hiep&page=1 — filter theo slug thể loại</td>
+    </tr>
+    <tr>
+        <td>Task 3.5: Client — Trang Search</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Input search + autocomplete, kết quả real-time, bộ lọc (thể loại, format, free/vip)</td>
+    </tr>
+    <tr>
+        <td>Task 3.6: Client — SEO meta tags</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1.5 ngày</td>
+        <td>Dynamic &lt;title&gt;, og:title, og:image, description cho mỗi trang BookDetail. react-helmet-async</td>
+    </tr>
+    <tr>
+        <td>Task 3.7: Client — Responsive mobile</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>3 ngày</td>
+        <td>Sidebar collapse/hamburger trên mobile, grid 2 cột, touch-friendly reading, bottom nav</td>
+    </tr>
+    <tr>
+        <td>Task 3.8: Client — Lazy loading ảnh</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>IntersectionObserver cho ảnh truyện tranh, skeleton loading, progressive image</td>
+    </tr>
+    <tr>
+        <td>Task 3.9: Client — "Sách tương tự" section</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>0.5 ngày</td>
+        <td>Hiển thị row sách tương tự dưới BookDetail page</td>
+    </tr>
+    <tr>
+        <td>Task 3.10: API — Pagination chuẩn hóa</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>1 ngày</td>
+        <td>Đảm bảo tất cả list endpoints trả về { data, totalCount, page, pageSize, totalPages }</td>
+    </tr>
+    <tr>
+        <td>Task 3.11: Increment ViewCount khi đọc</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>0.5 ngày</td>
+        <td>Khi GET /reading/chapter → increment viewCount trên Publication (debounce per user)</td>
+    </tr>
+</table>
+
+<h3>Thiết kế Full-text Search (PostgreSQL)</h3>
+<div class="section-box">
+<pre><code>-- Migration: Thêm tsvector column
+ALTER TABLE "Publications" ADD COLUMN "SearchVector" tsvector;
+
+-- Populate
+UPDATE "Publications" 
+SET "SearchVector" = to_tsvector('simple', 
+    coalesce("Title",'') || ' ' || 
+    coalesce("Author",'') || ' ' || 
+    coalesce("Description",'')
+);
+
+-- Index
+CREATE INDEX idx_publications_search ON "Publications" USING GIN("SearchVector");
+
+-- Query (trong Repository)
+SELECT * FROM "Publications"
+WHERE "SearchVector" @@ plainto_tsquery('simple', @keyword)
+   OR "Title" ILIKE '%' || @keyword || '%'
+ORDER BY ts_rank("SearchVector", plainto_tsquery('simple', @keyword)) DESC
+LIMIT @pageSize OFFSET @offset;</code></pre>
+</div>
+
+<h3>API Endpoints Sprint 3</h3>
+<div class="api-block">
+    <h4>Search & Discovery</h4>
+    <pre><code>GET /api/publications/search?q={keyword}&page=1&pageSize=20
+GET /api/publications/trending?period=week&limit=10
+GET /api/publications/{id}/similar?limit=6
+GET /api/publications?categorySlug=tien-hiep&formatType=2&accessLevel=1
+GET /api/categories (với count publications cho mỗi category)</code></pre>
+</div>
+
+<h3>Deliverable Sprint 3</h3>
+<div class="section-box">
+    <p><span class="success">✅</span> User gõ tên truyện → kết quả search nhanh, chính xác</p>
+    <p><span class="success">✅</span> Trang chủ có section "Trending" dựa trên lượt xem thực</p>
+    <p><span class="success">✅</span> BookDetail hiển thị "Truyện tương tự"</p>
+    <p><span class="success">✅</span> Website responsive trên mobile (không cần app)</p>
+    <p><span class="success">✅</span> Google có thể crawl + index từng trang truyện (SEO)</p>
+    <p><span class="success">✅</span> Ảnh truyện lazy load → trang đọc không bị lag</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<div class="sprint-header">
+    <h2 id="sprint4" style="color:#2196f3;">🔵 Sprint 4: MOBILE & DEPLOY — Hoàn thiện hệ thống</h2>
+    <p class="sprint-meta">📅 Tuần 7-8 | ⏱️ ~14 ngày | 🎯 Mobile app kết nối API, deploy production, end-to-end test</p>
+</div>
+
+<h3>Mục tiêu Sprint</h3>
+<p><span class="highlight">Mobile app dùng được thật → Deploy toàn bộ hệ thống lên production → Test end-to-end</span></p>
+
+<h3>Danh sách Task chi tiết</h3>
+<table>
+    <tr><th>Task</th><th>Priority</th><th>Effort</th><th>Chi tiết</th></tr>
+    <tr>
+        <td>Task 4.1: Mobile — Kết nối Auth API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>SignIn/SignUp gọi API thật, lưu JWT vào Capacitor Storage, auto refresh token</td>
+    </tr>
+    <tr>
+        <td>Task 4.2: Mobile — Home load sách từ API</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Xóa mock data, gọi /api/publications (trending, recommended, exclusive), pull-to-refresh</td>
+    </tr>
+    <tr>
+        <td>Task 4.3: Mobile — BookDetail + Reading</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Fetch book detail, list chapters, reading page (comic images + text content)</td>
+    </tr>
+    <tr>
+        <td>Task 4.4: Mobile — Xóa pages food delivery</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>Remove: Cart, ConfirmOrder, LocationMap, OrderStatus, VendorsList (không liên quan)</td>
+    </tr>
+    <tr>
+        <td>Task 4.5: Mobile — Search + Favorites</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1.5 ngày</td>
+        <td>Kết nối search API, favorites toggle API</td>
+    </tr>
+    <tr>
+        <td>Task 4.6: API — Rate Limiting</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>AspNetCoreRateLimit hoặc custom middleware: 100 req/min per IP, 10 req/min cho login</td>
+    </tr>
+    <tr>
+        <td>Task 4.7: API — Error handling chuẩn hóa</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>Global exception handler middleware, ProblemDetails format, logging to file</td>
+    </tr>
+    <tr>
+        <td>Task 4.8: Deploy — Setup laptop server</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Cài IIS + .NET 9 Hosting Bundle + PostgreSQL, publish API, cấu hình web.config</td>
+    </tr>
+    <tr>
+        <td>Task 4.9: Deploy — Cloudflare Tunnel + SSL</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>1 ngày</td>
+        <td>Cài cloudflared, tạo tunnel, map domain, HTTPS tự động</td>
+    </tr>
+    <tr>
+        <td>Task 4.10: Deploy — Vercel env update</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>0.5 ngày</td>
+        <td>Set VITE_API_BASE_URL = production URL cho cả xom-truyen + xomtruyen-admin</td>
+    </tr>
+    <tr>
+        <td>Task 4.11: E2E Testing</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>2 ngày</td>
+        <td>Test manual: Register → Login → Nạp xu → Mua VIP → Đọc truyện VIP → Bookmark → Review</td>
+    </tr>
+    <tr>
+        <td>Task 4.12: Seed data production</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>1 ngày</td>
+        <td>Upload 20-30 truyện (mix text + comic), tạo categories/topics, seed subscription plans</td>
+    </tr>
+</table>
+
+<h3>Mobile App — Cấu trúc sau refactor</h3>
+<div class="section-box">
+<pre><code>// Giữ lại (kết nối API):
+/tabs/home          → Home (load sách từ API)
+/tabs/search        → Search 
+/tabs/library       → Favorites + History
+/tabs/profile       → Profile + Settings
+
+/book-detail/:id    → BookDetail
+/read-book/:id      → Reading (comic + text)
+/signin             → Login
+/signup             → Register
+/onboarding         → Onboarding (giữ)
+
+// Xóa bỏ (template food delivery):
+❌ /confirm-order, /order-status, /order-received
+❌ /location-map, /location-form
+❌ /vendors, /offers
+❌ Cart-related components</code></pre>
+</div>
+
+<h3>Kiến trúc Production sau Deploy</h3>
+<div class="flow-diagram">
+┌──────────────────────────────────────────┐<br>
+│           INTERNET (Users)                │<br>
+└──────────────┬───────────────────────────┘<br>
+               │<br>
+    ┌──────────┴──────────┐<br>
+    │                     │<br>
+┌───▼───┐          ┌─────▼──────┐<br>
+│Vercel │          │ Cloudflare │<br>
+│(React)│          │  Tunnel    │<br>
+└───────┘          └─────┬──────┘<br>
+ xom-truyen               │<br>
+ xomtruyen-admin           │<br>
+                    ┌──────▼──────┐<br>
+                    │ Laptop Server│<br>
+                    │    (IIS)     │<br>
+                    ├──────────────┤<br>
+                    │ .NET 9 API   │<br>
+                    │ PostgreSQL   │<br>
+                    │ C:\Uploads   │<br>
+                    └──────────────┘
+</div>
+
+<h3>Checklist Deploy Production</h3>
+<div class="section-box">
+<ul>
+    <li>☐ Laptop server: Windows 10/11, 4GB+ RAM, SSD 50GB+</li>
+    <li>☐ Cài .NET 9 ASP.NET Core Hosting Bundle</li>
+    <li>☐ Cài PostgreSQL 16+, tạo database xomtruyen</li>
+    <li>☐ Bật IIS, tạo site XomTruyenAPI port 5172</li>
+    <li>☐ dotnet publish -c Release, copy vào C:\WebApps\xomtruyen.API</li>
+    <li>☐ Tạo C:\Uploads, cấp quyền IIS_IUSRS</li>
+    <li>☐ web.config + appsettings.Production.json (đổi JWT key, DB password)</li>
+    <li>☐ Cài cloudflared, chạy tunnel, test từ bên ngoài</li>
+    <li>☐ Vercel: update VITE_API_BASE_URL = tunnel URL</li>
+    <li>☐ dotnet ef database update (migrate schema)</li>
+    <li>☐ Seed data: subscription plans, categories, sample books</li>
+    <li>☐ Test E2E: register → nạp xu → đọc VIP → bookmark → review</li>
+    <li>☐ Tắt sleep laptop, set auto-start IIS</li>
+</ul>
+</div>
+
+<h3>Deliverable Sprint 4</h3>
+<div class="section-box">
+    <p><span class="success">✅</span> Mobile app (iOS/Android) đọc truyện được từ API thật</p>
+    <p><span class="success">✅</span> Hệ thống production online 24/7 (laptop server + Cloudflare Tunnel)</p>
+    <p><span class="success">✅</span> Full flow E2E hoạt động: Register → Nạp xu → Đọc VIP → Bookmark → Review</p>
+    <p><span class="success">✅</span> API có rate limiting + error handling chuẩn</p>
+    <p><span class="success">✅</span> 20-30 truyện seed data sẵn sàng cho user thử</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="summary">📈 Tổng kết & KPI mục tiêu sau 2 tháng</h2>
+
+<h3>Trước vs Sau 2 tháng</h3>
+<table>
+    <tr><th>Tiêu chí</th><th>Hiện tại</th><th>Sau 2 tháng</th></tr>
+    <tr><td>Monetization</td><td class="warning">❌ Không có</td><td class="success">✅ MoMo/VNPay + VIP subscription</td></tr>
+    <tr><td>User engagement</td><td class="warning">❌ Đọc xong bỏ đi</td><td class="success">✅ Bookmark, History, Favorite, Review</td></tr>
+    <tr><td>Discoverability</td><td class="warning">❌ Chỉ scroll trang chủ</td><td class="success">✅ Search, Trending, Similar, SEO</td></tr>
+    <tr><td>Mobile</td><td class="warning">❌ Mock data</td><td class="success">✅ App hoạt động với API thật</td></tr>
+    <tr><td>Production</td><td class="warning">❌ Chỉ chạy localhost</td><td class="success">✅ Online 24/7 (Vercel + Server)</td></tr>
+    <tr><td>Security</td><td class="warning">❌ Không có role auth</td><td class="success">✅ Role-based + Rate limiting</td></tr>
+    <tr><td>Content</td><td>Chỉ comic</td><td class="success">✅ Comic + Truyện chữ đầy đủ</td></tr>
+    <tr><td>Hoàn thiện tổng thể</td><td>~55%</td><td class="success">~90%</td></tr>
+</table>
+
+<h3>KPI mục tiêu (có thể đo)</h3>
+<div class="section-box">
+<ul>
+    <li>🎯 <strong>Technical:</strong> 100% API endpoints có error handling chuẩn, response time < 500ms</li>
+    <li>🎯 <strong>Content:</strong> 30+ truyện (mix comic + text), 500+ chương</li>
+    <li>🎯 <strong>Features:</strong> 45+ API endpoints hoạt động, 15+ trang client</li>
+    <li>🎯 <strong>Uptime:</strong> Server online > 95% thời gian</li>
+    <li>🎯 <strong>Business:</strong> Flow nạp xu end-to-end hoạt động, 3 gói subscription sẵn sàng</li>
+</ul>
+</div>
+
+<h3>Timeline tổng quan</h3>
+<table>
+    <tr><th>Tuần</th><th>Sprint</th><th>Focus</th><th>Output chính</th></tr>
+    <tr><td>1-2</td><td style="color:#ff4444">Sprint 1</td><td>Monetization</td><td>Nạp xu + VIP + Payment gateway</td></tr>
+    <tr><td>3-4</td><td style="color:#ff9800">Sprint 2</td><td>Engagement</td><td>Bookmark + Favorite + History + Review</td></tr>
+    <tr><td>5-6</td><td style="color:#4caf50">Sprint 3</td><td>Discovery</td><td>Search + SEO + Responsive + Lazy load</td></tr>
+    <tr><td>7-8</td><td style="color:#2196f3">Sprint 4</td><td>Mobile + Deploy</td><td>Mobile app + Production server + E2E</td></tr>
+</table>
+
+<h3>Rủi ro & Giải pháp</h3>
+<table>
+    <tr><th>Rủi ro</th><th>Xác suất</th><th>Giải pháp</th></tr>
+    <tr><td>MoMo/VNPay reject đăng ký merchant (cá nhân)</td><td>Cao</td><td>Dùng chuyển khoản thủ công + Admin duyệt trước. Đăng ký merchant song song.</td></tr>
+    <tr><td>Laptop server mất điện/mất mạng</td><td>Trung bình</td><td>UPS pin dự phòng, alert khi offline (uptime monitor), auto-restart IIS</td></tr>
+    <tr><td>Sprint 1 kéo dài hơn dự kiến</td><td>Trung bình</td><td>MVP: chỉ cần chuyển khoản thủ công + admin duyệt là đủ launch. MoMo/VNPay bổ sung sau.</td></tr>
+    <tr><td>Mobile app phức tạp hơn tưởng</td><td>Thấp</td><td>Fallback: responsive web thay mobile app. Ionic chỉ cần wrap API calls.</td></tr>
+</table>
+
+<h3>Lời khuyên chiến lược</h3>
+<div class="section-box">
+    <p><strong>1. MVP Monetization trước:</strong> Nếu MoMo/VNPay chưa duyệt được, làm chuyển khoản thủ công + Admin nạp xu. Đừng để payment gateway block toàn bộ Sprint 1.</p>
+    <p><strong>2. Content là vua:</strong> Song song với code, hãy upload 20-30 truyện hay lên hệ thống. Platform không có content = không ai dùng.</p>
+    <p><strong>3. Responsive web > Mobile app:</strong> Nếu Sprint 4 bị thiếu thời gian, ưu tiên responsive web hơn mobile app. 80% user đọc truyện trên điện thoại qua browser.</p>
+    <p><strong>4. Feedback sớm:</strong> Sau Sprint 2, mời 5-10 người thử đọc truyện. Feedback thật sẽ định hướng Sprint 3-4 tốt hơn.</p>
+</div>
+
+<hr>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2 id="after-roadmap" style="color:#e040fb;">🚀 Sau Roadmap 2 tháng — Hoàn thiện dự án</h2>
+<p>Sau khi hoàn thành 4 Sprint (đạt ~90%), dự án cần thêm <span class="highlight">2-3 tháng nữa</span> để đạt mức production-grade hoàn chỉnh, sẵn sàng scale user thật.</p>
+
+<h3>Timeline tổng thể dự án</h3>
+<div class="flow-diagram">
+Tháng 1-2: Roadmap hiện tại (Sprint 1-4) → 90% features<br>
+Tháng 3: PHASE 2 — Growth & Social → 95%<br>
+Tháng 4: PHASE 3 — Scale & Polish → 98%<br>
+Tháng 5 (nếu cần): PHASE 4 — Advanced → 100%<br>
+──────────────────────────────────────────────<br>
+TỔNG: 4-5 tháng để hoàn thiện toàn bộ dự án
+</div>
+
+<!-- PHASE 2 ═══════════════════════════════════════════════════ -->
+<div class="sprint-header">
+    <h2 style="color:#e040fb;">PHASE 2: Growth & Social (Tháng 3 — ~4 tuần)</h2>
+    <p class="sprint-meta">🎯 Tăng trưởng user, tạo cộng đồng, Social Login, Notification</p>
+</div>
+
+<table>
+    <tr><th>Tính năng</th><th>Effort</th><th>Mô tả chi tiết</th></tr>
+    <tr>
+        <td><strong>Social Login (Google + Zalo)</strong></td>
+        <td>3-4 ngày</td>
+        <td>OAuth2 integration. Đăng nhập 1 chạm không cần nhập email/password. Tăng conversion đăng ký 3-5x.</td>
+    </tr>
+    <tr>
+        <td><strong>Hệ thống Notification</strong></td>
+        <td>4-5 ngày</td>
+        <td>In-app notification (truyện yêu thích ra chương mới, đơn thanh toán thành công). Push notification qua Firebase FCM cho mobile.</td>
+    </tr>
+    <tr>
+        <td><strong>Hệ thống Comment/Bình luận</strong></td>
+        <td>3 ngày</td>
+        <td>Comment theo chương (không chỉ review sách). Reply, like comment. Realtime update.</td>
+    </tr>
+    <tr>
+        <td><strong>Author/Uploader Profile</strong></td>
+        <td>2 ngày</td>
+        <td>Trang tác giả: list truyện, số follower, bio. Cho phép user follow tác giả.</td>
+    </tr>
+    <tr>
+        <td><strong>Sharing & Referral</strong></td>
+        <td>2 ngày</td>
+        <td>Nút chia sẻ truyện (link + OG preview). Referral code: mời bạn → cả 2 nhận xu bonus.</td>
+    </tr>
+    <tr>
+        <td><strong>Reading Statistics</strong></td>
+        <td>2 ngày</td>
+        <td>User xem: đã đọc bao nhiêu chương/tuần, streak đọc liên tục, achievement badges.</td>
+    </tr>
+    <tr>
+        <td><strong>Admin — Content Moderation</strong></td>
+        <td>2 ngày</td>
+        <td>Duyệt review/comment, ban user, report system (user báo cáo nội dung vi phạm).</td>
+    </tr>
+    <tr>
+        <td><strong>Email Marketing Integration</strong></td>
+        <td>1-2 ngày</td>
+        <td>Gửi email: truyện mới, khuyến mãi xu, nhắc đọc tiếp. Dùng SendGrid/Mailgun.</td>
+    </tr>
+</table>
+
+<h3>API mới trong Phase 2</h3>
+<div class="api-block">
+<pre><code>// Social Auth
+POST /api/auth/google        → Login/Register qua Google OAuth
+POST /api/auth/zalo          → Login/Register qua Zalo OAuth
+
+// Notifications  
+GET  /api/notifications           → List notifications (paging)
+PATCH /api/notifications/read-all → Mark all as read
+GET  /api/notifications/unread-count
+
+// Comments
+POST /api/comment                       → Post comment on chapter
+GET  /api/comment/chapter/{chapterId}   → List comments
+POST /api/comment/{id}/like             → Like a comment
+POST /api/comment/{id}/reply            → Reply to comment
+
+// Author
+GET  /api/author/{id}                   → Author profile + publications
+POST /api/author/{id}/follow            → Follow/Unfollow
+
+// Referral
+POST /api/referral/apply                → Apply referral code
+GET  /api/referral/my-code              → Get my referral code + stats</code></pre>
+</div>
+
+<!-- PHASE 3 ═══════════════════════════════════════════════════ -->
+<div class="sprint-header">
+    <h2 style="color:#00bcd4;">PHASE 3: Scale & Polish (Tháng 4 — ~4 tuần)</h2>
+    <p class="sprint-meta">🎯 Performance, Analytics, Multi-device sync, Content pipeline tự động</p>
+</div>
+
+<table>
+    <tr><th>Tính năng</th><th>Effort</th><th>Mô tả chi tiết</th></tr>
+    <tr>
+        <td><strong>CDN cho ảnh truyện</strong></td>
+        <td>3-4 ngày</td>
+        <td>Tích hợp Cloudflare R2 hoặc BunnyCDN. Ảnh serve qua edge server gần user → load nhanh gấp 5-10x. API vẫn upload local → sync lên CDN.</td>
+    </tr>
+    <tr>
+        <td><strong>Image Optimization Pipeline</strong></td>
+        <td>2 ngày</td>
+        <td>Auto-resize theo device (mobile nhỏ hơn desktop). WebP + AVIF fallback. Lazy progressive loading.</td>
+    </tr>
+    <tr>
+        <td><strong>Multi-device Reading Sync</strong></td>
+        <td>2 ngày</td>
+        <td>Đọc trên laptop → mở mobile → tự động ở đúng chương + trang. Sync qua API reading position.</td>
+    </tr>
+    <tr>
+        <td><strong>Analytics Dashboard (Admin)</strong></td>
+        <td>3-4 ngày</td>
+        <td>DAU/MAU, retention rate, top truyện hot, revenue chart, user growth. Dùng chart.js/recharts.</td>
+    </tr>
+    <tr>
+        <td><strong>Recommendation Engine cơ bản</strong></td>
+        <td>3 ngày</td>
+        <td>Collaborative filtering đơn giản: "User đọc truyện A cũng đọc B". Dựa trên ReadingHistory + Category overlap.</td>
+    </tr>
+    <tr>
+        <td><strong>Offline Reading (Mobile)</strong></td>
+        <td>3-4 ngày</td>
+        <td>Download chương về device (Capacitor filesystem). Đọc không cần internet. Sync khi online lại.</td>
+    </tr>
+    <tr>
+        <td><strong>Admin — Bulk Content Import</strong></td>
+        <td>2 ngày</td>
+        <td>Import hàng loạt truyện từ folder/CSV. Auto-detect chapters từ cấu trúc file. Schedule publish.</td>
+    </tr>
+    <tr>
+        <td><strong>Caching Layer (Redis)</strong></td>
+        <td>2 ngày</td>
+        <td>Cache: list publications, hot chapters, user session. Giảm DB load 60-70%.</td>
+    </tr>
+    <tr>
+        <td><strong>API Versioning</strong></td>
+        <td>1 ngày</td>
+        <td>/api/v1/ prefix. Cho phép update API mà không break mobile app đang dùng version cũ.</td>
+    </tr>
+    <tr>
+        <td><strong>Health Monitoring & Alerts</strong></td>
+        <td>1 ngày</td>
+        <td>Uptime Robot/BetterStack monitor. Alert Telegram/Discord khi server down. Auto-restart service.</td>
+    </tr>
+</table>
+
+<h3>Kiến trúc sau Phase 3</h3>
+<div class="flow-diagram">
+Users (Web + Mobile)<br>
+       │<br>
+┌──────▼──────┐<br>
+│ Cloudflare  │ ← CDN ảnh truyện (edge caching)<br>
+│   (DNS+CDN) │<br>
+└──────┬──────┘<br>
+       │<br>
+┌──────▼──────────────────────────┐<br>
+│         Laptop Server           │<br>
+│  ┌─────────┐  ┌──────────────┐ │<br>
+│  │ IIS/.NET│  │  PostgreSQL  │ │<br>
+│  │  API    │  │  (Database)  │ │<br>
+│  └────┬────┘  └──────────────┘ │<br>
+│       │                         │<br>
+│  ┌────▼────┐  ┌──────────────┐ │<br>
+│  │  Redis  │  │  C:\Uploads  │ │<br>
+│  │ (Cache) │  │ → Sync → CDN │ │<br>
+│  └─────────┘  └──────────────┘ │<br>
+└─────────────────────────────────┘
+</div>
+
+<!-- PHASE 4 ═══════════════════════════════════════════════════ -->
+<div class="sprint-header">
+    <h2 style="color:#ff9800;">PHASE 4: Advanced — Nếu muốn scale lớn (Tháng 5+ / Tùy chọn)</h2>
+    <p class="sprint-meta">🎯 Chỉ cần nếu dự án có 1000+ user active. Không bắt buộc cho MVP.</p>
+</div>
+
+<table>
+    <tr><th>Tính năng</th><th>Effort</th><th>Khi nào cần</th></tr>
+    <tr>
+        <td><strong>Payment Gateway chính thức (Business License)</strong></td>
+        <td>2-4 tuần (chờ duyệt)</td>
+        <td>Khi có doanh thu > 10 triệu/tháng, cần hóa đơn/hợp đồng</td>
+    </tr>
+    <tr>
+        <td><strong>Migrate lên Cloud (VPS/Azure)</strong></td>
+        <td>2-3 ngày</td>
+        <td>Khi laptop server không đủ bandwidth/storage, hoặc cần uptime 99.9%</td>
+    </tr>
+    <tr>
+        <td><strong>User-Generated Content (UGC)</strong></td>
+        <td>1-2 tuần</td>
+        <td>Cho phép user upload truyện riêng. Cần moderation system phức tạp.</td>
+    </tr>
+    <tr>
+        <td><strong>Audiobook Integration</strong></td>
+        <td>2-3 tuần</td>
+        <td>Text-to-Speech (TTS) hoặc upload audio. Player UI.</td>
+    </tr>
+    <tr>
+        <td><strong>Multi-language (i18n)</strong></td>
+        <td>1 tuần</td>
+        <td>Nếu muốn mở rộng ra Đông Nam Á (EN, TH, ID)</td>
+    </tr>
+    <tr>
+        <td><strong>A/B Testing Framework</strong></td>
+        <td>3-4 ngày</td>
+        <td>Test UI variants, pricing strategies, recommendation algorithms</td>
+    </tr>
+    <tr>
+        <td><strong>Machine Learning Recommendation</strong></td>
+        <td>2-3 tuần</td>
+        <td>Khi có đủ data (10K+ reading events). Personalized homepage per user.</td>
+    </tr>
+    <tr>
+        <td><strong>Microservices Architecture</strong></td>
+        <td>1-2 tháng</td>
+        <td>Tách: Auth Service, Reading Service, Payment Service, Notification Service. Chỉ khi traffic > 10K concurrent.</td>
+    </tr>
+    <tr>
+        <td><strong>Native Mobile App (Flutter/React Native)</strong></td>
+        <td>2-3 tháng</td>
+        <td>Nếu Ionic performance không đủ. Build app store listing (App Store + Google Play).</td>
+    </tr>
+    <tr>
+        <td><strong>Legal & Compliance</strong></td>
+        <td>Ongoing</td>
+        <td>Bản quyền nội dung, DMCA takedown process, Terms of Service, Privacy Policy</td>
+    </tr>
+</table>
+
+<!-- TỔNG KẾT ═══════════════════════════════════════════════════ -->
+<hr>
+<h2 style="color:#00d4ff;">📊 Tổng kết toàn bộ dự án</h2>
+
+<h3>Timeline hoàn chỉnh</h3>
+<table>
+    <tr><th>Giai đoạn</th><th>Thời gian</th><th>Mục tiêu</th><th>Kết quả</th></tr>
+    <tr>
+        <td style="color:#ff4444">Roadmap 2 tháng (Sprint 1-4)</td>
+        <td>8 tuần</td>
+        <td>Core features + Deploy</td>
+        <td>MVP hoạt động, có monetization, production online</td>
+    </tr>
+    <tr>
+        <td style="color:#e040fb">Phase 2: Growth</td>
+        <td>4 tuần</td>
+        <td>Social + Community</td>
+        <td>Social login, notifications, comments, referral</td>
+    </tr>
+    <tr>
+        <td style="color:#00bcd4">Phase 3: Scale</td>
+        <td>4 tuần</td>
+        <td>Performance + Analytics</td>
+        <td>CDN, caching, offline mode, analytics dashboard</td>
+    </tr>
+    <tr>
+        <td style="color:#ff9800">Phase 4: Advanced (tùy chọn)</td>
+        <td>4-8 tuần</td>
+        <td>Enterprise features</td>
+        <td>Cloud migration, UGC, audiobook, ML recommendation</td>
+    </tr>
+</table>
+
+<h3>Ước tính effort tổng</h3>
+<div class="section-box">
+    <table>
+        <tr><th>Milestone</th><th>Thời gian</th><th>% Hoàn thiện</th><th>Trạng thái</th></tr>
+        <tr><td>Hiện tại</td><td>—</td><td>55%</td><td>Core logic + UI cơ bản</td></tr>
+        <tr><td>Sau Roadmap 2 tháng</td><td>+8 tuần</td><td>90%</td><td>MVP có thể launch</td></tr>
+        <tr><td>Sau Phase 2</td><td>+4 tuần</td><td>95%</td><td>Sẵn sàng marketing, có social features</td></tr>
+        <tr><td>Sau Phase 3</td><td>+4 tuần</td><td>98%</td><td>Production-grade, handle 1000+ users</td></tr>
+        <tr><td>Sau Phase 4</td><td>+4-8 tuần</td><td>100%</td><td>Enterprise, sẵn sàng scale lớn</td></tr>
+    </table>
+    <p style="margin-top:15px;"><strong>Tổng cộng từ hiện tại đến hoàn thiện 100%: ~5 tháng</strong> (nếu làm full-time 1 người)</p>
+    <p>Tuy nhiên, <span class="highlight">sau 2 tháng đầu (90%) đã đủ để launch và có user thật</span>. Phase 2-4 có thể làm song song với việc vận hành.</p>
+</div>
+
+<h3>Thứ tự ưu tiên nếu thiếu thời gian</h3>
+<div class="section-box">
+<pre><code>BẮT BUỘC (2 tháng đầu):
+  ✅ Sprint 1: Monetization      ← Không có = không kiếm tiền
+  ✅ Sprint 2: Engagement        ← Không có = user bỏ đi
+  ✅ Sprint 4: Deploy            ← Không có = không ai xài
+
+NÊN LÀM (tháng 3):
+  ⭐ Sprint 3: Search + SEO      ← Giúp user tìm truyện
+  ⭐ Phase 2: Social Login       ← Tăng conversion đăng ký
+  ⭐ Phase 2: Notification       ← Kéo user quay lại
+
+TÙY CHỌN (tháng 4-5):
+  💡 Phase 3: CDN + Caching     ← Cần khi có nhiều user
+  💡 Phase 3: Offline Mode      ← Nice-to-have cho mobile
+  💡 Phase 4: Cloud migration   ← Cần khi laptop không đủ</code></pre>
+</div>
+
+<h3>Chi phí duy trì hàng tháng (ước tính)</h3>
+<table>
+    <tr><th>Hạng mục</th><th>Phase hiện tại (laptop)</th><th>Khi scale (cloud)</th></tr>
+    <tr><td>Hosting API</td><td>0đ (laptop)</td><td>$10-30/tháng (VPS)</td></tr>
+    <tr><td>Database</td><td>0đ (local PostgreSQL)</td><td>$0-15/tháng (Supabase/Neon)</td></tr>
+    <tr><td>CDN ảnh</td><td>0đ (serve trực tiếp)</td><td>$5-15/tháng (Cloudflare R2)</td></tr>
+    <tr><td>Domain</td><td>~200-300K/năm</td><td>~200-300K/năm</td></tr>
+    <tr><td>Email service</td><td>0đ (SendGrid free tier)</td><td>$0-20/tháng</td></tr>
+    <tr><td>Vercel (frontend)</td><td>0đ (free tier)</td><td>0đ (free tier đủ)</td></tr>
+    <tr><td>SSL</td><td>0đ (Cloudflare)</td><td>0đ (Cloudflare/Let's Encrypt)</td></tr>
+    <tr><td><strong>TỔNG</strong></td><td><strong>~0-25K/tháng</strong></td><td><strong>~500K-1.5tr/tháng</strong></td></tr>
+</table>
+
+<hr>
+<p style="text-align:center; color:#666; margin-top:40px; font-size:0.9em;">
+    📅 Tạo ngày: 12/08/2026 | XomTruyen Full Development Roadmap<br>
+    Roadmap 2 tháng (8 tuần) + Phase 2-4 (8-16 tuần) = Tổng 4-5 tháng hoàn thiện 100%
+</p>
+
+</div>
+</body>
+</html>
