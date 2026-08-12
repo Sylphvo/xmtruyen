@@ -8,6 +8,7 @@ interface ComicReadingContentProps {
   totalPages: number;
   onPrevPage: () => void;
   onNextPage: () => void;
+  imageUrls?: string[];
 }
 
 export default function ComicReadingContent({
@@ -16,12 +17,9 @@ export default function ComicReadingContent({
   currentPage,
   totalPages,
   onPrevPage,
-  onNextPage
+  onNextPage,
+  imageUrls = []
 }: ComicReadingContentProps) {
-  // Generate some mock image URLs for the comic
-  const images = Array.from({ length: 5 }).map((_, i) => 
-    `https://placehold.co/800x1200/eaeaea/999999?text=Trang+${i + 1}`
-  );
 
   return (
     <div style={{ 
@@ -53,20 +51,24 @@ export default function ComicReadingContent({
         gap: "0px", // Images usually touch each other in webtoons
         width: "100%"
       }}>
-        {images.map((img, index) => (
-          <img 
-            key={index} 
-            src={img} 
-            alt={`Page ${index + 1}`} 
-            style={{ 
-              width: "100%", 
-              height: "auto", 
-              maxWidth: "800px",
-              display: "block" 
-            }} 
-            loading="lazy"
-          />
-        ))}
+        {imageUrls.length > 0 ? (
+          imageUrls.map((img, index) => (
+            <img 
+              key={index} 
+              src={img} 
+              alt={`Page ${index + 1}`} 
+              style={{ 
+                width: "100%", 
+                height: "auto", 
+                maxWidth: "800px",
+                display: "block" 
+              }} 
+              loading="lazy"
+            />
+          ))
+        ) : (
+          <div style={{ padding: "40px", color: "#6b7280" }}>Chưa có nội dung cho chương này</div>
+        )}
       </div>
 
       {/* Bottom Navigation */}

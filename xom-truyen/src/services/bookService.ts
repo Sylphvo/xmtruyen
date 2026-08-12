@@ -141,3 +141,39 @@ export async function getBookById(id: string | number): Promise<Book | null> {
 
   return null;
 }
+
+/**
+ * Fetch chapters for a publication
+ */
+export async function getComicChapters(publicationId: string | number): Promise<any[]> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/AdminComicChapter/publication/${publicationId}`);
+    const data = response.data?.data || response.data || [];
+    // Sort by chapter number ascending
+    return data.sort((a: any, b: any) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Fetch chapter content (images or text)
+ */
+export async function getChapterContent(chapterId: string | number): Promise<any> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/Reading/chapter/${chapterId}`);
+    const data = response.data?.data || null;
+    
+    if (data && data.imageUrls && Array.isArray(data.imageUrls)) {
+      data.imageUrls = data.imageUrls.map((url: string) => {
+        if (url.startsWith("http")) return url;
+        return url.startsWith("/") ? `${API_BASE_URL}${url}` : `${API_BASE_URL}/${url}`;
+      });
+    }
+    
+    return data;
+  } catch {
+    return null;
+  }
+}
+

@@ -1922,10 +1922,12 @@ class ArchitectureVisualizer {
     this.subnavBtnChangelog = document.getElementById("subnav-btn-changelog");
     this.subnavBtnDocs = document.getElementById("subnav-btn-docs");
     this.subnavBtnSettings = document.getElementById("subnav-btn-settings");
+    this.subnavBtnHistory = document.getElementById("subnav-btn-history");
     this.paneFlows = document.getElementById("pane-flows");
     this.paneChangelog = document.getElementById("pane-changelog");
     this.paneDocs = document.getElementById("pane-docs");
     this.paneSettings = document.getElementById("pane-settings");
+    this.paneHistory = document.getElementById("pane-history");
 
     // User Manual Navigation Elements
     this.docsNavItems = document.querySelectorAll("#docs-nav-menu .docs-nav-item");
@@ -2029,11 +2031,13 @@ class ArchitectureVisualizer {
     this.subnavBtnChangelog?.classList.toggle("active", tab === "changelog");
     this.subnavBtnDocs?.classList.toggle("active", tab === "docs");
     this.subnavBtnSettings?.classList.toggle("active", tab === "settings");
+    this.subnavBtnHistory?.classList.toggle("active", tab === "history");
 
     if (this.paneFlows) this.paneFlows.style.display = tab === "flows" ? "flex" : "none";
     if (this.paneChangelog) this.paneChangelog.style.display = tab === "changelog" ? "flex" : "none";
     if (this.paneDocs) this.paneDocs.style.display = tab === "docs" ? "block" : "none";
     if (this.paneSettings) this.paneSettings.style.display = tab === "settings" ? "flex" : "none";
+    if (this.paneHistory) this.paneHistory.style.display = tab === "history" ? "flex" : "none";
 
     if (tab === "changelog") {
       this.renderChangelogTable(this.currentChangelogFilter);
@@ -2879,6 +2883,11 @@ class ArchitectureVisualizer {
     this.subnavBtnSettings?.addEventListener("click", () => {
       this.playSound(400, 0.04);
       this.switchSubnavTab("settings");
+    });
+
+    this.subnavBtnHistory?.addEventListener("click", () => {
+      this.playSound(400, 0.04);
+      this.switchSubnavTab("history");
     });
 
     // User Manual Sidebar Navigation

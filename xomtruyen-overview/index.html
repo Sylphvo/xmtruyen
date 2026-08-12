@@ -131,6 +131,11 @@
                 <span class="subnav-text">Quản Trị Hệ Thống</span>
                 <span class="subnav-badge" id="settings-badge-count">Admin</span>
               </button>
+              <button class="subnav-pill" id="subnav-btn-history">
+                <span class="subnav-icon">🤖</span>
+                <span class="subnav-text">Lịch Sử Trò Chuyện (AI)</span>
+                <span class="subnav-badge" style="background: var(--purple-glow);">Log</span>
+              </button>
             </div>
             <div class="subnav-hint">
               <span class="subnav-dot">●</span> Tự động đồng bộ với mã nguồn thực tế
@@ -885,9 +890,50 @@ builder.WebHost.ConfigureKestrel(serverOptions => {
       </aside>
 
     </div>
-  </div>
+    </div>
 
-  <!-- Global Code Modal Viewer -->
+          <!-- TAB 5: AI CONVERSATION HISTORY -->
+          <div class="tab-view-pane" id="pane-history" style="display: none;">
+             <div class="table-hero-banner" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(30, 41, 59, 0.8) 100%);">
+              <div class="table-hero-left">
+                <span class="table-hero-tag" style="color: #a78bfa;">🤖 Nhật Ký Tương Tác AI</span>
+                <h1 class="table-hero-title">Lịch Sử Trò Chuyện Lập Trình</h1>
+                <p class="table-hero-desc">Bản lưu trữ lịch sử trò chuyện và sửa lỗi trực tiếp giữa User và AI Assistant.</p>
+              </div>
+            </div>
+
+            <div class="settings-container" style="padding: 24px; color: #fff; overflow-y: auto; flex: 1;">
+                
+                <div class="settings-card" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #f87171;">User (17:00 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5;">1. Hiện tại tôi đang vào truyện tranh tại sao lại ra truyện chữ sửa lại cho tôi.<br/>2. Khi upload các chapter như thế này thì có lưu database không và khi đang đọc truyện tranh thì load chap tương ứng theo sách.</p>
+                </div>
+
+                <div class="settings-card" style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #a78bfa;">Antigravity AI (17:24 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5; margin-bottom: 10px;">Chào bạn, mình xin trả lời các câu hỏi của bạn như sau:</p>
+                    <p style="color: #e2e8f0; line-height: 1.5; margin-bottom: 10px;"><strong>1. "Khi upload các chapter như thế này thì có lưu database không?"</strong><br/>Có lưu vào database bạn nhé. Trong API Backend, tính năng Upload Chapter không chỉ giải nén file .zip/.cbz để trích xuất ảnh vào thư mục tĩnh, mà còn quét và insert các bản ghi vào Database (bảng Chapter và ComicPages).</p>
+                    <p style="color: #e2e8f0; line-height: 1.5;"><strong>2. "Khi đang đọc truyện tranh thì load chap tương ứng theo sách"</strong><br/>Mình đã tiến hành sửa code ở Client (<code>bookService.ts</code>, <code>ReadingPage.tsx</code>, <code>ComicReadingContent.tsx</code>) để tự động gọi API fetch danh sách chương, truyền URL ảnh thực tế vào UI thay vì ảnh giả lập. Đã thêm tính năng "Chương trước / Chương sau".</p>
+                </div>
+
+                <div class="settings-card" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #f87171;">User (17:24 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5;">Bị lỗi load (kèm hình ảnh báo các ảnh bị lỗi 404/không tải được URL do ảnh đang ở dạng relative).</p>
+                </div>
+
+                <div class="settings-card" style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #a78bfa;">Antigravity AI (17:27 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5;">Lỗi này xảy ra là do đường dẫn ảnh mà backend trả về đang ở dạng tương đối (ví dụ: <code>uploads/chapters/...</code>). Trình duyệt tự ghép đường dẫn đó vào URL Web Client (port 5174) thay vì API (port 5172).</p>
+                    <p style="color: #e2e8f0; line-height: 1.5;">Mình đã sửa <code>bookService.ts</code> để tự động bắt và chèn <code>API_BASE_URL</code> vào đầu các đường dẫn ảnh bị thiếu domain. Bạn tải lại trang là ảnh sẽ hiển thị bình thường!</p>
+                </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Global Code Modal Viewer -->
   <div class="code-modal-overlay" id="code-modal" style="display: none;">
     <div class="code-modal-window">
       <div class="code-modal-header">
