@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen Admin — Luồng dịch truyện tranh & Tổng quan xử lý</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 15px; overflow-x: auto; margin: 12px 0; font-size: 0.88em; }
+        code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; color: #7ee787; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin-bottom: 6px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px;
+               font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+        .tag-critical { background: #ff4444; color: #fff; }
+        .tag-high { background: #ff9800; color: #fff; }
+        .tag-medium { background: #4caf50; color: #fff; }
+        .tag-low { background: #2196f3; color: #fff; }
+        .section-box { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 15px 0; }
+        .module-box { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                      padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #333; }
+        .api-block { background: #1a1a2e; padding: 15px; border-radius: 8px;
+                     margin: 10px 0; border-left: 3px solid #a78bfa; }
+        .flow-diagram { background: #0d1117; padding: 20px; border-radius: 8px;
+                        margin: 15px 0; text-align: left; font-family: monospace;
+                        color: #7ee787; line-height: 2; white-space: pre-wrap; }
+        hr { border: 1px solid #222; margin: 40px 0; }
+        .highlight { color: #ffd93d; }
+        .success { color: #7ee787; }
+        .warning { color: #ff6b6b; }
+        .info { color: #64b5f6; }
+        .note-box { background: #1a2e1a; border-left: 4px solid #7ee787; padding: 15px 20px;
+                    border-radius: 0 12px 12px 0; margin: 15px 0; }
+        .warn-box { background: #2e1a1a; border-left: 4px solid #ff6b6b; padding: 15px 20px;
+                    border-radius: 0 12px 12px 0; margin: 15px 0; }
+        .step-card { background: #1a1a2e; border: 1px solid #333; border-radius: 12px;
+                     padding: 20px; margin: 15px 0; position: relative; }
+        .step-card::before { content: attr(data-step); position: absolute; top: -12px; left: 20px;
+                             background: #e040fb; color: #fff; padding: 2px 12px; border-radius: 12px;
+                             font-size: 0.8em; font-weight: bold; }
+        .tech-badge { display: inline-block; background: #16213e; border: 1px solid #333;
+                      padding: 3px 10px; border-radius: 6px; font-size: 0.8em; margin: 2px; color: #64b5f6; }
+
+        @media (max-width: 768px) {
+            body { padding: 15px 10px; }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.2em; padding-left: 10px; }
+            h3 { font-size: 1em; }
+            table { font-size: 0.78em; display: block; overflow-x: auto; }
+            th, td { padding: 6px 8px; }
+            pre { font-size: 0.78em; padding: 10px; }
+            .flow-diagram { font-size: 0.72em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>🌐 XomTruyen Admin — Luồng dịch truyện tranh RAW</h1>
+<p class="subtitle">Thiết kế module Translation Pipeline: Nhận file RAW → OCR → AI Translate → Typeset → Xuất file dịch | Tích hợp vào Admin Panel</p>
+
+<div class="toc">
+    <h3 style="color:#fff; margin-bottom:10px;">📌 Mục lục</h3>
+    <a href="#overview">1. Tổng quan luồng xử lý Admin Panel</a>
+    <a href="#translation-flow">2. Luồng dịch truyện tranh RAW (Full Pipeline)</a>
+    <a href="#step1">3. Step 1: Upload RAW files</a>
+    <a href="#step2">4. Step 2: OCR — Nhận diện text trong ảnh</a>
+    <a href="#step3">5. Step 3: AI Translation — Dịch text</a>
+    <a href="#step4">6. Step 4: Typesetting — Chèn text dịch vào ảnh</a>
+    <a href="#step5">7. Step 5: QC Review — Kiểm tra & chỉnh sửa</a>
+    <a href="#step6">8. Step 6: Publish — Đăng lên XomTruyen</a>
+    <a href="#db-schema">9. Database Schema cho Translation Pipeline</a>
+    <a href="#api">10. API Endpoints</a>
+    <a href="#admin-ui">11. Admin UI — Trang quản lý dịch thuật</a>
+    <a href="#tech-stack">12. Tech Stack & Công cụ</a>
+    <a href="#novel-translation">13. Bonus: Luồng dịch truyện chữ (Novel)</a>
+    <a href="#tasks">14. Task list cho AI thực hiện</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="overview">📋 1. Tổng quan luồng xử lý Admin Panel</h2>
+
+<p>Admin Panel của XomTruyen quản lý toàn bộ vòng đời nội dung từ khi <strong>nhập truyện gốc</strong> đến khi <strong>user đọc</strong>:</p>
+
+<div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    ADMIN PANEL — TỔNG QUAN XỬ LÝ                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────┐    ┌─────────────┐    ┌──────────────┐    ┌────────┐ │
+│  │   IMPORT    │───▶│  TRANSLATE  │───▶│   QC/REVIEW  │───▶│PUBLISH │ │
+│  │   (Nhập)    │    │   (Dịch)    │    │  (Kiểm tra)  │    │(Đăng)  │ │
+│  └─────────────┘    └─────────────┘    └──────────────┘    └────────┘ │
+│        │                   │                   │                 │      │
+│        ▼                   ▼                   ▼                 ▼      │
+│  • Upload ZIP/CBZ    • OCR detect text   • Editor review   • Create    │
+│  • Crawl from URL    • AI translate      • Fix errors       chapters  │
+│  • Import folder     • Typeset images    • Approve/Reject • Set price │
+│  • Bulk upload       • Multi-language    • Re-translate    • Notify   │
+│                                                              users    │
+│                                                                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│  MANAGE (Quản lý)                                                       │
+│  • Publications CRUD    • Users CRUD       • Transactions              │
+│  • Categories/Topics    • Notifications    • Analytics                  │
+│  • Banners/Homepage     • Promotions       • System Config             │
+└─────────────────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>Các giai đoạn xử lý content trong Admin</h3>
+<table>
+    <tr><th>Giai đoạn</th><th>Input</th><th>Xử lý</th><th>Output</th><th>Trạng thái</th></tr>
+    <tr>
+        <td>1. Import</td>
+        <td>ZIP/CBZ/folder chứa ảnh RAW (ngôn ngữ gốc)</td>
+        <td>Extract, đặt tên, sắp xếp theo chapter</td>
+        <td>Ảnh RAW organized</td>
+        <td><code>imported</code></td>
+    </tr>
+    <tr>
+        <td>2. OCR</td>
+        <td>Ảnh RAW</td>
+        <td>Nhận diện vùng text + nội dung text trong ảnh</td>
+        <td>Text boxes + coordinates</td>
+        <td><code>ocr_done</code></td>
+    </tr>
+    <tr>
+        <td>3. Translate</td>
+        <td>Text boxes (ngôn ngữ gốc)</td>
+        <td>AI dịch sang ngôn ngữ đích</td>
+        <td>Translated text</td>
+        <td><code>translated</code></td>
+    </tr>
+    <tr>
+        <td>4. Typeset</td>
+        <td>Ảnh RAW + Translated text + coordinates</td>
+        <td>Xóa text gốc (inpaint) + chèn text dịch</td>
+        <td>Ảnh đã dịch (final images)</td>
+        <td><code>typeset_done</code></td>
+    </tr>
+    <tr>
+        <td>5. QC Review</td>
+        <td>Ảnh đã dịch</td>
+        <td>Editor kiểm tra, sửa lỗi dịch, fix font</td>
+        <td>Ảnh approved</td>
+        <td><code>approved</code></td>
+    </tr>
+    <tr>
+        <td>6. Publish</td>
+        <td>Ảnh approved</td>
+        <td>Tạo ComicChapter + ComicPages trên DB</td>
+        <td>Chapter live trên site</td>
+        <td><code>published</code></td>
+    </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="translation-flow">🔄 2. Luồng dịch truyện tranh RAW (Full Pipeline)</h2>
+
+<div class="flow-diagram">
+═══════════════════════════════════════════════════════════════════════════
+                    COMIC TRANSLATION PIPELINE
+═══════════════════════════════════════════════════════════════════════════
+
+ADMIN UPLOAD:
+┌──────────────────────────────────────────────────────────────────────┐
+│  Admin upload ZIP/CBZ chứa ảnh RAW truyện tranh (CN/KR/JP)          │
+│  Chọn: Publication, Chapter range, Source language, Target language   │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+STEP 1: EXTRACT & ORGANIZE
+┌──────────────────────────────────────────────────────────────────────┐
+│  • Extract ZIP → folder per chapter                                   │
+│  • Sort images by page number (page_001.jpg, page_002.jpg...)        │
+│  • Store RAW images → /uploads/raw/{publicationId}/{chapterNum}/     │
+│  • Create TranslationJob record (status: 'imported')                  │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+STEP 2: OCR (TEXT DETECTION + RECOGNITION)
+┌──────────────────────────────────────────────────────────────────────┐
+│  For each image:                                                      │
+│  • Detect text regions (bounding boxes)                               │
+│  • Recognize text content in each box                                 │
+│  • Output: List of { x, y, width, height, text, confidence }         │
+│                                                                       │
+│  Tools: PaddleOCR (CN/JP/KR) / manga-ocr / Google Vision API        │
+│  Store: TextBlocks JSON per page                                      │
+│  Status → 'ocr_done'                                                  │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+STEP 3: AI TRANSLATION
+┌──────────────────────────────────────────────────────────────────────┐
+│  For each text block:                                                 │
+│  • Send to translation API (source_lang → target_lang)               │
+│  • Context: include surrounding blocks for better translation        │
+│  • Special handling: SFX (sound effects), names, martial arts terms  │
+│                                                                       │
+│  Tools: GPT-4 API / DeepL / Google Translate                         │
+│  Prompt: "Translate manga dialog from {src} to {tgt}. Keep short."   │
+│  Store: TranslatedText per block                                      │
+│  Status → 'translated'                                                │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+STEP 4: TYPESETTING (IMAGE EDITING)
+┌──────────────────────────────────────────────────────────────────────┐
+│  For each image:                                                      │
+│  • INPAINT: Remove original text (fill with background)              │
+│  • INSERT: Place translated text at same position                    │
+│  • STYLE: Match font size, color, style to original                  │
+│  • RESIZE: Fit text within bounding box                              │
+│                                                                       │
+│  Tools: OpenCV + Pillow (Python) / sharp (Node.js)                   │
+│  Inpaint: cv2.inpaint() or AI inpainting (LaMa model)               │
+│  Font: Manga fonts (CC Wild Words, Anime Ace, Back Issues)           │
+│  Output: Final translated images                                      │
+│  Store: /uploads/translated/{pubId}/{chapterNum}/{lang}/             │
+│  Status → 'typeset_done'                                              │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+STEP 5: QC REVIEW (ADMIN UI)
+┌──────────────────────────────────────────────────────────────────────┐
+│  Admin/Editor mở trang review:                                        │
+│  • Side-by-side: RAW (original) | Translated (dịch)                  │
+│  • Click vào text block → sửa bản dịch → re-typeset block đó        │
+│  • Approve all / Reject (send back to re-translate)                  │
+│  • Mark issues: "font too big", "wrong translation", "missed bubble" │
+│                                                                       │
+│  Status → 'approved' hoặc 'rejected' (quay lại step 3)              │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+STEP 6: PUBLISH
+┌──────────────────────────────────────────────────────────────────────┐
+│  • Create ComicChapter record (chapterNumber, title, isLocked, etc.) │
+│  • Create ComicPage records (imageUrl = translated image path)       │
+│  • Update Publication.UpdatedAt                                       │
+│  • Send Notification to users who favorited this publication         │
+│  • Status → 'published'                                              │
+└──────────────────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="step1">📥 3. Step 1: Upload RAW files</h2>
+
+<div class="step-card" data-step="STEP 1 — IMPORT">
+    <h4>Input:</h4>
+    <ul>
+        <li>File ZIP/CBZ/RAR chứa ảnh truyện tranh gốc (chưa dịch)</li>
+        <li>Hoặc: folder path trên server (nếu đã crawl về)</li>
+        <li>Metadata: Publication ID, Chapter range (VD: chapter 1-10), Source language</li>
+    </ul>
+    <h4>Xử lý:</h4>
+    <ol>
+        <li>Extract archive → tạo folder structure:
+            <pre><code>/uploads/raw/{publicationId}/
+  ├── chapter_001/
+  │   ├── page_001.jpg
+  │   ├── page_002.jpg
+  │   └── page_003.jpg
+  ├── chapter_002/
+  │   ├── page_001.jpg
+  │   └── ...
+  └── chapter_003/
+      └── ...</code></pre>
+        </li>
+        <li>Auto-detect chapter structure (by folder name hoặc file naming pattern)</li>
+        <li>Convert to WebP nếu cần (giảm size)</li>
+        <li>Tạo record <code>TranslationJob</code> + <code>TranslationChapter</code> records</li>
+    </ol>
+    <h4>Output:</h4>
+    <ul>
+        <li>RAW images organized theo chapter/page</li>
+        <li>TranslationJob status = <code>imported</code></li>
+    </ul>
+</div>
+
+<h3>Admin UI cho Step 1</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Form upload:</strong> Chọn Publication (dropdown search), Chapter start number, Source language (CN/KR/JP/EN), Target language (VI), Upload file (ZIP/CBZ drag-drop)</li>
+        <li><strong>Bulk import:</strong> Upload 1 ZIP chứa nhiều chapters (auto-detect folders)</li>
+        <li><strong>Preview:</strong> Sau khi extract, hiển thị grid thumbnail các trang đầu tiên để confirm</li>
+        <li><strong>Progress bar:</strong> Upload + extract progress</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="step2">🔍 4. Step 2: OCR — Nhận diện text trong ảnh</h2>
+
+<div class="step-card" data-step="STEP 2 — OCR">
+    <h4>Input:</h4>
+    <ul>
+        <li>Ảnh RAW manga/manhwa/manhua</li>
+        <li>Source language setting (để chọn OCR model phù hợp)</li>
+    </ul>
+    <h4>Xử lý:</h4>
+    <ol>
+        <li><strong>Text Detection:</strong> Tìm vùng chứa text (speech bubbles, SFX, narration boxes)</li>
+        <li><strong>Text Recognition:</strong> Đọc nội dung text trong mỗi vùng</li>
+        <li><strong>Output per block:</strong>
+            <pre><code>{
+  "id": "block_001",
+  "pageIndex": 0,
+  "bbox": { "x": 120, "y": 45, "width": 200, "height": 80 },
+  "originalText": "俺は最強だ！",
+  "confidence": 0.95,
+  "textType": "dialog",        // dialog, sfx, narration, title
+  "fontStyle": "bold",
+  "fontSize": 24
+}</code></pre>
+        </li>
+    </ol>
+    <h4>Công cụ OCR theo ngôn ngữ:</h4>
+</div>
+
+<table>
+    <tr><th>Ngôn ngữ nguồn</th><th>OCR Tool khuyến nghị</th><th>Accuracy</th><th>Ghi chú</th></tr>
+    <tr>
+        <td>🇨🇳 Chinese (Manhua)</td>
+        <td><span class="tech-badge">PaddleOCR</span></td>
+        <td>95%+</td>
+        <td>Best cho Chinese text, free, fast</td>
+    </tr>
+    <tr>
+        <td>🇰🇷 Korean (Manhwa)</td>
+        <td><span class="tech-badge">PaddleOCR</span> <span class="tech-badge">Tesseract-kor</span></td>
+        <td>90-95%</td>
+        <td>PaddleOCR supports Korean well</td>
+    </tr>
+    <tr>
+        <td>🇯🇵 Japanese (Manga)</td>
+        <td><span class="tech-badge">manga-ocr</span> <span class="tech-badge">PaddleOCR</span></td>
+        <td>92-97%</td>
+        <td>manga-ocr chuyên cho manga (vertical text)</td>
+    </tr>
+    <tr>
+        <td>🇺🇸 English</td>
+        <td><span class="tech-badge">Tesseract-eng</span> <span class="tech-badge">EasyOCR</span></td>
+        <td>98%+</td>
+        <td>Dễ nhất, accuracy cao</td>
+    </tr>
+</table>
+
+<h3>Xử lý đặc biệt cho manga/manhwa</h3>
+<div class="section-box">
+    <h4>Thách thức:</h4>
+    <ul>
+        <li><strong>Vertical text (JP):</strong> Manga JP thường viết dọc → cần OCR model hỗ trợ vertical</li>
+        <li><strong>SFX (Sound effects):</strong> Text vẽ tay, không nằm trong bubble → khó detect. Có thể bỏ qua hoặc manual tag</li>
+        <li><strong>Stylized fonts:</strong> Text artistic/decorative → OCR confidence thấp → cần human review</li>
+        <li><strong>Overlapping text:</strong> Text chồng lên nhau hoặc lên artwork → cần AI segmentation tốt</li>
+    </ul>
+    <h4>Giải pháp:</h4>
+    <ul>
+        <li>Dùng <strong>2-pass OCR:</strong> Pass 1 (auto) → Pass 2 (human verify các block confidence < 0.8)</li>
+        <li>Train custom model cho SFX phổ biến (ドドド, 바사삭, 轰隆隆)</li>
+        <li>Cho admin <strong>manual add/edit text blocks</strong> trên UI nếu OCR miss</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="step3">🌍 5. Step 3: AI Translation — Dịch text</h2>
+
+<div class="step-card" data-step="STEP 3 — TRANSLATE">
+    <h4>Input:</h4>
+    <ul>
+        <li>List text blocks + original text</li>
+        <li>Source language + Target language</li>
+        <li>Context: publication genre, character names, previous translations</li>
+    </ul>
+    <h4>Xử lý:</h4>
+    <ol>
+        <li>Group text blocks by page (để AI có context đoạn hội thoại)</li>
+        <li>Send batch to translation API với prompt chuyên biệt</li>
+        <li>Post-process: Kiểm tra length (text dịch phải fit vào bbox), format</li>
+    </ol>
+</div>
+
+<h3>Translation API Prompt Design</h3>
+<div class="api-block">
+<pre><code>// Prompt for GPT-4 / Claude translation:
+SYSTEM: You are a professional manga/manhwa translator. Translate the following 
+dialog from {sourceLanguage} to {targetLanguage}.
+
+Rules:
+1. Keep translations SHORT - they must fit in small speech bubbles
+2. Preserve the tone and emotion (angry → use strong words, shy → soft words)
+3. For sound effects (SFX): transliterate OR translate meaning
+4. Character names: keep original romanization  
+5. Martial arts / cultivation terms: use Vietnamese standard translations
+   (修炼 → Tu luyện, 内力 → Nội lực, 剑气 → Kiếm khí)
+6. Format: Return JSON array matching input order
+
+CONTEXT:
+- Genre: {genre} (Tiên Hiệp / Action / Romance)
+- Publication: {title}
+- Chapter: {chapterNumber}
+- Character speaking: {characterName} (if known)
+
+INPUT (page {pageNum}, {blockCount} blocks):
+[
+  { "id": "block_001", "text": "俺は最強だ！", "type": "dialog" },
+  { "id": "block_002", "text": "ドドドド", "type": "sfx" },
+  { "id": "block_003", "text": "三年后...", "type": "narration" }
+]
+
+OUTPUT (translate to Vietnamese):
+[
+  { "id": "block_001", "translated": "Ta là mạnh nhất!", "note": "" },
+  { "id": "block_002", "translated": "ĐÙNG ĐÙNG", "note": "sound effect" },
+  { "id": "block_003", "translated": "Ba năm sau...", "note": "" }
+]</code></pre>
+</div>
+
+<h3>Multi-language support</h3>
+<table>
+    <tr><th>Target Language</th><th>Code</th><th>Use case</th><th>Translation quality</th></tr>
+    <tr><td>🇻🇳 Tiếng Việt</td><td>vi</td><td>Primary — thị trường chính</td><td>Cao (GPT-4 rất tốt)</td></tr>
+    <tr><td>🇺🇸 English</td><td>en</td><td>Global audience</td><td>Rất cao</td></tr>
+    <tr><td>🇮🇩 Bahasa Indonesia</td><td>id</td><td>ASEAN expansion</td><td>Cao</td></tr>
+    <tr><td>🇹🇭 Thai</td><td>th</td><td>ASEAN expansion</td><td>Trung bình-Cao</td></tr>
+    <tr><td>🇵🇭 Filipino/Tagalog</td><td>tl</td><td>ASEAN expansion</td><td>Trung bình</td></tr>
+</table>
+
+<h3>Glossary / Từ điển thuật ngữ</h3>
+<div class="section-box">
+    <p>Để dịch nhất quán (cùng 1 thuật ngữ luôn dịch giống nhau), cần <strong>Glossary table</strong>:</p>
+    <pre><code>// Database table: TranslationGlossary
+{
+  "sourceText": "修炼",
+  "targetText": "Tu luyện",
+  "sourceLanguage": "zh",
+  "targetLanguage": "vi",
+  "category": "cultivation",    // cultivation, martial_arts, names, sfx
+  "publicationId": null          // null = global, hoặc specific to 1 truyện
+}</code></pre>
+    <p>Khi translate → inject glossary vào prompt → AI sẽ dùng đúng thuật ngữ đã define.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="step4">🎨 6. Step 4: Typesetting — Chèn text dịch vào ảnh</h2>
+
+<div class="step-card" data-step="STEP 4 — TYPESET">
+    <h4>Input:</h4>
+    <ul>
+        <li>Ảnh RAW gốc</li>
+        <li>Text blocks với translated text + bbox coordinates</li>
+    </ul>
+    <h4>Xử lý (per image):</h4>
+    <ol>
+        <li><strong>MASK:</strong> Tạo mask vùng text gốc (dựa trên bbox)</li>
+        <li><strong>INPAINT:</strong> Xóa text gốc, fill bằng background color/pattern
+            <pre><code># Python with OpenCV
+mask = create_text_mask(image, text_blocks)
+inpainted = cv2.inpaint(image, mask, inpaintRadius=3, flags=cv2.INPAINT_TELEA)
+# Hoặc dùng LaMa AI inpainting cho kết quả tốt hơn</code></pre>
+        </li>
+        <li><strong>RENDER TEXT:</strong> Vẽ text dịch vào vị trí bbox
+            <pre><code># Python with Pillow
+from PIL import Image, ImageDraw, ImageFont
+
+draw = ImageDraw.Draw(inpainted_image)
+font = ImageFont.truetype("manga_font.ttf", size=calculate_font_size(bbox, text))
+
+# Auto-wrap text to fit bbox
+wrapped_text = wrap_text(translated_text, font, bbox.width)
+draw.text((bbox.x, bbox.y), wrapped_text, font=font, fill=text_color)</code></pre>
+        </li>
+        <li><strong>STYLE:</strong> Match font style (bold cho dialog hét, italic cho suy nghĩ, large cho SFX)</li>
+        <li><strong>OUTPUT:</strong> Save as WebP (quality 85) → /uploads/translated/...</li>
+    </ol>
+</div>
+
+<h3>Font selection per text type</h3>
+<table>
+    <tr><th>Text Type</th><th>Font gợi ý</th><th>Style</th><th>Ví dụ</th></tr>
+    <tr><td>Dialog (hội thoại)</td><td>CC Wild Words, Anime Ace</td><td>Regular, 18-24px</td><td>"Ta là mạnh nhất!"</td></tr>
+    <tr><td>Narration (kể chuyện)</td><td>CC Astro City, Blambot</td><td>Italic, 16-20px</td><td><em>"Ba năm sau..."</em></td></tr>
+    <tr><td>SFX (hiệu ứng)</td><td>Badaboom, Komika</td><td>Bold, 28-48px, rotated</td><td><strong>ĐÙNG!</strong></td></tr>
+    <tr><td>Yelling (la hét)</td><td>CC Wild Words</td><td>Bold + Larger, 26-32px</td><td><strong>DỪNG LẠI!</strong></td></tr>
+    <tr><td>Whisper (thì thầm)</td><td>CC Astro City</td><td>Small, 14-16px, lighter</td><td><small>khẽ nói...</small></td></tr>
+    <tr><td>Title/Chapter</td><td>Custom decorative</td><td>Bold, centered</td><td>Chương 156: Đại chiến</td></tr>
+</table>
+
+<h3>Thuật toán auto-fit text vào bubble</h3>
+<div class="api-block">
+<pre><code>def fit_text_in_bbox(text: str, bbox: dict, max_font_size: int = 28) -> dict:
+    """
+    Tự động điều chỉnh font size và wrap text để fit vào bounding box.
+    Returns: { font_size, wrapped_lines, text_position }
+    """
+    for font_size in range(max_font_size, 8, -1):
+        font = load_font(font_size)
+        lines = word_wrap(text, font, bbox['width'] - 10)  # padding 5px mỗi bên
+        total_height = len(lines) * (font_size + 4)  # line height
+        
+        if total_height <= bbox['height'] - 10:
+            # Text fits! Calculate centered position
+            y_start = bbox['y'] + (bbox['height'] - total_height) // 2
+            x_start = bbox['x'] + 5
+            return {
+                'font_size': font_size,
+                'lines': lines,
+                'position': (x_start, y_start)
+            }
+    
+    # Fallback: smallest font, might overflow
+    return { 'font_size': 8, 'lines': [text], 'position': (bbox['x'], bbox['y']) }</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="step5">✅ 7. Step 5: QC Review — Kiểm tra & chỉnh sửa</h2>
+
+<div class="step-card" data-step="STEP 5 — QC REVIEW">
+    <h4>Admin UI — Trang review dịch thuật:</h4>
+    <ul>
+        <li><strong>Side-by-side view:</strong> Bên trái = ảnh RAW gốc | Bên phải = ảnh đã dịch</li>
+        <li><strong>Text block overlay:</strong> Hover vào vùng text → hiển thị: original | translated | confidence</li>
+        <li><strong>Inline edit:</strong> Click vào text block → sửa bản dịch → nút "Re-typeset" (render lại block đó)</li>
+        <li><strong>Page navigation:</strong> Previous/Next page, jump to page</li>
+        <li><strong>Actions per chapter:</strong>
+            <ul>
+                <li>✅ Approve All → chuyển sang step 6</li>
+                <li>❌ Reject → ghi note lý do, quay lại step 3 (re-translate specific blocks)</li>
+                <li>🔄 Re-OCR page → chạy lại OCR cho page cụ thể (nếu miss text)</li>
+                <li>➕ Add text block manually → vẽ bbox mới + nhập text dịch</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<h3>QC Workflow</h3>
+<div class="flow-diagram">
+Editor mở trang /admin/translation-jobs/{jobId}/review:
+
+┌──────────────────────────────────────────────────────────┐
+│ Chapter 15 — Đấu Phá Thương Khung                        │
+│ Status: translated → Waiting for review                   │
+│ Pages: 22 | Text blocks: 145 | Language: CN → VI         │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌─────────────────┐  ┌─────────────────┐              │
+│  │   RAW (Gốc)     │  │  TRANSLATED     │              │
+│  │                  │  │                  │              │
+│  │  [Ảnh manga     │  │  [Ảnh đã dịch   │              │
+│  │   Chinese text]  │  │   Vietnamese]   │              │
+│  │                  │  │                  │              │
+│  │  ┌──────────┐   │  │  ┌──────────┐   │              │
+│  │  │ 俺は最強 │   │  │  │Ta là mạnh│   │  ← Click    │
+│  │  │    だ！   │   │  │  │  nhất!   │   │    to edit  │
+│  │  └──────────┘   │  │  └──────────┘   │              │
+│  │                  │  │                  │              │
+│  └─────────────────┘  └─────────────────┘              │
+│                                                          │
+│  [◄ Prev]  Page 3/22  [Next ►]                          │
+│                                                          │
+│  [✅ Approve Chapter] [❌ Reject] [🔄 Re-translate All]  │
+└──────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="step6">🚀 8. Step 6: Publish — Đăng lên XomTruyen</h2>
+
+<div class="step-card" data-step="STEP 6 — PUBLISH">
+    <h4>Sau khi Approve:</h4>
+    <ol>
+        <li>Tạo <code>ComicChapter</code> record:
+            <pre><code>INSERT INTO "ComicChapters" (Id, PublicationId, ChapterNumber, Title, IsLocked, CoinPrice)
+VALUES (newId, @pubId, @chapterNum, @title, @isLocked, @coinPrice)</code></pre>
+        </li>
+        <li>Tạo <code>ComicPage</code> records cho mỗi translated image:
+            <pre><code>INSERT INTO "ComicPages" (Id, ComicChapterId, PageNumber, ImageUrl)
+VALUES 
+  (newId, @chapterId, 1, '/uploads/translated/{pubId}/{chapter}/vi/page_001.webp'),
+  (newId, @chapterId, 2, '/uploads/translated/{pubId}/{chapter}/vi/page_002.webp'),
+  ...</code></pre>
+        </li>
+        <li>Update <code>Publication.UpdatedAt = NOW()</code></li>
+        <li>Notification: Gửi cho users đã favorite publication này</li>
+        <li>Update TranslationJob status = <code>published</code></li>
+    </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="db-schema">🗄️ 9. Database Schema cho Translation Pipeline</h2>
+
+<div class="api-block">
+<pre><code>-- ═══════════════════════════════════════════════════════════
+-- TRANSLATION PIPELINE TABLES
+-- ═══════════════════════════════════════════════════════════
+
+-- 1. Translation Jobs (1 job = 1 batch upload, có thể chứa nhiều chapters)
+CREATE TABLE "TranslationJobs" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "PublicationId" UUID NOT NULL REFERENCES "Publications"("Id"),
+    "SourceLanguage" VARCHAR(10) NOT NULL,          -- 'zh', 'ko', 'ja', 'en'
+    "TargetLanguage" VARCHAR(10) NOT NULL,          -- 'vi', 'en', 'id', 'th'
+    "Status" VARCHAR(30) NOT NULL DEFAULT 'imported',
+    -- Status: imported → ocr_processing → ocr_done → translating → translated 
+    --       → typesetting → typeset_done → reviewing → approved → publishing → published
+    --       → rejected (can go back to translating)
+    "TotalChapters" INT DEFAULT 0,
+    "TotalPages" INT DEFAULT 0,
+    "TotalTextBlocks" INT DEFAULT 0,
+    "ProcessedPages" INT DEFAULT 0,                 -- Progress tracking
+    "ErrorMessage" TEXT,
+    "CreatedBy" VARCHAR(100),
+    "CreatedAt" TIMESTAMP DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP DEFAULT NOW(),
+    "CompletedAt" TIMESTAMP
+);
+
+-- 2. Translation Chapters (mỗi chapter trong 1 job)
+CREATE TABLE "TranslationChapters" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "JobId" UUID NOT NULL REFERENCES "TranslationJobs"("Id") ON DELETE CASCADE,
+    "ChapterNumber" DECIMAL NOT NULL,
+    "Title" VARCHAR(200),
+    "Status" VARCHAR(30) NOT NULL DEFAULT 'imported',
+    "PageCount" INT DEFAULT 0,
+    "TextBlockCount" INT DEFAULT 0,
+    "RawFolderPath" VARCHAR(500),                   -- /uploads/raw/{pubId}/{chapter}/
+    "TranslatedFolderPath" VARCHAR(500),            -- /uploads/translated/{pubId}/{chapter}/{lang}/
+    "ReviewNote" TEXT,                              -- Editor note khi reject
+    "ReviewedBy" VARCHAR(100),
+    "ReviewedAt" TIMESTAMP,
+    "PublishedChapterId" UUID,                      -- FK to ComicChapters after publish
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- 3. Translation Pages (mỗi trang ảnh)
+CREATE TABLE "TranslationPages" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "ChapterId" UUID NOT NULL REFERENCES "TranslationChapters"("Id") ON DELETE CASCADE,
+    "PageNumber" INT NOT NULL,
+    "RawImageUrl" VARCHAR(500) NOT NULL,            -- Path to original image
+    "TranslatedImageUrl" VARCHAR(500),              -- Path to translated image (after typeset)
+    "OcrStatus" VARCHAR(20) DEFAULT 'pending',      -- pending, processing, done, failed
+    "TypesetStatus" VARCHAR(20) DEFAULT 'pending',
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- 4. Text Blocks (detected text regions per page)
+CREATE TABLE "TextBlocks" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "PageId" UUID NOT NULL REFERENCES "TranslationPages"("Id") ON DELETE CASCADE,
+    "BboxX" INT NOT NULL,
+    "BboxY" INT NOT NULL,
+    "BboxWidth" INT NOT NULL,
+    "BboxHeight" INT NOT NULL,
+    "OriginalText" TEXT NOT NULL,
+    "TranslatedText" TEXT,
+    "TextType" VARCHAR(20) DEFAULT 'dialog',        -- dialog, sfx, narration, title
+    "FontStyle" VARCHAR(20) DEFAULT 'regular',      -- regular, bold, italic
+    "OcrConfidence" DECIMAL(3,2),                   -- 0.00 - 1.00
+    "IsManualEdit" BOOLEAN DEFAULT FALSE,           -- TRUE nếu editor đã sửa tay
+    "OrderIndex" INT DEFAULT 0
+);
+
+-- 5. Translation Glossary (từ điển thuật ngữ)
+CREATE TABLE "TranslationGlossary" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "SourceText" VARCHAR(200) NOT NULL,
+    "TargetText" VARCHAR(200) NOT NULL,
+    "SourceLanguage" VARCHAR(10) NOT NULL,
+    "TargetLanguage" VARCHAR(10) NOT NULL,
+    "Category" VARCHAR(50),                         -- cultivation, martial_arts, names, sfx, general
+    "PublicationId" UUID,                           -- NULL = global, specific = only for this series
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_translation_jobs_pub ON "TranslationJobs"("PublicationId");
+CREATE INDEX idx_translation_jobs_status ON "TranslationJobs"("Status");
+CREATE INDEX idx_translation_chapters_job ON "TranslationChapters"("JobId");
+CREATE INDEX idx_translation_pages_chapter ON "TranslationPages"("ChapterId");
+CREATE INDEX idx_text_blocks_page ON "TextBlocks"("PageId");
+CREATE INDEX idx_glossary_source ON "TranslationGlossary"("SourceText", "SourceLanguage", "TargetLanguage");</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="api">🔌 10. API Endpoints</h2>
+
+<div class="api-block">
+<h4>AdminTranslationController [Authorize(Roles="Admin")]</h4>
+<pre><code>// ─── JOB MANAGEMENT ───
+POST   /api/admin/translation/jobs
+       Body: { publicationId, sourceLanguage, targetLanguage }
+       + FormData: file (ZIP/CBZ)
+       → Create job, extract files, return jobId
+
+GET    /api/admin/translation/jobs?status=&publicationId=&page=1&pageSize=20
+       → List translation jobs (filter by status, publication)
+
+GET    /api/admin/translation/jobs/{jobId}
+       → Job detail + chapters list + progress
+
+DELETE /api/admin/translation/jobs/{jobId}
+       → Cancel & delete job + all files
+
+// ─── PROCESSING ───
+POST   /api/admin/translation/jobs/{jobId}/start-ocr
+       → Start OCR processing (background job)
+
+POST   /api/admin/translation/jobs/{jobId}/start-translate
+       → Start AI translation (background job)
+
+POST   /api/admin/translation/jobs/{jobId}/start-typeset
+       → Start typesetting (background job)
+
+GET    /api/admin/translation/jobs/{jobId}/progress
+       → { status, processedPages, totalPages, currentStep, estimatedTimeLeft }
+
+// ─── CHAPTER REVIEW ───
+GET    /api/admin/translation/chapters/{chapterId}
+       → Chapter detail + pages + text blocks
+
+GET    /api/admin/translation/chapters/{chapterId}/pages
+       → List pages with raw + translated image URLs
+
+GET    /api/admin/translation/pages/{pageId}/blocks
+       → List text blocks for a page (with original + translated text)
+
+PATCH  /api/admin/translation/blocks/{blockId}
+       Body: { translatedText: "Sửa bản dịch" }
+       → Update translated text (manual edit)
+
+POST   /api/admin/translation/pages/{pageId}/blocks
+       Body: { bboxX, bboxY, bboxWidth, bboxHeight, originalText, translatedText, textType }
+       → Add manual text block (OCR missed)
+
+DELETE /api/admin/translation/blocks/{blockId}
+       → Remove text block (false detection)
+
+POST   /api/admin/translation/pages/{pageId}/re-typeset
+       → Re-render typeset for this page (after text edits)
+
+// ─── REVIEW ACTIONS ───
+POST   /api/admin/translation/chapters/{chapterId}/approve
+       → Mark chapter as approved
+
+POST   /api/admin/translation/chapters/{chapterId}/reject
+       Body: { note: "Block 5 sai nghĩa, block 12 miss text" }
+       → Reject, send back to translate step
+
+// ─── PUBLISH ───
+POST   /api/admin/translation/chapters/{chapterId}/publish
+       Body: { isLocked: false, coinPrice: 0, title: "Chương 15: ..." }
+       → Create ComicChapter + ComicPages from translated images
+
+POST   /api/admin/translation/jobs/{jobId}/publish-all
+       Body: { defaultIsLocked: false, defaultCoinPrice: 0 }
+       → Publish ALL approved chapters in job at once
+
+// ─── GLOSSARY ───
+GET    /api/admin/translation/glossary?source=zh&target=vi&category=&page=1
+       → List glossary entries
+
+POST   /api/admin/translation/glossary
+       Body: { sourceText, targetText, sourceLanguage, targetLanguage, category, publicationId }
+
+PUT    /api/admin/translation/glossary/{id}
+DELETE /api/admin/translation/glossary/{id}
+
+POST   /api/admin/translation/glossary/import
+       Body: CSV/JSON file with bulk glossary entries</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="admin-ui">🖥️ 11. Admin UI — Trang quản lý dịch thuật</h2>
+
+<h3>Trang chính: <code>/translation</code> (Dashboard dịch thuật)</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Stats cards:</strong> Jobs đang xử lý | Chapters chờ review | Chapters đã publish tuần này</li>
+        <li><strong>Table jobs:</strong> Publication name, Language pair (CN→VI), Status (badge color), Progress bar, Pages, Created, Actions</li>
+        <li><strong>Quick actions:</strong> "Upload RAW mới", "Xem chờ review"</li>
+    </ul>
+</div>
+
+<h3>Trang: <code>/translation/upload</code> (Upload RAW)</h3>
+<div class="section-box">
+    <ul>
+        <li>Form: Chọn Publication (autocomplete search), Source language (dropdown), Target language (dropdown)</li>
+        <li>Chapter start number (auto-detect từ existing chapters)</li>
+        <li>Drag-drop zone: Upload ZIP/CBZ (max 500MB)</li>
+        <li>Upload progress → auto redirect đến job detail sau khi xong</li>
+    </ul>
+</div>
+
+<h3>Trang: <code>/translation/jobs/{id}</code> (Job Detail)</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Header:</strong> Publication title, Language pair, Status, Created date</li>
+        <li><strong>Progress:</strong> Visual pipeline (Step 1 → 2 → 3 → 4 → 5 → 6) với current step highlighted</li>
+        <li><strong>Chapters table:</strong> Chapter number, Pages, Blocks, Status, Actions (Review/Publish)</li>
+        <li><strong>Action buttons:</strong> "Start OCR" → "Start Translate" → "Start Typeset" (theo sequence)</li>
+        <li><strong>Log/Timeline:</strong> Lịch sử các bước đã chạy + timestamp + errors</li>
+    </ul>
+</div>
+
+<h3>Trang: <code>/translation/review/{chapterId}</code> (QC Review)</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Split view:</strong> Left = RAW image | Right = Translated image</li>
+        <li><strong>Overlay mode:</strong> Toggle hiển thị text block boxes trên ảnh</li>
+        <li><strong>Block list panel:</strong> Sidebar liệt kê text blocks: Original → Translated (editable)</li>
+        <li><strong>Edit block:</strong> Click block → inline edit translated text → "Re-typeset" button</li>
+        <li><strong>Add block:</strong> Draw rectangle trên ảnh RAW → nhập text → save</li>
+        <li><strong>Page nav:</strong> Thumbnails bar ở dưới, click to jump</li>
+        <li><strong>Actions:</strong> Approve Chapter | Reject (with note) | Re-translate All</li>
+    </ul>
+</div>
+
+<h3>Trang: <code>/translation/glossary</code> (Từ điển thuật ngữ)</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Table:</strong> Source text, Target text, Language pair, Category (badge), Publication (hoặc Global), Actions</li>
+        <li><strong>Filter:</strong> by language pair, by category, by publication</li>
+        <li><strong>Bulk import:</strong> Upload CSV (columns: source, target, category)</li>
+        <li><strong>Form add/edit:</strong> Source text, Target text, Category dropdown, Scope (Global / Specific publication)</li>
+    </ul>
+</div>
+
+<h3>Sidebar navigation mới</h3>
+<div class="api-block">
+<pre><code>🌐 Dịch thuật (Translation)
+   ├── Dashboard dịch (/translation)
+   ├── Upload RAW (/translation/upload)
+   ├── Chờ review (/translation/pending-review)
+   ├── Từ điển thuật ngữ (/translation/glossary)
+   └── Cài đặt dịch (/translation/settings)
+       • Default AI model (GPT-4 / DeepL)
+       • Default fonts per text type
+       • OCR confidence threshold
+       • Auto-translate on OCR complete (toggle)</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="tech-stack">🛠️ 12. Tech Stack & Công cụ</h2>
+
+<h3>Architecture</h3>
+<div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                    ADMIN PANEL (React)                        │
+│  Upload UI → Review UI → Publish UI                          │
+└────────────────────────────┬────────────────────────────────┘
+                             │ REST API
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│              BACKEND (.NET 9 API)                             │
+│  AdminTranslationController → TranslationService             │
+│  Queue jobs → Background processing                          │
+└────────┬──────────────────┬──────────────────┬──────────────┘
+         │                  │                  │
+         ▼                  ▼                  ▼
+┌──────────────┐  ┌──────────────────┐  ┌──────────────┐
+│  PYTHON      │  │  EXTERNAL APIs   │  │  PostgreSQL  │
+│  WORKER      │  │                  │  │              │
+│              │  │  • OpenAI GPT-4  │  │  Jobs table  │
+│  • OCR       │  │  • DeepL API    │  │  Blocks table│
+│  • Typeset   │  │  • Google Trans  │  │  Pages table │
+│  • Inpaint   │  │                  │  │              │
+│              │  │                  │  │              │
+│  PaddleOCR   │  └──────────────────┘  └──────────────┘
+│  Pillow      │
+│  OpenCV      │
+│  manga-ocr   │
+└──────────────┘
+         │
+         ▼
+┌──────────────────┐
+│  FILE STORAGE    │
+│  /uploads/raw/   │
+│  /uploads/trans/ │
+└──────────────────┘
+</div>
+
+<h3>Tech choices</h3>
+<table>
+    <tr><th>Component</th><th>Technology</th><th>Lý do chọn</th></tr>
+    <tr>
+        <td>OCR Engine</td>
+        <td><span class="tech-badge">PaddleOCR</span> (primary)<br><span class="tech-badge">manga-ocr</span> (JP fallback)</td>
+        <td>Free, support CN/KR/JP/EN, accurate, fast. manga-ocr tốt cho vertical JP text</td>
+    </tr>
+    <tr>
+        <td>Translation AI</td>
+        <td><span class="tech-badge">OpenAI GPT-4o-mini</span> (primary)<br><span class="tech-badge">DeepL API</span> (fallback)</td>
+        <td>GPT-4o-mini: rẻ ($0.15/1M tokens), nhanh, hiểu context manga. DeepL: accurate cho formal text</td>
+    </tr>
+    <tr>
+        <td>Image Processing</td>
+        <td><span class="tech-badge">Python + Pillow</span><br><span class="tech-badge">OpenCV</span></td>
+        <td>Standard cho image manipulation, inpainting. LaMa model cho high-quality inpaint</td>
+    </tr>
+    <tr>
+        <td>Background Jobs</td>
+        <td><span class="tech-badge">Hangfire</span> (.NET)<br>hoặc <span class="tech-badge">Python Celery</span></td>
+        <td>.NET: Hangfire đã dùng sẵn cho book processing. Python: Celery nếu dùng Python worker riêng</td>
+    </tr>
+    <tr>
+        <td>Communication</td>
+        <td><span class="tech-badge">HTTP API</span> (.NET → Python)<br>hoặc <span class="tech-badge">Message Queue</span> (RabbitMQ)</td>
+        <td>Simple: .NET gọi Python Flask/FastAPI endpoint. Advanced: Queue for async processing</td>
+    </tr>
+    <tr>
+        <td>Fonts</td>
+        <td><span class="tech-badge">CC Wild Words</span><br><span class="tech-badge">Anime Ace</span><br><span class="tech-badge">Blambot fonts</span></td>
+        <td>Comic/manga fonts free for personal use. Professional look.</td>
+    </tr>
+</table>
+
+<h3>Chi phí vận hành ước tính</h3>
+<table>
+    <tr><th>Service</th><th>Pricing</th><th>Ước tính/tháng (100 chapters)</th></tr>
+    <tr><td>OpenAI GPT-4o-mini</td><td>$0.15/1M input + $0.60/1M output tokens</td><td>~$5-15 (100 chapters × 20 pages × 10 blocks)</td></tr>
+    <tr><td>DeepL API</td><td>$5.49/500K chars (Pro)</td><td>~$10-20</td></tr>
+    <tr><td>PaddleOCR</td><td>Free (self-hosted)</td><td>$0 (chỉ tốn CPU/GPU)</td></tr>
+    <tr><td>Storage (images)</td><td>~2MB/page translated</td><td>~4GB/tháng (100ch × 20pages)</td></tr>
+    <tr><td><strong>Tổng</strong></td><td></td><td><strong>$15-35/tháng</strong> (cho 100 chapters)</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="novel-translation">📖 13. Bonus: Luồng dịch truyện chữ (Novel)</h2>
+
+<div class="module-box">
+    <p>Truyện chữ đơn giản hơn nhiều vì không cần OCR/Typeset — chỉ cần dịch text thuần.</p>
+</div>
+
+<div class="flow-diagram">
+NOVEL TRANSLATION PIPELINE (đơn giản hơn Comic):
+
+1. IMPORT: Admin paste text gốc (CN/KR/JP) hoặc upload TXT file
+          → Lưu vào TranslationJob (type='novel')
+          
+2. TRANSLATE: AI dịch toàn bộ text
+          → GPT-4 + glossary + context (chapter trước)
+          → Prompt: "Translate web novel, keep names, cultivation terms..."
+          
+3. REVIEW: Editor đọc bản dịch, sửa lỗi
+          → Side-by-side: Gốc | Dịch
+          → Highlight sai → fix inline
+          
+4. PUBLISH: Tạo BookChapter với Content = bản dịch đã approve
+          → SET isLocked, coinPrice
+          → Notification users
+
+KHÔNG CẦN: OCR, Typeset, Image processing
+Chỉ cần: Text input → AI translate → Human review → Publish
+</div>
+
+<h3>API cho Novel Translation</h3>
+<div class="api-block">
+<pre><code>POST /api/admin/translation/novel/create
+     Body: {
+       publicationId: "guid",
+       chapters: [
+         { chapterNumber: 1, title: "Chương 1", originalContent: "Chinese text..." },
+         { chapterNumber: 2, title: "Chương 2", originalContent: "..." }
+       ],
+       sourceLanguage: "zh",
+       targetLanguage: "vi"
+     }
+
+POST /api/admin/translation/novel/{jobId}/translate
+     → AI dịch tất cả chapters
+
+GET  /api/admin/translation/novel/{jobId}/chapters/{chapterId}
+     → { originalContent, translatedContent, status }
+
+PATCH /api/admin/translation/novel/chapters/{chapterId}
+     Body: { translatedContent: "Bản dịch đã sửa" }
+
+POST /api/admin/translation/novel/chapters/{chapterId}/publish
+     → Tạo BookChapter (Content = translatedContent)</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="tasks">📋 14. Task list cho AI thực hiện</h2>
+
+<h3>TASK GROUP T: Translation Pipeline</h3>
+
+<div class="section-box">
+<h4>Task T1: Database Migration — Tạo Translation tables</h4>
+<pre><code>Dự án: xomtruyen.API (.NET 9, EF Core, PostgreSQL)
+Tạo migration thêm 5 tables:
+1. TranslationJobs
+2. TranslationChapters  
+3. TranslationPages
+4. TextBlocks
+5. TranslationGlossary
+
+(Schema chi tiết xem phần 9 ở trên)
+
+Thêm Models:
+- Models/TranslationJob.cs
+- Models/TranslationChapter.cs
+- Models/TranslationPage.cs
+- Models/TextBlock.cs
+- Models/TranslationGlossary.cs
+
+Thêm vào DbContext: DbSet cho mỗi model
+Migration: dotnet ef migrations add AddTranslationPipeline
+</code></pre>
+
+<h4>Task T2: Backend — AdminTranslationController (Job + Upload)</h4>
+<pre><code>Dự án: xomtruyen.API
+Tạo controller: Controllers/AdminTranslationController.cs [Authorize(Roles="Admin")]
+
+Phase 1 endpoints (Job management + Upload):
+- POST /api/admin/translation/jobs → Upload ZIP + create job + extract files
+- GET /api/admin/translation/jobs → List jobs (filter, paging)
+- GET /api/admin/translation/jobs/{id} → Job detail
+- DELETE /api/admin/translation/jobs/{id} → Delete job + files
+
+Upload logic:
+1. Receive ZIP file via FormData
+2. Extract to /uploads/raw/{publicationId}/{timestamp}/
+3. Auto-detect chapter folders (folder per chapter)
+4. Create TranslationJob + TranslationChapters + TranslationPages records
+5. Return jobId
+
+Service: ITranslationService + TranslationService
+</code></pre>
+
+<h4>Task T3: Python Worker — OCR Service</h4>
+<pre><code>Dự án: Tạo mới — python-worker/ (hoặc tích hợp vào existing project)
+
+Tech: Python 3.11+, FastAPI, PaddleOCR, Pillow
+
+Endpoint: POST /ocr/process
+Body: { 
+  imageUrl: "/uploads/raw/.../page_001.jpg",
+  language: "zh"    // zh, ko, ja, en
+}
+Response: {
+  blocks: [
+    { bbox: {x, y, w, h}, text: "原文text", confidence: 0.95, textType: "dialog" }
+  ]
+}
+
+Hoặc batch endpoint:
+POST /ocr/batch
+Body: { images: [...urls], language: "zh" }
+
+Setup:
+pip install paddlepaddle paddleocr fastapi uvicorn pillow
+
+Docker (optional):
+FROM python:3.11
+RUN pip install paddlepaddle paddleocr fastapi uvicorn
+</code></pre>
+
+<h4>Task T4: Python Worker — Typeset Service</h4>
+<pre><code>Dự án: python-worker/
+
+Endpoint: POST /typeset/process
+Body: {
+  rawImageUrl: "/uploads/raw/.../page_001.jpg",
+  blocks: [
+    { bbox: {x, y, w, h}, translatedText: "Bản dịch", textType: "dialog", fontStyle: "bold" }
+  ],
+  outputPath: "/uploads/translated/.../page_001.webp",
+  settings: {
+    fontFamily: "CC Wild Words",
+    defaultFontSize: 22,
+    textColor: "#000000",
+    inpaintMethod: "telea"    // telea, ns, lama
+  }
+}
+Response: { success: true, outputUrl: "/uploads/translated/..." }
+
+Logic:
+1. Load raw image
+2. Create mask from all block bboxes
+3. Inpaint (remove original text)
+4. For each block: fit_text_in_bbox() → render translated text
+5. Save as WebP
+6. Return output path
+
+Dependencies: pillow, opencv-python, numpy
+Fonts: Store in python-worker/fonts/ directory
+</code></pre>
+
+<h4>Task T5: Backend — Translation Processing Endpoints</h4>
+<pre><code>Dự án: xomtruyen.API
+
+Thêm endpoints vào AdminTranslationController:
+- POST /jobs/{id}/start-ocr → Queue background job gọi Python OCR
+- POST /jobs/{id}/start-translate → Queue job gọi OpenAI/DeepL
+- POST /jobs/{id}/start-typeset → Queue job gọi Python Typeset
+- GET /jobs/{id}/progress → Return progress %
+
+Background processing (Hangfire hoặc BackgroundService):
+1. OCR Job: Loop qua pages → gọi Python /ocr/process → save TextBlocks
+2. Translate Job: Loop qua TextBlocks → gọi OpenAI API → save translatedText
+3. Typeset Job: Loop qua pages → gọi Python /typeset/process → save translatedImageUrl
+
+Translation logic:
+- Group blocks by page
+- Send page blocks as batch to GPT-4
+- Include glossary in prompt
+- Parse JSON response → update TextBlocks.TranslatedText
+</code></pre>
+
+<h4>Task T6: Backend — Review + Publish Endpoints</h4>
+<pre><code>Dự án: xomtruyen.API
+
+Endpoints:
+- GET /chapters/{id}/pages → pages with raw + translated URLs
+- GET /pages/{id}/blocks → text blocks for review
+- PATCH /blocks/{id} → edit translated text
+- POST /pages/{id}/re-typeset → re-render 1 page
+- POST /chapters/{id}/approve
+- POST /chapters/{id}/reject
+- POST /chapters/{id}/publish → create ComicChapter + ComicPages
+
+Publish logic:
+1. Create ComicChapter (publicationId, chapterNumber, title, isLocked, coinPrice)
+2. For each TranslationPage (approved):
+   - Create ComicPage (comicChapterId, pageNumber=page.PageNumber, imageUrl=page.TranslatedImageUrl)
+3. Update Publication.UpdatedAt
+4. Update TranslationChapter.PublishedChapterId = new ComicChapter.Id
+5. Update status = 'published'
+6. (Optional) Send notification to users who favorited this publication
+</code></pre>
+
+<h4>Task T7: Backend — Glossary CRUD</h4>
+<pre><code>Dự án: xomtruyen.API
+
+Simple CRUD cho TranslationGlossary:
+- GET /api/admin/translation/glossary (filter: source lang, target lang, category, publicationId)
+- POST /api/admin/translation/glossary (create)
+- PUT /api/admin/translation/glossary/{id} (update)
+- DELETE /api/admin/translation/glossary/{id}
+- POST /api/admin/translation/glossary/import (bulk import from CSV/JSON)
+
+CSV format: sourceText,targetText,category
+Example:
+修炼,Tu luyện,cultivation
+内力,Nội lực,martial_arts
+剑气,Kiếm khí,martial_arts
+</code></pre>
+
+<h4>Task T8: Frontend Admin — Translation Pages</h4>
+<pre><code>Dự án: xomtruyen-admin (React + TypeScript + Vite)
+
+Files mới:
+- src/pages/Translation.tsx (dashboard)
+- src/pages/TranslationUpload.tsx (upload form)
+- src/pages/TranslationJobDetail.tsx (job detail + progress)
+- src/pages/TranslationReview.tsx (QC side-by-side review)
+- src/pages/TranslationGlossary.tsx (glossary CRUD)
+- src/api/translationApi.ts (API module)
+
+Routes thêm vào App.tsx:
+- /translation
+- /translation/upload
+- /translation/jobs/:id
+- /translation/review/:chapterId
+- /translation/glossary
+
+Sidebar: Thêm nhóm "🌐 Dịch thuật" với icon Globe
+
+Key UI components:
+1. TranslationUpload: Drag-drop zone + form metadata
+2. JobDetail: Pipeline progress visualization + chapters table
+3. Review: Split-pane (left=raw, right=translated) + text block editor
+4. Glossary: Standard CRUD table + CSV import
+
+Libraries cần thêm:
+- react-split-pane (hoặc CSS flexbox) cho split view
+- react-dropzone cho upload
+</code></pre>
+</div>
+
+<h3>Thứ tự triển khai</h3>
+<div class="flow-diagram">
+Week 1: T1 (DB) + T3 (Python OCR) + T4 (Python Typeset)
+  → Setup infrastructure: DB tables + Python worker chạy được
+
+Week 2: T2 (Upload endpoint) + T5 (Processing endpoints)  
+  → Backend hoàn chỉnh: upload → OCR → translate → typeset
+
+Week 3: T6 (Review + Publish) + T7 (Glossary)
+  → Full pipeline working end-to-end via API
+
+Week 4: T8 (Frontend Admin UI)
+  → Admin có thể dùng UI thay vì gọi API trực tiếp
+
+TỔNG: ~4 tuần cho Translation Pipeline hoàn chỉnh
+</div>
+
+<hr>
+<p style="text-align:center; color:#666; margin-top:40px; font-size:0.9em;">
+    📅 Tạo ngày: 14/08/2026 | XomTruyen Admin — Translation Pipeline Design<br>
+    Pipeline: Upload RAW → OCR → AI Translate → Typeset → QC Review → Publish<br>
+    Tech: PaddleOCR + GPT-4o-mini + Python (Pillow/OpenCV) + .NET Background Jobs<br>
+    Effort: ~4 tuần | Cost: ~$15-35/tháng cho 100 chapters
+</p>
+
+</div>
+</body>
+</html>
