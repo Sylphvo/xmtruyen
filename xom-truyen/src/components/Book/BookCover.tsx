@@ -21,12 +21,12 @@ export function resolveCoverImageUrl(coverImageUrl?: string, images?: string): s
 
 export default function BookCover({
   book,
-  width,
-  height,
+  width = "100%",
+  height = "100%",
 }: {
   book: Book;
-  width: number | string;
-  height: number | string;
+  width?: number | string;
+  height?: number | string;
 }) {
   const imageUrl = resolveCoverImageUrl(book?.coverImageUrl, book?.images);
   const [hasError, setHasError] = useState(false);
@@ -54,6 +54,7 @@ export default function BookCover({
           key={imageUrl}
           src={imageUrl}
           alt={`Bìa truyện ${book?.title || ""}`}
+          loading="lazy"
           style={{
             width: "100%",
             height: "100%",

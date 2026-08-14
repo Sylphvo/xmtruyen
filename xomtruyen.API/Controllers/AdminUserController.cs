@@ -6,7 +6,7 @@ using XomTruyen.API.Services.Interfaces;
 namespace XomTruyen.API.Controllers;
 
 [Route("api/users")]
-// [Authorize(Roles = "Admin")] // Uncomment when roles are implemented
+[Authorize(Roles = "Admin")]
 public class AdminUserController : BaseApiController
 {
     private readonly IUserManagementService _userService;

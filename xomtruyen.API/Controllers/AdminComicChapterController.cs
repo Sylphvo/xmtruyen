@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using XomTruyen.API.Models.Requests;
 using XomTruyen.API.Services.Interfaces;
@@ -5,6 +6,7 @@ using XomTruyen.API.Services.Interfaces;
 namespace XomTruyen.API.Controllers;
 
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class AdminComicChapterController : BaseApiController
 {
     private readonly IComicChapterManagementService _chapterService;

@@ -11,6 +11,9 @@ import { Login } from './pages/Login';
 import { Database } from './pages/Database';
 import { DatabaseTableViewer } from './pages/DatabaseTableViewer';
 import { BookFiles } from './pages/BookFiles';
+import { Transactions } from './pages/Transactions';
+import { SubscriptionPlans } from './pages/SubscriptionPlans';
+import { Reviews } from './pages/Reviews';
 
 function App() {
   return (
@@ -19,14 +22,18 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/books" element={<Books />} />
+          <Route path="/books" element={<Books formatType={0} />} />
+          <Route path="/comics" element={<Books formatType={1} />} />
           <Route path="/books/:id" element={<BookDetails />} />
           <Route path="/topics" element={<Topics />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/users" element={<Users />} />
           <Route path="/database" element={<Database />} />
           <Route path="/database/:tableName" element={<DatabaseTableViewer />} />
+          <Route path="/transactions" element={<Transactions />} />
           <Route path="/book-files" element={<BookFiles />} />
+          <Route path="/plans" element={<SubscriptionPlans />} />
+          <Route path="/reviews" element={<Reviews />} />
         </Route>
       </Routes>
       <Toaster position="top-right" />

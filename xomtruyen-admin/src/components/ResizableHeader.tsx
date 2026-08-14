@@ -38,7 +38,7 @@ export const ResizableHeader: React.FC<{
         ...style,
         width: typeof width === 'number' ? `${width}px` : width,
         minWidth: `${minWidth}px`,
-        position: 'relative',
+        position: style?.position || 'relative',
         userSelect: 'none'
       }}
       onClick={onClick}

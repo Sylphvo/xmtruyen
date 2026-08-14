@@ -386,6 +386,37 @@ namespace xomtruyen.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SubscriptionPlans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DurationDays = 3650,
+                            IsUnlimited = false,
+                            MaxChaptersPerDay = 10,
+                            Name = "Free",
+                            Price = 0,
+                            RemoveAds = false
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DurationDays = 30,
+                            IsUnlimited = false,
+                            MaxChaptersPerDay = 30,
+                            Name = "Basic",
+                            Price = 29000,
+                            RemoveAds = false
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DurationDays = 30,
+                            IsUnlimited = true,
+                            Name = "VIP",
+                            Price = 59000,
+                            RemoveAds = true
+                        });
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Topic", b =>
@@ -420,13 +451,34 @@ namespace xomtruyen.API.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("CoinAmount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalTransactionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<int?>("SubscriptionPlanId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TransactionType")
                         .IsRequired()
@@ -437,6 +489,8 @@ namespace xomtruyen.API.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionPlanId");
 
                     b.HasIndex("UserId");
 
@@ -492,6 +546,10 @@ namespace xomtruyen.API.Migrations
                     b.Property<string>("ProviderId")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("TotalGuestReads")
                         .HasColumnType("integer");
@@ -741,10 +799,17 @@ namespace xomtruyen.API.Migrations
 
             modelBuilder.Entity("XomTruyen.API.Models.Transaction", b =>
                 {
+                    b.HasOne("XomTruyen.API.Models.SubscriptionPlan", "SubscriptionPlan")
+                        .WithMany()
+                        .HasForeignKey("SubscriptionPlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("XomTruyen.API.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SubscriptionPlan");
 
                     b.Navigation("User");
                 });

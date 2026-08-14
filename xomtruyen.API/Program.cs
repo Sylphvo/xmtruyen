@@ -10,6 +10,7 @@ using XomTruyen.API.Repositories.Implementations;
 using XomTruyen.API.Services.Interfaces;
 using XomTruyen.API.Services.Implementations;
 using XomTruyen.API.Services.Background;
+using XomTruyen.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,8 +62,12 @@ builder.Services.AddScoped<ICategoryManagementService, CategoryManagementService
 builder.Services.AddScoped<ITopicManagementService, TopicManagementService>();
 builder.Services.AddScoped<IPublicationManagementService, PublicationManagementService>();
 builder.Services.AddScoped<IComicChapterManagementService, ComicChapterManagementService>();
+builder.Services.AddScoped<IBookChapterManagementService, BookChapterManagementService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<XomTruyen.API.Services.IPaymentService, XomTruyen.API.Services.PaymentService>();
+builder.Services.AddScoped<IEngagementService, EngagementService>();
+builder.Services.AddScoped<IDiscoveryService, DiscoveryService>();
 
 // Register Publication Processing Services
 builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx => new BackgroundTaskQueue(100));

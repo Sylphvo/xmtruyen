@@ -56,7 +56,8 @@ export default function Sidebar() {
 
   return (
     <div 
-      style={{ display: "flex", height: "100vh", zIndex: 1000, position: "relative" }}
+      className="desktop-sidebar"
+      style={{ height: "100vh", zIndex: 1000, position: "relative" }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

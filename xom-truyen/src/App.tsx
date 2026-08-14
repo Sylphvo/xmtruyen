@@ -5,6 +5,7 @@ import Header from "./components/Layout/Header";
 import HomePage from "./pages";
 import LibraryPage from "./pages/LibraryPage";
 import ComicPage from "./pages/ComicPage";
+import { SearchPage } from "./pages/SearchPage";
 import LoginPage from "./pages/LoginPage"; // <-- Nhớ import trang Login vào đây
 import RegisterPage from "./pages/RegisterPage"; // <-- Import thêm trang Register (nếu có)
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -13,6 +14,8 @@ import ReadingPage from "./pages/ReadingPage";
 import HistoryPage from "./pages/HistoryPage";
 import BookmarkPage from "./pages/BookmarkPage";
 import ProfilePage from "./pages/ProfilePage";
+import WalletPage from "./pages/WalletPage";
+import SubscriptionPage from "./pages/SubscriptionPage";
 import { BG } from "./constants";
 
 // ─── COMPONENT LAYOUT CHÍNH ──────────────────────────────────────────────────
@@ -95,6 +98,16 @@ export default function App() {
           }
         />
 
+        {/* Tuyến đường Tìm kiếm */}
+        <Route
+          path="/search"
+          element={
+            <MainLayout>
+              <SearchPage />
+            </MainLayout>
+          }
+        />
+
         {/* Tuyến đường Thư viện sách */}
         <Route
           path="/library"
@@ -151,6 +164,26 @@ export default function App() {
           element={
             <MainLayout>
               <BookDetailPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Tuyến đường Nạp xu */}
+        <Route
+          path="/wallet"
+          element={
+            <MainLayout>
+              <WalletPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Tuyến đường Mua gói VIP */}
+        <Route
+          path="/subscription"
+          element={
+            <MainLayout>
+              <SubscriptionPage />
             </MainLayout>
           }
         />

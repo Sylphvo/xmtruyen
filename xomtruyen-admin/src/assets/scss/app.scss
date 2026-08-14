@@ -301,3 +301,155 @@ table.table tbody tr {
   -ms-overflow-style: none; 
   scrollbar-width: none; 
 }
+
+// Jira-like Table Redesign
+.jira-table-container {
+  background-color: #ffffff !important;
+  color: #172b4d !important;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #dfe1e6;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.jira-table-header {
+  background-color: #f4f5f7 !important;
+  border-bottom: 1px solid #dfe1e6 !important;
+}
+
+.jira-table-header th {
+  background-color: #f4f5f7 !important;
+  color: #5e6c84 !important;
+  border: none !important;
+  border-right: 1px solid #dfe1e6 !important;
+  padding: 8px 16px !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+.jira-table-header th:last-child {
+  border-right: none !important;
+}
+
+.jira-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  text-align: center;
+  
+  h4 {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #172b4d;
+    font-size: 18px;
+  }
+  
+  p {
+    color: #5e6c84;
+    font-size: 14px;
+    max-width: 450px;
+    line-height: 1.5;
+  }
+}
+
+.jira-table-footer {
+  background-color: #ffffff;
+  border-top: 1px solid #dfe1e6;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #5e6c84;
+
+  .btn-create {
+    color: #5e6c84;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(9, 30, 66, 0.08);
+      color: #172b4d;
+    }
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    
+    .icon-btn {
+      color: #5e6c84;
+      background: transparent;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      &:hover { color: #172b4d; }
+    }
+  }
+}
+
+.jira-table-row {
+  border-bottom: 1px solid #dfe1e6 !important;
+  background-color: #ffffff !important;
+  
+  td {
+    border: none !important;
+    border-right: 1px solid #dfe1e6 !important;
+    color: #172b4d !important;
+    background-color: #ffffff !important;
+    padding: 12px 16px !important;
+  }
+  td:last-child {
+    border-right: none !important;
+  }
+  &:hover td {
+    background-color: rgba(9, 30, 66, 0.04) !important;
+  }
+}
+
+.jira-scroll {
+  &::-webkit-scrollbar {
+    height: 14px;
+    width: 14px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #babaca;
+    border-radius: 10px;
+    border: 3px solid #ffffff;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #8c8c8c;
+  }
+  &::-webkit-scrollbar-button:single-button {
+    background-color: transparent;
+    display: block;
+    height: 14px;
+    width: 16px;
+  }
+  &::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235e6c84"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>');
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  &::-webkit-scrollbar-button:single-button:horizontal:increment {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235e6c84"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>');
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}

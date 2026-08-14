@@ -158,7 +158,7 @@ code {
   background: var(--code-bg);
 }
 
-/* Fix browser autofill styling (tránh bị đen nền do dark mode mặc định của trình duyệt) */
+/* Fix browser autofill styling */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -166,4 +166,25 @@ input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 100px var(--bg) inset !important;
   -webkit-text-fill-color: var(--text-primary) !important;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Responsive Classes */
+.desktop-sidebar {
+  display: flex;
+}
+
+.mobile-menu-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  .header-search {
+    display: none !important;
+  }
 }

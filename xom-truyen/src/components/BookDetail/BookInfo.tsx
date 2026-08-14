@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, Bookmark, Heart, Share2, BookOpen } from "lucide-react";
 import BookCover from "../Book/BookCover";
 import type { Book } from "../../types";
+import { checkFavorite, toggleFavorite } from "../../services/engagementService";
 
 interface BookInfoProps {
   book: Book;
@@ -10,6 +11,28 @@ interface BookInfoProps {
 
 export default function BookInfo({ book }: BookInfoProps) {
   const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    if (book.id) {
+      checkFavorite(book.id.toString())
+        .then(res => setIsFavorite(res.data))
+        .catch(() => {});
+    }
+  }, [book.id]);
+
+  const handleToggleFavorite = async () => {
+    try {
+      const res = await toggleFavorite(book.id.toString());
+      if (res.message === "Added to favorites") {
+        setIsFavorite(true);
+      } else {
+        setIsFavorite(false);
+      }
+    } catch (err) {
+      alert("Vui lòng đăng nhập để thêm vào yêu thích!");
+    }
+  };
 
   return (
     <div style={{ display: "flex", gap: "40px", marginBottom: "40px" }}>
@@ -99,7 +122,9 @@ export default function BookInfo({ book }: BookInfoProps) {
             <Bookmark size={22} />
           </button>
           
-          <button style={{
+          <button 
+            onClick={handleToggleFavorite}
+            style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -107,10 +132,10 @@ export default function BookInfo({ book }: BookInfoProps) {
             height: "40px",
             backgroundColor: "transparent",
             border: "none",
-            color: "#4b5563",
+            color: isFavorite ? "#ef4444" : "#4b5563",
             cursor: "pointer"
           }}>
-            <Heart size={22} />
+            <Heart size={22} fill={isFavorite ? "#ef4444" : "none"} />
           </button>
           
           <button style={{

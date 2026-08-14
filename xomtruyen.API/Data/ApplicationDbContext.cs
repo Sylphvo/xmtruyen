@@ -38,6 +38,13 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            
+            // Seed Data
+            entity.HasData(
+                new SubscriptionPlan { Id = 1, Name = "Free", Price = 0, DurationDays = 3650, IsUnlimited = false, MaxChaptersPerDay = 10, RemoveAds = false },
+                new SubscriptionPlan { Id = 2, Name = "Basic", Price = 29000, DurationDays = 30, IsUnlimited = false, MaxChaptersPerDay = 30, RemoveAds = false },
+                new SubscriptionPlan { Id = 3, Name = "VIP", Price = 59000, DurationDays = 30, IsUnlimited = true, MaxChaptersPerDay = null, RemoveAds = true }
+            );
         });
 
         // User
@@ -258,11 +265,19 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.TransactionType).HasMaxLength(50).IsRequired();
             entity.Property(e => e.Status).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+            entity.Property(e => e.ExternalTransactionId).HasMaxLength(255);
+            entity.Property(e => e.Note).HasMaxLength(500);
             
             entity.HasOne(e => e.User)
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.HasOne(e => e.SubscriptionPlan)
+                  .WithMany()
+                  .HasForeignKey(e => e.SubscriptionPlanId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // UserToken

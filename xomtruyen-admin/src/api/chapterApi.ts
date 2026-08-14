@@ -106,3 +106,41 @@ export const chapterApi = {
         );
     }
 };
+
+export interface BookChapter {
+    id: string;
+    publicationId: string;
+    chapterNumber: number;
+    title?: string;
+    content?: string;
+    isLocked: boolean;
+    coinPrice?: number;
+    viewCount?: number;
+    createdAt?: string;
+}
+
+export const bookChapterApi = {
+    getChaptersByPublication: async (publicationId: string) => {
+        return apiClient.get<any, any>(`/AdminBookChapter/publication/${publicationId}`);
+    },
+
+    getChapterById: async (chapterId: string) => {
+        return apiClient.get<any, any>(`/AdminBookChapter/${chapterId}`);
+    },
+
+    createChapter: async (data: Partial<BookChapter>) => {
+        return apiClient.post<any, any>(`/AdminBookChapter`, data);
+    },
+
+    updateChapter: async (chapterId: string, data: Partial<BookChapter>) => {
+        return apiClient.put<any, any>(`/AdminBookChapter/${chapterId}`, data);
+    },
+
+    deleteChapter: async (chapterId: string) => {
+        return apiClient.delete<any, any>(`/AdminBookChapter/${chapterId}`);
+    },
+
+    deleteAllChapters: async (publicationId: string) => {
+        return apiClient.delete<any, any>(`/AdminBookChapter/publication/${publicationId}/chapters`);
+    }
+};

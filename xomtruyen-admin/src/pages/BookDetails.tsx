@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPlus, faTrash, faEdit, faImage, faSave, faTimes, faUpload, faFileImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPlus, faTrash, faEdit, faImage, faSave, faTimes, faUpload, faFileImage, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-hot-toast';
 import { Modal, Button, ProgressBar } from 'react-bootstrap';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { BulkUploadModal } from '../components/BulkUploadModal';
 import * as bookApi from '../api/bookApi';
 import type { IBook } from '../types/book';
-import { chapterApi, type ComicChapter, type ComicPage } from '../api/chapterApi';
+import { chapterApi, bookChapterApi, type ComicChapter, type BookChapter, type ComicPage } from '../api/chapterApi';
 import { uploadChapterPage } from '../api/uploadApi';
 import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,7 +16,7 @@ export const BookDetails = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [book, setBook] = useState<IBook | null>(null);
-    const [chapters, setChapters] = useState<ComicChapter[]>([]);
+    const [chapters, setChapters] = useState<any[]>([]); // Can be ComicChapter or BookChapter
     const [loading, setLoading] = useState(true);
     
     // Pagination state
@@ -30,10 +30,11 @@ export const BookDetails = () => {
 
     // Add/Edit chapter modal state
     const [showChapterModal, setShowChapterModal] = useState(false);
-    const [editingChapter, setEditingChapter] = useState<ComicChapter | null>(null);
+    const [editingChapter, setEditingChapter] = useState<any | null>(null);
     const [chapterForm, setChapterForm] = useState({
         chapterNumber: 1,
         title: '',
+        content: '',
         isLocked: false,
         coinPrice: 0
     });
@@ -45,6 +46,8 @@ export const BookDetails = () => {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [existingPages, setExistingPages] = useState<ComicPage[]>([]);
+
+    const isTextBook = book?.formatType === 1;
 
     useEffect(() => {
         if (id) {
@@ -58,8 +61,13 @@ export const BookDetails = () => {
             const bookData = await bookApi.getBookById(id!);
             setBook(bookData);
             
-            const chaptersData = await chapterApi.getChaptersByPublication(id!);
-            setChapters(chaptersData.data || []);
+            if (bookData.formatType === 1) {
+                const chaptersData = await bookChapterApi.getChaptersByPublication(id!);
+                setChapters(chaptersData.data || []);
+            } else {
+                const chaptersData = await chapterApi.getChaptersByPublication(id!);
+                setChapters(chaptersData.data || []);
+            }
         } catch (error) {
             toast.error('Lỗi khi tải thông tin sách');
             console.error(error);
@@ -70,15 +78,33 @@ export const BookDetails = () => {
 
     const handleSaveChapter = async () => {
         try {
-            if (editingChapter) {
-                await chapterApi.updateChapter(editingChapter.id, chapterForm);
-                toast.success('Cập nhật chapter thành công');
-            } else {
-                await chapterApi.createChapter({
+            if (isTextBook) {
+                const dataToSave = {
                     ...chapterForm,
                     publicationId: id!
-                });
-                toast.success('Thêm chapter thành công');
+                };
+                if (editingChapter) {
+                    await bookChapterApi.updateChapter(editingChapter.id, dataToSave);
+                    toast.success('Cập nhật chapter thành công');
+                } else {
+                    await bookChapterApi.createChapter(dataToSave);
+                    toast.success('Thêm chapter thành công');
+                }
+            } else {
+                const dataToSave = {
+                    chapterNumber: chapterForm.chapterNumber,
+                    title: chapterForm.title,
+                    isLocked: chapterForm.isLocked,
+                    coinPrice: chapterForm.coinPrice,
+                    publicationId: id!
+                };
+                if (editingChapter) {
+                    await chapterApi.updateChapter(editingChapter.id, dataToSave);
+                    toast.success('Cập nhật chapter thành công');
+                } else {
+                    await chapterApi.createChapter(dataToSave);
+                    toast.success('Thêm chapter thành công');
+                }
             }
             setShowChapterModal(false);
             fetchData();
@@ -91,7 +117,11 @@ export const BookDetails = () => {
     const handleDeleteChapter = async (chapterId: string) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa chapter này?')) {
             try {
-                await chapterApi.deleteChapter(chapterId);
+                if (isTextBook) {
+                    await bookChapterApi.deleteChapter(chapterId);
+                } else {
+                    await chapterApi.deleteChapter(chapterId);
+                }
                 toast.success('Xóa chapter thành công');
                 fetchData();
             } catch (error) {
@@ -105,7 +135,11 @@ export const BookDetails = () => {
         if (!chapters || chapters.length === 0) return;
         if (window.confirm('CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ chapter của truyện này? Hành động này không thể hoàn tác!')) {
             try {
-                await chapterApi.deleteAllChapters(id!);
+                if (isTextBook) {
+                    await bookChapterApi.deleteAllChapters(id!);
+                } else {
+                    await chapterApi.deleteAllChapters(id!);
+                }
                 toast.success('Đã xóa toàn bộ chapter thành công');
                 setCurrentPage(1);
                 fetchData();
@@ -116,12 +150,13 @@ export const BookDetails = () => {
         }
     };
 
-    const openChapterModal = (chapter?: ComicChapter) => {
+    const openChapterModal = (chapter?: any) => {
         if (chapter) {
             setEditingChapter(chapter);
             setChapterForm({
                 chapterNumber: chapter.chapterNumber,
                 title: chapter.title || '',
+                content: chapter.content || '',
                 isLocked: chapter.isLocked,
                 coinPrice: chapter.coinPrice || 0
             });
@@ -133,6 +168,7 @@ export const BookDetails = () => {
             setChapterForm({
                 chapterNumber: nextChapterNum,
                 title: '',
+                content: '',
                 isLocked: false,
                 coinPrice: 0
             });
@@ -278,10 +314,17 @@ export const BookDetails = () => {
                                     <td className="text-center fw-bold text-dark" style={{ padding: '16px' }}>{chapter.chapterNumber}</td>
                                     <td className="fw-medium text-dark" style={{ padding: '16px' }}>{chapter.title || `Chapter ${chapter.chapterNumber}`}</td>
                                     <td className="text-center" style={{ padding: '16px' }}>
-                                        <span className="badge rounded-pill bg-light text-primary border" style={{ padding: '6px 12px', fontSize: '13px' }}>
-                                            <FontAwesomeIcon icon={faImage} className="me-2" />
-                                            {chapter.imageCount} ảnh
-                                        </span>
+                                        {isTextBook ? (
+                                            <span className="badge rounded-pill bg-light text-primary border" style={{ padding: '6px 12px', fontSize: '13px' }}>
+                                                <FontAwesomeIcon icon={faFileAlt} className="me-2" />
+                                                Truyện Chữ
+                                            </span>
+                                        ) : (
+                                            <span className="badge rounded-pill bg-light text-primary border" style={{ padding: '6px 12px', fontSize: '13px' }}>
+                                                <FontAwesomeIcon icon={faImage} className="me-2" />
+                                                {chapter.imageCount} ảnh
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="text-center" style={{ padding: '16px' }}>{chapter.coinPrice || 0}</td>
                                     <td className="text-center" style={{ padding: '16px' }}>{chapter.viewCount || 0}</td>
@@ -290,9 +333,11 @@ export const BookDetails = () => {
                                     </td>
                                     <td className="text-center" style={{ padding: '16px' }}>
                                         <div className="d-flex gap-2 justify-content-center">
-                                            <button className="btn btn-sm btn-light border" onClick={() => openPagesModal(chapter)} title="Quản lý ảnh" style={{ color: '#5955D1', borderRadius: '6px' }}>
-                                                <FontAwesomeIcon icon={faUpload} />
-                                            </button>
+                                            {!isTextBook && (
+                                                <button className="btn btn-sm btn-light border" onClick={() => openPagesModal(chapter)} title="Quản lý ảnh" style={{ color: '#5955D1', borderRadius: '6px' }}>
+                                                    <FontAwesomeIcon icon={faUpload} />
+                                                </button>
+                                            )}
                                             <button className="btn btn-sm btn-light border" onClick={() => openChapterModal(chapter)} title="Sửa" style={{ color: '#4b5563', borderRadius: '6px' }}>
                                                 <FontAwesomeIcon icon={faEdit} />
                                             </button>
@@ -339,23 +384,37 @@ export const BookDetails = () => {
             </div>
 
             {/* Chapter Modal */}
-            <Modal show={showChapterModal} onHide={() => setShowChapterModal(false)} centered>
+            <Modal show={showChapterModal} onHide={() => setShowChapterModal(false)} centered size="lg">
                 <Modal.Header closeButton className="border-0 pb-0">
                     <Modal.Title className="fs-5 fw-bold">{editingChapter ? 'Sửa Chapter' : 'Thêm Chapter'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className="mb-3">
-                        <label className="form-label fw-medium">Số Chapter</label>
-                        <input type="number" step="any" className="form-control" value={chapterForm.chapterNumber} onChange={e => setChapterForm({...chapterForm, chapterNumber: parseFloat(e.target.value) || 0})} />
+                    <div className="row">
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label fw-medium">Số Chapter</label>
+                            <input type="number" step="any" className="form-control" value={chapterForm.chapterNumber} onChange={e => setChapterForm({...chapterForm, chapterNumber: parseFloat(e.target.value) || 0})} />
+                        </div>
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label fw-medium">Giá Coin</label>
+                            <input type="number" className="form-control" value={chapterForm.coinPrice} onChange={e => setChapterForm({...chapterForm, coinPrice: parseInt(e.target.value) || 0})} />
+                        </div>
                     </div>
                     <div className="mb-3">
                         <label className="form-label fw-medium">Tiêu đề (Tùy chọn)</label>
                         <input type="text" className="form-control" placeholder="VD: Khởi đầu mới" value={chapterForm.title} onChange={e => setChapterForm({...chapterForm, title: e.target.value})} />
                     </div>
-                    <div className="mb-3">
-                        <label className="form-label fw-medium">Giá Coin</label>
-                        <input type="number" className="form-control" value={chapterForm.coinPrice} onChange={e => setChapterForm({...chapterForm, coinPrice: parseInt(e.target.value) || 0})} />
-                    </div>
+                    {isTextBook && (
+                        <div className="mb-3">
+                            <label className="form-label fw-medium">Nội dung chương (Truyện chữ)</label>
+                            <textarea 
+                                className="form-control" 
+                                rows={15}
+                                placeholder="Nhập nội dung chương..." 
+                                value={chapterForm.content} 
+                                onChange={e => setChapterForm({...chapterForm, content: e.target.value})}
+                            ></textarea>
+                        </div>
+                    )}
                     <div className="form-check form-switch mb-3">
                         <input className="form-check-input" type="checkbox" role="switch" checked={chapterForm.isLocked} onChange={e => setChapterForm({...chapterForm, isLocked: e.target.checked})} />
                         <label className="form-check-label">Khóa (Yêu cầu mua)</label>

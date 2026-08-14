@@ -249,7 +249,9 @@ public class AuthService : IAuthService
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email ?? user.Provider ?? string.Empty)
+                new Claim(ClaimTypes.Name, user.FullName ?? user.Email ?? "Unknown"),
+                new Claim(ClaimTypes.Email, user.Email ?? user.Provider ?? string.Empty),
+                new Claim(ClaimTypes.Role, user.Role ?? "User")
             }),
             Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpireMinutes"]!)),
             Issuer = jwtSettings["Issuer"],

@@ -20,4 +20,5 @@ public class User
     public DateOnly? LastReadDate { get; set; }
     public DateTime? CreatedAt { get; set; }
     public bool IsActive { get; set; } = true;
+    public string Role { get; set; } = "User";
 }

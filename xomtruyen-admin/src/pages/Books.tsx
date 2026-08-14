@@ -22,7 +22,7 @@ interface SortConfig {
 import { ResizableHeader } from '../components/ResizableHeader';
 import { useNavigate } from 'react-router-dom';
 
-export const Books: React.FC = () => {
+export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatType }) => {
   const navigate = useNavigate();
   const getImageUrl = (url?: string) => {
     if (!url) return defaultBookImage;
@@ -424,56 +424,49 @@ export const Books: React.FC = () => {
 
   return (
     <>
-      <div className="card border-0 shadow-sm h-auto" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
-        <div className="card-header border-bottom-0 pt-4 pb-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: 'transparent' }}>
-          <h5 className="mb-0 fw-semibold" style={{ color: 'var(--bs-heading-color)' }}>Quản lý Sách</h5>
-          <Button variant="primary" size="sm" onClick={() => setIsAddingNew(true)} className="d-flex align-items-center gap-2 rounded-2">
-            <FontAwesomeIcon icon={faPlus} />
-            Thêm Mới
-          </Button>
-        </div>
-
-        <div className="card-body d-flex flex-column">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div className="d-flex align-items-center gap-2">
-              <Form.Select
-                size="sm"
-                className="bg-transparent text-body border-secondary-subtle"
-                style={{ width: '70px' }}
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={15}>15</option>
-                <option value={20}>20</option>
-              </Form.Select>
-              <span className="text-muted small">dòng / trang</span>
-            </div>
-
-            <div style={{ width: '250px' }}>
-              <Form.Control
-                size="sm"
-                type="text"
-                className="bg-transparent text-body border-secondary-subtle"
-                placeholder="Tìm kiếm..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
+      <div className="jira-table-container">
+        {/* Custom Header for search and filters */}
+        <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #323338' }}>
+          <div className="d-flex align-items-center gap-2">
+            <Form.Select
+              size="sm"
+              className="bg-transparent text-light border-secondary-subtle"
+              style={{ width: '70px', color: '#e3e3e3' }}
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </Form.Select>
+            <span className="small" style={{ color: '#9ba1a6' }}>dòng / trang</span>
           </div>
 
-          <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-            <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1450px' }}>
-              <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
-                <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                  <ResizableHeader initialWidth={90} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+          <div style={{ width: '250px' }}>
+            <Form.Control
+              size="sm"
+              type="text"
+              className="bg-transparent border-secondary-subtle"
+              style={{ color: '#e3e3e3' }}
+              placeholder="Tìm kiếm..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ minHeight: '616px', maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
+          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1450px' }}>
+            <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+              <tr>
+                  <ResizableHeader initialWidth={90} style={{ borderLeft: 0, backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
                     <span className="fw-semibold text-nowrap">Ảnh Bìa</span>
                   </ResizableHeader>
                   <ResizableHeader initialWidth={260} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('title')}>
@@ -497,16 +490,16 @@ export const Books: React.FC = () => {
                   <ResizableHeader initialWidth={150} minWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('status')}>
                     <span className="fw-semibold text-nowrap">Trạng Thái {getSortIcon('status')}</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={350} minWidth={350} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={350} minWidth={350} style={{ borderRight: 0, backgroundColor: 'var(--bs-body-bg)', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
                     <span className="fw-semibold text-nowrap">Thao Tác <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: '12px' }} /></span>
                   </ResizableHeader>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style={{ height: '1px' }}>
                 <>
                   {isAddingNew && (
-                    <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
+                    <tr className="jira-table-row inline-edit-row" style={{ height: '46px' }}>
+                      <td style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
                         <div className="d-flex flex-column align-items-center gap-2">
                           <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => { setTargetCoverBookId('NEW'); coverInputRef.current?.click(); }} title="Click để upload ảnh bìa">
                             <img 
@@ -578,7 +571,7 @@ export const Books: React.FC = () => {
                           On Hold
                         </div>
                       </td>
-                      <td style={{ padding: '5px 6px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      <td style={{ borderRight: 0, padding: '5px 6px', textAlign: 'center', backgroundColor: 'var(--bs-body-bg)', color: 'var(--bs-body-color)' }}>
                         <div className="d-flex gap-2 justify-content-center">
                           <Button variant="light" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                             <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
@@ -594,13 +587,13 @@ export const Books: React.FC = () => {
                   )}
                   {isLoading ? (
                     <tr>
-                      <td colSpan={9} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                      <td colSpan={9} style={{ borderLeft: 0, borderRight: 0 }} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
                     </tr>
                   ) : sortedData.length > 0 ? (
                     sortedData.map((book) => (
                       <React.Fragment key={book.id}>
-                        <tr className={editingBookId === book.id ? "inline-edit-row" : ""} style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
+                        <tr className={editingBookId === book.id ? "jira-table-row inline-edit-row" : "jira-table-row"} style={{ height: '46px' }}>
+                          <td style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
                             <div className="d-flex flex-column align-items-center gap-2">
                               <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => { setTargetCoverBookId(book.id); coverInputRef.current?.click(); }} title="Click để thay đổi ảnh bìa">
                                 <img
@@ -807,7 +800,7 @@ export const Books: React.FC = () => {
                             </div>
                           </td>
 
-                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--bs-body-color)' }}>
+                          <td style={{ borderRight: 0, padding: '5px 6px', backgroundColor: 'var(--bs-body-bg)', textAlign: 'center', color: 'var(--bs-body-color)' }}>
                             {editingBookId === book.id ? (
                               <div className="d-flex gap-2 justify-content-center">
                                 <Button variant="light" size="sm" onClick={() => handleSaveEdit(book.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
@@ -843,79 +836,53 @@ export const Books: React.FC = () => {
                         </tr>
                       </React.Fragment>
                     ))
-                  ) : (
+                  ) : !isAddingNew ? (
                     <tr>
-                      <td colSpan={8} className="text-center py-4 text-muted">
-                        Không tìm thấy dữ liệu
+                      <td colSpan={9} style={{ border: 0, padding: 0 }}>
+                        <div className="jira-empty-state">
+                          <h4>There are no work items here yet</h4>
+                          <p>You either don't have any work items or your existing ones don't match your current filters.</p>
+                        </div>
                       </td>
                     </tr>
-                  )}
+                  ) : null}
                 </>
+              </tbody>
+              <tbody style={{ height: 'auto' }}>
+                {/* Filler row to push the table height and extend the sticky border */}
+                <tr style={{ height: '100%' }}>
+                  <td style={{ borderBottom: 0, borderLeft: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  <td style={{ borderBottom: 0, borderRight: 0, padding: 0, backgroundColor: 'var(--bs-body-bg)' }}></td>
+                </tr>
               </tbody>
             </table>
           </div>
 
-          <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top bg-white">
-            <div className="text-muted" style={{ fontSize: '13px' }}>
-              Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + itemsPerPage, totalItems)} trong {totalItems} sách
+          <div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr' }}>
+            <div>
+              <button className="btn-create" onClick={() => setIsAddingNew(true)}>
+                <FontAwesomeIcon icon={faPlus} /> Create
+              </button>
             </div>
-
-            {totalPages > 1 && (
-              <div className="d-flex" style={{ gap: '4px' }}>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: validCurrentPage === 1 ? '#a9b1c0' : '#5955D1' }}
-                  onClick={() => setCurrentPage(1)}
-                  disabled={validCurrentPage === 1}
-                >
-                  <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
-                </button>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: validCurrentPage === 1 ? '#a9b1c0' : '#5955D1' }}
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={validCurrentPage === 1}
-                >
-                  <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
-                </button>
-
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i + 1}
-                    className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
-                    style={{
-                      width: '32px', height: '32px', fontSize: '13px',
-                      backgroundColor: i + 1 === validCurrentPage ? '#5955D1' : '#f4f5f8',
-                      color: i + 1 === validCurrentPage ? '#fff' : '#5955D1'
-                    }}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: validCurrentPage === totalPages ? '#a9b1c0' : '#5955D1' }}
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={validCurrentPage === totalPages}
-                >
-                  <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
-                </button>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: validCurrentPage === totalPages ? '#a9b1c0' : '#5955D1' }}
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={validCurrentPage === totalPages}
-                >
-                  <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
-                </button>
-              </div>
-            )}
+            <div className="pagination-controls">
+              <span>{totalItems === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}</span>
+              <button className="icon-btn" onClick={() => setCurrentPage(1)} disabled={validCurrentPage === 1}><FontAwesomeIcon icon={faAngleDoubleLeft} /></button>
+              <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={validCurrentPage === 1}><FontAwesomeIcon icon={faAngleLeft} /></button>
+              <span>{validCurrentPage} / {totalPages || 1}</span>
+              <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={validCurrentPage === totalPages}><FontAwesomeIcon icon={faAngleRight} /></button>
+              <button className="icon-btn" onClick={() => setCurrentPage(totalPages)} disabled={validCurrentPage === totalPages}><FontAwesomeIcon icon={faAngleDoubleRight} /></button>
+              <button className="icon-btn" onClick={() => setRefreshTrigger(prev => prev + 1)} title="Refresh"><FontAwesomeIcon icon={faExchangeAlt} /></button>
+            </div>
+            <div></div>
           </div>
         </div>
-
-      </div>
       
       <input 
         type="file" 

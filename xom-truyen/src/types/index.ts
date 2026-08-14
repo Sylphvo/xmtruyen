@@ -27,6 +27,7 @@ export interface Book {
 export interface PublicationFilter {
   keyword?: string;
   categoryId?: string | number;
+  categorySlug?: string;
   formatType?: number;
   accessLevel?: number;
   status?: string;

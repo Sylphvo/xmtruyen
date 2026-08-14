@@ -4,7 +4,9 @@ import ReadingHeader from "../components/Reading/ReadingHeader";
 import ReadingContent from "../components/Reading/ReadingContent";
 import ComicReadingContent from "../components/Reading/ComicReadingContent";
 import { useBookDetail } from "../hooks/useBooks";
-import { getComicChapters, getChapterContent } from "../services/bookService";
+import { getComicChapters, getTextChapters, getChapterContent, incrementViewCount } from "../services/bookService";
+import { saveHistory, toggleBookmark } from "../services/engagementService";
+import { Bookmark } from "lucide-react";
 
 export default function ReadingPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +17,9 @@ export default function ReadingPage() {
   const [chapters, setChapters] = useState<any[]>([]);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [textContent, setTextContent] = useState<string>("");
   const [contentLoading, setContentLoading] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   // Mode toggling
   const isComicFromState = location.state?.isComic;
@@ -34,16 +38,17 @@ export default function ReadingPage() {
   // Fetch chapters list when id is available
   useEffect(() => {
     if (id) {
-      getComicChapters(id).then(data => {
+      const fetcher = isComicMode ? getComicChapters : getTextChapters;
+      fetcher(id).then(data => {
         setChapters(data);
         setCurrentChapterIndex(0); // Reset to first chapter
       });
     }
-  }, [id]);
+  }, [id, isComicMode]);
 
   // Fetch chapter content when chapter changes
   useEffect(() => {
-    if (chapters.length > 0 && chapters[currentChapterIndex]) {
+    if (chapters.length > 0 && chapters[currentChapterIndex] && id) {
       const chapterId = chapters[currentChapterIndex].id;
       setContentLoading(true);
       getChapterContent(chapterId).then(data => {
@@ -52,12 +57,43 @@ export default function ReadingPage() {
         } else {
           setImageUrls([]);
         }
+        if (data && data.content) {
+          setTextContent(data.content);
+        } else {
+          setTextContent(chapters[currentChapterIndex].content || "");
+        }
         setContentLoading(false);
+        
+        // Save History (1 for Book, 2 for Comic)
+        const chapterType = isComicMode ? 2 : 1;
+        saveHistory(id, chapterId, chapterType).catch(() => {});
+        // Increment View Count
+        incrementViewCount(id).catch(() => {});
       });
     } else {
       setImageUrls([]);
+      setTextContent("");
     }
-  }, [chapters, currentChapterIndex]);
+  }, [chapters, currentChapterIndex, id, isComicMode]);
+
+  const handleToggleBookmark = async () => {
+    if (chapters.length > 0 && chapters[currentChapterIndex]) {
+      const chapterId = chapters[currentChapterIndex].id;
+      const chapterType = isComicMode ? 2 : 1;
+      try {
+        const res = await toggleBookmark(chapterId, chapterType);
+        if (res.message === "Added bookmark") {
+          setIsBookmarked(true);
+          alert("Đã thêm đánh dấu trang!");
+        } else {
+          setIsBookmarked(false);
+          alert("Đã bỏ đánh dấu trang!");
+        }
+      } catch (err) {
+        alert("Vui lòng đăng nhập để đánh dấu trang!");
+      }
+    }
+  };
 
   const handlePrevPage = () => {
     setCurrentChapterIndex(prev => Math.max(0, prev - 1));
@@ -99,22 +135,43 @@ export default function ReadingPage() {
         <div style={{ flex: 1 }}>
           <ReadingHeader title={title} />
         </div>
-        <button 
-          onClick={toggleMode}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: isComicMode ? "#4f46e5" : "#10b981",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: 600,
-            fontSize: "14px",
-            whiteSpace: "nowrap"
-          }}
-        >
-          {isComicMode ? "Đang đọc: Truyện Tranh" : "Đang đọc: Truyện Chữ"}
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button 
+            onClick={handleToggleBookmark}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: isBookmarked ? "#f59e0b" : "#4b5563",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: 600,
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px"
+            }}
+          >
+            <Bookmark size={18} fill={isBookmarked ? "white" : "none"} />
+            {isBookmarked ? "Đã Đánh Dấu" : "Đánh Dấu"}
+          </button>
+          <button 
+            onClick={toggleMode}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: isComicMode ? "#4f46e5" : "#10b981",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: 600,
+              fontSize: "14px",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {isComicMode ? "Đang đọc: Truyện Tranh" : "Đang đọc: Truyện Chữ"}
+          </button>
+        </div>
       </div>
 
       {contentLoading && chapters.length > 0 ? (
@@ -139,6 +196,7 @@ export default function ReadingPage() {
           totalPages={totalPages}
           onPrevPage={handlePrevPage}
           onNextPage={handleNextPage}
+          textContent={textContent}
         />
       )}
 

@@ -6,7 +6,7 @@ using XomTruyen.API.Services.Interfaces;
 namespace XomTruyen.API.Controllers;
 
 [Route("api/topics")]
-// [Authorize(Roles = "Admin")] // Uncomment when roles are implemented
+[Authorize(Roles = "Admin")]
 public class AdminTopicController : BaseApiController
 {
     private readonly ITopicManagementService _topicService;

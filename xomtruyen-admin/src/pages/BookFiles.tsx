@@ -62,21 +62,21 @@ export const BookFiles: React.FC = () => {
   const paginatedData = files.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="card border-0 shadow-sm h-auto" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
-      <div className="card-header border-bottom-0 pt-4 pb-3 d-flex justify-content-between align-items-center bg-transparent">
-        <h5 className="mb-0 fw-semibold" style={{ color: 'var(--bs-heading-color)' }}>Quản lý File sách (Uploads)</h5>
-        <Button variant="outline-primary" size="sm" onClick={fetchFiles} className="d-flex align-items-center gap-2 rounded-2">
-          <FontAwesomeIcon icon={faSync} /> Làm mới
-        </Button>
-      </div>
-
-      <div className="card-body d-flex flex-column">
-        <div className="d-flex justify-content-between align-items-center mb-3">
+    <>
+      <div className="jira-table-container">
+      <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
+        <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý File sách (Uploads)</h5>
+        <div className="d-flex align-items-center gap-3">
+          <Button variant="light" size="sm" onClick={fetchFiles} className="d-flex align-items-center gap-2 rounded-2">
+            <FontAwesomeIcon icon={faSync} /> Làm mới
+          </Button>
+          
           <div className="d-flex align-items-center gap-2">
+            <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
             <Form.Select
               size="sm"
               className="bg-transparent text-body border-secondary-subtle"
-              style={{ width: '70px' }}
+              style={{ width: '70px', height: '32px', fontSize: '13px' }}
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -88,16 +88,16 @@ export const BookFiles: React.FC = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </Form.Select>
-            <span className="text-muted small">dòng / trang</span>
           </div>
         </div>
+      </div>
 
-        <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-          {isLoading ? (
-            <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
-          ) : (
-            <table className="table table-bordered mb-0 align-middle text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent' }}>
-              <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
+      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+        {isLoading ? (
+          <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
+        ) : (
+          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+            <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
                   <ResizableHeader initialWidth={60} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
                     <span className="fw-semibold text-nowrap">#</span>
@@ -119,7 +119,7 @@ export const BookFiles: React.FC = () => {
               <tbody>
                 {paginatedData.length > 0 ? (
                   paginatedData.map((file, i) => (
-                    <tr key={file.name} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                    <tr key={file.name} className="jira-table-row" style={{ height: '46px' }}>
                       <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{startIndex + i + 1}</td>
                       <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         <FontAwesomeIcon icon={faFileAlt} className="text-secondary me-2" />
@@ -138,7 +138,13 @@ export const BookFiles: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center py-5 text-muted" style={{ backgroundColor: 'transparent' }}>Chưa có file sách nào được upload.</td>
+                    <td colSpan={5} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                      <div className="jira-empty-state">
+                        <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                        <h4>There are no work items here yet</h4>
+                        <p>We couldn't find any data matching your criteria. Try adjusting your filters or search terms.</p>
+                      </div>
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -147,67 +153,30 @@ export const BookFiles: React.FC = () => {
         </div>
 
         {!isLoading && (
-          <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top bg-transparent">
-            <div className="text-muted" style={{ fontSize: '13px' }}>
-              Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + itemsPerPage, totalItems)} trong {totalItems} file
+          <div className="jira-table-footer">
+            <div style={{ visibility: 'hidden' }}>
+              <Button variant="light" size="sm" className="btn-create">
+                Create
+              </Button>
             </div>
 
             {totalPages > 1 && (
-              <div className="d-flex" style={{ gap: '4px' }}>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setCurrentPage(1)}
-                  disabled={validCurrentPage === 1}
-                >
-                  <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
+              <div className="pagination-controls">
+                <span className="text-muted" style={{ fontSize: '13px' }}>
+                  {startIndex + 1}-{Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
+                </span>
+                <button className="icon-btn" onClick={() => setCurrentPage(1)} disabled={validCurrentPage === 1}>
+                  <FontAwesomeIcon icon={faAngleDoubleLeft} />
                 </button>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={validCurrentPage === 1}
-                >
-                  <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
+                <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={validCurrentPage === 1}>
+                  <FontAwesomeIcon icon={faAngleLeft} />
                 </button>
-
-                {[...Array(totalPages)].map((_, i) => {
-                  if (i + 1 < validCurrentPage - 2 || i + 1 > validCurrentPage + 2) {
-                    if (i + 1 === 1 || i + 1 === totalPages) return null;
-                    if (i + 1 === validCurrentPage - 3 || i + 1 === validCurrentPage + 3) return <span key={i} className="px-1 text-muted">...</span>;
-                    return null;
-                  }
-                  return (
-                    <button
-                      key={i + 1}
-                      className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
-                      style={{
-                        width: '32px', height: '32px', fontSize: '13px',
-                        backgroundColor: i + 1 === validCurrentPage ? '#5955D1' : 'var(--bs-tertiary-bg)',
-                        color: i + 1 === validCurrentPage ? '#fff' : '#5955D1'
-                      }}
-                      onClick={() => setCurrentPage(i + 1)}
-                    >
-                      {i + 1}
-                    </button>
-                  );
-                })}
-
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={validCurrentPage === totalPages}
-                >
-                  <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
+                <span className="text-muted px-2">{validCurrentPage}</span>
+                <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={validCurrentPage === totalPages}>
+                  <FontAwesomeIcon icon={faAngleRight} />
                 </button>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={validCurrentPage === totalPages}
-                >
-                  <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
+                <button className="icon-btn" onClick={() => setCurrentPage(totalPages)} disabled={validCurrentPage === totalPages}>
+                  <FontAwesomeIcon icon={faAngleDoubleRight} />
                 </button>
               </div>
             )}
@@ -233,6 +202,6 @@ export const BookFiles: React.FC = () => {
           )}
         </Modal.Body>
       </Modal>
-    </div>
+    </>
   );
 };

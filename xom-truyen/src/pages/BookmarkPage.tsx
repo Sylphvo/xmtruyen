@@ -1,42 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BookmarkItem from "../components/Bookmark/BookmarkItem";
 import type { BookmarkRecord } from "../components/Bookmark/BookmarkItem";
 import Footer from "../components/Layout/Footer";
-
-// Mock Data
-const MOCK_BOOKMARKS: BookmarkRecord[] = [
-  {
-    id: 1,
-    type: "favorite", // Red heart
-    book: {
-      id: 2,
-      title: "Tiểu thư thần toán",
-      author: "Bạch Thiên",
-      genres: ["Cổ đại"],
-      images: "mock-book-2",
-      coverIndex: 1,
-      currentChapter: 12,
-      lastUpdated: "Đang ra"
-    }
-  },
-  {
-    id: 2,
-    type: "saved", // Yellow ribbon
-    book: {
-      id: 3,
-      title: "Cứ yêu cứ chiều",
-      author: "Nhất Lộ Phiên Hoa",
-      genres: ["Ngôn tình"],
-      images: "mock-book-3",
-      coverIndex: 2,
-      currentChapter: 61,
-      lastUpdated: "Hoàn thành"
-    }
-  }
-];
+import { getBookmarks, getFavorites } from "../services/engagementService";
 
 export default function BookmarkPage() {
-  const [bookmarks] = useState<BookmarkRecord[]>(MOCK_BOOKMARKS);
+  const [bookmarks, setBookmarks] = useState<BookmarkRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [bookmarksData, favoritesData] = await Promise.all([
+          getBookmarks().catch(() => ({ data: [] })),
+          getFavorites().catch(() => ({ data: [] }))
+        ]);
+
+        const mappedBookmarks: BookmarkRecord[] = (bookmarksData.data || []).map((b: any) => ({
+          id: b.id,
+          type: "saved",
+          book: {
+            id: b.publicationId,
+            title: b.publicationTitle || "Đang tải",
+            author: "Tác giả",
+            genres: ["Truyện"],
+            images: "",
+            coverIndex: 0,
+            currentChapter: b.chapterTitle || "Chưa có thông tin",
+            lastUpdated: new Date(b.createdAt).toLocaleDateString("vi-VN")
+          }
+        }));
+
+        const mappedFavorites: BookmarkRecord[] = (favoritesData.data || []).map((f: any) => ({
+          id: f.publicationId,
+          type: "favorite",
+          book: {
+            id: f.publication.id,
+            title: f.publication.title,
+            author: f.publication.author,
+            genres: [f.publication.formatType === 2 ? "Truyện Tranh" : "Truyện Chữ"],
+            images: f.publication.coverImageUrl,
+            coverIndex: 0,
+            currentChapter: 1,
+            lastUpdated: new Date(f.createdAt).toLocaleDateString("vi-VN")
+          }
+        }));
+
+        // Sort by date descending
+        const combined = [...mappedBookmarks, ...mappedFavorites].sort((a, b) => {
+          return new Date(b.book.lastUpdated).getTime() - new Date(a.book.lastUpdated).getTime();
+        });
+
+        setBookmarks(combined);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   return (
     <main style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
@@ -53,24 +77,30 @@ export default function BookmarkPage() {
           Lưu trữ
         </h1>
 
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(6, 1fr)", 
-          gap: "28px" 
-        }}>
-          {bookmarks.length > 0 ? (
-            bookmarks.map(record => (
-              <BookmarkItem 
-                key={record.id} 
-                record={record} 
-              />
-            ))
-          ) : (
-            <div style={{ textAlign: "center", padding: "40px", color: "#6b7280", width: "100%" }}>
-              Chưa có truyện nào được lưu trữ.
-            </div>
-          )}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#6b7280", width: "100%" }}>
+            Đang tải dữ liệu...
+          </div>
+        ) : (
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(6, 1fr)", 
+            gap: "28px" 
+          }}>
+            {bookmarks.length > 0 ? (
+              bookmarks.map(record => (
+                <BookmarkItem 
+                  key={`${record.type}-${record.id}`} 
+                  record={record} 
+                />
+              ))
+            ) : (
+              <div style={{ textAlign: "center", padding: "40px", color: "#6b7280", width: "100%" }}>
+                Chưa có truyện nào được lưu trữ.
+              </div>
+            )}
+          </div>
+        )}
 
       </div>
       

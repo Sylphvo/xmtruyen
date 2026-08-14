@@ -153,22 +153,21 @@ export const Categories: React.FC = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   return (
-    <div className="card border-0 shadow-sm h-auto" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
-      <div className="card-header border-bottom-0 pt-4 pb-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: 'transparent' }}>
-        <h5 className="mb-0 fw-semibold" style={{ color: 'var(--bs-heading-color)' }}>Quản lý Thể loại</h5>
-        <Button variant="primary" size="sm" onClick={() => setIsAddingNew(true)} className="d-flex align-items-center gap-2 rounded-2">
-          <FontAwesomeIcon icon={faPlus} />
-          Thêm Mới
-        </Button>
-      </div>
-      
-      <div className="card-body d-flex flex-column">
-        <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="jira-table-container">
+      <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
+        <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý Thể loại</h5>
+        <div className="d-flex align-items-center gap-3">
+          <Button variant="primary" size="sm" onClick={() => setIsAddingNew(true)} className="d-flex align-items-center gap-2 rounded-2">
+            <FontAwesomeIcon icon={faPlus} />
+            Thêm Mới
+          </Button>
+          
           <div className="d-flex align-items-center gap-2">
-            <Form.Select 
-              size="sm" 
+            <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
+            <Form.Select
+              size="sm"
               className="bg-transparent text-body border-secondary-subtle"
-              style={{ width: '70px' }}
+              style={{ width: '70px', height: '32px', fontSize: '13px' }}
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -180,15 +179,15 @@ export const Categories: React.FC = () => {
               <option value={15}>15</option>
               <option value={20}>20</option>
             </Form.Select>
-            <span className="text-muted small">dòng / trang</span>
           </div>
-          
+
           <div style={{ width: '250px' }}>
-            <Form.Control 
-              size="sm" 
-              type="text" 
-              className="bg-transparent text-body border-secondary-subtle"
-              placeholder="Tìm kiếm..." 
+            <Form.Control
+              size="sm"
+              type="text"
+              className="bg-transparent text-body"
+              style={{ height: '32px', fontSize: '13px', border: '1px solid #dfe1e6', borderRadius: '4px' }}
+              placeholder="Tìm kiếm..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -197,26 +196,27 @@ export const Categories: React.FC = () => {
             />
           </div>
         </div>
+      </div>
 
-        <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-          <table className="table table-bordered align-middle mb-0 text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
-            <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
+      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+        <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+          <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('id')}>
+                <ResizableHeader initialWidth={100} style={{ borderLeft: 0, cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('id')}>
                   <span className="fw-semibold text-nowrap">ID {getSortIcon('id')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={300} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('name')}>
+                <ResizableHeader initialWidth={300} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('name')}>
                   <span className="fw-semibold text-nowrap">Tên Thể Loại {getSortIcon('name')}</span>
                 </ResizableHeader>
                 <ResizableHeader initialWidth={280} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '12px 16px' , color: 'var(--bs-heading-color)'}} onClick={() => handleSort('slug')}>
                   <span className="fw-semibold text-nowrap">Slug (Đường dẫn) {getSortIcon('slug')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ backgroundColor: 'transparent', padding: '12px 16px', textAlign: 'right' , color: 'var(--bs-heading-color)'}}>
+                <ResizableHeader initialWidth={120} style={{ borderRight: 0, backgroundColor: 'transparent', padding: '12px 16px', textAlign: 'right' , color: 'var(--bs-heading-color)'}}>
                   <span className="fw-semibold text-nowrap">Thao tác</span>
                 </ResizableHeader>
               </tr>
             </thead>
-            <tbody>
+            <tbody style={{ height: '1px' }}>
               {loading ? (
                 <tr>
                   <td colSpan={4} className="text-center py-5">
@@ -225,143 +225,125 @@ export const Categories: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-              <>
-                {isAddingNew && (
-                  <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <span className="text-muted small">Tự động</span>
-                    </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <Form.Control autoFocus size="sm" value={newItem.name || ''} onChange={(e) => setNewItem({...newItem, name: e.target.value})} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit, handleCloseAdd)} placeholder="Tên thể loại" className="inline-edit-input text-body w-100" />
-                    </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <span className="text-muted small">Tự động tạo</span>
-                    </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                      <div className="d-flex gap-2 justify-content-end">
-                        <Button variant="success" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
-                        <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-                {data.length > 0 ? (
-                  data.map((category) => (
-                    editingId === category.id ? (
-                      <tr key={category.id} className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                          {category.id}
-                        </td>
-                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                          <Form.Control autoFocus size="sm" value={editData.name || ''} onChange={(e) => setEditData({...editData, name: e.target.value})} onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(category.id), handleCancelEdit)} placeholder="Tên thể loại" className="inline-edit-input text-body w-100" />
-                        </td>
-                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                          <span className="text-muted">{category.slug}</span>
-                        </td>
-                        <td style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                          <div className="d-flex gap-2 justify-content-end">
-                            <Button variant="success" size="sm" onClick={() => handleSaveEdit(category.id)} className="px-3 rounded-2 fw-medium">Lưu</Button>
-                            <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                    <tr key={category.id} style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }} onDoubleClick={() => handleEditClick(category)}>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
-                        {category.id}
+                <>
+                  {isAddingNew && (
+                    <tr className="jira-table-row inline-edit-row" style={{ height: '46px' }}>
+                      <td style={{ borderLeft: 0, padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <span className="text-muted small">Tự động</span>
                       </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
-                        <span className="fw-medium">{category.name}</span>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <Form.Control autoFocus size="sm" value={newItem.name || ''} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit, handleCloseAdd)} placeholder="Tên thể loại" className="inline-edit-input text-body w-100" />
                       </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent' , color: 'var(--bs-body-color)'}}>
-                        <span className="text-muted">{category.slug}</span>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <span className="text-muted small">Tự động tạo</span>
                       </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'right' , color: 'var(--bs-body-color)'}}>
+                      <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         <div className="d-flex gap-2 justify-content-end">
-                          <Button variant="light" size="sm" onClick={() => handleEditClick(category)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                            <FontAwesomeIcon icon={faPen} className="me-2" style={{ color: '#9ca3af' }} />
-                            Sửa
-                          </Button>
-                          <Button variant="light" size="sm" onClick={() => handleDelete(category.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                            <FontAwesomeIcon icon={faTrash} className="me-2" />
-                            Xóa
-                          </Button>
+                          <Button variant="success" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
+                          <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
                         </div>
                       </td>
                     </tr>
-                    )
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="text-center py-5 text-muted">
-                      Không tìm thấy dữ liệu
-                    </td>
-                  </tr>
-                )}
-              </>
+                  )}
+                  {data.length > 0 ? (
+                    data.map((category) => (
+                      editingId === category.id ? (
+                        <tr key={`edit-${category.id}`} className="jira-table-row inline-edit-row" style={{ height: '46px' }}>
+                          <td style={{ borderLeft: 0, padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <span className="text-muted small">{category.id}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <Form.Control autoFocus size="sm" value={editData.name || ''} onChange={(e) => setEditData({ ...editData, name: e.target.value })} onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(category.id), handleCancelEdit)} placeholder="Tên thể loại" className="inline-edit-input text-body w-100" />
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <span className="text-muted small">{category.slug}</span>
+                          </td>
+                          <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <div className="d-flex gap-2 justify-content-end">
+                              <Button variant="success" size="sm" onClick={() => handleSaveEdit(category.id)} className="px-3 rounded-2 fw-medium">Lưu</Button>
+                              <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        <tr key={`view-${category.id}`} className="jira-table-row" style={{ height: '46px' }} onDoubleClick={() => handleEditClick(category)}>
+                          <td style={{ borderLeft: 0, padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <span className="text-muted small">{category.id}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <span className="fw-medium">{category.name}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                            <span className="text-muted small">{category.slug}</span>
+                          </td>
+                          <td style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'right', color: 'var(--bs-body-color)' }}>
+                            <div className="d-flex gap-2 justify-content-end">
+                              <Button variant="light" size="sm" onClick={() => handleEditClick(category)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <FontAwesomeIcon icon={faPen} className="me-2" style={{ color: '#9ca3af' }} />
+                                Sửa
+                              </Button>
+                              <Button variant="light" size="sm" onClick={() => handleDelete(category.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <FontAwesomeIcon icon={faTrash} className="me-2" />
+                                Xóa
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                        <div className="jira-empty-state">
+                          <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                          <h4>There are no work items here yet</h4>
+                          <p>We couldn't find any data matching your criteria. Try adjusting your filters or search terms.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               )}
+            </tbody>
+            <tbody style={{ height: 'auto' }}>
+              {/* Filler row to push the table height and extend the sticky border */}
+              <tr style={{ height: '100%' }}>
+                <td style={{ borderBottom: 0, borderLeft: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                <td style={{ borderBottom: 0, borderRight: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary-subtle bg-transparent">
-          <div className="text-muted" style={{ fontSize: '13px' }}>
-            Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + itemsPerPage, totalItems)} trong {totalItems} thể loại
-          </div>
-          
-          {totalPages > 1 && (
-            <div className="d-flex" style={{ gap: '4px' }}>
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === 1 ? '#a9b1c0' : '#5955D1' }}
-                onClick={() => setCurrentPage(1)}
-                disabled={currentPage === 1}
-              >
-                <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
-              </button>
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === 1 ? '#a9b1c0' : '#5955D1' }}
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-              >
-                <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
-              </button>
-
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
-                  style={{
-                    width: '32px', height: '32px', fontSize: '13px',
-                    backgroundColor: i + 1 === currentPage ? '#5955D1' : '#f4f5f8',
-                    color: i + 1 === currentPage ? '#fff' : '#5955D1'
-                  }}
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === totalPages ? '#a9b1c0' : '#5955D1' }}
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-              >
-                <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
-              </button>
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: '#f4f5f8', color: currentPage === totalPages ? '#a9b1c0' : '#5955D1' }}
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={currentPage === totalPages}
-              >
-                <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
-              </button>
-            </div>
-          )}
+      <div className="jira-table-footer">
+        <div style={{ visibility: 'hidden' }}>
+          <Button variant="light" size="sm" className="btn-create">
+            <FontAwesomeIcon icon={faPlus} /> Create
+          </Button>
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination-controls">
+            <span className="text-muted" style={{ fontSize: '13px' }}>
+              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
+            </span>
+            <button className="icon-btn" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+              <FontAwesomeIcon icon={faAngleDoubleLeft} />
+            </button>
+            <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>
+              <FontAwesomeIcon icon={faAngleLeft} />
+            </button>
+            <span className="text-muted px-2">{currentPage}</span>
+            <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
+              <FontAwesomeIcon icon={faAngleRight} />
+            </button>
+            <button className="icon-btn" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+              <FontAwesomeIcon icon={faAngleDoubleRight} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

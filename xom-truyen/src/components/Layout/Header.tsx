@@ -36,6 +36,25 @@ export default function Header() {
   const fullName = user?.fullName || "Guest";
   const isLoggedIn = !!user;
 
+  // Wallet state
+  const [wallet, setWallet] = useState<any>(null);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        fetch("http://localhost:5172/api/payment/wallet", {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data) setWallet(data);
+        })
+        .catch(console.error);
+      }
+    }
+  }, [isLoggedIn]);
+
   // State quản lý việc mở/đóng Menu sổ xuống
   const [showDropdown, setShowDropdown] = useState(false);
   // ─── 1. STATE CHO POPUP NGÔN NGỮ ──────────────────────────────────────────
@@ -123,6 +142,7 @@ export default function Header() {
     >
       {/* Search */}
       <div
+        className="header-search"
         style={{
           flex: 1,
           display: "flex",
@@ -138,6 +158,11 @@ export default function Header() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && query.trim()) {
+              navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+            }
+          }}
           placeholder="Tìm kiếm sách, tác giả,..."
           style={{
             border: "none",
@@ -180,22 +205,27 @@ export default function Header() {
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
 
         {/* Grid (Menu) */}
-        <button
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            backgroundColor: theme.btnBg,
-            color: theme.btnText,
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          <Grip size={22} />
-        </button>
+        <div style={{ position: "relative" }}>
+          <button
+            className="mobile-menu-btn"
+            onClick={() => {
+              navigate('/'); // Quick navigate home on mobile for now
+            }}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              backgroundColor: theme.btnBg,
+              color: theme.btnText,
+              border: "none",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Grip size={22} />
+          </button>
+        </div>
 
         {/* Messenger */}
         <button
@@ -493,7 +523,15 @@ export default function Header() {
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px", border: `1px solid var(--border-color, #ddd)`, padding: "4px 14px 4px 4px", borderRadius: "30px", backgroundColor: "var(--bg-secondary, #fff)" }}>
               <img src="/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
-              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{fullName}</span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{fullName}</span>
+                {wallet && (
+                  <span style={{ fontSize: "12px", color: "#f7b125", fontWeight: "bold" }}>
+                    {wallet.coinBalance} Xu 
+                    {wallet.planName && <span style={{ marginLeft: 5, padding: "2px 6px", background: "#ff6b9d", color: "white", borderRadius: "4px", fontSize: "10px" }}>{wallet.planName}</span>}
+                  </span>
+                )}
+              </div>
             </div>
           </button>
 

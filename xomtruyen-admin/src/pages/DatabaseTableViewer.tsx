@@ -166,43 +166,44 @@ export const DatabaseTableViewer: React.FC = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="card border-0 shadow-sm h-100" style={{ backgroundColor: 'var(--bs-body-bg)' }}>
+    <>
+      <div className="jira-table-container">
       {/* Header with Table Description Banner */}
-      <div className="card-header border-bottom-0 pt-4 pb-2 bg-transparent">
-        <div className="d-flex justify-content-between align-items-start gap-3">
-          <div className="d-flex align-items-start gap-3">
-            <Button variant="light" size="sm" onClick={() => navigate('/database')} className="mt-1" title="Quay lại danh sách bảng">
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </Button>
-            <div>
-              <div className="d-flex align-items-center gap-2 flex-wrap">
-                <h5 className="mb-0 fw-bold text-body">Chi tiết bảng: {tableName}</h5>
-                <Badge bg="primary-subtle" className="text-primary border border-primary-subtle px-2 py-1" style={{ fontSize: '12px', fontWeight: 600 }}>
-                  {tableMeta.vietnameseName}
-                </Badge>
-                <Badge bg="secondary-subtle" className="text-secondary border border-secondary-subtle px-2 py-1" style={{ fontSize: '11px' }}>
-                  {columns.length} cột
-                </Badge>
-              </div>
+      <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
+        <div className="d-flex align-items-start gap-3">
+          <Button variant="light" size="sm" onClick={() => navigate('/database')} className="mt-1" title="Quay lại danh sách bảng">
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </Button>
+          <div>
+            <div className="d-flex align-items-center gap-2 flex-wrap">
+              <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Chi tiết bảng: {tableName}</h5>
+              <Badge bg="primary-subtle" className="text-primary border border-primary-subtle px-2 py-1" style={{ fontSize: '12px', fontWeight: 600 }}>
+                {tableMeta.vietnameseName}
+              </Badge>
+              <Badge bg="secondary-subtle" className="text-secondary border border-secondary-subtle px-2 py-1" style={{ fontSize: '11px' }}>
+                {columns.length} cột
+              </Badge>
+            </div>
 
-              {/* Dòng mô tả chi tiết chức năng bảng và thông tin lưu trữ */}
-              <div className="text-muted mt-2 d-flex align-items-baseline gap-2 flex-wrap" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                <span className="text-body-secondary">
-                  <strong>📌 Quy cách lưu trữ:</strong> {tableMeta.summary}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowDictionaryModal(true)}
-                  className="btn btn-link btn-sm p-0 text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
-                  style={{ fontSize: '12.5px', color: '#5955D1' }}
-                >
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  Xem chi tiết từng cột & ví dụ
-                </button>
-              </div>
+            {/* Dòng mô tả chi tiết chức năng bảng và thông tin lưu trữ */}
+            <div className="text-muted mt-2 d-flex align-items-baseline gap-2 flex-wrap" style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              <span className="text-body-secondary">
+                <strong>📌 Quy cách lưu trữ:</strong> {tableMeta.summary}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowDictionaryModal(true)}
+                className="btn btn-link btn-sm p-0 text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
+                style={{ fontSize: '12.5px', color: '#5955D1' }}
+              >
+                <FontAwesomeIcon icon={faInfoCircle} />
+                Xem chi tiết từng cột & ví dụ
+              </button>
             </div>
           </div>
+        </div>
 
+        <div className="d-flex align-items-center gap-3">
           <div className="d-flex align-items-center gap-2">
             <Button
               variant="outline-secondary"
@@ -222,35 +223,34 @@ export const DatabaseTableViewer: React.FC = () => {
         </div>
       </div>
 
-      <div className="card-body d-flex flex-column" style={{ overflow: 'hidden' }}>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <div className="d-flex align-items-center gap-2">
-            <Form.Select
-              size="sm"
-              className="bg-transparent text-body border-secondary-subtle"
-              style={{ width: '70px' }}
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Form.Select>
-            <span className="text-muted small">dòng / trang</span>
-          </div>
+      <div className="d-flex justify-content-between align-items-center mb-3 mt-3 px-3">
+        <div className="d-flex align-items-center gap-2">
+          <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
+          <Form.Select
+            size="sm"
+            className="bg-transparent text-body border-secondary-subtle"
+            style={{ width: '70px', height: '32px', fontSize: '13px' }}
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Form.Select>
         </div>
+      </div>
 
-        <div className="table-responsive flex-grow-1" style={{ minHeight: '616px', maxHeight: '1756px', overflowY: 'auto' }}>
-          {isLoading ? (
-            <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
-          ) : (
-            <table className="table table-bordered mb-0 align-middle text-body" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent' }}>
-              <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'var(--bs-body-bg)' }}>
-                <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+        {isLoading ? (
+          <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
+        ) : (
+          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed' }}>
+            <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+              <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
                   {columns.map(col => {
                     const schemaCol = schemaColumns.find(sc => sc.name === col);
                     const colInfo = getColumnInfo(tableName, col);
@@ -285,7 +285,7 @@ export const DatabaseTableViewer: React.FC = () => {
               <tbody>
                 {data.length > 0 ? (
                   data.map((row, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                    <tr key={i} className="jira-table-row" style={{ height: '46px' }}>
                       {columns.map(col => {
                         const rawVal = row[col];
                         const strVal = rawVal != null ? String(rawVal) : '';
@@ -351,7 +351,13 @@ export const DatabaseTableViewer: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={columns.length + 1} className="text-center py-5 text-muted" style={{ backgroundColor: 'transparent' }}>Không có dữ liệu</td>
+                    <td colSpan={columns.length + 1} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                      <div className="jira-empty-state">
+                        <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                        <h4>There are no work items here yet</h4>
+                        <p>We couldn't find any data matching your criteria. Try adjusting your filters or search terms.</p>
+                      </div>
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -360,67 +366,30 @@ export const DatabaseTableViewer: React.FC = () => {
         </div>
 
         {!isLoading && (
-          <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top bg-transparent">
-            <div className="text-muted" style={{ fontSize: '13px' }}>
-              Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + pageSize, totalItems)} trong {totalItems} bản ghi
+          <div className="jira-table-footer">
+            <div style={{ visibility: 'hidden' }}>
+              <Button variant="light" size="sm" className="btn-create">
+                <FontAwesomeIcon icon={faPlus} /> Create
+              </Button>
             </div>
 
             {totalPages > 1 && (
-              <div className="d-flex" style={{ gap: '4px' }}>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setPage(1)}
-                  disabled={page === 1}
-                >
-                  <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
+              <div className="pagination-controls">
+                <span className="text-muted" style={{ fontSize: '13px' }}>
+                  {startIndex + 1}-{Math.min(startIndex + pageSize, totalItems)} of {totalItems}
+                </span>
+                <button className="icon-btn" onClick={() => setPage(1)} disabled={page === 1}>
+                  <FontAwesomeIcon icon={faAngleDoubleLeft} />
                 </button>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                  disabled={page === 1}
-                >
-                  <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
+                <button className="icon-btn" onClick={() => setPage(prev => Math.max(1, prev - 1))} disabled={page === 1}>
+                  <FontAwesomeIcon icon={faAngleLeft} />
                 </button>
-
-                {[...Array(totalPages)].map((_, i) => {
-                  if (i + 1 < page - 2 || i + 1 > page + 2) {
-                    if (i + 1 === 1 || i + 1 === totalPages) return null;
-                    if (i + 1 === page - 3 || i + 1 === page + 3) return <span key={i} className="px-1 text-muted">...</span>;
-                    return null;
-                  }
-                  return (
-                    <button
-                      key={i + 1}
-                      className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
-                      style={{
-                        width: '32px', height: '32px', fontSize: '13px',
-                        backgroundColor: i + 1 === page ? '#5955D1' : 'var(--bs-tertiary-bg)',
-                        color: i + 1 === page ? '#fff' : '#5955D1'
-                      }}
-                      onClick={() => setPage(i + 1)}
-                    >
-                      {i + 1}
-                    </button>
-                  );
-                })}
-
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={page === totalPages}
-                >
-                  <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
+                <span className="text-muted px-2">{page}</span>
+                <button className="icon-btn" onClick={() => setPage(prev => Math.min(totalPages, prev + 1))} disabled={page === totalPages}>
+                  <FontAwesomeIcon icon={faAngleRight} />
                 </button>
-                <button
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                  style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: page === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                  onClick={() => setPage(totalPages)}
-                  disabled={page === totalPages}
-                >
-                  <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
+                <button className="icon-btn" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
+                  <FontAwesomeIcon icon={faAngleDoubleRight} />
                 </button>
               </div>
             )}
@@ -579,7 +548,7 @@ export const DatabaseTableViewer: React.FC = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   );
 };
 

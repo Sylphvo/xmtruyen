@@ -68,6 +68,7 @@ export function mapPublicationToBook(item: any, index: number = 0): Book {
  */
 export async function getPublications(filter?: PublicationFilter): Promise<{ books: Book[]; totalCount: number }> {
   const endpoints = [
+    `${API_BASE_URL}/api/discovery/search`,
     `${API_BASE_URL}/api/Publications`,
     `${API_BASE_URL}/api/books`,
     `${API_BASE_URL}/api/ManagerDB/data/Publications`,
@@ -78,17 +79,21 @@ export async function getPublications(filter?: PublicationFilter): Promise<{ boo
     page: filter?.page || 1,
   };
 
-  if (filter?.keyword) params.keyword = filter.keyword;
-  if (filter?.categoryId) params.categoryId = filter.categoryId;
+  if (filter?.keyword) params.q = filter.keyword; // mapped to q for discovery
+  if (filter?.categoryId || filter?.categorySlug) params.categorySlug = filter.categorySlug || filter.categoryId;
   if (filter?.formatType !== undefined) params.formatType = filter.formatType;
   if (filter?.accessLevel !== undefined) params.accessLevel = filter.accessLevel;
-  if (filter?.status) params.status = filter.status;
-  if (filter?.isRecommended !== undefined) params.isRecommended = filter.isRecommended;
-  if (filter?.isExclusive !== undefined) params.isExclusive = filter.isExclusive;
 
   for (const endpoint of endpoints) {
     try {
-      const response = await axios.get(endpoint, { params, timeout: 4000 });
+      // If it's a fallback to old endpoints, map q back to keyword
+      const apiParams = { ...params };
+      if (!endpoint.includes('discovery') && apiParams.q) {
+        apiParams.keyword = apiParams.q;
+        delete apiParams.q;
+      }
+      
+      const response = await axios.get(endpoint, { params: apiParams, timeout: 4000 });
       const rawData = response.data;
 
       let list: any[] = [];
@@ -118,6 +123,43 @@ export async function getPublications(filter?: PublicationFilter): Promise<{ boo
 }
 
 /**
+ * Fetch trending books
+ */
+export async function getTrendingBooks(period: string = "week", limit: number = 10): Promise<Book[]> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/discovery/trending`, { params: { period, limit } });
+    const list = response.data?.data || response.data?.Data || [];
+    return list.map((item: any, idx: number) => mapPublicationToBook(item, idx));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Fetch similar books
+ */
+export async function getSimilarBooks(id: string | number, limit: number = 6): Promise<Book[]> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/discovery/${id}/similar`, { params: { limit } });
+    const list = response.data?.data || response.data?.Data || [];
+    return list.map((item: any, idx: number) => mapPublicationToBook(item, idx));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Increment view count
+ */
+export async function incrementViewCount(id: string | number): Promise<void> {
+  try {
+    await axios.post(`${API_BASE_URL}/api/discovery/${id}/view`);
+  } catch {
+    // silently fail
+  }
+}
+
+/**
  * Fetch a single book by ID
  */
 export async function getBookById(id: string | number): Promise<Book | null> {
@@ -143,11 +185,25 @@ export async function getBookById(id: string | number): Promise<Book | null> {
 }
 
 /**
- * Fetch chapters for a publication
+ * Fetch chapters for a comic publication
  */
 export async function getComicChapters(publicationId: string | number): Promise<any[]> {
   try {
     const response = await axios.get(`${API_BASE_URL}/api/AdminComicChapter/publication/${publicationId}`);
+    const data = response.data?.data || response.data || [];
+    // Sort by chapter number ascending
+    return data.sort((a: any, b: any) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Fetch chapters for a text book publication
+ */
+export async function getTextChapters(publicationId: string | number): Promise<any[]> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/AdminBookChapter/publication/${publicationId}`);
     const data = response.data?.data || response.data || [];
     // Sort by chapter number ascending
     return data.sort((a: any, b: any) => (a.chapterNumber || 0) - (b.chapterNumber || 0));

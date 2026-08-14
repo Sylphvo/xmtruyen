@@ -20,12 +20,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   }, []);
 
   useEffect(() => {
-    if (path.startsWith('/books') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-files')) {
+    if (path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-files')) {
       setActiveMenu('books');
+    } else if (path.startsWith('/plans')) {
+      setActiveMenu('plans');
+    } else if (path.startsWith('/reviews')) {
+      setActiveMenu('reviews');
     } else if (path.startsWith('/users')) {
       setActiveMenu('users');
     } else if (path.startsWith('/database')) {
       setActiveMenu('database');
+    } else if (path.startsWith('/transactions')) {
+      setActiveMenu('transactions');
     } else {
       setActiveMenu('dashboard');
     }
@@ -70,6 +76,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
         >
           <Database />
         </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'transactions' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('transactions')}
+          style={{ cursor: 'pointer' }}
+          title="Giao dịch"
+        >
+          <Tag />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'plans' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('plans')}
+          style={{ cursor: 'pointer' }}
+          title="Gói VIP"
+        >
+          <TableProperties />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'reviews' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('reviews')}
+          style={{ cursor: 'pointer' }}
+          title="Đánh giá"
+        >
+          <List />
+        </div>
       </aside>
 
       {/* Menu Sidebar */}
@@ -93,7 +123,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
               <div className="menu-heading">Quản lý Sách</div>
               <NavLink to="/books" className="menu-link">
                 <Book />
-                <span>Sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Tác phẩm)</span></span>
+                <span>Sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Truyện chữ)</span></span>
+              </NavLink>
+              <NavLink to="/comics" className="menu-link">
+                <Book />
+                <span>Truyện <span className="text-secondary small" style={{ fontSize: '12px' }}>(Truyện tranh)</span></span>
               </NavLink>
               <NavLink to="/book-files" className="menu-link">
                 <Database />
@@ -144,6 +178,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                   </NavLink>
                 );
               })}
+            </>
+          )}
+
+          {activeMenu === 'plans' && (
+            <>
+              <div className="menu-heading">Cấu hình VIP</div>
+              <NavLink to="/plans" className="menu-link" end>
+                <TableProperties />
+                <span>Gói VIP <span className="text-secondary small" style={{ fontSize: '12px' }}>(Subscription)</span></span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'reviews' && (
+            <>
+              <div className="menu-heading">Đánh giá</div>
+              <NavLink to="/reviews" className="menu-link" end>
+                <List />
+                <span>Đánh giá <span className="text-secondary small" style={{ fontSize: '12px' }}>(Reviews)</span></span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'transactions' && (
+            <>
+              <div className="menu-heading">Quản lý Giao dịch</div>
+              <NavLink to="/transactions" className="menu-link">
+                <Tag />
+                <span>Giao dịch <span className="text-secondary small" style={{ fontSize: '12px' }}>(Nạp xu)</span></span>
+              </NavLink>
             </>
           )}
         </div>

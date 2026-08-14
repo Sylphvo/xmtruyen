@@ -8,6 +8,7 @@ interface ReadingContentProps {
   totalPages: number;
   onPrevPage: () => void;
   onNextPage: () => void;
+  textContent?: string;
 }
 
 export default function ReadingContent({
@@ -16,8 +17,13 @@ export default function ReadingContent({
   currentPage,
   totalPages,
   onPrevPage,
-  onNextPage
+  onNextPage,
+  textContent
 }: ReadingContentProps) {
+  // If no textContent, use some placeholder text for now
+  const contentToRender = textContent || "Đang cập nhật nội dung chương...";
+  const isHtml = contentToRender.includes('<p>') || contentToRender.includes('<div>') || contentToRender.includes('<br>');
+
   return (
     <div style={{ 
       flex: 1, 
@@ -81,76 +87,19 @@ export default function ReadingContent({
         </h1>
       </div>
 
-      {/* Two Column Text */}
+      {/* Text Content */}
       <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "1fr 1fr", 
-        gap: "60px",
-        fontSize: "15px",
+        fontSize: "18px",
         lineHeight: 1.8,
-        color: "#374151"
+        color: "#374151",
+        whiteSpace: isHtml ? "normal" : "pre-wrap",
+        minHeight: "50vh"
       }}>
-        {/* Left Column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <p style={{ margin: 0 }}>
-            Chung Thu Yếu muốn đính chính với cậu ta, nhưng mấp máy môi lại không biết nói gì, đành giả vờ như không nghe thấy.
-          </p>
-          <p style={{ margin: 0 }}>
-            Tống Cạnh Hàm nhắm mắt lại nhưng không hề ngủ, khóe môi hơi cong lên, trên mặt lộ vẻ thỏa mãn.
-          </p>
-          <p style={{ margin: 0 }}>
-            Cậu ta mệt thật, lúc đầu chỉ muốn dựa vào, nhưng cứ dựa như vậy rồi ngủ thiếp đi.
-          </p>
-          <p style={{ margin: 0 }}>
-            Chung Thu Yếu giữ nguyên tư thế, cả người không thoải mái, vai cũng hơi mỏi vì bị cậu ta đè.
-          </p>
-          <p style={{ margin: 0 }}>
-            Nhưng nghe thấy tiếng thở đều đều của cậu ta, biết cậu ta đã ngủ, cô ta chịu đựng không cử động.
-          </p>
-          <p style={{ margin: 0 }}>
-            Xe dừng ở ngoài khu chung cư của Chung Thu Yếu, cô ta lay vai Tống Cạnh Hàm gọi: "Tống Cạnh Hàm."
-          </p>
-          <p style={{ margin: 0 }}>
-            Tống Cạnh Hàm nheo mắt lại rồi mở mắt ra, ngồi thẳng người nhìn ra bên ngoài: "Tới nhanh vậy sao?"
-          </p>
-          <p style={{ margin: 0 }}>
-            Toàn bộ cánh tay của Chung Thu Yếu tê dại, cô ta cử động vài cái, lẩm bẩm: "Nặng chết đi được."
-          </p>
-          <p style={{ margin: 0 }}>
-            Tống Cạnh Hàm thấy cô ta ôm cánh tay, biết mình đè làm cánh tay cô ta tê: "Sao không đánh thức em?"
-          </p>
-        </div>
-
-        {/* Right Column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <p style={{ margin: 0 }}>
-            "Thấy em mệt mỏi nên không gọi." Cánh tay tê liệt của Chung Thu Yếu có thể cử động, cô xách túi chuẩn bị xuống xe.
-          </p>
-          <p style={{ margin: 0 }}>
-            Tống Cạnh Hàm bật cười. Nếu là trước đây tay mà tê, Chung Thu Yếu nhất định sẽ tát cho cậu ta tỉnh hoặc đẩy đầu cậu ta ra, nào có thể quan tâm cậu ta có mệt hay không.
-          </p>
-          <p style={{ margin: 0 }}>
-            Thái độ của cô ta đối với cậu ta đang dần thay đổi, đây là một dấu hiệu tốt.
-          </p>
-          <p style={{ margin: 0, textAlign: "center", color: "#9ca3af" }}>
-            *
-          </p>
-          <p style={{ margin: 0 }}>
-            Sau bữa tối, Tần Huy Nguyệt bật tivi xem show mà Lâm Thành ghi hình ngày hôm qua.
-          </p>
-          <p style={{ margin: 0 }}>
-            Xem xong vẫn còn sớm, cô ta xem thêm hai tập phim truyền hình, sau đó thấy thời gian cũng khá muộn nên cô ta tắt tivi định lên lầu.
-          </p>
-          <p style={{ margin: 0 }}>
-            Lúc đi đến đầu cầu thang, cô ta cảm thấy hơi khát nước nên quay người đi về phía máy lọc nước. Khi đang uống nước thì cửa phòng khách mở ra, Lâm Thành từ bên ngoài đi vào.
-          </p>
-          <p style={{ margin: 0 }}>
-            Máy lọc nước đặt ở trong góc, Lâm Thành không nhìn thấy cô ta nên tiện tay đóng cửa đi về phía sofa.
-          </p>
-          <p style={{ margin: 0 }}>
-            Anh ta có vẻ rất mệt mỏi, đi tới ngồi phịch xuống sofa, khẽ nhắm mắt lại, một tay day mi tâm.
-          </p>
-        </div>
+        {isHtml ? (
+          <div dangerouslySetInnerHTML={{ __html: contentToRender }} />
+        ) : (
+          contentToRender
+        )}
       </div>
 
       {/* Pagination Footer */}
