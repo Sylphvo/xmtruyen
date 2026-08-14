@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen Admin — Luồng Crawler kéo truyện từ nguồn ngoài</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.8; padding: 40px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px; border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px; padding: 15px; overflow-x: auto; margin: 12px 0; font-size: 0.88em; }
+        code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; color: #7ee787; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin-bottom: 6px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+        .tag-critical { background: #ff4444; color: #fff; }
+        .tag-high { background: #ff9800; color: #fff; }
+        .tag-medium { background: #4caf50; color: #fff; }
+        .tag-low { background: #2196f3; color: #fff; }
+        .section-box { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 15px 0; }
+        .module-box { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #333; }
+        .api-block { background: #1a1a2e; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 3px solid #a78bfa; }
+        .flow-diagram { background: #0d1117; padding: 20px; border-radius: 8px; margin: 15px 0; text-align: left; font-family: monospace; color: #7ee787; line-height: 2; white-space: pre-wrap; }
+        hr { border: 1px solid #222; margin: 40px 0; }
+        .highlight { color: #ffd93d; }
+        .success { color: #7ee787; }
+        .warning { color: #ff6b6b; }
+        .info { color: #64b5f6; }
+        .note-box { background: #1a2e1a; border-left: 4px solid #7ee787; padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 15px 0; }
+        .warn-box { background: #2e1a1a; border-left: 4px solid #ff6b6b; padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 15px 0; }
+        .tech-badge { display: inline-block; background: #16213e; border: 1px solid #333; padding: 3px 10px; border-radius: 6px; font-size: 0.8em; margin: 2px; color: #64b5f6; }
+        @media (max-width: 768px) { body { padding: 15px 10px; } h1 { font-size: 1.5em; } h2 { font-size: 1.2em; padding-left: 10px; } table { font-size: 0.78em; display: block; overflow-x: auto; } pre { font-size: 0.78em; } .flow-diagram { font-size: 0.72em; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>🕷️ XomTruyen Admin — Luồng Crawler kéo truyện từ nguồn ngoài</h1>
+<p class="subtitle">Thiết kế module tự động crawl truyện chữ + truyện tranh từ các trang nước ngoài | Quản lý nguồn, lịch chạy, review & publish</p>
+
+<div class="toc">
+    <h3 style="color:#fff; margin-bottom:10px;">📌 Mục lục</h3>
+    <a href="#overview">1. Tổng quan Crawler Pipeline</a>
+    <a href="#sources">2. Nguồn crawl & Chiến lược</a>
+    <a href="#flow-novel">3. Luồng A: Crawl truyện chữ (Novel)</a>
+    <a href="#flow-comic">4. Luồng B: Crawl truyện tranh (Manga/Manhwa/Manhua)</a>
+    <a href="#anti-ban">5. Anti-ban & Proxy rotation</a>
+    <a href="#scheduler">6. Scheduler — Lịch crawl tự động</a>
+    <a href="#db-schema">7. Database Schema</a>
+    <a href="#api">8. API Endpoints</a>
+    <a href="#admin-ui">9. Admin UI — Trang quản lý Crawler</a>
+    <a href="#integration">10. Tích hợp với Translation + Audiobook Pipeline</a>
+    <a href="#tech-stack">11. Tech Stack</a>
+    <a href="#tasks">12. Task list cho AI thực hiện</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="overview">🌐 1. Tổng quan Crawler Pipeline</h2>
+
+<div class="flow-diagram">
+═══════════════════════════════════════════════════════════════════════════
+                       CRAWLER PIPELINE — TỔNG QUAN
+═══════════════════════════════════════════════════════════════════════════
+
+ADMIN SETUP:                          SCHEDULER (tự động):
+┌────────────────────┐                ┌────────────────────────────┐
+│ • Thêm nguồn mới  │                │ • Cron job mỗi 30 phút     │
+│ • Config selector  │                │ • Check new chapters       │
+│ • Test crawl 1 ch  │                │ • Auto-crawl nếu có mới   │
+│ • Set lịch chạy   │                │ • Alert nếu source thay đổi│
+└────────┬───────────┘                └─────────────┬──────────────┘
+         │                                          │
+         └──────────────────┬───────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                         CRAWL ENGINE                                  │
+│                                                                      │
+│  ┌─────────┐    ┌─────────────┐    ┌────────────┐    ┌───────────┐ │
+│  │ FETCH   │───▶│   PARSE     │───▶│  DOWNLOAD  │───▶│   STORE   │ │
+│  │ Page    │    │  HTML/JSON  │    │  Images/   │    │  Raw DB   │ │
+│  │ Content │    │  Extract    │    │  Text      │    │  + Files  │ │
+│  └─────────┘    └─────────────┘    └────────────┘    └───────────┘ │
+│                                                                      │
+│  Anti-ban: Proxy rotation | Rate limit | Random delay | User-Agent  │
+└──────────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                      POST-CRAWL OPTIONS                               │
+│                                                                      │
+│  ┌─────────────────┐  ┌──────────────────┐  ┌────────────────────┐ │
+│  │ A. PUBLISH      │  │ B. TRANSLATE     │  │ C. AUDIOBOOK       │ │
+│  │ DIRECTLY        │  │ (send to         │  │ (send to TTS       │ │
+│  │ (nếu cùng      │  │ Translation      │  │ pipeline)          │ │
+│  │  ngôn ngữ VN)  │  │ Pipeline)        │  │                    │ │
+│  └─────────────────┘  └──────────────────┘  └────────────────────┘ │
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────────┐ │
+│  │ D. QUEUE FOR REVIEW (Admin kiểm tra trước khi làm gì tiếp)     │ │
+│  └─────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="sources">📡 2. Nguồn crawl & Chiến lược</h2>
+
+<h3>A. Nguồn truyện chữ (Novel)</h3>
+<table>
+    <tr><th>Nguồn</th><th>Ngôn ngữ</th><th>Loại</th><th>Crawl method</th><th>Ghi chú</th></tr>
+    <tr><td><strong>69shu.com</strong></td><td>🇨🇳 CN</td><td>Web Novel</td><td>HTML parse (simple)</td><td>Ít anti-bot, content trong &lt;div class="content"&gt;</td></tr>
+    <tr><td><strong>biquge (biqu*.com)</strong></td><td>🇨🇳 CN</td><td>Web Novel</td><td>HTML parse</td><td>Nhiều mirror sites, dễ crawl</td></tr>
+    <tr><td><strong>qidian.com</strong></td><td>🇨🇳 CN</td><td>Web Novel (premium)</td><td>API + Browser render</td><td>Anti-bot mạnh, cần Playwright. VIP chapters encrypted</td></tr>
+    <tr><td><strong>syosetu.com</strong></td><td>🇯🇵 JP</td><td>Light Novel</td><td>HTML parse (simple)</td><td>Dễ crawl, robots.txt cho phép</td></tr>
+    <tr><td><strong>kakuyomu.jp</strong></td><td>🇯🇵 JP</td><td>Light Novel</td><td>HTML parse</td><td>Kadokawa platform, clean HTML</td></tr>
+    <tr><td><strong>munpia.com</strong></td><td>🇰🇷 KR</td><td>Web Novel</td><td>HTML parse</td><td>Korean novels, có free chapters</td></tr>
+    <tr><td><strong>novelupdates.com</strong></td><td>🇺🇸 EN</td><td>Index (không có content)</td><td>Lấy metadata + links</td><td>Database novels + links đến raw sources</td></tr>
+</table>
+
+<h3>B. Nguồn truyện tranh (Comic/Manga/Manhwa)</h3>
+<table>
+    <tr><th>Nguồn</th><th>Ngôn ngữ</th><th>Loại</th><th>Crawl method</th><th>Ghi chú</th></tr>
+    <tr><td><strong>rawkuma.com</strong></td><td>🇯🇵 JP RAW</td><td>Manga</td><td>Image download</td><td>Raw manga scans, ít anti-bot</td></tr>
+    <tr><td><strong>mangaraw.to</strong></td><td>🇯🇵 JP RAW</td><td>Manga</td><td>Image download</td><td>Alternative raw source</td></tr>
+    <tr><td><strong>newtoki*.com</strong></td><td>🇰🇷 KR</td><td>Manhwa</td><td>Image download</td><td>Domain hay đổi, cần update thường xuyên</td></tr>
+    <tr><td><strong>copymanga.tv</strong></td><td>🇨🇳 CN</td><td>Manhua</td><td>API JSON</td><td>Có API riêng, trả JSON + image URLs</td></tr>
+    <tr><td><strong>mangadex.org</strong></td><td>Multi</td><td>All types</td><td>Official API</td><td>Có REST API public, tốc độ limit 5req/s</td></tr>
+    <tr><td><strong>webtoons.com</strong></td><td>🇰🇷 KR + EN</td><td>Webtoon</td><td>Browser render</td><td>Anti-bot mạnh, cần Playwright/Puppeteer</td></tr>
+    <tr><td><strong>baozimh.com</strong></td><td>🇨🇳 CN</td><td>Manhua</td><td>HTML parse</td><td>Manhua popular, images lazy-load</td></tr>
+</table>
+
+<h3>C. Nguồn truyện Việt (VN — publish trực tiếp)</h3>
+<table>
+    <tr><th>Nguồn</th><th>Loại</th><th>Crawl method</th><th>Ghi chú</th></tr>
+    <tr><td><strong>truyenfull.vn</strong></td><td>Novel VN</td><td>HTML parse</td><td>Truyện đã dịch VN, publish thẳng</td></tr>
+    <tr><td><strong>dtruyen.com</strong></td><td>Novel VN</td><td>HTML parse</td><td>Alternative VN novel source</td></tr>
+    <tr><td><strong>nettruyen / nettruyenmax</strong></td><td>Comic VN</td><td>Image download</td><td>Truyện tranh đã dịch VN. Domain thay đổi thường xuyên</td></tr>
+    <tr><td><strong>truyenqqvn.com</strong></td><td>Comic VN</td><td>Image download</td><td>Manhwa/manhua đã dịch VN</td></tr>
+</table>
+
+<div class="note-box">
+    <h4 style="color:#7ee787; margin-top:0;">💡 Chiến lược crawl</h4>
+    <ul>
+        <li><strong>Nguồn VN (C):</strong> Crawl → publish trực tiếp (không cần dịch) — nhanh nhất, có content ngay</li>
+        <li><strong>Nguồn ngoại ngữ (A, B):</strong> Crawl → đẩy vào Translation Pipeline → dịch → publish</li>
+        <li><strong>Ưu tiên:</strong> Crawl truyện HOT ở nước ngoài mà chưa có bản VN → differentiation</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="flow-novel">📖 3. Luồng A: Crawl truyện chữ (Novel)</h2>
+
+<div class="flow-diagram">
+┌──────────────────────────────────────────────────────────────────────┐
+│  LUỒNG CRAWL TRUYỆN CHỮ                                             │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. ADMIN TẠO CRAWL SOURCE                                           │
+│     ├── URL trang truyện: https://69shu.com/book/12345/              │
+│     ├── Selector config:                                             │
+│     │   • title_selector: "h1.book-title"                           │
+│     │   • author_selector: ".book-info .author"                     │
+│     │   • chapter_list_selector: "#chapter-list li a"               │
+│     │   • chapter_content_selector: "#content"                      │
+│     │   • next_page_selector: ".next-page a" (nếu paginated)       │
+│     ├── Source language: "zh"                                        │
+│     ├── Category mapping: "仙侠" → "Tiên Hiệp"                     │
+│     └── Schedule: mỗi 2 giờ check chương mới                        │
+│                                                                      │
+│  2. CRAWL METADATA (lần đầu)                                        │
+│     ├── Fetch book page → extract: title, author, description,      │
+│     │   cover image URL, categories, total chapters                  │
+│     ├── Create Publication record (status="crawled", not published) │
+│     ├── Download cover image → save local                            │
+│     └── Crawl chapter list → save CrawlChapter records              │
+│                                                                      │
+│  3. CRAWL CHAPTERS (batch)                                           │
+│     ├── For each chapter URL (with delay 2-5s between requests):    │
+│     │   • Fetch chapter page                                         │
+│     │   • Extract text content (strip ads, nav, footer)             │
+│     │   • Clean: remove JS, inline styles, extra whitespace         │
+│     │   • Save raw text to CrawlChapter.RawContent                  │
+│     ├── Batch size: 20 chapters per run (avoid ban)                  │
+│     ├── Resume: track lastCrawledChapter, skip already done         │
+│     └── Progress: update CrawlSource.lastCrawlAt + chapter count    │
+│                                                                      │
+│  4. POST-CRAWL ACTION (admin chọn):                                  │
+│     ┌─────────────────────────────────────────────────────────┐     │
+│     │ Option A: PUBLISH DIRECTLY (nếu nguồn VN)              │     │
+│     │   → Tạo BookChapter (Content = cleaned text)            │     │
+│     │   → Set Publication.Status = "Active"                   │     │
+│     │                                                         │     │
+│     │ Option B: SEND TO TRANSLATION PIPELINE                  │     │
+│     │   → Tạo TranslationJob (type=novel)                    │     │
+│     │   → AI dịch CN/KR/JP → VN                             │     │
+│     │   → Editor review → publish                            │     │
+│     │                                                         │     │
+│     │ Option C: SEND TO AUDIOBOOK PIPELINE                    │     │
+│     │   → Tạo AudioJob (sourceType=crawled_novel)            │     │
+│     │   → TTS generate audio                                 │     │
+│     │                                                         │     │
+│     │ Option D: KEEP IN QUEUE (review later)                  │     │
+│     │   → Status = "crawled", admin review khi rảnh          │     │
+│     └─────────────────────────────────────────────────────────┘     │
+│                                                                      │
+│  5. AUTO-UPDATE (Scheduler)                                          │
+│     ├── Mỗi X giờ: check source có chương mới không                │
+│     │   (so sánh chapter count hoặc check last chapter URL)         │
+│     ├── Nếu có mới: crawl chương mới → auto action (theo config)   │
+│     └── Notify admin: "Đấu Phá Thương Khung có 3 chương mới"       │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>Ví dụ Selector Config cho 69shu.com</h3>
+<div class="api-block">
+<pre><code>{
+  "sourceId": "69shu-dau-pha",
+  "sourceUrl": "https://www.69shu.com/txt/12345/",
+  "siteName": "69shu",
+  "language": "zh",
+  "type": "novel",
+  
+  "selectors": {
+    "bookPage": {
+      "title": "h1",
+      "author": ".booknav2 p:nth-child(1) a",
+      "description": ".navtxt p",
+      "coverImage": ".bookimg2 img@src",
+      "categories": ".booknav2 p:nth-child(2) a"
+    },
+    "chapterList": {
+      "listUrl": "https://www.69shu.com/txt/12345/",
+      "chapterLinks": "#catalog li a",
+      "chapterTitle": "#catalog li a@text",
+      "chapterUrl": "#catalog li a@href",
+      "pagination": null
+    },
+    "chapterContent": {
+      "contentSelector": ".txtnav",
+      "removeSelectors": [".ads", "script", ".bottom-nav"],
+      "nextPageSelector": null
+    }
+  },
+  
+  "crawlConfig": {
+    "delayBetweenRequests": 3000,
+    "maxChaptersPerRun": 30,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ...",
+    "encoding": "gbk",
+    "useProxy": true
+  },
+  
+  "autoAction": "translate",
+  "scheduleInterval": "2h",
+  "isActive": true
+}</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="flow-comic">🖼️ 4. Luồng B: Crawl truyện tranh (Manga/Manhwa/Manhua)</h2>
+
+<div class="flow-diagram">
+┌──────────────────────────────────────────────────────────────────────┐
+│  LUỒNG CRAWL TRUYỆN TRANH                                           │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  1. ADMIN TẠO CRAWL SOURCE                                           │
+│     ├── URL: https://rawkuma.com/manga/solo-leveling/                │
+│     ├── Selectors:                                                   │
+│     │   • chapter_list: ".chapter-list li a"                        │
+│     │   • image_list: ".reading-content img@src"                    │
+│     │   • (hoặc) API endpoint nếu site có API                      │
+│     ├── Image handling:                                              │
+│     │   • Referer header required? (nhiều site check referer)       │
+│     │   • Lazy-load? (cần scroll/JS render)                        │
+│     │   • Image format: jpg/png/webp                                │
+│     └── Schedule: mỗi 6 giờ check chapter mới                       │
+│                                                                      │
+│  2. CRAWL METADATA                                                   │
+│     ├── Fetch manga page → extract: title, author, genres, cover    │
+│     ├── Create Publication (formatType=Comic, status="crawled")     │
+│     ├── Download + save cover image                                  │
+│     └── Crawl chapter list → save CrawlChapter records              │
+│                                                                      │
+│  3. CRAWL CHAPTER IMAGES                                             │
+│     ├── For each chapter:                                            │
+│     │   • Fetch chapter page (or use Playwright for JS-rendered)    │
+│     │   • Extract all image URLs from page                          │
+│     │   • Download images (with correct Referer header)             │
+│     │   • Save to: /uploads/crawled/{sourceId}/{chapter}/           │
+│     │   • Rename: page_001.jpg, page_002.jpg, ...                   │
+│     │   • Convert to WebP (quality 85, reduce size 40-60%)         │
+│     ├── Handle: lazy-load images (scroll simulation)                 │
+│     ├── Handle: split images (long-strip manhwa → cut per page)     │
+│     └── Track: which chapters already downloaded                     │
+│                                                                      │
+│  4. POST-CRAWL ACTION:                                               │
+│     ┌─────────────────────────────────────────────────────────┐     │
+│     │ Option A: PUBLISH DIRECTLY (nếu nguồn đã là tiếng Việt) │     │
+│     │   → Tạo ComicChapter + ComicPages (imageUrl = local)    │     │
+│     │   → Publication status = "Active"                        │     │
+│     │                                                          │     │
+│     │ Option B: SEND TO TRANSLATION PIPELINE                   │     │
+│     │   → Tạo TranslationJob (images = crawled images)        │     │
+│     │   → OCR → Translate → Typeset → Publish                 │     │
+│     │                                                          │     │
+│     │ Option C: KEEP RAW (archive, translate later)            │     │
+│     │   → Lưu raw images, chờ admin quyết định                │     │
+│     └─────────────────────────────────────────────────────────┘     │
+│                                                                      │
+│  5. AUTO-UPDATE                                                      │
+│     ├── Check chapter list → so sánh với DB                         │
+│     ├── Có mới → auto-crawl images                                  │
+│     ├── Auto-action theo config (publish/translate/queue)           │
+│     └── Notification: "Solo Leveling chapter 189 đã crawl xong"     │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>Xử lý đặc biệt cho ảnh truyện tranh</h3>
+<table>
+    <tr><th>Vấn đề</th><th>Mô tả</th><th>Giải pháp</th></tr>
+    <tr>
+        <td>Hotlink protection</td>
+        <td>Site chặn download ảnh nếu không có đúng Referer header</td>
+        <td>Set Referer header = page URL khi download image</td>
+    </tr>
+    <tr>
+        <td>Lazy-load images</td>
+        <td>Ảnh chỉ load khi scroll đến (data-src thay vì src)</td>
+        <td>Dùng Playwright scroll toàn trang, hoặc parse data-src trực tiếp</td>
+    </tr>
+    <tr>
+        <td>Long-strip format (Manhwa)</td>
+        <td>1 chapter = 1 ảnh cực dài (10000px+)</td>
+        <td>Auto-split thành pages 1200px height mỗi page</td>
+    </tr>
+    <tr>
+        <td>Watermark</td>
+        <td>Nguồn có watermark text trên ảnh</td>
+        <td>AI remove watermark (optional) hoặc crop edges</td>
+    </tr>
+    <tr>
+        <td>Low quality sources</td>
+        <td>Ảnh nén nhiều, bị blur</td>
+        <td>AI upscale (waifu2x / Real-ESRGAN) — tùy chọn</td>
+    </tr>
+    <tr>
+        <td>Dynamic image URLs</td>
+        <td>URL ảnh thay đổi mỗi lần load (token-based)</td>
+        <td>Fetch + download ngay trong cùng session, không cache URL</td>
+    </tr>
+    <tr>
+        <td>CDN rate limit</td>
+        <td>CDN chặn nếu download quá nhanh</td>
+        <td>Delay 500ms-1s giữa mỗi ảnh, retry với exponential backoff</td>
+    </tr>
+</table>
+
+<h3>Ví dụ: Crawl từ MangaDex API (có API chính thức)</h3>
+<div class="api-block">
+<pre><code># MangaDex có REST API public — dễ crawl nhất
+
+import requests, time
+
+BASE = "https://api.mangadex.org"
+
+# 1. Search manga
+resp = requests.get(f"{BASE}/manga", params={"title": "Solo Leveling", "limit": 5})
+manga_id = resp.json()["data"][0]["id"]
+
+# 2. Get chapters
+resp = requests.get(f"{BASE}/manga/{manga_id}/feed", params={
+    "translatedLanguage[]": "ko",  # Korean raw
+    "order[chapter]": "asc",
+    "limit": 100
+})
+chapters = resp.json()["data"]
+
+# 3. Get chapter images
+for ch in chapters:
+    ch_id = ch["id"]
+    time.sleep(1)  # Rate limit: 5 req/s
+    
+    # Get image server + filenames
+    resp = requests.get(f"{BASE}/at-home/server/{ch_id}")
+    server = resp.json()
+    base_url = server["baseUrl"]
+    chapter_hash = server["chapter"]["hash"]
+    pages = server["chapter"]["data"]  # ["page1.jpg", "page2.jpg", ...]
+    
+    # 4. Download images
+    for i, page_filename in enumerate(pages):
+        img_url = f"{base_url}/data/{chapter_hash}/{page_filename}"
+        img_data = requests.get(img_url).content
+        
+        with open(f"chapter_{ch['attributes']['chapter']}/page_{i+1:03d}.jpg", "wb") as f:
+            f.write(img_data)
+        
+        time.sleep(0.5)  # Gentle rate limit</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="anti-ban">🛡️ 5. Anti-ban & Proxy rotation</h2>
+
+<h3>Chiến lược tránh bị block</h3>
+<div class="section-box">
+    <table>
+        <tr><th>Kỹ thuật</th><th>Mô tả</th><th>Implementation</th></tr>
+        <tr>
+            <td><strong>Request delay</strong></td>
+            <td>Random delay 2-5s giữa mỗi request</td>
+            <td><code>await asyncio.sleep(random.uniform(2, 5))</code></td>
+        </tr>
+        <tr>
+            <td><strong>User-Agent rotation</strong></td>
+            <td>Đổi UA mỗi request, giả lập nhiều browser</td>
+            <td>Pool 50+ UA strings (Chrome, Firefox, Safari, Mobile)</td>
+        </tr>
+        <tr>
+            <td><strong>Proxy rotation</strong></td>
+            <td>Đổi IP mỗi 10-20 requests</td>
+            <td>Dùng proxy pool (free: ProxyScrape / paid: BrightData, SmartProxy)</td>
+        </tr>
+        <tr>
+            <td><strong>Session management</strong></td>
+            <td>Giữ cookies, giả lập user thật</td>
+            <td>requests.Session() với persistent cookies</td>
+        </tr>
+        <tr>
+            <td><strong>Headless browser</strong></td>
+            <td>Render JS cho sites có anti-bot (Cloudflare, etc.)</td>
+            <td>Playwright / Puppeteer (stealth mode)</td>
+        </tr>
+        <tr>
+            <td><strong>Respectful crawling</strong></td>
+            <td>Không crawl quá nhanh, không DDoS</td>
+            <td>Max 1 request/3s per domain, 30 chapters/run</td>
+        </tr>
+        <tr>
+            <td><strong>Error handling</strong></td>
+            <td>Retry với backoff khi bị 403/429</td>
+            <td>Exponential backoff: 5s → 15s → 45s → skip</td>
+        </tr>
+    </table>
+</div>
+
+<h3>Proxy config</h3>
+<div class="api-block">
+<pre><code># Free proxy sources (rotate every 10 requests):
+PROXY_SOURCES = [
+    "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=3000",
+    "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt"
+]
+
+# Hoặc paid proxy (reliable):
+# BrightData: $15/GB — residential proxies
+# SmartProxy: $12.5/GB — datacenter + residential
+
+class ProxyRotator:
+    def __init__(self):
+        self.proxies = self.fetch_proxies()
+        self.index = 0
+    
+    def get_next(self):
+        proxy = self.proxies[self.index % len(self.proxies)]
+        self.index += 1
+        return {"http": f"http://{proxy}", "https": f"http://{proxy}"}
+    
+    def mark_dead(self, proxy):
+        self.proxies.remove(proxy)</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="scheduler">⏰ 6. Scheduler — Lịch crawl tự động</h2>
+
+<div class="flow-diagram">
+SCHEDULER WORKFLOW:
+
+┌────────────────────────────────────────────────────────────┐
+│  CRON JOB (chạy mỗi 30 phút)                              │
+│                                                            │
+│  1. Load active CrawlSources từ DB                         │
+│  2. For each source:                                       │
+│     ├── Check: lastCrawlAt + interval < NOW()?            │
+│     │   └── No → skip                                     │
+│     ├── Yes → Fetch chapter list page                     │
+│     ├── Compare: server chapter count vs DB count         │
+│     │   └── Same → skip (no new chapters)                │
+│     ├── New chapters found!                                │
+│     │   ├── Crawl new chapters (content/images)           │
+│     │   ├── Execute autoAction:                           │
+│     │   │   • "publish" → create chapters directly       │
+│     │   │   • "translate" → create TranslationJob        │
+│     │   │   • "queue" → just save, wait for admin        │
+│     │   ├── Update source.lastCrawlAt                     │
+│     │   └── Notify admin: "3 chương mới đã crawl"        │
+│     └── Error? → log error, retry next cycle              │
+│                                                            │
+│  3. Health check: sources offline? selectors broken?       │
+│     └── Alert admin if source returns 404 or empty        │
+└────────────────────────────────────────────────────────────┘
+
+SCHEDULE OPTIONS (per source):
+• "30m" — mỗi 30 phút (cho truyện daily update)
+• "2h"  — mỗi 2 giờ (default)
+• "6h"  — mỗi 6 giờ (cho truyện weekly)
+• "1d"  — mỗi ngày
+• "manual" — chỉ chạy khi admin bấm
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="db-schema">🗄️ 7. Database Schema</h2>
+
+<div class="api-block">
+<pre><code>-- ═══════════════════════════════════════════════════════════
+-- CRAWLER PIPELINE TABLES
+-- ═══════════════════════════════════════════════════════════
+
+-- 1. Crawl Sources (cấu hình mỗi truyện cần crawl)
+CREATE TABLE "CrawlSources" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "PublicationId" UUID REFERENCES "Publications"("Id"),  -- Link to local publication (null if not created yet)
+    "SourceName" VARCHAR(100) NOT NULL,                    -- "69shu", "rawkuma", "nettruyen"
+    "SourceUrl" VARCHAR(500) NOT NULL,                     -- URL trang truyện
+    "SourceType" VARCHAR(20) NOT NULL,                     -- 'novel', 'comic'
+    "SourceLanguage" VARCHAR(10) NOT NULL,                 -- 'zh', 'ko', 'ja', 'vi', 'en'
+    "Selectors" TEXT NOT NULL,                             -- JSON config selectors
+    "CrawlConfig" TEXT,                                    -- JSON: delay, proxy, userAgent, encoding
+    "AutoAction" VARCHAR(30) DEFAULT 'queue',              -- 'publish', 'translate', 'audiobook', 'queue'
+    "ScheduleInterval" VARCHAR(20) DEFAULT '2h',           -- '30m', '2h', '6h', '1d', 'manual'
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "LastCrawlAt" TIMESTAMP,
+    "LastChapterCrawled" INT DEFAULT 0,
+    "TotalChaptersCrawled" INT DEFAULT 0,
+    "ErrorCount" INT DEFAULT 0,                            -- Consecutive errors
+    "LastError" TEXT,
+    "CreatedAt" TIMESTAMP DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- 2. Crawl Chapters (mỗi chương đã crawl về)
+CREATE TABLE "CrawlChapters" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "SourceId" UUID NOT NULL REFERENCES "CrawlSources"("Id") ON DELETE CASCADE,
+    "ChapterNumber" DECIMAL NOT NULL,
+    "Title" VARCHAR(300),
+    "SourceChapterUrl" VARCHAR(500),                       -- URL gốc của chương
+    "RawContent" TEXT,                                     -- Text content (for novels)
+    "ImageFolder" VARCHAR(500),                            -- Path to downloaded images (for comics)
+    "ImageCount" INT DEFAULT 0,
+    "Status" VARCHAR(30) DEFAULT 'pending',                -- 'pending', 'crawling', 'crawled', 'published', 'failed'
+    "PublishedChapterId" UUID,                             -- FK to BookChapter/ComicChapter after publish
+    "FileSize" BIGINT DEFAULT 0,                           -- Total size of downloaded content
+    "CrawledAt" TIMESTAMP,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- 3. Crawl Runs (log mỗi lần chạy crawl)
+CREATE TABLE "CrawlRuns" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "SourceId" UUID NOT NULL REFERENCES "CrawlSources"("Id"),
+    "TriggerType" VARCHAR(20) NOT NULL,                    -- 'scheduled', 'manual', 'auto_update'
+    "Status" VARCHAR(20) NOT NULL DEFAULT 'running',       -- 'running', 'completed', 'failed', 'cancelled'
+    "ChaptersCrawled" INT DEFAULT 0,
+    "ChaptersNew" INT DEFAULT 0,
+    "ImagesDownloaded" INT DEFAULT 0,
+    "BytesDownloaded" BIGINT DEFAULT 0,
+    "Duration" INT,                                        -- Duration in seconds
+    "ErrorMessage" TEXT,
+    "StartedAt" TIMESTAMP DEFAULT NOW(),
+    "CompletedAt" TIMESTAMP
+);
+
+-- 4. Crawl Site Templates (pre-built selector configs cho sites phổ biến)
+CREATE TABLE "CrawlSiteTemplates" (
+    "Id" VARCHAR(50) PRIMARY KEY,                          -- '69shu', 'rawkuma', 'nettruyen', 'mangadex'
+    "SiteName" VARCHAR(100) NOT NULL,
+    "SiteUrl" VARCHAR(200),
+    "SourceType" VARCHAR(20) NOT NULL,
+    "Language" VARCHAR(10),
+    "SelectorsTemplate" TEXT NOT NULL,                     -- JSON default selectors
+    "CrawlConfigTemplate" TEXT,                            -- JSON default crawl config
+    "Notes" TEXT,
+    "IsActive" BOOLEAN DEFAULT TRUE
+);
+
+-- Indexes
+CREATE INDEX idx_crawl_sources_active ON "CrawlSources"("IsActive", "ScheduleInterval");
+CREATE INDEX idx_crawl_chapters_source ON "CrawlChapters"("SourceId", "ChapterNumber");
+CREATE INDEX idx_crawl_chapters_status ON "CrawlChapters"("Status");
+CREATE INDEX idx_crawl_runs_source ON "CrawlRuns"("SourceId", "StartedAt" DESC);
+
+-- Seed site templates
+INSERT INTO "CrawlSiteTemplates" VALUES
+('69shu', '69Shu', 'https://www.69shu.com', 'novel', 'zh', 
+ '{"bookPage":{"title":"h1","author":".booknav2 p a","description":".navtxt p"},"chapterList":{"chapterLinks":"#catalog li a"},"chapterContent":{"contentSelector":".txtnav","removeSelectors":[".ads","script"]}}',
+ '{"delayBetweenRequests":3000,"encoding":"gbk","useProxy":true}', 'Chinese novel site, simple HTML', true),
+
+('rawkuma', 'RawKuma', 'https://rawkuma.com', 'comic', 'ja',
+ '{"bookPage":{"title":".post-title h1","author":".author-content a","genres":".genres-content a"},"chapterList":{"chapterLinks":".listing-chapters_wrap li a"},"chapterImages":{"imageSelector":".reading-content img@src"}}',
+ '{"delayBetweenRequests":2000,"refererRequired":true}', 'Japanese manga raw scans', true),
+
+('nettruyen', 'NetTruyen', 'https://www.nettruyenmax.com', 'comic', 'vi',
+ '{"bookPage":{"title":"h1.title-detail","author":".author .col-xs-8"},"chapterList":{"chapterLinks":"#nt_listchapter li a"},"chapterImages":{"imageSelector":".reading-detail .page-chapter img@src"}}',
+ '{"delayBetweenRequests":1500,"refererRequired":true}', 'Vietnamese translated comics', true),
+
+('mangadex', 'MangaDex', 'https://mangadex.org', 'comic', 'multi',
+ '{"apiMode":true,"apiBase":"https://api.mangadex.org","mangaEndpoint":"/manga","chapterEndpoint":"/manga/{id}/feed","imageEndpoint":"/at-home/server/{chapterId}"}',
+ '{"delayBetweenRequests":1200,"rateLimit":"5/s"}', 'Official API, multi-language', true);</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="api">🔌 8. API Endpoints</h2>
+
+<div class="api-block">
+<h4>AdminCrawlerController [Authorize(Roles="Admin")]</h4>
+<pre><code>// ─── SOURCE MANAGEMENT ───
+GET    /api/admin/crawler/sources?isActive=&type=&page=1
+       → List crawl sources (filter by type, status)
+
+GET    /api/admin/crawler/sources/{id}
+       → Source detail + recent runs + chapter stats
+
+POST   /api/admin/crawler/sources
+       Body: { sourceUrl, sourceName, sourceType, sourceLanguage, selectors, crawlConfig, autoAction, scheduleInterval }
+       → Create new crawl source
+
+PUT    /api/admin/crawler/sources/{id}
+       → Update source config (selectors, schedule, etc.)
+
+PATCH  /api/admin/crawler/sources/{id}/toggle
+       → Enable/Disable source
+
+DELETE /api/admin/crawler/sources/{id}
+       → Delete source + all crawled data
+
+// ─── CRAWL ACTIONS ───
+POST   /api/admin/crawler/sources/{id}/crawl-now
+       Body: { chapterRange: "1-50" (optional), force: false }
+       → Trigger manual crawl immediately
+
+POST   /api/admin/crawler/sources/{id}/test
+       Body: { testUrl: "chapter URL" (optional) }
+       → Test crawl 1 page, return extracted data (for debugging selectors)
+
+POST   /api/admin/crawler/sources/{id}/stop
+       → Cancel running crawl
+
+// ─── CHAPTERS ───
+GET    /api/admin/crawler/sources/{id}/chapters?status=&page=1
+       → List crawled chapters for this source
+
+GET    /api/admin/crawler/chapters/{chapterId}/preview
+       → Preview raw content (text or first few images)
+
+POST   /api/admin/crawler/chapters/publish
+       Body: { chapterIds: ["id1","id2",...], isLocked: false, coinPrice: 0 }
+       → Publish selected chapters directly to XomTruyen
+
+POST   /api/admin/crawler/chapters/send-to-translate
+       Body: { chapterIds: [...], targetLanguage: "vi" }
+       → Create TranslationJob from crawled chapters
+
+POST   /api/admin/crawler/chapters/send-to-audio
+       Body: { chapterIds: [...] }
+       → Create AudioJob from crawled chapters
+
+DELETE /api/admin/crawler/chapters/{chapterId}
+       → Delete crawled chapter data
+
+// ─── RUNS / LOGS ───
+GET    /api/admin/crawler/runs?sourceId=&status=&page=1
+       → List crawl run history
+
+GET    /api/admin/crawler/runs/{runId}
+       → Run detail + logs
+
+// ─── TEMPLATES ───
+GET    /api/admin/crawler/templates
+       → List pre-built site templates
+
+POST   /api/admin/crawler/sources/from-template
+       Body: { templateId: "69shu", bookUrl: "https://69shu.com/txt/12345/" }
+       → Auto-create source using template selectors
+
+// ─── DASHBOARD ───
+GET    /api/admin/crawler/stats
+       → { activeSources, totalChaptersCrawled, todayCrawled, failedSources, storageUsed }
+
+GET    /api/admin/crawler/activity-feed?limit=20
+       → Recent crawl activity (like a log feed)</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="admin-ui">🖥️ 9. Admin UI — Trang quản lý Crawler</h2>
+
+<h3>Sidebar</h3>
+<div class="api-block">
+<pre><code>🕷️ Crawler (Kéo truyện)
+   ├── Dashboard (/crawler)
+   ├── Nguồn crawl (/crawler/sources)
+   ├── Thêm nguồn mới (/crawler/sources/new)
+   ├── Chương đã crawl (/crawler/chapters)
+   ├── Lịch sử chạy (/crawler/runs)
+   └── Templates (/crawler/templates)</code></pre>
+</div>
+
+<h3>Trang <code>/crawler</code> — Dashboard</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Stats cards:</strong> Sources active | Chapters crawled today | Failed sources | Storage used</li>
+        <li><strong>Activity feed:</strong> Real-time log: "✅ 69shu - Đấu Phá: 3 chương mới (10:30)", "❌ rawkuma - timeout (10:15)"</li>
+        <li><strong>Quick actions:</strong> "Crawl All Now", "Check for updates"</li>
+    </ul>
+</div>
+
+<h3>Trang <code>/crawler/sources</code> — Danh sách nguồn</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Table:</strong> Site (favicon + name), Truyện, Type (novel/comic badge), Language, Schedule, Last crawl, Chapters, Status (active/error/paused), Actions</li>
+        <li><strong>Row actions:</strong> Crawl Now | Edit | Test | View chapters | Disable | Delete</li>
+        <li><strong>Bulk actions:</strong> Enable/Disable selected, Crawl all selected</li>
+    </ul>
+</div>
+
+<h3>Trang <code>/crawler/sources/new</code> — Thêm nguồn mới</h3>
+<div class="section-box">
+    <h4>Wizard 4 bước:</h4>
+    <ol>
+        <li><strong>Chọn phương thức:</strong>
+            <ul>
+                <li>🎯 Từ template (chọn site → paste URL truyện → auto-fill selectors)</li>
+                <li>🔧 Custom (tự config selectors — cho sites mới)</li>
+            </ul>
+        </li>
+        <li><strong>Nhập URL + Config:</strong>
+            <ul>
+                <li>URL trang truyện</li>
+                <li>Type: Novel / Comic</li>
+                <li>Language: CN / KR / JP / VN / EN</li>
+                <li>Selectors (pre-filled nếu dùng template, editable)</li>
+            </ul>
+        </li>
+        <li><strong>Test crawl:</strong>
+            <ul>
+                <li>Bấm "Test" → fetch 1 trang → hiển thị kết quả extracted</li>
+                <li>Verify: title đúng? author đúng? chapters list đúng? content clean?</li>
+                <li>Nếu sai → quay lại sửa selectors</li>
+            </ul>
+        </li>
+        <li><strong>Schedule & Action:</strong>
+            <ul>
+                <li>Schedule interval (dropdown)</li>
+                <li>Auto-action: Publish / Translate / Audio / Queue</li>
+                <li>Publish settings: isLocked, coinPrice mặc định</li>
+            </ul>
+        </li>
+    </ol>
+</div>
+
+<h3>Trang <code>/crawler/chapters</code> — Chương đã crawl</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Table:</strong> Source, Chapter #, Title, Status (badge), Size, Crawled at, Actions</li>
+        <li><strong>Filter:</strong> by Source, by Status (pending/crawled/published/failed)</li>
+        <li><strong>Preview:</strong> Click chapter → modal hiển thị text hoặc grid ảnh thumbnails</li>
+        <li><strong>Batch actions:</strong> Publish selected | Send to Translation | Send to Audio | Delete</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="integration">🔗 10. Tích hợp với Translation + Audiobook Pipeline</h2>
+
+<div class="flow-diagram">
+FULL CONTENT PIPELINE — KẾT NỐI TẤT CẢ MODULES:
+
+                    ┌──────────────┐
+                    │   CRAWLER    │
+                    │  (Kéo về)    │
+                    └──────┬───────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+     ┌────────────┐ ┌──────────┐ ┌──────────────┐
+     │ VN content │ │ Foreign  │ │ Already      │
+     │ (publish   │ │ content  │ │ translated   │
+     │  trực tiếp)│ │ (CN/KR/  │ │ (EN novels)  │
+     │            │ │  JP RAW) │ │              │
+     └─────┬──────┘ └────┬─────┘ └──────┬───────┘
+           │              │              │
+           │              ▼              │
+           │    ┌──────────────────┐    │
+           │    │  TRANSLATION     │    │
+           │    │  PIPELINE        │    │
+           │    │  (OCR+Dịch+      │    │
+           │    │   Typeset)       │    │
+           │    └────────┬─────────┘    │
+           │             │              │
+           └─────────────┼──────────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │      PUBLICATION     │
+              │   (BookChapter /     │
+              │    ComicChapter)     │
+              └──────────┬───────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │    AUDIOBOOK         │
+              │    PIPELINE          │
+              │   (TTS convert)     │
+              └──────────────────────┘
+
+ADMIN ACTION SHORTCUTS:
+• "Crawl → Publish" (VN sources, 1 click)
+• "Crawl → Translate → Publish" (Foreign sources, auto pipeline)
+• "Crawl → Translate → Audio" (Full pipeline: text + audio)
+• "Crawl → Queue" (Manual review before any action)
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="tech-stack">🛠️ 11. Tech Stack</h2>
+
+<h3>Architecture</h3>
+<div class="flow-diagram">
+┌────────────────────────────────────────────────────┐
+│            ADMIN PANEL (React)                      │
+│  Source CRUD | Test tool | Chapter browser         │
+└───────────────────────┬────────────────────────────┘
+                        │ REST API
+                        ▼
+┌────────────────────────────────────────────────────┐
+│         .NET 9 BACKEND                              │
+│  AdminCrawlerController → CrawlerService           │
+│  Hangfire jobs (scheduled crawling)                │
+└─────────┬──────────────────────────────────────────┘
+          │ HTTP / Queue
+          ▼
+┌────────────────────────────────────────────────────┐
+│         PYTHON CRAWLER WORKER                       │
+│                                                    │
+│  ┌──────────────┐  ┌────────────────────────────┐ │
+│  │  Scrapy /    │  │  Playwright                 │ │
+│  │  Requests    │  │  (for JS-rendered sites)    │ │
+│  │  (simple     │  │  (Cloudflare bypass)        │ │
+│  │   HTML)      │  │                             │ │
+│  └──────────────┘  └────────────────────────────┘ │
+│                                                    │
+│  ┌──────────────┐  ┌────────────────────────────┐ │
+│  │  Proxy       │  │  Image Processor            │ │
+│  │  Rotator     │  │  (download, convert WebP,   │ │
+│  │              │  │   split long-strip)         │ │
+│  └──────────────┘  └────────────────────────────┘ │
+└────────────────────────────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────────────────────────────┐
+│  FILE STORAGE                                      │
+│  /uploads/crawled/{sourceId}/{chapter}/             │
+│  /uploads/crawled/{sourceId}/metadata.json         │
+└────────────────────────────────────────────────────┘
+</div>
+
+<h3>Python dependencies</h3>
+<div class="api-block">
+<pre><code># requirements.txt for crawler worker
+fastapi==0.104.0
+uvicorn==0.24.0
+requests==2.31.0
+beautifulsoup4==4.12.0
+lxml==4.9.0
+playwright==1.40.0          # For JS-rendered sites
+Pillow==10.1.0              # Image processing
+aiohttp==3.9.0              # Async HTTP
+fake-useragent==1.4.0       # UA rotation
+charset-normalizer==3.3.0   # Encoding detection (gbk, euc-kr, etc.)
+schedule==1.2.0             # Simple scheduler (hoặc dùng Hangfire từ .NET)
+
+# Optional:
+scrapy==2.11.0              # Full crawling framework (alternative to requests)
+cloudscraper==1.2.71        # Cloudflare bypass</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="tasks">📋 12. Task list cho AI thực hiện</h2>
+
+<div class="section-box">
+<h4>Task CR1: Database Migration — Crawler tables</h4>
+<pre><code>Dự án: xomtruyen.API (.NET 9, EF Core, PostgreSQL)
+Tạo migration thêm 4 tables:
+1. CrawlSources
+2. CrawlChapters
+3. CrawlRuns
+4. CrawlSiteTemplates
+
+Models mới:
+- Models/CrawlSource.cs
+- Models/CrawlChapter.cs
+- Models/CrawlRun.cs
+- Models/CrawlSiteTemplate.cs
+
+Seed CrawlSiteTemplates (69shu, rawkuma, nettruyen, mangadex).
+Migration: dotnet ef migrations add AddCrawlerPipeline
+</code></pre>
+
+<h4>Task CR2: Python Worker — Crawler Service</h4>
+<pre><code>Dự án: python-worker/ (mở rộng)
+
+Endpoints mới (FastAPI):
+
+POST /crawler/crawl-novel
+Body: {
+  sourceUrl: "https://69shu.com/txt/12345/",
+  selectors: { ... },
+  crawlConfig: { delay, encoding, proxy },
+  chapterRange: { from: 1, to: 50 }  // optional
+}
+Response: {
+  metadata: { title, author, description, coverUrl, totalChapters },
+  chapters: [
+    { number: 1, title: "...", content: "...", url: "..." },
+    ...
+  ]
+}
+
+POST /crawler/crawl-comic
+Body: {
+  sourceUrl: "https://rawkuma.com/manga/xyz/chapter-15/",
+  selectors: { imageSelector: "..." },
+  crawlConfig: { referer, delay, proxy },
+  outputFolder: "/uploads/crawled/source123/chapter_015/"
+}
+Response: {
+  images: ["page_001.webp", "page_002.webp", ...],
+  imageCount: 22,
+  totalSize: 15234567
+}
+
+POST /crawler/test-selectors
+Body: {
+  url: "...",
+  selectors: { title: "h1", author: ".info a", ... }
+}
+Response: {
+  extracted: { title: "Đấu Phá...", author: "Thiên Tằm..." },
+  success: true,
+  htmlPreview: "..." (first 500 chars)
+}
+
+POST /crawler/check-updates
+Body: {
+  sourceUrl: "...",
+  selectors: { chapterList: "..." },
+  lastKnownChapter: 150
+}
+Response: {
+  latestChapter: 153,
+  newChapters: [151, 152, 153],
+  hasUpdates: true
+}
+
+Logic:
+- Requests + BeautifulSoup cho simple HTML sites
+- Playwright cho JS-rendered sites (auto-detect khi requests fails)
+- Image download with Referer header + convert to WebP
+- Encoding detection (gbk for Chinese sites)
+- Proxy rotation from pool
+- Error handling + retry
+</code></pre>
+
+<h4>Task CR3: Backend — AdminCrawlerController</h4>
+<pre><code>Dự án: xomtruyen.API
+Controller: Controllers/AdminCrawlerController.cs [Authorize(Roles="Admin")]
+
+Implement tất cả endpoints ở phần 8.
+
+Key services:
+- ICrawlerService → CrawlerService
+  • CreateSource, UpdateSource, DeleteSource
+  • TriggerCrawl (call Python worker)
+  • TestSelectors (call Python /crawler/test-selectors)
+  • CheckForUpdates (call Python /crawler/check-updates)
+  • PublishChapters (create BookChapter/ComicChapter from CrawlChapter)
+  • SendToTranslation (create TranslationJob)
+  • SendToAudio (create AudioJob)
+
+Background jobs (Hangfire):
+- CrawlSchedulerJob: chạy mỗi 5 phút
+  • Load active sources
+  • Check interval: lastCrawlAt + interval < NOW?
+  • If yes → trigger crawl
+  • Log to CrawlRuns table
+</code></pre>
+
+<h4>Task CR4: Backend — Scheduler Service (Hangfire)</h4>
+<pre><code>Dự án: xomtruyen.API
+
+Tạo: Services/CrawlSchedulerService.cs
+- Registered as Hangfire RecurringJob (chạy mỗi 5 phút)
+- Logic:
+  1. var sources = await _db.CrawlSources.Where(s => s.IsActive).ToListAsync();
+  2. foreach source: check if due (lastCrawlAt + interval < now)
+  3. If due: enqueue crawl job (Hangfire BackgroundJob.Enqueue)
+  4. Crawl job:
+     a. Call Python /crawler/check-updates
+     b. If new chapters → Call Python /crawler/crawl-novel or /crawl-comic
+     c. Save CrawlChapters to DB
+     d. Execute autoAction (publish/translate/queue)
+     e. Update source.LastCrawlAt
+     f. Create CrawlRun log
+
+Setup trong Program.cs:
+services.AddHangfire(config => config.UsePostgreSqlStorage(connectionString));
+app.UseHangfireDashboard("/hangfire");
+RecurringJob.AddOrUpdate<CrawlSchedulerService>("crawl-scheduler", x => x.RunAsync(), "*/5 * * * *");
+</code></pre>
+
+<h4>Task CR5: Frontend Admin — Crawler Pages</h4>
+<pre><code>Dự án: xomtruyen-admin (React + TypeScript)
+
+Files mới:
+- src/pages/CrawlerDashboard.tsx
+- src/pages/CrawlerSources.tsx
+- src/pages/CrawlerSourceNew.tsx (wizard)
+- src/pages/CrawlerSourceDetail.tsx
+- src/pages/CrawlerChapters.tsx
+- src/pages/CrawlerRuns.tsx
+- src/api/crawlerApi.ts
+
+Routes:
+- /crawler → CrawlerDashboard
+- /crawler/sources → CrawlerSources (list)
+- /crawler/sources/new → CrawlerSourceNew (wizard)
+- /crawler/sources/:id → CrawlerSourceDetail
+- /crawler/chapters → CrawlerChapters (all sources)
+- /crawler/runs → CrawlerRuns (history)
+
+Sidebar: Thêm nhóm "🕷️ Crawler"
+
+Key UI features:
+1. Source wizard: Template selection → URL input → Selector config → Test → Schedule
+2. Test tool: Input URL + selectors → "Test" button → show extracted result
+3. Chapter browser: Grid (images) or List (text) view + batch actions
+4. Activity feed: Real-time log of crawl activity
+5. Source detail: Stats + chart (chapters/day) + chapter list + run history
+</code></pre>
+</div>
+
+<h3>Timeline triển khai</h3>
+<div class="flow-diagram">
+Week 1: CR1 (DB) + CR2 (Python Crawler Worker)
+  → Python worker crawl được novel + comic từ URL
+
+Week 2: CR3 (Backend Controller) + CR4 (Scheduler)
+  → API hoàn chỉnh + auto-crawl theo lịch
+
+Week 3: CR5 (Frontend Admin UI)
+  → Admin dùng UI để quản lý sources + xem chapters + trigger crawl
+
+Week 4: Integration testing + thêm site templates
+  → Test end-to-end: add source → auto crawl → publish / translate
+
+TỔNG: ~4 tuần
+Sau khi xong: Admin thêm URL truyện → system tự crawl mỗi vài giờ → content tự cập nhật
+</div>
+
+<hr>
+<p style="text-align:center; color:#666; margin-top:40px; font-size:0.9em;">
+    📅 Tạo ngày: 14/08/2026 | XomTruyen Admin — Crawler Pipeline Design<br>
+    Sources: 69shu, rawkuma, nettruyen, mangadex, biquge, newtoki, copymanga, ...<br>
+    Pipeline: Admin add URL → Auto-crawl → Publish / Translate / Audio<br>
+    Tech: Python (Requests + Playwright + BeautifulSoup) + .NET Hangfire scheduler<br>
+    Effort: ~4 tuần | Kết quả: Hệ thống tự kéo truyện mới mỗi ngày, không cần manual
+</p>
+
+</div>
+</body>
+</html>
