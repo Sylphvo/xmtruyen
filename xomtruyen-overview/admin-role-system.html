@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen — Hệ thống phân quyền Role-based (RBAC)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.8; padding: 40px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px; border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px; padding: 15px; overflow-x: auto; margin: 12px 0; font-size: 0.88em; }
+        code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; color: #7ee787; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin-bottom: 6px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+        .tag-admin { background: #ff4444; color: #fff; }
+        .tag-editor { background: #ff9800; color: #fff; }
+        .tag-translator { background: #9c27b0; color: #fff; }
+        .tag-moderator { background: #2196f3; color: #fff; }
+        .tag-author { background: #4caf50; color: #fff; }
+        .tag-user { background: #607d8b; color: #fff; }
+        .tag-guest { background: #333; color: #aaa; }
+        .section-box { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 15px 0; }
+        .api-block { background: #1a1a2e; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 3px solid #a78bfa; }
+        .flow-diagram { background: #0d1117; padding: 20px; border-radius: 8px; margin: 15px 0; text-align: left; font-family: monospace; color: #7ee787; line-height: 2; white-space: pre-wrap; }
+        hr { border: 1px solid #222; margin: 40px 0; }
+        .highlight { color: #ffd93d; }
+        .success { color: #7ee787; }
+        .warning { color: #ff6b6b; }
+        .note-box { background: #1a2e1a; border-left: 4px solid #7ee787; padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 15px 0; }
+        .perm-yes { color: #7ee787; font-weight: bold; }
+        .perm-no { color: #ff6b6b; }
+        .perm-partial { color: #ffd93d; }
+        @media (max-width: 768px) { body { padding: 15px 10px; } h1 { font-size: 1.5em; } h2 { font-size: 1.2em; padding-left: 10px; } table { font-size: 0.75em; display: block; overflow-x: auto; } pre { font-size: 0.78em; } .flow-diagram { font-size: 0.7em; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>👮 XomTruyen — Hệ thống phân quyền Role-based (RBAC)</h1>
+<p class="subtitle">Thiết kế chi tiết 6 Roles | Permission matrix | Backend + Frontend implementation | Admin UI quản lý roles</p>
+
+<div class="toc">
+    <h3 style="color:#fff; margin-bottom:10px;">📌 Mục lục</h3>
+    <a href="#overview">1. Tổng quan hệ thống Role</a>
+    <a href="#roles">2. Định nghĩa 6 Roles</a>
+    <a href="#permissions">3. Permission Matrix (Bảng quyền chi tiết)</a>
+    <a href="#hierarchy">4. Cấp bậc & Kế thừa quyền</a>
+    <a href="#db-schema">5. Database Schema</a>
+    <a href="#backend">6. Backend Implementation (.NET 9)</a>
+    <a href="#frontend-admin">7. Frontend Admin — Quản lý Roles</a>
+    <a href="#frontend-client">8. Frontend Client — Phân quyền theo Role</a>
+    <a href="#api">9. API Endpoints</a>
+    <a href="#flows">10. Luồng nghiệp vụ theo Role</a>
+    <a href="#tasks">11. Task list cho AI thực hiện</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="overview">🌐 1. Tổng quan hệ thống Role</h2>
+
+<div class="flow-diagram">
+═══════════════════════════════════════════════════════════════════════════
+                    HỆ THỐNG PHÂN QUYỀN XOMTRUYEN
+═══════════════════════════════════════════════════════════════════════════
+
+ADMIN PANEL (xomtruyen-admin):
+┌─────────────────────────────────────────────────────────────────────┐
+│  👑 SUPER ADMIN  — Toàn quyền hệ thống                              │
+│  📝 EDITOR       — Quản lý nội dung (sách, chương, dịch thuật)      │
+│  🌐 TRANSLATOR   — Dịch thuật, review bản dịch                      │
+│  🛡️ MODERATOR    — Duyệt reviews, xử lý reports, quản lý comments  │
+└─────────────────────────────────────────────────────────────────────┘
+
+CLIENT WEB + MOBILE (xom-truyen / xomtruyen-app):
+┌─────────────────────────────────────────────────────────────────────┐
+│  ✍️ AUTHOR       — Đăng truyện riêng, quản lý tác phẩm của mình    │
+│  👤 USER         — Đọc truyện, mua xu, bookmark, review             │
+│  👻 GUEST        — Đọc giới hạn, không có tài khoản                 │
+└─────────────────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="roles">🎭 2. Định nghĩa 6 Roles</h2>
+
+<table>
+    <tr><th>Role</th><th>Badge</th><th>Mô tả</th><th>Ai có thể assign?</th><th>Truy cập Admin Panel?</th></tr>
+    <tr>
+        <td><strong>SuperAdmin</strong></td>
+        <td><span class="tag tag-admin">ADMIN</span></td>
+        <td>Toàn quyền hệ thống. Quản lý users, roles, settings, database, tài chính, deploy. Chỉ có 1-2 người (founder).</td>
+        <td>Chỉ SuperAdmin khác</td>
+        <td class="perm-yes">✅ Full</td>
+    </tr>
+    <tr>
+        <td><strong>Editor</strong></td>
+        <td><span class="tag tag-editor">EDITOR</span></td>
+        <td>Quản lý nội dung: CRUD sách, chương, categories, topics. Quản lý crawler, translation pipeline. Không truy cập tài chính, users, database.</td>
+        <td>SuperAdmin</td>
+        <td class="perm-yes">✅ Giới hạn</td>
+    </tr>
+    <tr>
+        <td><strong>Translator</strong></td>
+        <td><span class="tag tag-translator">TRANSLATOR</span></td>
+        <td>Làm việc với Translation Pipeline: review bản dịch, sửa text blocks, approve/reject chapters. Không CRUD sách, không publish.</td>
+        <td>SuperAdmin, Editor</td>
+        <td class="perm-yes">✅ Rất giới hạn</td>
+    </tr>
+    <tr>
+        <td><strong>Moderator</strong></td>
+        <td><span class="tag tag-moderator">MODERATOR</span></td>
+        <td>Quản lý cộng đồng: duyệt/xóa reviews, xử lý reports, ban users, quản lý comments. Không truy cập content management.</td>
+        <td>SuperAdmin</td>
+        <td class="perm-yes">✅ Rất giới hạn</td>
+    </tr>
+    <tr>
+        <td><strong>Author</strong></td>
+        <td><span class="tag tag-author">AUTHOR</span></td>
+        <td>Tác giả/nhóm dịch: đăng truyện của mình, quản lý chương, xem analytics truyện mình. Không truy cập truyện người khác.</td>
+        <td>SuperAdmin, Editor</td>
+        <td class="perm-partial">⚠️ Author Dashboard riêng</td>
+    </tr>
+    <tr>
+        <td><strong>User</strong></td>
+        <td><span class="tag tag-user">USER</span></td>
+        <td>Người dùng bình thường: đọc truyện, mua xu, VIP, bookmark, review, favorite. Không có quyền quản trị.</td>
+        <td>Tự đăng ký</td>
+        <td class="perm-no">❌ Không</td>
+    </tr>
+    <tr>
+        <td><strong>Guest</strong></td>
+        <td><span class="tag tag-guest">GUEST</span></td>
+        <td>Chưa đăng nhập: đọc giới hạn 10 chương, xem trang chủ, search. Không bookmark, không review, không mua.</td>
+        <td>Mặc định</td>
+        <td class="perm-no">❌ Không</td>
+    </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="permissions">🔐 3. Permission Matrix (Bảng quyền chi tiết)</h2>
+
+<h3>A. Admin Panel Permissions</h3>
+<table>
+    <tr>
+        <th>Module / Action</th>
+        <th><span class="tag tag-admin">Admin</span></th>
+        <th><span class="tag tag-editor">Editor</span></th>
+        <th><span class="tag tag-translator">Translator</span></th>
+        <th><span class="tag tag-moderator">Moderator</span></th>
+    </tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">📊 Dashboard</td></tr>
+    <tr><td>Xem dashboard tổng quan</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-yes">✅ (limited)</td><td class="perm-yes">✅ (limited)</td></tr>
+    <tr><td>Xem doanh thu / tài chính</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">📚 Quản lý Nội dung</td></tr>
+    <tr><td>CRUD Publications (sách)</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>CRUD Chapters (chương)</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>CRUD Categories / Topics</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Upload files (ZIP/images)</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Quản lý Banners / Homepage</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">🌐 Translation Pipeline</td></tr>
+    <tr><td>Tạo Translation Job</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Start OCR / Translate / Typeset</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Review bản dịch (sửa text blocks)</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td>Approve / Reject translation</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td>Publish translated chapters</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Quản lý Glossary</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">🕷️ Crawler</td></tr>
+    <tr><td>CRUD Crawl Sources</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Trigger manual crawl</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Publish crawled chapters</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">🎧 Audiobook</td></tr>
+    <tr><td>Tạo Audio Jobs</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Review / Publish audio</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">👥 Quản lý Users</td></tr>
+    <tr><td>Xem danh sách users</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-yes">✅</td></tr>
+    <tr><td>Create / Edit users</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Ban / Unban users</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-yes">✅</td></tr>
+    <tr><td>Đổi Role cho user</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">💰 Tài chính</td></tr>
+    <tr><td>Xem Transactions</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Manual top-up xu</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Quản lý Subscription Plans</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Quản lý Promotions / Coupons</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">🛡️ Moderation</td></tr>
+    <tr><td>Xem / Xóa Reviews</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-yes">✅</td></tr>
+    <tr><td>Xử lý Reports</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-yes">✅</td></tr>
+    <tr><td>Quản lý Notifications (broadcast)</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-yes">✅</td></tr>
+    <tr><td colspan="5" style="background:#16213e; color:#ffd93d; font-weight:bold;">⚙️ System</td></tr>
+    <tr><td>Database Management</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>System Config</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Xem Audit Logs</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+</table>
+
+<h3>B. Client Permissions</h3>
+<table>
+    <tr>
+        <th>Action</th>
+        <th><span class="tag tag-author">Author</span></th>
+        <th><span class="tag tag-user">User</span></th>
+        <th><span class="tag tag-guest">Guest</span></th>
+    </tr>
+    <tr><td>Đọc chương miễn phí</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-yes">✅ (giới hạn 10)</td></tr>
+    <tr><td>Đọc chương VIP</td><td class="perm-yes">✅ (nếu có VIP/xu)</td><td class="perm-yes">✅ (nếu có VIP/xu)</td><td class="perm-no">❌</td></tr>
+    <tr><td>Mua xu / VIP</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td>Bookmark / Favorite / History</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td>Viết Review</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td>Report nội dung</td><td class="perm-yes">✅</td><td class="perm-yes">✅</td><td class="perm-no">❌</td></tr>
+    <tr><td>Đăng truyện riêng</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Quản lý chương truyện mình</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Xem analytics truyện mình</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+    <tr><td>Nhận doanh thu từ truyện</td><td class="perm-yes">✅</td><td class="perm-no">❌</td><td class="perm-no">❌</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="hierarchy">📊 4. Cấp bậc & Kế thừa quyền</h2>
+
+<div class="flow-diagram">
+CẤP BẬC ROLE (từ cao → thấp):
+
+    👑 SuperAdmin (Level 100)
+        │
+        ├── Có TẤT CẢ quyền
+        ├── Assign/Remove mọi role
+        └── Truy cập mọi module
+             │
+    ┌────────┴─────────────────────────────┐
+    │                                      │
+    📝 Editor (Level 50)              🛡️ Moderator (Level 40)
+    │                                      │
+    ├── Content management             ├── Community management
+    ├── Crawler, Translation           ├── Reviews, Reports
+    ├── Audiobook, Banners             ├── Ban/Unban users
+    ├── Promotions                     └── Notifications
+    │
+    🌐 Translator (Level 30)
+    │
+    ├── Translation review only
+    ├── Edit text blocks
+    └── Approve/Reject translations
+         │
+    ┌────┴────────────────────────────────┐
+    │                                     │
+    ✍️ Author (Level 20)              👤 User (Level 10)
+    │                                     │
+    ├── Đăng truyện riêng             ├── Đọc truyện
+    ├── Quản lý tác phẩm mình        ├── Mua xu/VIP
+    └── Xem analytics mình            ├── Bookmark, Review
+                                      └── Cộng đồng
+                                           │
+                                      👻 Guest (Level 0)
+                                           │
+                                      └── Đọc giới hạn only
+
+QUY TẮC:
+• 1 user có thể có NHIỀU roles (VD: vừa là Editor vừa là Author)
+• Role cao hơn bao gồm quyền role thấp hơn? → KHÔNG (mỗi role độc lập)
+• SuperAdmin có tất cả quyền (bypass check)
+• User phải đăng nhập mới có role (Guest = chưa đăng nhập)
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="db-schema">🗄️ 5. Database Schema</h2>
+
+<div class="api-block">
+<pre><code>-- ═══════════════════════════════════════════════════════════
+-- ROLE-BASED ACCESS CONTROL (RBAC) TABLES
+-- ═══════════════════════════════════════════════════════════
+
+-- 1. Roles (định nghĩa các role)
+CREATE TABLE "Roles" (
+    "Id" INT PRIMARY KEY,
+    "Name" VARCHAR(50) UNIQUE NOT NULL,            -- 'SuperAdmin', 'Editor', 'Translator', 'Moderator', 'Author', 'User'
+    "DisplayName" VARCHAR(100) NOT NULL,           -- 'Quản trị viên', 'Biên tập viên', ...
+    "Description" TEXT,
+    "Level" INT DEFAULT 0,                         -- Hierarchy level (100, 50, 40, 30, 20, 10)
+    "Color" VARCHAR(20),                           -- Badge color: '#ff4444', '#ff9800', ...
+    "IsSystemRole" BOOLEAN DEFAULT TRUE,           -- TRUE = không cho xóa
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- 2. UserRoles (nhiều-nhiều: 1 user có nhiều roles)
+CREATE TABLE "UserRoles" (
+    "UserId" UUID NOT NULL REFERENCES "Users"("Id") ON DELETE CASCADE,
+    "RoleId" INT NOT NULL REFERENCES "Roles"("Id") ON DELETE CASCADE,
+    "AssignedBy" UUID,                             -- Ai assign role này
+    "AssignedAt" TIMESTAMP DEFAULT NOW(),
+    "ExpiresAt" TIMESTAMP,                         -- NULL = vĩnh viễn, có giá trị = tạm thời
+    PRIMARY KEY ("UserId", "RoleId")
+);
+
+-- 3. Permissions (quyền cụ thể)
+CREATE TABLE "Permissions" (
+    "Id" VARCHAR(100) PRIMARY KEY,                 -- 'publications.create', 'users.ban', 'transactions.view'
+    "Module" VARCHAR(50) NOT NULL,                 -- 'publications', 'users', 'transactions', 'translation', ...
+    "Action" VARCHAR(50) NOT NULL,                 -- 'create', 'read', 'update', 'delete', 'publish', 'approve'
+    "DisplayName" VARCHAR(200) NOT NULL,
+    "Description" TEXT
+);
+
+-- 4. RolePermissions (role nào có permission nào)
+CREATE TABLE "RolePermissions" (
+    "RoleId" INT NOT NULL REFERENCES "Roles"("Id") ON DELETE CASCADE,
+    "PermissionId" VARCHAR(100) NOT NULL REFERENCES "Permissions"("Id") ON DELETE CASCADE,
+    PRIMARY KEY ("RoleId", "PermissionId")
+);
+
+-- 5. Audit Log (ghi lại thay đổi role)
+CREATE TABLE "RoleAuditLogs" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "UserId" UUID NOT NULL,                        -- User bị thay đổi
+    "Action" VARCHAR(50) NOT NULL,                 -- 'role_assigned', 'role_removed', 'user_banned'
+    "RoleId" INT,
+    "PerformedBy" UUID NOT NULL,                   -- Admin thực hiện
+    "Reason" TEXT,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_user_roles_user ON "UserRoles"("UserId");
+CREATE INDEX idx_user_roles_role ON "UserRoles"("RoleId");
+CREATE INDEX idx_role_permissions_role ON "RolePermissions"("RoleId");
+CREATE INDEX idx_audit_logs_user ON "RoleAuditLogs"("UserId", "CreatedAt" DESC);
+
+-- ═══════════════════════════════════════════════════════════
+-- SEED DATA
+-- ═══════════════════════════════════════════════════════════
+
+INSERT INTO "Roles" ("Id", "Name", "DisplayName", "Description", "Level", "Color", "IsSystemRole") VALUES
+(1, 'SuperAdmin', 'Quản trị viên', 'Toàn quyền hệ thống, quản lý users, tài chính, settings', 100, '#ff4444', true),
+(2, 'Editor', 'Biên tập viên', 'Quản lý nội dung: sách, chương, dịch thuật, crawler', 50, '#ff9800', true),
+(3, 'Translator', 'Dịch giả', 'Review bản dịch, sửa text, approve/reject translations', 30, '#9c27b0', true),
+(4, 'Moderator', 'Quản lý viên', 'Duyệt reviews, xử lý reports, ban users', 40, '#2196f3', true),
+(5, 'Author', 'Tác giả', 'Đăng truyện riêng, quản lý tác phẩm của mình', 20, '#4caf50', true),
+(6, 'User', 'Người dùng', 'Đọc truyện, mua xu, bookmark, review', 10, '#607d8b', true);
+
+-- Seed permissions
+INSERT INTO "Permissions" ("Id", "Module", "Action", "DisplayName") VALUES
+-- Publications
+('publications.create', 'publications', 'create', 'Tạo sách mới'),
+('publications.read', 'publications', 'read', 'Xem danh sách sách'),
+('publications.update', 'publications', 'update', 'Sửa thông tin sách'),
+('publications.delete', 'publications', 'delete', 'Xóa sách'),
+('publications.publish', 'publications', 'publish', 'Publish/Unpublish sách'),
+-- Chapters
+('chapters.create', 'chapters', 'create', 'Tạo chương mới'),
+('chapters.update', 'chapters', 'update', 'Sửa chương'),
+('chapters.delete', 'chapters', 'delete', 'Xóa chương'),
+-- Users
+('users.read', 'users', 'read', 'Xem danh sách users'),
+('users.create', 'users', 'create', 'Tạo user mới'),
+('users.update', 'users', 'update', 'Sửa thông tin user'),
+('users.ban', 'users', 'ban', 'Ban/Unban user'),
+('users.assign_role', 'users', 'assign_role', 'Gán/Gỡ role cho user'),
+-- Transactions
+('transactions.read', 'transactions', 'read', 'Xem giao dịch'),
+('transactions.topup', 'transactions', 'topup', 'Nạp xu thủ công'),
+('transactions.approve', 'transactions', 'approve', 'Duyệt giao dịch'),
+-- Translation
+('translation.create_job', 'translation', 'create_job', 'Tạo translation job'),
+('translation.review', 'translation', 'review', 'Review bản dịch'),
+('translation.approve', 'translation', 'approve', 'Approve/Reject translation'),
+('translation.publish', 'translation', 'publish', 'Publish translated chapter'),
+('translation.glossary', 'translation', 'glossary', 'Quản lý glossary'),
+-- Crawler
+('crawler.manage', 'crawler', 'manage', 'Quản lý crawl sources'),
+('crawler.trigger', 'crawler', 'trigger', 'Trigger manual crawl'),
+-- Audio
+('audio.create', 'audio', 'create', 'Tạo audio job'),
+('audio.publish', 'audio', 'publish', 'Publish audio chapter'),
+-- Moderation
+('moderation.reviews', 'moderation', 'reviews', 'Quản lý reviews'),
+('moderation.reports', 'moderation', 'reports', 'Xử lý reports'),
+('moderation.notifications', 'moderation', 'notifications', 'Gửi notifications'),
+-- System
+('system.database', 'system', 'database', 'Quản lý database'),
+('system.config', 'system', 'config', 'Thay đổi system config'),
+('system.audit_log', 'system', 'audit_log', 'Xem audit logs');
+
+-- Assign permissions to roles
+-- SuperAdmin: ALL permissions (handled by code — bypass check)
+
+-- Editor permissions:
+INSERT INTO "RolePermissions" ("RoleId", "PermissionId") VALUES
+(2, 'publications.create'), (2, 'publications.read'), (2, 'publications.update'),
+(2, 'publications.delete'), (2, 'publications.publish'),
+(2, 'chapters.create'), (2, 'chapters.update'), (2, 'chapters.delete'),
+(2, 'translation.create_job'), (2, 'translation.review'), (2, 'translation.approve'),
+(2, 'translation.publish'), (2, 'translation.glossary'),
+(2, 'crawler.manage'), (2, 'crawler.trigger'),
+(2, 'audio.create'), (2, 'audio.publish'),
+(2, 'moderation.notifications');
+
+-- Translator permissions:
+INSERT INTO "RolePermissions" ("RoleId", "PermissionId") VALUES
+(3, 'translation.review'), (3, 'translation.approve'), (3, 'translation.glossary');
+
+-- Moderator permissions:
+INSERT INTO "RolePermissions" ("RoleId", "PermissionId") VALUES
+(4, 'users.read'), (4, 'users.ban'),
+(4, 'moderation.reviews'), (4, 'moderation.reports'), (4, 'moderation.notifications');</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="backend">⚙️ 6. Backend Implementation (.NET 9)</h2>
+
+<h3>Thay đổi model User</h3>
+<div class="api-block">
+<pre><code>// Models/User.cs — THÊM navigation property
+public class User
+{
+    // ... existing fields ...
+    
+    // Thêm:
+    public ICollection&lt;UserRole&gt; UserRoles { get; set; } = new List&lt;UserRole&gt;();
+}
+
+// Models/UserRole.cs — MỚI
+public class UserRole
+{
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
+    
+    public int RoleId { get; set; }
+    public Role Role { get; set; } = null!;
+    
+    public Guid? AssignedBy { get; set; }
+    public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? ExpiresAt { get; set; }
+}
+
+// Models/Role.cs — MỚI
+public class Role
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string DisplayName { get; set; } = null!;
+    public string? Description { get; set; }
+    public int Level { get; set; }
+    public string? Color { get; set; }
+    public bool IsSystemRole { get; set; } = true;
+    
+    public ICollection&lt;UserRole&gt; UserRoles { get; set; } = new List&lt;UserRole&gt;();
+    public ICollection&lt;RolePermission&gt; RolePermissions { get; set; } = new List&lt;RolePermission&gt;();
+}</code></pre>
+</div>
+
+<h3>JWT Token — Include Roles</h3>
+<div class="api-block">
+<pre><code>// Services/TokenService.cs — Sửa logic generate token
+public string GenerateToken(User user, List&lt;string&gt; roles)
+{
+    var claims = new List&lt;Claim&gt;
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Email, user.Email ?? ""),
+        new Claim("fullName", user.FullName ?? ""),
+    };
+    
+    // Thêm TẤT CẢ roles của user vào token
+    foreach (var role in roles)
+    {
+        claims.Add(new Claim(ClaimTypes.Role, role));
+    }
+    
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]!));
+    var token = new JwtSecurityToken(
+        issuer: _config["Jwt:Issuer"],
+        audience: _config["Jwt:Audience"],
+        claims: claims,
+        expires: DateTime.UtcNow.AddHours(24),
+        signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+    );
+    
+    return new JwtSecurityTokenHandler().WriteToken(token);
+}</code></pre>
+</div>
+
+<h3>Authorization Policies</h3>
+<div class="api-block">
+<pre><code>// Program.cs — Đăng ký policies
+builder.Services.AddAuthorization(options =>
+{
+    // Role-based policies
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("EditorOrAbove", policy => policy.RequireRole("SuperAdmin", "Editor"));
+    options.AddPolicy("TranslatorOrAbove", policy => policy.RequireRole("SuperAdmin", "Editor", "Translator"));
+    options.AddPolicy("ModeratorOrAbove", policy => policy.RequireRole("SuperAdmin", "Moderator"));
+    options.AddPolicy("AuthorOrAbove", policy => policy.RequireRole("SuperAdmin", "Editor", "Author"));
+    
+    // Permission-based policies (more granular)
+    options.AddPolicy("CanManagePublications", policy => 
+        policy.Requirements.Add(new PermissionRequirement("publications.create")));
+    options.AddPolicy("CanManageUsers", policy => 
+        policy.Requirements.Add(new PermissionRequirement("users.update")));
+    options.AddPolicy("CanViewTransactions", policy => 
+        policy.Requirements.Add(new PermissionRequirement("transactions.read")));
+});
+
+// Controllers usage:
+[Authorize(Policy = "AdminOnly")]           // Chỉ SuperAdmin
+[Authorize(Policy = "EditorOrAbove")]       // SuperAdmin + Editor
+[Authorize(Policy = "TranslatorOrAbove")]   // SuperAdmin + Editor + Translator
+[Authorize(Policy = "ModeratorOrAbove")]    // SuperAdmin + Moderator</code></pre>
+</div>
+
+<h3>Custom Permission Handler</h3>
+<div class="api-block">
+<pre><code>// Authorization/PermissionRequirement.cs
+public class PermissionRequirement : IAuthorizationRequirement
+{
+    public string Permission { get; }
+    public PermissionRequirement(string permission) => Permission = permission;
+}
+
+// Authorization/PermissionHandler.cs
+public class PermissionHandler : AuthorizationHandler&lt;PermissionRequirement&gt;
+{
+    private readonly AppDbContext _db;
+    
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, PermissionRequirement requirement)
+    {
+        var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) return;
+        
+        // SuperAdmin bypass — có tất cả quyền
+        if (context.User.IsInRole("SuperAdmin"))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+        
+        // Check permission trong DB
+        var hasPermission = await _db.UserRoles
+            .Where(ur => ur.UserId == Guid.Parse(userId))
+            .Where(ur => ur.ExpiresAt == null || ur.ExpiresAt > DateTime.UtcNow)
+            .SelectMany(ur => ur.Role.RolePermissions)
+            .AnyAsync(rp => rp.PermissionId == requirement.Permission);
+        
+        if (hasPermission)
+            context.Succeed(requirement);
+    }
+}</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="frontend-admin">🖥️ 7. Frontend Admin — Quản lý Roles</h2>
+
+<h3>Trang <code>/users</code> — Thêm cột Role</h3>
+<div class="section-box">
+    <ul>
+        <li>Table users thêm cột "Roles": hiển thị badges màu (Admin đỏ, Editor cam, ...)</li>
+        <li>Filter thêm: dropdown "Lọc theo Role"</li>
+        <li>Row action: "Đổi Role" → modal chọn roles (multi-select checkboxes)</li>
+    </ul>
+</div>
+
+<h3>Trang <code>/roles</code> — Quản lý Roles (Admin only)</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Table roles:</strong> Name, Display name, Level, Color badge, Users count, Actions</li>
+        <li><strong>Role detail:</strong> Click role → xem danh sách permissions (checkboxes matrix)</li>
+        <li><strong>Edit permissions:</strong> Toggle on/off permissions cho mỗi role</li>
+        <li><strong>Users in role:</strong> Tab hiển thị users thuộc role này</li>
+    </ul>
+</div>
+
+<h3>Modal "Assign Role"</h3>
+<div class="api-block">
+<pre><code>// Component: AssignRoleModal
+// Hiển thị khi admin click "Đổi Role" trên user row
+
+┌───────────────────────────────────────┐
+│  Phân quyền: user@email.com           │
+├───────────────────────────────────────┤
+│                                       │
+│  ☑️ User (mặc định, không bỏ được)   │
+│  ☐ Author (Tác giả)                  │
+│  ☐ Translator (Dịch giả)             │
+│  ☐ Moderator (Quản lý viên)          │
+│  ☐ Editor (Biên tập viên)            │
+│  ☐ SuperAdmin (Quản trị viên)        │
+│                                       │
+│  Lý do thay đổi: [_______________]   │
+│                                       │
+│  [Hủy]              [Lưu thay đổi]   │
+└───────────────────────────────────────┘</code></pre>
+</div>
+
+<h3>Sidebar động theo Role</h3>
+<div class="section-box">
+    <p>Sidebar Admin hiển thị khác nhau dựa trên role của user đang login:</p>
+    <pre><code>// Logic trong Sidebar.tsx:
+const userRoles = authContext.user.roles; // ["Editor", "Translator"]
+
+// Hiển thị menu items dựa trên roles:
+const menuConfig = [
+  { label: "Dashboard", icon: "📊", roles: ["SuperAdmin", "Editor", "Translator", "Moderator"] },
+  { label: "Nội dung", icon: "📚", roles: ["SuperAdmin", "Editor"] },
+  { label: "Dịch thuật", icon: "🌐", roles: ["SuperAdmin", "Editor", "Translator"] },
+  { label: "Crawler", icon: "🕷️", roles: ["SuperAdmin", "Editor"] },
+  { label: "Audiobook", icon: "🎧", roles: ["SuperAdmin", "Editor"] },
+  { label: "Tài chính", icon: "💰", roles: ["SuperAdmin"] },
+  { label: "Users", icon: "👥", roles: ["SuperAdmin", "Moderator"] },
+  { label: "Moderation", icon: "🛡️", roles: ["SuperAdmin", "Moderator"] },
+  { label: "System", icon: "⚙️", roles: ["SuperAdmin"] },
+];
+
+// Filter: chỉ show items mà user có role match
+const visibleMenu = menuConfig.filter(item => 
+  item.roles.some(r => userRoles.includes(r))
+);</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="frontend-client">📱 8. Frontend Client — Phân quyền theo Role</h2>
+
+<h3>Author Dashboard (cho role Author)</h3>
+<div class="section-box">
+    <p>Users có role "Author" truy cập trang <code>/author-dashboard</code> trên client web:</p>
+    <ul>
+        <li><strong>Tác phẩm của tôi:</strong> List publications mà user sở hữu (OwnerId = userId)</li>
+        <li><strong>Thêm chương mới:</strong> Form thêm BookChapter / upload ảnh ComicChapter (chỉ cho truyện mình)</li>
+        <li><strong>Analytics:</strong> Lượt đọc, doanh thu xu từ truyện mình, top chapters</li>
+        <li><strong>Thu nhập:</strong> Tổng xu kiếm được (nếu có revenue share model)</li>
+    </ul>
+</div>
+
+<h3>Client route protection</h3>
+<div class="api-block">
+<pre><code>// src/App.tsx (client web)
+&lt;Route path="/author-dashboard" element={
+  &lt;RequireRole roles={["Author", "SuperAdmin", "Editor"]}&gt;
+    &lt;AuthorDashboard /&gt;
+  &lt;/RequireRole&gt;
+} /&gt;
+
+// src/components/RequireRole.tsx
+const RequireRole = ({ roles, children }) => {
+  const { user } = useAuth();
+  
+  if (!user) return &lt;Navigate to="/login" /&gt;;
+  
+  const hasRole = user.roles.some(r => roles.includes(r));
+  if (!hasRole) return &lt;Navigate to="/" /&gt;;
+  
+  return children;
+};</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="api">🔌 9. API Endpoints</h2>
+
+<div class="api-block">
+<h4>AdminRoleController [Authorize(Policy = "AdminOnly")]</h4>
+<pre><code>// ─── ROLES CRUD ───
+GET    /api/admin/roles
+       → List all roles + user count per role
+
+GET    /api/admin/roles/{roleId}
+       → Role detail + permissions list
+
+PUT    /api/admin/roles/{roleId}/permissions
+       Body: { permissionIds: ["publications.create", "chapters.create", ...] }
+       → Update permissions for role
+
+// ─── USER-ROLE MANAGEMENT ───
+GET    /api/admin/users/{userId}/roles
+       → List roles of a user
+
+POST   /api/admin/users/{userId}/roles
+       Body: { roleId: 2, reason: "Thăng chức editor" }
+       → Assign role to user
+
+DELETE /api/admin/users/{userId}/roles/{roleId}
+       Body: { reason: "Hết hợp đồng dịch thuật" }
+       → Remove role from user
+
+// ─── PERMISSIONS ───
+GET    /api/admin/permissions
+       → List all permissions grouped by module
+
+// ─── AUDIT LOG ───
+GET    /api/admin/audit-logs?userId=&action=&page=1
+       → List role change history</code></pre>
+</div>
+
+<div class="api-block">
+<h4>Auth Response — Include roles</h4>
+<pre><code>// POST /api/auth/login response (sửa):
+{
+  "accessToken": "eyJhbG...",
+  "refreshToken": "abc123...",
+  "user": {
+    "id": "guid",
+    "email": "user@email.com",
+    "fullName": "Nguyễn Văn A",
+    "avatarUrl": "/avatars/...",
+    "roles": ["User", "Author"],          // ← THÊM
+    "permissions": ["publications.create", "chapters.create", ...]  // ← THÊM (optional, cho client check)
+  }
+}
+
+// GET /api/auth/me response:
+{
+  "id": "guid",
+  "email": "...",
+  "roles": ["Editor", "Translator"],
+  "permissions": ["publications.create", "translation.review", ...]
+}</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="flows">🔄 10. Luồng nghiệp vụ theo Role</h2>
+
+<h3>Luồng 1: Admin assign role cho user</h3>
+<div class="flow-diagram">
+1. SuperAdmin mở trang /users → tìm user
+2. Click "Đổi Role" → modal hiện ra
+3. Check thêm role "Translator" 
+4. Nhập lý do: "Tuyển dịch giả mới"
+5. Submit → POST /api/admin/users/{id}/roles
+6. Backend:
+   - Insert UserRoles (userId, roleId=3, assignedBy=adminId)
+   - Insert RoleAuditLog (action='role_assigned')
+   - User mới login sẽ nhận JWT có thêm role "Translator"
+7. Translator login Admin Panel → thấy menu "Dịch thuật" 
+</div>
+
+<h3>Luồng 2: Author đăng truyện riêng</h3>
+<div class="flow-diagram">
+1. User request thành Author:
+   - Client: nút "Đăng ký làm tác giả" → form thông tin
+   - Hoặc: Admin assign role Author cho user
+
+2. Author login → thấy menu "Author Dashboard" trên client
+3. Author tạo Publication:
+   - POST /api/author/publications (chỉ Author+ mới gọi được)
+   - Backend auto-set: OwnerId = current userId
+4. Author thêm chương:
+   - POST /api/author/chapters (chỉ thêm cho truyện mình)
+   - Backend check: publication.OwnerId == currentUser.Id
+5. Revenue sharing (tương lai):
+   - Khi user mua chương truyện Author → Author nhận % xu
+   - Author dashboard hiển thị thu nhập
+</div>
+
+<h3>Luồng 3: Translator workflow</h3>
+<div class="flow-diagram">
+1. Translator login Admin Panel
+2. Sidebar chỉ hiện: Dashboard (limited) + Dịch thuật
+3. Translator vào /translation → thấy jobs "Waiting for Review"
+4. Click vào job → review side-by-side (RAW vs Translated)
+5. Sửa text blocks sai → "Re-typeset"
+6. Approve chapter (hoặc Reject + ghi note)
+7. KHÔNG THỂ: publish, tạo sách, xem users, xem tài chính
+   → Nếu cố truy cập URL /users → redirect 403 "Không có quyền"
+</div>
+
+<h3>Luồng 4: Moderator xử lý report</h3>
+<div class="flow-diagram">
+1. Moderator login Admin Panel
+2. Sidebar: Dashboard + Users (view+ban only) + Moderation
+3. Vào /reports → thấy list reports pending
+4. Xem report: "User X spam review trên truyện Y"
+5. Action:
+   - Xóa review vi phạm (DELETE /api/admin/reviews/{id})
+   - Ban user X (PATCH /api/admin/users/{id}/ban)
+   - Dismiss report (nếu không vi phạm)
+6. KHÔNG THỂ: sửa sách, quản lý tài chính, assign roles
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="tasks">📋 11. Task list cho AI thực hiện</h2>
+
+<div class="section-box">
+<h4>Task R1: Database Migration — RBAC tables</h4>
+<pre><code>Dự án: xomtruyen.API (.NET 9, EF Core, PostgreSQL)
+
+1. Tạo models:
+   - Models/Role.cs
+   - Models/UserRole.cs
+   - Models/Permission.cs
+   - Models/RolePermission.cs
+   - Models/RoleAuditLog.cs
+
+2. Sửa Models/User.cs: thêm ICollection&lt;UserRole&gt; UserRoles
+
+3. Sửa AppDbContext:
+   - DbSet&lt;Role&gt;, DbSet&lt;UserRole&gt;, DbSet&lt;Permission&gt;, DbSet&lt;RolePermission&gt;, DbSet&lt;RoleAuditLog&gt;
+   - Composite key: UserRole (UserId, RoleId)
+   - Composite key: RolePermission (RoleId, PermissionId)
+
+4. Migration: dotnet ef migrations add AddRBAC
+
+5. Seed data: Roles (6) + Permissions (30+) + RolePermissions mappings
+   + Assign SuperAdmin role cho admin user hiện tại
+
+XÓA: Không cần thêm column "Role" vào Users table nữa (dùng UserRoles thay thế)
+</code></pre>
+
+<h4>Task R2: Backend — Token + Authorization Policies</h4>
+<pre><code>Dự án: xomtruyen.API
+
+1. Sửa TokenService (hoặc AuthService):
+   - Khi generate JWT → query UserRoles → add ALL role names as ClaimTypes.Role
+   - Include trong login response: roles array
+
+2. Tạo: Authorization/PermissionRequirement.cs
+3. Tạo: Authorization/PermissionHandler.cs (query DB check permission)
+
+4. Sửa Program.cs:
+   - builder.Services.AddScoped&lt;IAuthorizationHandler, PermissionHandler&gt;()
+   - AddAuthorization: define policies (AdminOnly, EditorOrAbove, TranslatorOrAbove, ModeratorOrAbove)
+
+5. Sửa TẤT CẢ Admin controllers — thêm [Authorize(Policy = "...")]
+   - AdminComicChapter → [Authorize(Policy = "EditorOrAbove")]
+   - Publications CRUD → [Authorize(Policy = "EditorOrAbove")]
+   - Users CRUD → [Authorize(Policy = "AdminOnly")]
+   - Database → [Authorize(Policy = "AdminOnly")]
+   - Translation review endpoints → [Authorize(Policy = "TranslatorOrAbove")]
+   - Moderation endpoints → [Authorize(Policy = "ModeratorOrAbove")]
+
+6. Sửa GET /api/auth/me → return roles + permissions
+</code></pre>
+
+<h4>Task R3: Backend — AdminRoleController</h4>
+<pre><code>Dự án: xomtruyen.API
+Controller: Controllers/AdminRoleController.cs [Authorize(Policy = "AdminOnly")]
+
+Endpoints:
+- GET /api/admin/roles → List roles + userCount
+- GET /api/admin/roles/{id} → Role detail + permissions
+- PUT /api/admin/roles/{id}/permissions → Update permissions for role
+- GET /api/admin/users/{userId}/roles → User's roles
+- POST /api/admin/users/{userId}/roles → Assign role (+ audit log)
+- DELETE /api/admin/users/{userId}/roles/{roleId} → Remove role (+ audit log)
+- GET /api/admin/permissions → All permissions grouped by module
+- GET /api/admin/audit-logs → Role change history
+
+Service: IRoleService + RoleService
+- AssignRole(userId, roleId, assignedBy, reason)
+- RemoveRole(userId, roleId, removedBy, reason)
+- GetUserPermissions(userId) → List&lt;string&gt;
+- HasPermission(userId, permissionId) → bool
+</code></pre>
+
+<h4>Task R4: Frontend Admin — Role Management UI</h4>
+<pre><code>Dự án: xomtruyen-admin (React + TypeScript)
+
+Files mới:
+- src/pages/Roles.tsx (role list + permission matrix)
+- src/components/AssignRoleModal.tsx (modal chọn roles cho user)
+- src/api/roleApi.ts
+
+Sửa files:
+- src/pages/Users.tsx → thêm cột Roles (badges) + filter by role + action "Đổi Role"
+- src/components/layout/Sidebar.tsx → dynamic menu dựa trên user.roles
+- src/contexts/AuthContext.tsx → store user.roles, check hasRole()
+- src/App.tsx → wrap routes với role check
+
+Route mới: /roles (chỉ SuperAdmin thấy trong sidebar)
+
+Logic sidebar động:
+- AuthContext cung cấp: user.roles
+- Sidebar filter menuItems dựa trên roles
+- VD: user chỉ có role "Translator" → chỉ thấy Dashboard + Dịch thuật
+</code></pre>
+
+<h4>Task R5: Frontend Admin — Protected Routes by Role</h4>
+<pre><code>Dự án: xomtruyen-admin
+
+Tạo: src/components/layout/RoleGuard.tsx
+- Props: { allowedRoles: string[], children }
+- Logic: nếu user.roles không intersect allowedRoles → hiện "403 Không có quyền"
+- SuperAdmin luôn pass
+
+Sửa App.tsx routes:
+&lt;Route path="/users" element={&lt;RoleGuard allowedRoles={["SuperAdmin","Moderator"]}&gt;&lt;Users/&gt;&lt;/RoleGuard&gt;} /&gt;
+&lt;Route path="/books" element={&lt;RoleGuard allowedRoles={["SuperAdmin","Editor"]}&gt;&lt;Books/&gt;&lt;/RoleGuard&gt;} /&gt;
+&lt;Route path="/translation/*" element={&lt;RoleGuard allowedRoles={["SuperAdmin","Editor","Translator"]}&gt;...&lt;/RoleGuard&gt;} /&gt;
+&lt;Route path="/database/*" element={&lt;RoleGuard allowedRoles={["SuperAdmin"]}&gt;...&lt;/RoleGuard&gt;} /&gt;
+&lt;Route path="/roles" element={&lt;RoleGuard allowedRoles={["SuperAdmin"]}&gt;&lt;Roles/&gt;&lt;/RoleGuard&gt;} /&gt;
+</code></pre>
+
+<h4>Task R6: Backend — Author API (Client-facing)</h4>
+<pre><code>Dự án: xomtruyen.API
+Controller: Controllers/AuthorController.cs [Authorize(Roles = "Author,SuperAdmin,Editor")]
+
+Cho phép Author quản lý truyện CỦA MÌNH (OwnerId = currentUser.Id):
+
+GET    /api/author/publications
+       → List publications WHERE OwnerId = currentUserId
+
+POST   /api/author/publications
+       Body: { title, formatType, description, ... }
+       → Tạo publication với OwnerId = currentUserId, status = "Draft"
+
+PUT    /api/author/publications/{id}
+       → Update (check OwnerId == currentUser first!)
+
+POST   /api/author/chapters
+       Body: { publicationId, chapterNumber, title, content }
+       → Tạo BookChapter (check publication.OwnerId == currentUser)
+
+GET    /api/author/analytics
+       → { totalViews, totalRevenue, topChapters, readerCount } cho truyện mình
+
+LƯU Ý QUAN TRỌNG: Mọi endpoint đều phải verify OwnerId == currentUser
+để Author không truy cập được truyện người khác!
+</code></pre>
+</div>
+
+<h3>Timeline triển khai</h3>
+<div class="flow-diagram">
+Day 1-2: Task R1 (DB Migration + Seed)
+  → Tables ready, roles + permissions seeded
+
+Day 3-4: Task R2 (JWT + Authorization Policies)
+  → Backend enforce roles trên tất cả endpoints
+
+Day 5: Task R3 (AdminRoleController)
+  → API quản lý assign/remove roles
+
+Day 6-7: Task R4 + R5 (Frontend Admin UI + Route protection)
+  → Admin panel dynamic theo role
+
+Day 8: Task R6 (Author API)
+  → Authors có thể đăng truyện
+
+TỔNG: ~8 ngày (khoảng 1.5 tuần)
+</div>
+
+<hr>
+<p style="text-align:center; color:#666; margin-top:40px; font-size:0.9em;">
+    📅 Tạo ngày: 14/08/2026 | XomTruyen — Role-Based Access Control (RBAC)<br>
+    6 Roles: SuperAdmin, Editor, Translator, Moderator, Author, User (+ Guest)<br>
+    30+ Permissions | Dynamic sidebar | JWT role claims | Author dashboard<br>
+    Effort: ~8 ngày | Backend (.NET 9 Policies) + Frontend (React RoleGuard)
+</p>
+
+</div>
+</body>
+</html>
