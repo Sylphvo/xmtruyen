@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 
+import { Breadcrumbs } from './Breadcrumbs';
+
 export const AppLayout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -12,6 +14,7 @@ export const AppLayout: React.FC = () => {
       <div className="app-main">
         <Header toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)} isSidebarCollapsed={isSidebarCollapsed} />
         <main className="app-content">
+          <Breadcrumbs />
           <Outlet />
         </main>
       </div>

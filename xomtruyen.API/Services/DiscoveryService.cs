@@ -36,7 +36,7 @@ public class DiscoveryService : IDiscoveryService
         {
             query = query.Where(p => 
                 EF.Functions.ILike(p.Title, $"%{keyword}%") || 
-                EF.Functions.ILike(p.Author ?? "", $"%{keyword}%"));
+                EF.Functions.ILike(p.AuthorName ?? "", $"%{keyword}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(categorySlug))
@@ -65,7 +65,7 @@ public class DiscoveryService : IDiscoveryService
                 Id = p.Id,
                 Title = p.Title,
                 Slug = p.Slug,
-                Author = p.Author,
+                Author = p.AuthorName,
                 CoverImageUrl = p.CoverImageUrl,
                 FormatType = p.FormatType,
                 AccessLevel = p.AccessLevel,
@@ -115,7 +115,7 @@ public class DiscoveryService : IDiscoveryService
                 Id = p.Id,
                 Title = p.Title,
                 Slug = p.Slug,
-                Author = p.Author,
+                Author = p.AuthorName,
                 CoverImageUrl = p.CoverImageUrl,
                 FormatType = p.FormatType,
                 AccessLevel = p.AccessLevel,
@@ -168,7 +168,7 @@ public class DiscoveryService : IDiscoveryService
                 Id = p.Id,
                 Title = p.Title,
                 Slug = p.Slug,
-                Author = p.Author,
+                Author = p.AuthorName,
                 CoverImageUrl = p.CoverImageUrl,
                 FormatType = p.FormatType,
                 AccessLevel = p.AccessLevel,

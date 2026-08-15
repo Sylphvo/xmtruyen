@@ -329,6 +329,5 @@ export const Database: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
   );
 };

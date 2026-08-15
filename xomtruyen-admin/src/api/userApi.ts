@@ -66,11 +66,10 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    // Uncomment when you implement authentication
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = sessionStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -83,6 +82,13 @@ apiClient.interceptors.response.use(
     return response.data; 
   },
   (error) => {
+    if (error.response?.status === 401) {
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
     const message = error.response?.data?.message || error.message || 'Có lỗi xảy ra khi gọi API.';
     return Promise.reject(new Error(message));
   }

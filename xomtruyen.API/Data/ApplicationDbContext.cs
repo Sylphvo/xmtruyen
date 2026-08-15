@@ -28,6 +28,24 @@ public class ApplicationDbContext : DbContext
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<UserToken> UserTokens { get; set; }
+    public DbSet<CoinPackage> CoinPackages { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Promotion> Promotions { get; set; }
+    public DbSet<UserPromotionUsage> UserPromotionUsages { get; set; }
+    public DbSet<CrawlJob> CrawlJobs { get; set; }
+    public DbSet<TranslationJob> TranslationJobs { get; set; }
+    public DbSet<TranslationChapter> TranslationChapters { get; set; }
+    public DbSet<TranslationPage> TranslationPages { get; set; }
+    public DbSet<TextBlock> TextBlocks { get; set; }
+    public DbSet<TranslationGlossary> TranslationGlossaries { get; set; }
+    public DbSet<Banner> Banners { get; set; }
+    public DbSet<HomeSection> HomeSections { get; set; }
+    public DbSet<Author> Authors { get; set; }
+    public DbSet<Report> Reports { get; set; }
+    public DbSet<SystemConfig> SystemConfigs { get; set; }
+    public DbSet<ReadingAnalytic> ReadingAnalytics { get; set; }
+    public DbSet<EmailTemplate> EmailTemplates { get; set; }
+    public DbSet<HelpArticle> HelpArticles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,7 +103,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
             entity.Property(e => e.Slug).HasMaxLength(255).IsRequired();
-            entity.Property(e => e.Author).HasMaxLength(150);
+            entity.Property(e => e.AuthorName).HasMaxLength(150);
             entity.Property(e => e.AverageRating).HasColumnType("decimal(3,2)");
             entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Active");
             
@@ -291,6 +309,22 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SystemConfig>(entity =>
+        {
+            entity.HasKey(e => e.Key);
+        });
+
+        modelBuilder.Entity<EmailTemplate>(entity =>
+        {
+            entity.HasKey(e => e.Code);
+        });
+        
+        modelBuilder.Entity<HelpArticle>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Slug).IsUnique();
         });
     }
 }

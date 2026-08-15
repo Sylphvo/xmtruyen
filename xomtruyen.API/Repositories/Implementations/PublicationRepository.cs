@@ -177,7 +177,7 @@ public class PublicationRepository : IPublicationRepository
 
         var dataSql = $@"
             SELECT 
-                b.""Id"", b.""Title"", b.""Slug"", b.""Author"", b.""Description"", b.""CoverImageUrl"",
+                b.""Id"", b.""Title"", b.""Slug"", b.""AuthorName"", b.""Description"", b.""CoverImageUrl"",
                 b.""FormatType"", b.""AccessLevel"", b.""Status"", b.""ViewCount"", b.""AverageRating"",
                 b.""IsRecommended"", b.""IsExclusive"", b.""CreatedAt"", b.""UpdatedAt"", b.""CreatedBy"", b.""UpdatedBy"",
                 (
@@ -208,7 +208,7 @@ public class PublicationRepository : IPublicationRepository
             Id = b.Id,
             Title = b.Title,
             Slug = b.Slug,
-            Author = b.Author,
+            Author = b.AuthorName,
             CoverImageUrl = b.CoverImageUrl,
             FormatType = (FormatType)b.FormatType,
             AccessLevel = (AccessLevel)b.AccessLevel,

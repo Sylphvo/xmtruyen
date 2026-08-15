@@ -8,7 +8,7 @@ import { ResizableHeader } from '../components/ResizableHeader';
 import { BulkUploadModal } from '../components/BulkUploadModal';
 import * as bookApi from '../api/bookApi';
 import type { IBook } from '../types/book';
-import { chapterApi, bookChapterApi, type ComicChapter, type BookChapter, type ComicPage } from '../api/chapterApi';
+import { chapterApi, bookChapterApi, type ComicChapter, type ComicPage } from '../api/chapterApi';
 import { uploadChapterPage } from '../api/uploadApi';
 import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -405,7 +405,7 @@ export const BookDetails = () => {
                     </div>
                     {isTextBook && (
                         <div className="mb-3">
-                            <label className="form-label fw-medium">Nội dung chương (Truyện chữ)</label>
+                            <label className="form-label fw-medium">Nội dung chương (Sách)</label>
                             <textarea 
                                 className="form-control" 
                                 rows={15}

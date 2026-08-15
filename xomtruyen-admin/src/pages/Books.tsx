@@ -42,6 +42,10 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
   const [editingBookId, setEditingBookId] = useState<string | null>(null);
   const [editBookData, setEditBookData] = useState<Partial<SaveBookRequest>>({});
   const [activeEditField, setActiveEditField] = useState<string | null>(null);
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [popupNewItem, setPopupNewItem] = useState<Partial<SaveBookRequest>>({});
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,6 +85,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
           page: currentPage,
           pageSize: itemsPerPage,
           keyword: searchTerm || undefined,
+          formatType: _formatType !== undefined ? _formatType : undefined
         });
         setData(res.data || []);
         setTotalItems(res.totalCount || 0);
@@ -96,7 +101,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
       fetchBooks();
     }, 300);
     return () => clearTimeout(timer);
-  }, [currentPage, itemsPerPage, searchTerm, refreshTrigger]);
+  }, [currentPage, itemsPerPage, searchTerm, refreshTrigger, _formatType]);
 
   const handleUploadClick = (bookId: string) => {
     setUploadingBookId(bookId);
@@ -233,6 +238,47 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     }
   };
 
+
+  const handleOpenAddModal = () => {
+    setPopupNewItem({
+      formatType: _formatType !== undefined ? _formatType : 1,
+      accessLevel: 1,
+      categoryIds: [],
+      topicIds: []
+    });
+    setShowAddModal(true);
+  };
+
+  const handlePopupAddSubmit = async () => {
+    if (!popupNewItem.title || !popupNewItem.author) {
+      toast.error('Vui lòng nhập đầy đủ tiêu đề và tác giả');
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      const request: SaveBookRequest = {
+        id: popupNewItem.id,
+        title: popupNewItem.title,
+        author: popupNewItem.author,
+        formatType: popupNewItem.formatType || 1,
+        accessLevel: popupNewItem.accessLevel || 1,
+        categoryIds: popupNewItem.categoryIds || [],
+        topicIds: popupNewItem.topicIds || [],
+        description: popupNewItem.description,
+        coverImageUrl: popupNewItem.coverImageUrl
+      };
+      await createBook(request);
+      setShowAddModal(false);
+      setRefreshTrigger(prev => prev + 1);
+      toast.success('Thêm sách thành công');
+    } catch (error) {
+      console.error('Lỗi khi thêm sách:', error);
+      toast.error('Không thể thêm sách');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleCloseAdd = () => {
     setIsAddingNew(false);
     setNewItem({});
@@ -296,7 +342,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
   const handleCellKeyDown = (e: React.KeyboardEvent, currentField: string, book: IBook) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const fields = ['title', 'author', 'categories', 'topics'];
+      const fields = ['title', 'author', 'formatType', 'categories', 'topics'];
       const currentIndex = fields.indexOf(currentField);
       if (e.shiftKey) {
         if (currentIndex > 0) setActiveEditField(fields[currentIndex - 1]);
@@ -346,7 +392,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     }
   };
 
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: null });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'id', direction: 'asc' });
 
   const handleSort = (key: keyof IBook) => {
     let direction: SortDirection = 'asc';
@@ -425,13 +471,19 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
   return (
     <>
       <div className="jira-table-container">
+        <div className="px-4 py-3 border-bottom d-flex justify-content-between align-items-center bg-white" style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
+          <h5 className="mb-0 fw-bold" style={{ color: '#1e293b', fontSize: '16px' }}>
+            {_formatType === 1 ? 'Quản lý Sách' : _formatType === 2 ? 'Quản lý Truyện tranh' : 'Tất cả Sách'}
+          </h5>
+          <div className="text-muted fw-bold" style={{ cursor: 'pointer', letterSpacing: '2px' }}>...</div>
+        </div>
         {/* Custom Header for search and filters */}
         <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #323338' }}>
           <div className="d-flex align-items-center gap-2">
             <Form.Select
               size="sm"
-              className="bg-transparent text-light border-secondary-subtle"
-              style={{ width: '70px', color: '#e3e3e3' }}
+              className="bg-transparent text-body border-secondary-subtle"
+              style={{ width: '70px' }}
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -450,8 +502,8 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
             <Form.Control
               size="sm"
               type="text"
-              className="bg-transparent border-secondary-subtle"
-              style={{ color: '#e3e3e3' }}
+              className="bg-transparent text-body border-secondary-subtle"
+              style={{}}
               placeholder="Tìm kiếm..."
               value={searchTerm}
               onChange={(e) => {
@@ -475,6 +527,11 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                   <ResizableHeader initialWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('author')}>
                     <span className="fw-semibold text-nowrap">Tác Giả {getSortIcon('author')}</span>
                   </ResizableHeader>
+                  {_formatType === undefined && (
+                    <ResizableHeader initialWidth={120} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                      <span className="fw-semibold text-nowrap">Loại Sách</span>
+                    </ResizableHeader>
+                  )}
                   <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
                     <span className="fw-semibold text-nowrap">Thể Loại</span>
                   </ResizableHeader>
@@ -522,6 +579,14 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                       <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         <Form.Control size="sm" value={newItem.author || ''} onChange={(e) => setNewItem({ ...newItem, author: e.target.value })} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit, handleCloseAdd)} placeholder="Tác giả" className="inline-edit-input text-body" />
                       </td>
+                      {_formatType === undefined && (
+                        <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                          <Form.Select size="sm" value={newItem.formatType || 1} onChange={(e) => setNewItem({ ...newItem, formatType: Number(e.target.value) })} className="inline-edit-input text-body">
+                            <option value={1}>Sách</option>
+                            <option value={2}>Truyện tranh</option>
+                          </Form.Select>
+                        </td>
+                      )}
                       <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
                         <Select
                           isMulti
@@ -587,7 +652,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                   )}
                   {isLoading ? (
                     <tr>
-                      <td colSpan={9} style={{ borderLeft: 0, borderRight: 0 }} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                      <td colSpan={_formatType === undefined ? 10 : 9} style={{ borderLeft: 0, borderRight: 0 }} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
                     </tr>
                   ) : sortedData.length > 0 ? (
                     sortedData.map((book) => (
@@ -649,6 +714,31 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                               <span>{editingBookId === book.id ? editBookData.author : book.author}</span>
                             )}
                           </td>
+                          {_formatType === undefined && (
+                            <td
+                              onDoubleClick={() => handleCellDoubleClick(book, 'formatType')}
+                              style={{ padding: editingBookId === book.id && activeEditField === 'formatType' ? 0 : '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}
+                            >
+                              {editingBookId === book.id && activeEditField === 'formatType' ? (
+                                <Form.Select
+                                  size="sm"
+                                  value={editBookData.formatType || 1}
+                                  onChange={(e) => setEditBookData({ ...editBookData, formatType: Number(e.target.value) })}
+                                  onKeyDown={(e) => handleCellKeyDown(e, 'formatType', book)}
+                                  className="cell-edit-input text-body"
+                                  style={{ border: '2px solid #0d6efd', borderRadius: '0' }}
+                                  autoFocus
+                                >
+                                  <option value={1}>Sách</option>
+                                  <option value={2}>Truyện tranh</option>
+                                </Form.Select>
+                              ) : (
+                                <span className="badge bg-light text-dark border">
+                                  {(editingBookId === book.id && editBookData.formatType !== undefined ? editBookData.formatType : book.formatType) === 1 ? 'Sách' : ((editingBookId === book.id && editBookData.formatType !== undefined ? editBookData.formatType : book.formatType) === 2 ? 'Truyện tranh' : 'Khác')}
+                                </span>
+                              )}
+                            </td>
+                          )}
 
                           <td
                             onDoubleClick={() => handleCellDoubleClick(book, 'categories')}
@@ -838,7 +928,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                     ))
                   ) : !isAddingNew ? (
                     <tr>
-                      <td colSpan={9} style={{ border: 0, padding: 0 }}>
+                      <td colSpan={_formatType === undefined ? 10 : 9} style={{ border: 0, padding: 0 }}>
                         <div className="jira-empty-state">
                           <h4>There are no work items here yet</h4>
                           <p>You either don't have any work items or your existing ones don't match your current filters.</p>
@@ -853,7 +943,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                 <tr style={{ height: '100%' }}>
                   <td style={{ borderBottom: 0, borderLeft: 0, padding: 0, backgroundColor: 'transparent' }}></td>
                   <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                  {_formatType === undefined && <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>}
                   <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
                   <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
                   <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
@@ -868,7 +958,10 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
           <div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr' }}>
             <div>
               <button className="btn-create" onClick={() => setIsAddingNew(true)}>
-                <FontAwesomeIcon icon={faPlus} /> Create
+                <FontAwesomeIcon icon={faPlus} /> Create (Inline)
+              </button>
+              <button className="btn-create ms-2" style={{ backgroundColor: '#17a2b8' }} onClick={handleOpenAddModal}>
+                <FontAwesomeIcon icon={faPlus} /> Create (Popup)
               </button>
             </div>
             <div className="pagination-controls">
@@ -960,6 +1053,99 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
           </div>
         </Modal.Body>
       </Modal>
+
+      <Modal show={showAddModal} onHide={() => !isSubmitting && setShowAddModal(false)} size="lg" centered backdrop="static">
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fs-5 fw-semibold text-dark">Thêm mới Sách / Truyện</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="pt-3 pb-4 px-4">
+          <div className="row g-3">
+            <div className="col-md-6">
+              <Form.Group>
+                <Form.Label className="small fw-medium">Tên sách (*)</Form.Label>
+                <Form.Control 
+                  value={popupNewItem.title || ''} 
+                  onChange={e => setPopupNewItem({ ...popupNewItem, title: e.target.value })}
+                  placeholder="Nhập tên sách..."
+                />
+              </Form.Group>
+            </div>
+            <div className="col-md-6">
+              <Form.Group>
+                <Form.Label className="small fw-medium">Tác giả (*)</Form.Label>
+                <Form.Control 
+                  value={popupNewItem.author || ''} 
+                  onChange={e => setPopupNewItem({ ...popupNewItem, author: e.target.value })}
+                  placeholder="Nhập tên tác giả..."
+                />
+              </Form.Group>
+            </div>
+            {_formatType === undefined && (
+              <div className="col-md-6">
+                <Form.Group>
+                  <Form.Label className="small fw-medium">Loại Sách</Form.Label>
+                  <Form.Select 
+                    value={popupNewItem.formatType || 1} 
+                    onChange={e => setPopupNewItem({ ...popupNewItem, formatType: Number(e.target.value) })}
+                  >
+                    <option value={1}>Sách</option>
+                    <option value={2}>Truyện tranh</option>
+                  </Form.Select>
+                </Form.Group>
+              </div>
+            )}
+            <div className="col-md-6">
+              <Form.Group>
+                <Form.Label className="small fw-medium">Thể Loại</Form.Label>
+                <Select
+                  isMulti
+                  classNamePrefix="rs"
+                  options={categories.map(c => ({ value: c.id, label: c.name }))}
+                  value={categories.filter(c => popupNewItem.categoryIds?.includes(c.id as any)).map(c => ({ value: c.id, label: c.name }))}
+                  onChange={(selected) => setPopupNewItem({ ...popupNewItem, categoryIds: selected.map(s => s.value as any) })}
+                  placeholder="Chọn thể loại..."
+                  menuPortalTarget={document.body}
+                />
+              </Form.Group>
+            </div>
+            <div className="col-md-12">
+              <Form.Group>
+                <Form.Label className="small fw-medium">Chủ Đề</Form.Label>
+                <Select
+                  isMulti
+                  classNamePrefix="rs"
+                  options={topics.map(t => ({ value: t.id, label: t.name }))}
+                  value={topics.filter(t => popupNewItem.topicIds?.includes(t.id as any)).map(t => ({ value: t.id, label: t.name }))}
+                  onChange={(selected) => setPopupNewItem({ ...popupNewItem, topicIds: selected.map(s => s.value as any) })}
+                  placeholder="Chọn chủ đề..."
+                  menuPortalTarget={document.body}
+                />
+              </Form.Group>
+            </div>
+            <div className="col-md-12">
+              <Form.Group>
+                <Form.Label className="small fw-medium">Mô tả</Form.Label>
+                <Form.Control 
+                  as="textarea"
+                  rows={3}
+                  value={popupNewItem.description || ''} 
+                  onChange={e => setPopupNewItem({ ...popupNewItem, description: e.target.value })}
+                  placeholder="Nhập mô tả..."
+                />
+              </Form.Group>
+            </div>
+          </div>
+          <div className="d-flex justify-content-end gap-2 mt-4">
+            <Button variant="light" onClick={() => setShowAddModal(false)} disabled={isSubmitting} className="px-4 fw-medium border">
+              Hủy
+            </Button>
+            <Button variant="primary" onClick={handlePopupAddSubmit} disabled={isSubmitting} className="px-4 fw-medium border-0" style={{ backgroundColor: '#5955D1' }}>
+              {isSubmitting ? 'Đang lưu...' : 'Lưu lại'}
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
     </>
   );
 };

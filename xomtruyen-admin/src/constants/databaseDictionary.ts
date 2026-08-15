@@ -70,7 +70,7 @@ export const DATABASE_TABLE_DICTIONARY: Record<string, TableDescription> = {
       Id: { label: "Mã tác phẩm", description: "Khóa chính UUID của bộ truyện", example: "7c9e6679-..." },
       Title: { label: "Tên bộ truyện", description: "Tiêu đề đầy đủ của tác phẩm", example: "Đấu Phá Thương Khung" },
       Slug: { label: "Đường dẫn thân thiện (Slug)", description: "Chuỗi URL SEO không dấu", example: "dau-pha-thuong-khung" },
-      FormatType: { label: "Định dạng tác phẩm", description: "0: Truyện chữ (Text), 1: Truyện tranh (Comic), 2: Audio", example: "0" },
+      FormatType: { label: "Định dạng tác phẩm", description: "1: Sách (Text), 2: Truyện tranh (Comic)", example: "1" },
       AccessLevel: { label: "Cấp độ truy cập", description: "0: Miễn phí (Free), 1: Trả phí theo chương (PayPerChapter), 2: Gói VIP", example: "0" },
       Author: { label: "Tác giả", description: "Tên tác giả gốc hoặc bút danh", example: "Thiên Tằm Thổ Đậu" },
       Description: { label: "Tóm tắt nội dung", description: "Mô tả cốt truyện, giới thiệu tác phẩm", example: "Đây là thế giới thuộc về đấu khí..." },

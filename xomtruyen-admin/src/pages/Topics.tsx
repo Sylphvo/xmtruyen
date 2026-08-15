@@ -5,6 +5,7 @@ import { Form, Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
 import toast from 'react-hot-toast';
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -22,7 +23,7 @@ export const Topics: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'id', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'id', direction: 'asc' });
 
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -149,6 +150,33 @@ export const Topics: React.FC = () => {
     }
   };
 
+  const handleImportExcel = async (importedData: any[]) => {
+    let successCount = 0;
+    let errorCount = 0;
+    
+    setLoading(true);
+    for (const row of importedData) {
+      const name = row.name || row.Name || row.Tên;
+      if (!name) continue;
+      
+      try {
+        await createTopic({ name });
+        successCount++;
+      } catch (error) {
+        errorCount++;
+      }
+    }
+    setLoading(false);
+    
+    if (successCount > 0) {
+      toast.success(`Nhập thành công ${successCount} chủ đề`);
+      fetchTopics();
+    }
+    if (errorCount > 0) {
+      toast.error(`Lỗi khi nhập ${errorCount} chủ đề`);
+    }
+  };
+
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
 
@@ -157,6 +185,12 @@ export const Topics: React.FC = () => {
       <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý Chủ đề</h5>
         <div className="d-flex align-items-center gap-3">
+          <ExcelActionButtons 
+            dataToExport={data.map(c => ({ ID: c.id, Tên: c.name }))}
+            exportFileName="Topics"
+            onImport={handleImportExcel}
+            isLoading={loading}
+          />
           <Button variant="primary" size="sm" onClick={() => setIsAddingNew(true)} className="d-flex align-items-center gap-2 rounded-2">
             <FontAwesomeIcon icon={faPlus} />
             Thêm Mới

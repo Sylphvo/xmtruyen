@@ -1,103 +1,93 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using XomTruyen.API.Models.Requests;
-using XomTruyen.API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using XomTruyen.API.Data;
+using XomTruyen.API.Models;
 
 namespace XomTruyen.API.Controllers;
 
-[Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
-public class AdminBookChapterController : BaseApiController
+[ApiController]
+public class AdminBookChapterController : ControllerBase
 {
-    private readonly IBookChapterManagementService _chapterService;
+    private readonly ApplicationDbContext _context;
 
-    public AdminBookChapterController(IBookChapterManagementService chapterService)
+    public AdminBookChapterController(ApplicationDbContext context)
     {
-        _chapterService = chapterService;
+        _context = context;
     }
 
-    [HttpGet("publication/{publicationId}")]
-    public async Task<IActionResult> GetChapters(Guid publicationId)
+    [HttpGet("api/admin/book-chapters")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetChapters([FromQuery] Guid publicationId)
     {
-        var chapters = await _chapterService.GetChaptersByPublicationIdAsync(publicationId);
-        return Ok(new { success = true, data = chapters });
+        var chapters = await _context.BookChapters
+            .Where(c => c.PublicationId == publicationId)
+            .OrderBy(c => c.ChapterNumber)
+            .Select(c => new
+            {
+                c.Id,
+                c.PublicationId,
+                c.ChapterNumber,
+                c.Title,
+                c.IsLocked,
+                c.CoinPrice,
+                c.ViewCount,
+                c.CreatedAt,
+                // Don't fetch full content in list view for performance
+                ContentPreview = c.Content != null ? (c.Content.Length > 100 ? c.Content.Substring(0, 100) + "..." : c.Content) : ""
+            })
+            .ToListAsync();
+        return Ok(chapters);
+    }
+    
+    [HttpGet("api/admin/book-chapters/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetChapter(Guid id)
+    {
+        var chapter = await _context.BookChapters.FindAsync(id);
+        if (chapter == null) return NotFound();
+        return Ok(chapter);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpPost("api/admin/book-chapters")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> CreateChapter([FromBody] BookChapter chapter)
     {
-        var chapter = await _chapterService.GetChapterByIdAsync(id);
-        if (chapter == null) return NotFound(new { success = false, message = "Chapter not found" });
-        return Ok(new { success = true, data = chapter });
+        chapter.Id = Guid.NewGuid();
+        chapter.CreatedAt = DateTime.UtcNow;
+        chapter.ViewCount = 0;
+
+        _context.BookChapters.Add(chapter);
+        await _context.SaveChangesAsync();
+        return Ok(chapter);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] BookChapterRequest request)
+    [HttpPut("api/admin/book-chapters/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateChapter(Guid id, [FromBody] BookChapter req)
     {
-        try
-        {
-            var chapter = await _chapterService.CreateChapterAsync(request);
-            return Ok(new { success = true, data = chapter });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { success = false, message = ex.Message });
-        }
+        var chapter = await _context.BookChapters.FindAsync(id);
+        if (chapter == null) return NotFound();
+
+        chapter.ChapterNumber = req.ChapterNumber;
+        chapter.Title = req.Title;
+        chapter.Content = req.Content;
+        chapter.IsLocked = req.IsLocked;
+        chapter.CoinPrice = req.CoinPrice;
+
+        await _context.SaveChangesAsync();
+        return Ok(chapter);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] BookChapterRequest request)
+    [HttpDelete("api/admin/book-chapters/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteChapter(Guid id)
     {
-        try
-        {
-            await _chapterService.UpdateChapterAsync(id, request);
-            return Ok(new { success = true });
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { success = false, message = ex.Message });
-        }
-    }
+        var chapter = await _context.BookChapters.FindAsync(id);
+        if (chapter == null) return NotFound();
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        try
-        {
-            await _chapterService.DeleteChapterAsync(id);
-            return Ok(new { success = true });
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { success = false, message = ex.Message });
-        }
-    }
-
-    [HttpDelete("publication/{publicationId}")]
-    public async Task<IActionResult> DeleteAllChapters(Guid publicationId)
-    {
-        try
-        {
-            await _chapterService.DeleteAllChaptersByPublicationAsync(publicationId);
-            return Ok(new { success = true, message = "Đã xóa toàn bộ chương chữ." });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { success = false, message = $"Lỗi xóa chương: {ex.Message}" });
-        }
-    }
-
-    [HttpPatch("publication/{publicationId}/reorder")]
-    public async Task<IActionResult> ReorderChapters(Guid publicationId, [FromBody] IEnumerable<BookChapterReorderRequest> requests)
-    {
-        try
-        {
-            await _chapterService.ReorderChaptersAsync(publicationId, requests);
-            return Ok(new { success = true });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { success = false, message = $"Lỗi sắp xếp chương: {ex.Message}" });
-        }
+        _context.BookChapters.Remove(chapter);
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Deleted" });
     }
 }

@@ -151,7 +151,7 @@ public class EngagementService : IEngagementService
                     f.Publication.Id,
                     f.Publication.Title,
                     f.Publication.CoverImageUrl,
-                    f.Publication.Author,
+                    Author = f.Publication.AuthorName,
                     f.Publication.FormatType,
                     f.Publication.ViewCount,
                     f.Publication.AverageRating

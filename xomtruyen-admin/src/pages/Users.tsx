@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import { getUsers, updateUserStatus, createUser, updateUser, type User, type SaveUserRequest } from '../api/userApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
 import toast from 'react-hot-toast';
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -23,7 +24,7 @@ export const Users: React.FC = () => {
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'createdAt', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'createdAt', direction: 'asc' });
 
   // Add User State
   const [isAddingNewUser, setIsAddingNewUser] = useState(false);
@@ -167,6 +168,46 @@ export const Users: React.FC = () => {
     });
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN').format(amount);
+  };
+
+  const handleImportExcel = async (importedData: any[]) => {
+    let successCount = 0;
+    let errorCount = 0;
+    
+    setLoading(true);
+    for (const row of importedData) {
+      const email = row.email || row.Email || row['Email'];
+      const fullName = row.fullName || row.FullName || row['Họ tên'];
+      const password = row.password || row.Password || '123456';
+      
+      if (!email || !fullName) continue;
+      
+      try {
+        await createUser({ 
+          email, 
+          fullName, 
+          password: password,
+          isActive: true,
+          coinBalance: 0
+        });
+        successCount++;
+      } catch (error) {
+        errorCount++;
+      }
+    }
+    setLoading(false);
+    
+    if (successCount > 0) {
+      toast.success(`Nhập thành công ${successCount} user`);
+      fetchUsersData();
+    }
+    if (errorCount > 0) {
+      toast.error(`Lỗi khi nhập ${errorCount} user (có thể email đã tồn tại)`);
+    }
+  };
+
   const handleCancelEdit = () => {
     setEditingUserId(null);
     setEditFormData({});
@@ -199,10 +240,29 @@ export const Users: React.FC = () => {
 
   return (
     <div className="jira-table-container">
+        <div className="px-4 py-3 border-bottom d-flex justify-content-between align-items-center bg-white" style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
+          <h5 className="mb-0 fw-bold" style={{ color: '#1e293b', fontSize: '16px' }}>
+            Quản lý Người dùng
+          </h5>
+          <div className="text-muted fw-bold" style={{ cursor: 'pointer', letterSpacing: '2px' }}>...</div>
+        </div>
       {/* Custom Header for search and filters */}
       <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý User</h5>
         <div className="d-flex align-items-center gap-3">
+          <ExcelActionButtons 
+            dataToExport={data.map(u => ({
+              'ID': u.id,
+              'Họ tên': u.fullName,
+              'Email': u.email,
+              'Nguồn': u.provider,
+              'Xu': u.coinBalance,
+              'Trạng thái': u.isActive ? 'Hoạt động' : 'Bị khóa'
+            }))}
+            exportFileName="Users"
+            onImport={handleImportExcel}
+            isLoading={loading}
+          />
           <Button variant="primary" size="sm" onClick={() => setIsAddingNewUser(true)} className="d-flex align-items-center gap-2 rounded-2">
             <FontAwesomeIcon icon={faPlus} />
             Thêm User

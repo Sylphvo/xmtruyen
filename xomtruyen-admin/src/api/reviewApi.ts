@@ -1,16 +1,21 @@
-import { apiClient } from './userApi';
+import { apiClient, type PaginatedResponse } from './userApi';
 
-export interface IReview {
+export interface Review {
   id: string;
+  publicationId: string;
+  publicationTitle: string;
+  userId: string;
+  userName: string;
   rating: number;
-  content: string;
-  createdAt: string;
-  user: { id: string; email: string; fullName: string };
-  publication: { id: string; title: string };
+  content?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export const getReviews = async (page: number = 1, pageSize: number = 20): Promise<{ data: IReview[], totalCount: number }> => {
-  return apiClient.get<any, { data: IReview[], totalCount: number }>(`/admin/reviews?page=${page}&pageSize=${pageSize}`);
+export const getReviews = async (publicationId?: string, page: number = 1, pageSize: number = 50): Promise<PaginatedResponse<Review>> => {
+  let url = `/admin/reviews?page=${page}&pageSize=${pageSize}`;
+  if (publicationId) url += `&publicationId=${publicationId}`;
+  return apiClient.get<any, PaginatedResponse<Review>>(url);
 };
 
 export const deleteReview = async (id: string): Promise<any> => {

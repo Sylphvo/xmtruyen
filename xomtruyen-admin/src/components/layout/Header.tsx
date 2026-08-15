@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Bell, ChevronsLeft, Moon, Sun, ClipboardList, ChevronDown, User, Settings, ArrowUpCircle, LogOut, Lock, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
+import { useAuth } from '../../contexts/AuthContext';
+
 interface HeaderProps {
   toggleSidebar?: () => void;
   isSidebarCollapsed?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapsed }) => {
+  const { user, logout } = useAuth();
   const [theme, setTheme] = useState(
     document.documentElement.getAttribute('data-bs-theme') || 'light'
   );
@@ -208,10 +211,10 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapse
             <div className="position-relative" ref={profileRef}>
               <div className="d-flex align-items-center gap-2 ms-3" style={{ cursor: 'pointer' }} onClick={() => setIsProfileOpen(!isProfileOpen)}>
                 <div className="text-end d-none d-sm-block">
-                  <div className="fw-bold lh-sm mb-1" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Robert Brown</div>
+                  <div className="fw-bold lh-sm mb-1" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>{user?.name || 'Admin'}</div>
                   <div className="text-muted d-flex align-items-center justify-content-end" style={{ fontSize: '12px' }}>
                     <ChevronDown size={12} className="me-1" />
-                    <span>Manager</span>
+                    <span>{user?.role || 'Manager'}</span>
                   </div>
                 </div>
                 <div className="position-relative">
@@ -226,8 +229,8 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapse
                     <div className="d-flex align-items-center gap-3">
                       <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Profile" className="rounded-circle flex-shrink-0" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
                       <div>
-                        <div className="fw-bold" style={{ fontSize: '14px', color: 'var(--text-heading)' }}>Robert Brown</div>
-                        <div className="text-muted" style={{ fontSize: '12px' }}>robert@gmail.com</div>
+                        <div className="fw-bold text-truncate" style={{ fontSize: '14px', color: 'var(--text-heading)', maxWidth: '140px' }}>{user?.name || 'Admin'}</div>
+                        <div className="text-muted text-truncate" style={{ fontSize: '12px', maxWidth: '140px' }}>{user?.email || ''}</div>
                       </div>
                     </div>
                   </div>
@@ -246,9 +249,9 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarCollapse
                     </a>
                   </div>
                   <div className="p-2 border-top" style={{ borderColor: 'var(--border-color) !important' }}>
-                    <Link to="/login" className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded-2 text-danger" onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(220,53,69,0.1)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <button onClick={logout} className="d-flex align-items-center gap-2 px-3 py-2 w-100 border-0 bg-transparent text-decoration-none rounded-2 text-danger" onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(220,53,69,0.1)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <LogOut size={16} /> <span style={{ fontSize: '14px' }}>Log Out</span>
-                    </Link>
+                    </button>
                   </div>
                 </div>
               )}

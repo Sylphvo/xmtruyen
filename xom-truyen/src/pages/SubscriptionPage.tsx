@@ -35,7 +35,7 @@ export default function SubscriptionPage() {
     }
   };
 
-  const handleSubscribe = async (planId: parseInt, price: parseInt) => {
+  const handleSubscribe = async (planId: number, price: number) => {
     try {
       setIsProcessing(true);
       const token = localStorage.getItem("token");

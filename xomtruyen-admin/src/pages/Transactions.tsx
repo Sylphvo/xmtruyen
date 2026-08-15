@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Badge, Button, Form, Spinner } from 'react-bootstrap';
+import { Card, Badge, Button, Form, Spinner } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
-import { Check, X, Search, RefreshCw } from 'lucide-react';
+import { Check, RefreshCw } from 'lucide-react';
+import { getTransactions, getRevenueSummary, approveTransaction, type Transaction } from '../api/transactionApi';
+import { ResizableHeader } from '../components/ResizableHeader';
 
 export const Transactions: React.FC = () => {
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [summary, setSummary] = useState({ totalRevenue: 0, todayRevenue: 0 });
@@ -17,14 +19,8 @@ export const Transactions: React.FC = () => {
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      let url = 'http://localhost:5172/api/admin/payment/transactions?page=1&pageSize=50';
-      if (statusFilter) url += `&status=${statusFilter}`;
-      
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setTransactions(data.data || []);
-      }
+      const res = await getTransactions({ status: statusFilter || undefined, page: 1, pageSize: 50 });
+      setTransactions(res.data);
     } catch (error) {
       toast.error('Lỗi khi tải danh sách giao dịch');
     } finally {
@@ -34,10 +30,8 @@ export const Transactions: React.FC = () => {
 
   const fetchSummary = async () => {
     try {
-      const res = await fetch('http://localhost:5172/api/admin/payment/revenue-summary');
-      if (res.ok) {
-        setSummary(await res.json());
-      }
+      const res = await getRevenueSummary();
+      setSummary(res);
     } catch (error) {
       console.error(error);
     }
@@ -47,20 +41,12 @@ export const Transactions: React.FC = () => {
     if (!window.confirm('Xác nhận đã nhận tiền và duyệt giao dịch này?')) return;
     
     try {
-      const res = await fetch(`http://localhost:5172/api/admin/payment/${id}/approve`, {
-        method: 'PATCH'
-      });
-      
-      if (res.ok) {
-        toast.success('Duyệt giao dịch thành công');
-        fetchTransactions();
-        fetchSummary();
-      } else {
-        const err = await res.json();
-        toast.error(err.message || 'Lỗi khi duyệt giao dịch');
-      }
-    } catch (error) {
-      toast.error('Lỗi kết nối');
+      await approveTransaction(id);
+      toast.success('Duyệt giao dịch thành công');
+      fetchTransactions();
+      fetchSummary();
+    } catch (error: any) {
+      toast.error(error.message || 'Lỗi khi duyệt giao dịch');
     }
   };
 
@@ -106,14 +92,30 @@ export const Transactions: React.FC = () => {
             <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
               <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Mã GD</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Người dùng</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Loại</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Số tiền / Xu</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Phương thức</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Trạng thái</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Thời gian</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--bs-heading-color)' }}>Thao tác</th>
+                  <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Mã GD</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Người dùng</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Loại</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Số tiền / Xu</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Phương thức</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Trạng thái</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Thời gian</span>
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                    <span className="fw-semibold text-nowrap">Thao tác</span>
+                  </ResizableHeader>
                 </tr>
               </thead>
               <tbody>
@@ -121,8 +123,8 @@ export const Transactions: React.FC = () => {
                   <tr key={t.id} className="jira-table-row" style={{ height: '46px' }}>
                     <td className="px-4 text-secondary" style={{ fontSize: '13px', padding: '12px 16px' }}>{t.id.substring(0, 8)}...</td>
                     <td style={{ padding: '12px 16px' }}>
-                      <div><strong>{t.user?.fullName}</strong></div>
-                      <div className="text-secondary small">{t.user?.email}</div>
+                      <div><strong>{t.userEmail ? t.userEmail.split('@')[0] : 'Unknown'}</strong></div>
+                      <div className="text-secondary small">{t.userEmail}</div>
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <Badge bg={t.transactionType === 'TopUp' ? 'info' : 'warning'}>

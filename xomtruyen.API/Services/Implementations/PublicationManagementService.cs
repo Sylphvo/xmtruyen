@@ -33,7 +33,7 @@ public class PublicationManagementService : IPublicationManagementService
             Id = request.Id ?? Guid.NewGuid(),
             Title = request.Title,
             Slug = SlugHelper.GenerateSlugWithRandomSuffix(request.Title),
-            Author = request.Author,
+            AuthorName = request.Author,
             Description = request.Description,
             CoverImageUrl = request.CoverImageUrl,
             FormatType = request.FormatType,
@@ -59,7 +59,7 @@ public class PublicationManagementService : IPublicationManagementService
         }
 
         Publication.Title = request.Title;
-        Publication.Author = request.Author;
+        Publication.AuthorName = request.Author;
         Publication.Description = request.Description;
         Publication.CoverImageUrl = request.CoverImageUrl;
         Publication.FormatType = request.FormatType;
@@ -74,7 +74,7 @@ public class PublicationManagementService : IPublicationManagementService
         if (Publication == null) throw new KeyNotFoundException("Publication not found");
 
         if (request.Title != null) Publication.Title = request.Title;
-        if (request.Author != null) Publication.Author = request.Author;
+        if (request.Author != null) Publication.AuthorName = request.Author;
         if (request.Description != null) Publication.Description = request.Description;
         if (request.CoverImageUrl != null) Publication.CoverImageUrl = request.CoverImageUrl;
         if (request.FormatType.HasValue) Publication.FormatType = request.FormatType.Value;

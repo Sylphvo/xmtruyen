@@ -22,8 +22,10 @@
     "chart.js": "^4.5.1",
     "datatables.net-dt": "^2.3.8",
     "datatables.net-react": "^1.0.2",
+    "date-fns": "^4.4.0",
     "flatpickr": "^4.6.13",
     "jquery": "^4.0.0",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.454.0",
     "react": "^19.2.7",
     "react-apexcharts": "^2.1.1",
@@ -35,7 +37,8 @@
     "react-router-dom": "^7.18.0",
     "react-select": "^5.10.2",
     "sass": "^1.101.0",
-    "swiper": "^12.2.0"
+    "swiper": "^12.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

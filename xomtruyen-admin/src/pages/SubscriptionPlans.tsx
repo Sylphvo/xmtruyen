@@ -3,6 +3,7 @@ import { Card, Button, Form, Modal, Table } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
 import { Edit, Trash, Plus } from 'lucide-react';
 import * as planApi from '../api/subscriptionPlanApi';
+import { ResizableHeader } from '../components/ResizableHeader';
 
 export const SubscriptionPlans = () => {
   const [plans, setPlans] = useState<planApi.ISubscriptionPlan[]>([]);
@@ -123,12 +124,24 @@ export const SubscriptionPlans = () => {
           <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>ID</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Tên Gói</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Giá (VNĐ)</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Thời gian (Ngày)</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Quyền lợi</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--bs-heading-color)' }}>Thao tác</th>
+                <ResizableHeader initialWidth={60} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">ID</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Tên Gói</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Giá (VNĐ)</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Thời gian (Ngày)</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={250} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Quyền lợi</span>
+                </ResizableHeader>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <span className="fw-semibold text-nowrap">Thao tác</span>
+                </ResizableHeader>
               </tr>
             </thead>
               <tbody>

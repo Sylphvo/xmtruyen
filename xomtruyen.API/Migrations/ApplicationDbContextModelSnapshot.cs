@@ -22,6 +22,73 @@ namespace xomtruyen.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("XomTruyen.API.Models.Author", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Twitter")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authors");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.Banner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LinkUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Banners");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.BookChapter", b =>
                 {
                     b.Property<Guid>("Id")
@@ -108,6 +175,42 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.CoinPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("BonusCoins")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CoinAmount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPopular")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PriceVND")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CoinPackages");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.ComicChapter", b =>
                 {
                     b.Property<Guid>("Id")
@@ -166,6 +269,167 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("ComicPages");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.CrawlJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CrawledItems")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TotalItems")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CrawlJobs");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.EmailTemplate", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BodyHtml")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Variables")
+                        .HasColumnType("text");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("EmailTemplates");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.HelpArticle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentHtml")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("HelpArticles");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.HomeSection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ItemLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PublicationIds")
+                        .HasColumnType("text");
+
+                    b.Property<string>("QueryType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HomeSections");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Note", b =>
                 {
                     b.Property<Guid>("Id")
@@ -195,6 +459,92 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("Notes");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ReferenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ReferenceType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.Promotion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("DiscountPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxDiscountAmount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinPurchaseAmount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UsageLimit")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UsedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ValidTo")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Promotions");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Publication", b =>
                 {
                     b.Property<Guid>("Id")
@@ -204,7 +554,10 @@ namespace xomtruyen.API.Migrations
                     b.Property<int>("AccessLevel")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Author")
+                    b.Property<Guid?>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthorName")
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
@@ -263,6 +616,8 @@ namespace xomtruyen.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Publications");
@@ -298,6 +653,45 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("PublicationTopics");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.ReadingAnalytic", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ChapterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DeviceInfo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GuestSessionId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ReadingDurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ReadingAnalytics");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.ReadingHistory", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -320,6 +714,52 @@ namespace xomtruyen.API.Migrations
                     b.HasIndex("PublicationId");
 
                     b.ToTable("ReadingHistories");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ResolutionNote")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResolvedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterId");
+
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Review", b =>
@@ -419,6 +859,89 @@ namespace xomtruyen.API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.SystemConfig", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DataType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("SystemConfigs");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TextBlock", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("BboxHeight")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BboxWidth")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BboxX")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BboxY")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FontStyle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsManualEdit")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("OcrConfidence")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("OriginalText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TextType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TranslatedText")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PageId");
+
+                    b.ToTable("TextBlocks");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Topic", b =>
                 {
                     b.Property<int>("Id")
@@ -495,6 +1018,189 @@ namespace xomtruyen.API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationChapter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ChapterNumber")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("PageCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("PublishedChapterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RawFolderPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReviewNote")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReviewedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TextBlockCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TranslatedFolderPath")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("TranslationChapters");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationGlossary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SourceLanguage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetLanguage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("TranslationGlossaries");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProcessedPages")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SourceLanguage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetLanguage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TotalChapters")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalPages")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalTextBlocks")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("TranslationJobs");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationPage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChapterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OcrStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RawImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TranslatedImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TypesetStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChapterId");
+
+                    b.ToTable("TranslationPages");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.User", b =>
@@ -577,6 +1283,30 @@ namespace xomtruyen.API.Migrations
                     b.HasIndex("PublicationId");
 
                     b.ToTable("UserFavorites");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.UserPromotionUsage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PromotionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PromotionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPromotionUsages");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.UserPublication", b =>
@@ -700,6 +1430,15 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("ComicChapter");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.HelpArticle", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
+
+                    b.Navigation("Author");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Note", b =>
                 {
                     b.HasOne("XomTruyen.API.Models.User", "User")
@@ -711,12 +1450,27 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.Notification", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Publication", b =>
                 {
+                    b.HasOne("XomTruyen.API.Models.Author", "Author")
+                        .WithMany("Publications")
+                        .HasForeignKey("AuthorId");
+
                     b.HasOne("XomTruyen.API.Models.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Author");
 
                     b.Navigation("Owner");
                 });
@@ -759,6 +1513,23 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("Topic");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.ReadingAnalytic", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("XomTruyen.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Publication");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.ReadingHistory", b =>
                 {
                     b.HasOne("XomTruyen.API.Models.Publication", "Publication")
@@ -776,6 +1547,17 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("Publication");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.Report", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.User", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reporter");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Review", b =>
@@ -797,6 +1579,17 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.TextBlock", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.TranslationPage", "Page")
+                        .WithMany("TextBlocks")
+                        .HasForeignKey("PageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Page");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Transaction", b =>
                 {
                     b.HasOne("XomTruyen.API.Models.SubscriptionPlan", "SubscriptionPlan")
@@ -812,6 +1605,48 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("SubscriptionPlan");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationChapter", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.TranslationJob", "Job")
+                        .WithMany("Chapters")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationGlossary", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId");
+
+                    b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationJob", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationPage", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.TranslationChapter", "Chapter")
+                        .WithMany("Pages")
+                        .HasForeignKey("ChapterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chapter");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.User", b =>
@@ -839,6 +1674,25 @@ namespace xomtruyen.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Publication");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.UserPromotionUsage", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Promotion", "Promotion")
+                        .WithMany()
+                        .HasForeignKey("PromotionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("XomTruyen.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Promotion");
 
                     b.Navigation("User");
                 });
@@ -884,6 +1738,11 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.Author", b =>
+                {
+                    b.Navigation("Publications");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.ComicChapter", b =>
                 {
                     b.Navigation("Pages");
@@ -898,6 +1757,21 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("PublicationCategories");
 
                     b.Navigation("PublicationTopics");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationChapter", b =>
+                {
+                    b.Navigation("Pages");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationJob", b =>
+                {
+                    b.Navigation("Chapters");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.TranslationPage", b =>
+                {
+                    b.Navigation("TextBlocks");
                 });
 #pragma warning restore 612, 618
         }

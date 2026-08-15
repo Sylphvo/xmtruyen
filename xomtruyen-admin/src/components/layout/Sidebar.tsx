@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties } from 'lucide-react';
+import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings } from 'lucide-react';
 import { getTables } from '../../api/managerDbApi';
 import { getTableInfo } from '../../constants/databaseDictionary';
 
@@ -20,18 +20,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   }, []);
 
   useEffect(() => {
-    if (path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-files')) {
+    if (path.startsWith('/all-books') || path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/book-files') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-chapters') || path.startsWith('/authors') || path.startsWith('/reading-analytics')) {
       setActiveMenu('books');
     } else if (path.startsWith('/plans')) {
       setActiveMenu('plans');
-    } else if (path.startsWith('/reviews')) {
-      setActiveMenu('reviews');
     } else if (path.startsWith('/users')) {
       setActiveMenu('users');
-    } else if (path.startsWith('/database')) {
+    } else if (path.startsWith('/database') || path.startsWith('/system-configs')) {
       setActiveMenu('database');
-    } else if (path.startsWith('/transactions')) {
+    } else if (path.startsWith('/transactions') || path.startsWith('/coin-packages')) {
       setActiveMenu('transactions');
+    } else if (path.startsWith('/notifications') || path.startsWith('/reports') || path.startsWith('/reviews')) {
+      setActiveMenu('notifications');
+    } else if (path.startsWith('/promotions') || path.startsWith('/banners') || path.startsWith('/home-sections') || path.startsWith('/email-templates') || path.startsWith('/help-articles')) {
+      setActiveMenu('marketing');
+    } else if (path.startsWith('/crawlers') || path.startsWith('/translation')) {
+      setActiveMenu('automation');
     } else {
       setActiveMenu('dashboard');
     }
@@ -93,12 +97,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           <TableProperties />
         </div>
         <div 
-          className={`icon-nav-item ${activeMenu === 'reviews' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('reviews')}
+          className={`icon-nav-item ${activeMenu === 'notifications' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('notifications')}
           style={{ cursor: 'pointer' }}
-          title="Đánh giá"
+          title="Thông báo"
         >
-          <List />
+          <Bell />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'marketing' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('marketing')}
+          style={{ cursor: 'pointer' }}
+          title="Marketing"
+        >
+          <Ticket />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'automation' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('automation')}
+          style={{ cursor: 'pointer' }}
+          title="Tự động hóa"
+        >
+          <Bot />
         </div>
       </aside>
 
@@ -121,9 +141,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           {activeMenu === 'books' && (
             <>
               <div className="menu-heading">Quản lý Sách</div>
-              <NavLink to="/books" className="menu-link">
+              <NavLink to="/all-books" className="menu-link" end>
+                <Database />
+                <span>Tất cả sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(All Books)</span></span>
+              </NavLink>
+              <NavLink to="/books" className="menu-link" end>
                 <Book />
-                <span>Sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Truyện chữ)</span></span>
+                <span>Sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Books)</span></span>
+              </NavLink>
+              <NavLink to="/book-chapters" className="menu-link">
+                <Book />
+                <span>QL Chương <span className="text-secondary small" style={{ fontSize: '12px' }}>(Chapters)</span></span>
+              </NavLink>
+              <NavLink to="/reading-analytics" className="menu-link">
+                <BarChart2 />
+                <span>Phân tích Lượt đọc <span className="text-secondary small" style={{ fontSize: '12px' }}>(Analytics)</span></span>
               </NavLink>
               <NavLink to="/comics" className="menu-link">
                 <Book />
@@ -140,6 +172,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
               <NavLink to="/categories" className="menu-link">
                 <List />
                 <span>Thể loại <span className="text-secondary small" style={{ fontSize: '12px' }}>(Categories)</span></span>
+              </NavLink>
+              <NavLink to="/authors" className="menu-link">
+                <Users />
+                <span>Tác giả <span className="text-secondary small" style={{ fontSize: '12px' }}>(Authors)</span></span>
               </NavLink>
             </>
           )}
@@ -178,6 +214,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                   </NavLink>
                 );
               })}
+              <NavLink to="/system-configs" className="menu-link" end>
+                <Settings />
+                <span>Cấu hình (System Config)</span>
+              </NavLink>
             </>
           )}
 
@@ -191,22 +231,82 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
             </>
           )}
 
-          {activeMenu === 'reviews' && (
+          {activeMenu === 'transactions' && (
             <>
-              <div className="menu-heading">Đánh giá</div>
-              <NavLink to="/reviews" className="menu-link" end>
-                <List />
-                <span>Đánh giá <span className="text-secondary small" style={{ fontSize: '12px' }}>(Reviews)</span></span>
+              <div className="menu-heading">Tài chính</div>
+              <NavLink to="/transactions" className="menu-link">
+                <Tag />
+                <span>Giao dịch <span className="text-secondary small" style={{ fontSize: '12px' }}>(Nạp xu)</span></span>
+              </NavLink>
+              <NavLink to="/coin-packages" className="menu-link">
+                <Tag />
+                <span>Gói Xu <span className="text-secondary small" style={{ fontSize: '12px' }}>(Nạp tiền)</span></span>
               </NavLink>
             </>
           )}
 
-          {activeMenu === 'transactions' && (
+          {activeMenu === 'notifications' && (
             <>
-              <div className="menu-heading">Quản lý Giao dịch</div>
-              <NavLink to="/transactions" className="menu-link">
-                <Tag />
-                <span>Giao dịch <span className="text-secondary small" style={{ fontSize: '12px' }}>(Nạp xu)</span></span>
+              <div className="menu-heading">Tương tác</div>
+              <NavLink to="/notifications" className="menu-link" end>
+                <Bell />
+                <span>Thông báo <span className="text-secondary small" style={{ fontSize: '12px' }}>(Notifications)</span></span>
+              </NavLink>
+              <NavLink to="/reviews" className="menu-link" end>
+                <MessageSquare />
+                <span>Đánh giá <span className="text-secondary small" style={{ fontSize: '12px' }}>(Reviews)</span></span>
+              </NavLink>
+              <NavLink to="/reports" className="menu-link" end>
+                <ShieldAlert />
+                <span>Báo cáo vi phạm <span className="text-secondary small" style={{ fontSize: '12px' }}>(Reports)</span></span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'marketing' && (
+            <>
+              <div className="menu-heading">Trang chủ & Marketing</div>
+              <NavLink to="/promotions" className="menu-link" end>
+                <Ticket />
+                <span>Khuyến mãi <span className="text-secondary small" style={{ fontSize: '12px' }}>(Promotions)</span></span>
+              </NavLink>
+              <NavLink to="/banners" className="menu-link" end>
+                <LayoutDashboard />
+                <span>Quản lý Banner</span>
+              </NavLink>
+              <NavLink to="/home-sections" className="menu-link" end>
+                <LayoutDashboard />
+                <span>Trang chủ (Home CMS)</span>
+              </NavLink>
+              <NavLink to="/email-templates" className="menu-link" end>
+                <FileText />
+                <span>Mẫu Email <span className="text-secondary small" style={{ fontSize: '12px' }}>(Templates)</span></span>
+              </NavLink>
+              <NavLink to="/help-articles" className="menu-link" end>
+                <HelpCircle />
+                <span>Trợ giúp <span className="text-secondary small" style={{ fontSize: '12px' }}>(Help Center)</span></span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'automation' && (
+            <>
+              <div className="menu-heading">Tự động hóa (Phase 1)</div>
+              <NavLink to="/crawlers" className="menu-link" end>
+                <Bot />
+                <span>Crawler Pipeline <span className="text-secondary small" style={{ fontSize: '12px' }}>(Bot)</span></span>
+              </NavLink>
+              <NavLink to="/translation" className="menu-link" end>
+                <Languages />
+                <span>Dashboard Dịch thuật</span>
+              </NavLink>
+              <NavLink to="/translation/upload" className="menu-link" end>
+                <Languages />
+                <span>Upload RAW</span>
+              </NavLink>
+              <NavLink to="/translation/glossary" className="menu-link" end>
+                <BookOpen />
+                <span>Từ điển (Glossary)</span>
               </NavLink>
             </>
           )}
