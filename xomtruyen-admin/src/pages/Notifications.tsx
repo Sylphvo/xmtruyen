@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Trash, Plus, Bell, Send } from 'lucide-react';
 import * as api from '../api/notificationApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 
 export const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<api.Notification[]>([]);
@@ -13,6 +14,20 @@ export const Notifications: React.FC = () => {
   const pageSize = 20;
   const [typeFilter, setTypeFilter] = useState('');
   
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(notifications.map(n => n.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState<api.SaveNotificationRequest>({
     title: '',
@@ -119,33 +134,52 @@ export const Notifications: React.FC = () => {
         {loading ? (
           <div className="text-center p-4">Đang tải dữ liệu...</div>
         ) : (
-          <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-            <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+          <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+            <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
               <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <ResizableHeader initialWidth={250} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={notifications.length > 0 && selectedIds.length === notifications.length}
+                    ref={(input) => {
+                      if (input) {
+                        input.indeterminate = selectedIds.length > 0 && selectedIds.length < notifications.length;
+                      }
+                    }}
+                    onChange={handleSelectAll}
+                  />
+                </ResizableHeader>
+                <ResizableHeader initialWidth={250} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Tiêu đề</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Loại</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Người nhận</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Trạng thái</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Thời gian</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Thao tác</span>
                 </ResizableHeader>
                 </tr>
               </thead>
                 <tbody>
                   {notifications.map(noti => (
-                    <tr key={noti.id} className="jira-table-row" style={{ height: '46px' }}>
+                    <tr key={noti.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(noti.id) ? '#ebf2fc' : 'transparent' }}>
+                      <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                        <Form.Check
+                          type="checkbox"
+                          checked={selectedIds.includes(noti.id)}
+                          onChange={() => toggleSelect(noti.id)}
+                        />
+                      </td>
                       <td style={{ padding: '12px 16px' }}>
                         <div className="fw-bold">{noti.title}</div>
                         <div className="text-secondary small text-truncate" style={{ maxWidth: '300px' }}>{noti.message}</div>
@@ -181,7 +215,7 @@ export const Notifications: React.FC = () => {
                   ))}
                   {notifications.length === 0 && (
                     <tr>
-                      <td colSpan={6} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                      <td colSpan={7} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                         <div className="jira-empty-state">
                           <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                           <h4>Chưa có thông báo nào</h4>
@@ -207,6 +241,10 @@ export const Notifications: React.FC = () => {
               )}
             </div>
           )}
+          <FloatingBulkActionBar 
+            selectedCount={selectedIds.length} 
+            onClearSelection={() => setSelectedIds([])} 
+          />
         </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="lg" data-bs-theme={document.documentElement.getAttribute('data-bs-theme')}>
@@ -214,7 +252,7 @@ export const Notifications: React.FC = () => {
           <Modal.Title>Gửi Thông báo mới</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
-          <Modal.Body style={{ backgroundColor: 'var(--bs-body-bg)' }}>
+          <Modal.Body style={{ backgroundColor: 'transparent' }}>
             <div className="row">
               <div className="col-md-8">
                 <Form.Group className="mb-3">
@@ -226,7 +264,7 @@ export const Notifications: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     placeholder="VD: Khuyến mãi Tết Nguyên Đán 50%"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -237,7 +275,7 @@ export const Notifications: React.FC = () => {
                     name="type" 
                     value={formData.type} 
                     onChange={handleChange} 
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   >
                     <option value="system">Hệ thống</option>
                     <option value="promotion">Khuyến mãi</option>
@@ -257,7 +295,7 @@ export const Notifications: React.FC = () => {
                 onChange={handleChange} 
                 required 
                 placeholder="Nhập nội dung chi tiết gửi đến người dùng..."
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               />
             </Form.Group>
 
@@ -267,7 +305,7 @@ export const Notifications: React.FC = () => {
                 name="userId" 
                 value={formData.userId || ''} 
                 onChange={e => setFormData(prev => ({ ...prev, userId: e.target.value === '' ? null : e.target.value }))} 
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               >
                 <option value="">Tất cả người dùng (Broadcast)</option>
                 <option value="specific" disabled>Gửi 1 người dùng cụ thể (Tính năng đang phát triển)</option>

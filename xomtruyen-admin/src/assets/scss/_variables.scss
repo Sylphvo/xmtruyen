@@ -9,34 +9,36 @@
   --light: #f8f9fa;
   --dark: #151521;
   
-  --bg-main: #f5f6fa;
-  --bg-card: #ffffff;
-  --bg-sidebar-icon: #ffffff;
-  --bg-sidebar-menu: #ffffff;
-  --bg-header: #ffffff;
+  // Jira Light Theme Uniform Backgrounds
+  --bg-main: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-sidebar-icon: #FFFFFF;
+  --bg-sidebar-menu: #FFFFFF;
+  --bg-header: #FFFFFF;
   
-  --text-main: #5e6278;
-  --text-heading: #181c32;
-  --border-color: rgba(0, 0, 0, 0.05);
-  --border-color-hover: rgba(0, 0, 0, 0.1);
-  --hover-bg: rgba(0, 0, 0, 0.05);
+  --text-main: #172B4D;
+  --text-heading: #172B4D;
+  --border-color: #DFE1E6;
+  --border-color-hover: rgba(9, 30, 66, 0.15);
+  --hover-bg: rgba(9, 30, 66, 0.04);
 }
 
 [data-bs-theme="dark"] {
   --light: #2a2b36;
   --dark: #f8f9fa;
   
-  --bg-main: #1f2128;
-  --bg-card: #2a2b36;
-  --bg-sidebar-icon: #23252d;
-  --bg-sidebar-menu: #2a2b36;
-  --bg-header: #1f2128;
+  // Jira Dark Theme Uniform Backgrounds
+  --bg-main: #1D2125;
+  --bg-card: #1D2125;
+  --bg-sidebar-icon: #1D2125;
+  --bg-sidebar-menu: #1D2125;
+  --bg-header: #1D2125;
   
-  --text-main: #a1a5b7;
-  --text-heading: #ffffff;
-  --border-color: rgba(255, 255, 255, 0.05);
-  --border-color-hover: rgba(255, 255, 255, 0.1);
-  --hover-bg: rgba(255, 255, 255, 0.05);
+  --text-main: #B6C2CF;
+  --text-heading: #FFFFFF;
+  --border-color: #2C333A;
+  --border-color-hover: rgba(255, 255, 255, 0.15);
+  --hover-bg: rgba(255, 255, 255, 0.04);
 }
 
 $primary: #5955D1;

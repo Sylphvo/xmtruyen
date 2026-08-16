@@ -144,19 +144,19 @@ export const SystemConfigs: React.FC = () => {
                 <Table responsive hover className="mb-0 align-middle">
                   <thead className="jira-table-header">
                     <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                      <ResizableHeader initialWidth={250} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                      <ResizableHeader initialWidth={250} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <span className="fw-semibold text-nowrap">Tên cấu hình (Key)</span>
                       </ResizableHeader>
-                      <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                      <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <span className="fw-semibold text-nowrap">Giá trị (Value)</span>
                       </ResizableHeader>
-                      <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                      <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <span className="fw-semibold text-nowrap">Mô tả</span>
                       </ResizableHeader>
-                      <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                      <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <span className="fw-semibold text-nowrap">Loại DL</span>
                       </ResizableHeader>
-                      <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                      <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <span className="fw-semibold text-nowrap">Thao tác</span>
                       </ResizableHeader>
                     </tr>
@@ -164,10 +164,10 @@ export const SystemConfigs: React.FC = () => {
                   <tbody>
                     {items.map(config => (
                       <tr key={config.key} className="jira-table-row" style={{ height: '46px' }}>
-                        <td className="ps-4 fw-medium text-primary" style={{ fontFamily: 'monospace', fontSize: '13px', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <td className="ps-4 fw-medium text-primary" style={{ fontFamily: 'monospace', fontSize: '13px', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                           {config.key}
                         </td>
-                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                           <div 
                             className="bg-light px-2 py-1 rounded text-truncate" 
                             style={{ maxWidth: '300px', fontFamily: config.dataType === 'json' ? 'monospace' : 'inherit', fontSize: '13px' }}
@@ -176,13 +176,13 @@ export const SystemConfigs: React.FC = () => {
                             {config.value}
                           </div>
                         </td>
-                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                           <span className="small text-muted">{config.description}</span>
                         </td>
-                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                           <Badge bg="light" text="dark" className="border">{config.dataType}</Badge>
                         </td>
-                        <td className="text-end pe-4" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <td className="text-end pe-4" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                           <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShowModal(config)}>
                             <Edit2 size={14} />
                           </Button>

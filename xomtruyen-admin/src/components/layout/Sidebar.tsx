@@ -43,11 +43,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
 
   return (
     <div className="app-menubar-wrapper">
-      {/* Icon Sidebar */}
       <aside className="app-sidebar-icon">
-        <NavLink to="/" className="brand-icon" title="Xóm Truyện">
-          <Hexagon fill="white" size={24} />
-        </NavLink>
+        <div className="sidebar-icon-header">
+          <NavLink to="/" className="brand-icon" title="Xóm Truyện">
+            <Hexagon fill="white" size={24} />
+          </NavLink>
+        </div>
         <div 
           className={`icon-nav-item ${activeMenu === 'dashboard' ? 'active' : ''}`} 
           onClick={() => setActiveMenu('dashboard')}

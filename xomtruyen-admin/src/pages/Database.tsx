@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisH, faSort, faSortUp, faSortDown, faDatabase, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 import { getTables } from '../api/managerDbApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { getTableInfo } from '../constants/databaseDictionary';
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -46,6 +47,20 @@ export const Database: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'asc' });
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(data.map(t => t.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     fetchTables();
@@ -168,26 +183,38 @@ export const Database: React.FC = () => {
         </div>
       </div>
 
-      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-        <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+        <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <ResizableHeader initialWidth={250} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('name')}>
+                <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={data.length > 0 && selectedIds.length === data.length}
+                    ref={(input) => {
+                      if (input) {
+                        input.indeterminate = selectedIds.length > 0 && selectedIds.length < data.length;
+                      }
+                    }}
+                    onChange={handleSelectAll}
+                  />
+                </ResizableHeader>
+                <ResizableHeader initialWidth={250} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('name')}>
                   <span className="fw-semibold text-nowrap">Tên bảng {getSortIcon('name')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('rowCount')}>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('rowCount')}>
                   <span className="fw-semibold text-nowrap">Số dòng {getSortIcon('rowCount')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('size')}>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('size')}>
                   <span className="fw-semibold text-nowrap">Kích thước {getSortIcon('size')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={150} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('lastBackup')}>
+                <ResizableHeader initialWidth={150} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('lastBackup')}>
                   <span className="fw-semibold text-nowrap">Lần backup cuối {getSortIcon('lastBackup')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('status')}>
+                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('status')}>
                   <span className="fw-semibold text-nowrap">Trạng thái {getSortIcon('status')}</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Thao Tác</span>
                 </ResizableHeader>
               </tr>
@@ -195,7 +222,7 @@ export const Database: React.FC = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-5">
+                  <td colSpan={7} className="text-center py-5">
                     <Spinner animation="border" variant="secondary" size="sm" />
                     <div className="mt-2 text-muted small">Đang tải danh sách bảng...</div>
                   </td>
@@ -204,8 +231,15 @@ export const Database: React.FC = () => {
                 paginatedData.map((table) => {
                   const info = getTableInfo(table.name);
                   return (
-                    <tr key={table.id} className="jira-table-row" style={{ height: '46px' }}>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <tr key={table.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(table.id) ? '#ebf2fc' : 'transparent' }}>
+                      <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                        <Form.Check
+                          type="checkbox"
+                          checked={selectedIds.includes(table.id)}
+                          onChange={() => toggleSelect(table.id)}
+                        />
+                      </td>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <div className="d-flex flex-column gap-1">
                           <div className="d-flex align-items-center gap-2">
                             <span className="fw-bold text-primary font-monospace" style={{ fontSize: '13.5px' }}>{table.name}</span>
@@ -218,27 +252,27 @@ export const Database: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <span className="text-body">{table.rowCount.toLocaleString()}</span>
                     </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <span className="text-body">{table.size}</span>
                     </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       {formatDate(table.lastBackup)}
                     </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <span className={`badge ${table.status === 'Active' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'} border-0 px-2 py-1`}>
                         {table.status}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <Dropdown align="end">
                         <Dropdown.Toggle as={CustomToggle}>
                           <FontAwesomeIcon icon={faEllipsisH} className="text-muted" />
                         </Dropdown.Toggle>
 
-                        <Dropdown.Menu className="shadow-sm border border-secondary-subtle py-2" style={{ backgroundColor: 'var(--bs-body-bg)', minWidth: '120px' }}>
+                        <Dropdown.Menu className="shadow-sm border border-secondary-subtle py-2" style={{ backgroundColor: 'transparent', minWidth: '120px' }}>
                           <Dropdown.Item 
                             className="text-body py-2 px-3 hover-bg-subtle" 
                             style={{ fontSize: '14px', backgroundColor: 'transparent', cursor: 'pointer' }}
@@ -257,7 +291,7 @@ export const Database: React.FC = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                  <td colSpan={7} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                     <div className="jira-empty-state">
                       <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                       <h4>There are no work items here yet</h4>
@@ -328,6 +362,10 @@ export const Database: React.FC = () => {
             </div>
           )}
         </div>
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
   );
 };

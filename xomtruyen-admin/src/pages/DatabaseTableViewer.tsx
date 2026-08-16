@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPlus, faEdit, faTrash, faSave, faKey, faLink, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faInfoCircle, faBookOpen, faDatabase, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { getTableInfo, getColumnInfo } from '../constants/databaseDictionary';
 
 export const DatabaseTableViewer: React.FC = () => {
@@ -26,6 +27,8 @@ export const DatabaseTableViewer: React.FC = () => {
   const [formData, setFormData] = useState<any>({});
   const [currentId, setCurrentId] = useState<any>(null);
   const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<any[]>([]);
 
   const tableMeta = useMemo(() => getTableInfo(tableName), [tableName]);
 
@@ -65,6 +68,7 @@ export const DatabaseTableViewer: React.FC = () => {
 
   useEffect(() => {
     if (tableName) {
+      setSelectedIds([]);
       loadData();
     }
   }, [tableName, page, pageSize]);
@@ -95,6 +99,31 @@ export const DatabaseTableViewer: React.FC = () => {
     }
     return [];
   }, [schemaColumns, data]);
+
+  const primaryKeyCol = useMemo(() => {
+    const pk = schemaColumns.find(c => c.isPrimaryKey);
+    if (pk) return pk.name;
+    if (columns.includes('Id')) return 'Id';
+    if (columns.includes('id')) return 'id';
+    return columns[0];
+  }, [schemaColumns, columns]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      if (primaryKeyCol) {
+        setSelectedIds(data.map(row => row[primaryKeyCol]));
+      } else {
+        setSelectedIds(data.map((_, i) => i));
+      }
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (row: any, i: number) => {
+    const id = primaryKeyCol ? row[primaryKeyCol] : i;
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
 
   const handleOpenAdd = () => {
     const initialData: any = {};
@@ -244,18 +273,30 @@ export const DatabaseTableViewer: React.FC = () => {
         </div>
       </div>
 
-      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
         {isLoading ? (
           <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
         ) : (
-          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed' }}>
+          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+                <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '10px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={data.length > 0 && selectedIds.length === data.length}
+                    ref={(input) => {
+                      if (input) {
+                        input.indeterminate = selectedIds.length > 0 && selectedIds.length < data.length;
+                      }
+                    }}
+                    onChange={handleSelectAll}
+                  />
+                </ResizableHeader>
                   {columns.map(col => {
                     const schemaCol = schemaColumns.find(sc => sc.name === col);
                     const colInfo = getColumnInfo(tableName, col);
                     return (
-                      <ResizableHeader key={col} initialWidth={getInitialColumnWidth(col)} style={{ padding: '10px 14px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)', verticalAlign: 'top' }}>
+                      <ResizableHeader key={col} initialWidth={getInitialColumnWidth(col)} style={{ padding: '10px 14px', backgroundColor: 'transparent', color: 'var(--jira-text)', verticalAlign: 'top' }}>
                         <div className="d-flex flex-column gap-1">
                           <div className="d-flex align-items-center gap-1">
                             <span className="fw-bold text-nowrap" style={{ fontSize: '13.5px' }}>{col}</span>
@@ -274,7 +315,7 @@ export const DatabaseTableViewer: React.FC = () => {
                       </ResizableHeader>
                     );
                   })}
-                  <ResizableHeader initialWidth={110} style={{ padding: '10px 14px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)', verticalAlign: 'top' }}>
+                  <ResizableHeader initialWidth={110} style={{ padding: '10px 14px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', verticalAlign: 'top' }}>
                     <div className="d-flex flex-column gap-1 align-items-center">
                       <span className="fw-bold text-nowrap" style={{ fontSize: '13.5px' }}>Thao tác</span>
                       <span className="text-secondary text-nowrap" style={{ fontSize: '11.5px', fontWeight: 500, opacity: 0.85 }}>Sửa / Xóa</span>
@@ -284,8 +325,18 @@ export const DatabaseTableViewer: React.FC = () => {
               </thead>
               <tbody>
                 {data.length > 0 ? (
-                  data.map((row, i) => (
-                    <tr key={i} className="jira-table-row" style={{ height: '46px' }}>
+                  data.map((row, i) => {
+                    const rowId = primaryKeyCol ? row[primaryKeyCol] : i;
+                    const isSelected = selectedIds.includes(rowId);
+                    return (
+                    <tr key={i} className="jira-table-row" style={{ height: '46px', backgroundColor: isSelected ? '#ebf2fc' : 'transparent' }}>
+                      <td style={{ borderLeft: 0, padding: '10px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                        <Form.Check
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelect(row, i)}
+                        />
+                      </td>
                       {columns.map(col => {
                         const rawVal = row[col];
                         const strVal = rawVal != null ? String(rawVal) : '';
@@ -334,24 +385,25 @@ export const DatabaseTableViewer: React.FC = () => {
                         }
 
                         return (
-                          <td key={col} className="text-truncate" style={{ maxWidth: '220px', padding: '10px 14px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }} title={strVal}>
+                          <td key={col} className="text-truncate" style={{ maxWidth: '220px', padding: '10px 14px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} title={strVal}>
                             {strVal}
                           </td>
                         );
                       })}
-                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <Button variant="light" size="sm" className="me-2 px-2 py-1 bg-white d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#0d6efd', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleOpenEdit(row)} title="Chỉnh sửa bản ghi">
+                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                        <Button variant="light" size="sm" className="me-2 px-2 py-1  d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#0d6efd', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleOpenEdit(row)} title="Chỉnh sửa bản ghi">
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
-                        <Button variant="light" size="sm" className="px-2 py-1 bg-white d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleDelete(row)} title="Xóa bản ghi">
+                        <Button variant="light" size="sm" className="px-2 py-1  d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleDelete(row)} title="Xóa bản ghi">
                           <FontAwesomeIcon icon={faTrash} />
                         </Button>
                       </td>
                     </tr>
-                  ))
+                    )
+                  })
                 ) : (
                   <tr>
-                    <td colSpan={columns.length + 1} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                    <td colSpan={columns.length + 2} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                       <div className="jira-empty-state">
                         <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                         <h4>There are no work items here yet</h4>
@@ -395,6 +447,10 @@ export const DatabaseTableViewer: React.FC = () => {
             )}
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
 
       {/* Modal Thêm / Sửa Bản Ghi */}

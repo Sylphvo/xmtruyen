@@ -5,9 +5,9 @@ import type { ICategory } from '../types/category';
 import type { ITopic } from '../types/topic';
 import { getCategories } from '../api/categoryApi';
 import { getTopics } from '../api/topicApi';
-import { Form, Button, Modal, ProgressBar, Spinner } from 'react-bootstrap';
+import { Form, Button, Modal, ProgressBar, Spinner, Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select';
 import defaultBookImage from '../assets/images/default.png';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ interface SortConfig {
 }
 
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { useNavigate } from 'react-router-dom';
 
 export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatType }) => {
@@ -42,6 +43,20 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
   const [editingBookId, setEditingBookId] = useState<string | null>(null);
   const [editBookData, setEditBookData] = useState<Partial<SaveBookRequest>>({});
   const [activeEditField, setActiveEditField] = useState<string | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(data.map(b => b.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [popupNewItem, setPopupNewItem] = useState<Partial<SaveBookRequest>>({});
@@ -311,9 +326,8 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     }
   };
 
-  const handleChangeStatus = async (book: IBook) => {
+  const handleSetStatus = async (book: IBook, newStatus: string) => {
     try {
-      const newStatus = book.status === 'Active' ? 'On Hold' : 'Active';
       await toggleStatus(book.id, newStatus);
       setRefreshTrigger(prev => prev + 1);
     } catch (error) {
@@ -471,14 +485,8 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
   return (
     <>
       <div className="jira-table-container">
-        <div className="px-4 py-3 border-bottom d-flex justify-content-between align-items-center bg-white" style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
-          <h5 className="mb-0 fw-bold" style={{ color: '#1e293b', fontSize: '16px' }}>
-            {_formatType === 1 ? 'Quản lý Sách' : _formatType === 2 ? 'Quản lý Truyện tranh' : 'Tất cả Sách'}
-          </h5>
-          <div className="text-muted fw-bold" style={{ cursor: 'pointer', letterSpacing: '2px' }}>...</div>
-        </div>
         {/* Custom Header for search and filters */}
-        <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #323338' }}>
+        <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--jira-border)' }}>
           <div className="d-flex align-items-center gap-2">
             <Form.Select
               size="sm"
@@ -495,7 +503,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
               <option value={15}>15</option>
               <option value={20}>20</option>
             </Form.Select>
-            <span className="small" style={{ color: '#9ba1a6' }}>dòng / trang</span>
+            <span className="small" style={{ color: 'var(--jira-text-muted)' }}>dòng / trang</span>
           </div>
 
           <div style={{ width: '250px' }}>
@@ -514,40 +522,52 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
           </div>
         </div>
 
-        <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ minHeight: '616px', maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
-          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1450px' }}>
+        <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
+          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1450px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr>
-                  <ResizableHeader initialWidth={90} style={{ borderLeft: 0, backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                    <Form.Check
+                      type="checkbox"
+                      checked={data.length > 0 && selectedIds.length === data.length}
+                      ref={(input) => {
+                        if (input) {
+                          input.indeterminate = selectedIds.length > 0 && selectedIds.length < data.length;
+                        }
+                      }}
+                      onChange={handleSelectAll}
+                    />
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={90} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Ảnh Bìa</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={260} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('title')}>
+                  <ResizableHeader initialWidth={260} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('title')}>
                     <span className="fw-semibold text-nowrap">Tên Sách {getSortIcon('title')}</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('author')}>
+                  <ResizableHeader initialWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('author')}>
                     <span className="fw-semibold text-nowrap">Tác Giả {getSortIcon('author')}</span>
                   </ResizableHeader>
                   {_formatType === undefined && (
-                    <ResizableHeader initialWidth={120} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                    <ResizableHeader initialWidth={120} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                       <span className="fw-semibold text-nowrap">Loại Sách</span>
                     </ResizableHeader>
                   )}
-                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thể Loại</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Chủ Đề</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={150} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={150} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Người Tạo / Sửa</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thời Gian Update</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={150} minWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('status')}>
+                  <ResizableHeader initialWidth={150} minWidth={150} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('status')}>
                     <span className="fw-semibold text-nowrap">Trạng Thái {getSortIcon('status')}</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={350} minWidth={350} style={{ borderRight: 0, backgroundColor: 'var(--bs-body-bg)', padding: '5px 6px', textAlign: 'center', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={350} minWidth={350} style={{ borderRight: 0, backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thao Tác <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: '12px' }} /></span>
                   </ResizableHeader>
                 </tr>
@@ -556,7 +576,8 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                 <>
                   {isAddingNew && (
                     <tr className="jira-table-row inline-edit-row" style={{ height: '46px' }}>
-                      <td style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
+                      <td style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent' }}></td>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}>
                         <div className="d-flex flex-column align-items-center gap-2">
                           <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => { setTargetCoverBookId('NEW'); coverInputRef.current?.click(); }} title="Click để upload ảnh bìa">
                             <img 
@@ -573,21 +594,21 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <Form.Control size="sm" value={newItem.title || ''} onChange={(e) => setNewItem({ ...newItem, title: e.target.value })} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit, handleCloseAdd)} placeholder="Tên sách" className="inline-edit-input text-body" />
                       </td>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <Form.Control size="sm" value={newItem.author || ''} onChange={(e) => setNewItem({ ...newItem, author: e.target.value })} onKeyDown={(e) => handleKeyDown(e, handleAddSubmit, handleCloseAdd)} placeholder="Tác giả" className="inline-edit-input text-body" />
                       </td>
                       {_formatType === undefined && (
-                        <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                        <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                           <Form.Select size="sm" value={newItem.formatType || 1} onChange={(e) => setNewItem({ ...newItem, formatType: Number(e.target.value) })} className="inline-edit-input text-body">
                             <option value={1}>Sách</option>
                             <option value={2}>Truyện tranh</option>
                           </Form.Select>
                         </td>
                       )}
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <Select
                           isMulti
                           classNamePrefix="rs"
@@ -602,7 +623,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                           menuPortalTarget={document.body}
                         />
                       </td>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <Select
                           isMulti
                           classNamePrefix="rs"
@@ -617,9 +638,9 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                           menuPortalTarget={document.body}
                         />
                       </td>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}></td>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}></td>
-                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}></td>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}></td>
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <div
                           className="fw-medium d-flex align-items-center justify-content-center"
                           style={{
@@ -636,13 +657,13 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                           On Hold
                         </div>
                       </td>
-                      <td style={{ borderRight: 0, padding: '5px 6px', textAlign: 'center', backgroundColor: 'var(--bs-body-bg)', color: 'var(--bs-body-color)' }}>
+                      <td style={{ borderRight: 0, padding: '5px 6px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <div className="d-flex gap-2 justify-content-center">
-                          <Button variant="light" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                          <Button variant="light" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                             <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
                             Lưu
                           </Button>
-                          <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#6c757d', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                          <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#6c757d', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                             <FontAwesomeIcon icon={faTimes} className="me-2" />
                             Hủy
                           </Button>
@@ -652,13 +673,20 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                   )}
                   {isLoading ? (
                     <tr>
-                      <td colSpan={_formatType === undefined ? 10 : 9} style={{ borderLeft: 0, borderRight: 0 }} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                      <td colSpan={_formatType === undefined ? 11 : 10} style={{ borderLeft: 0, borderRight: 0 }} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
                     </tr>
                   ) : sortedData.length > 0 ? (
                     sortedData.map((book) => (
                       <React.Fragment key={book.id}>
-                        <tr className={editingBookId === book.id ? "jira-table-row inline-edit-row" : "jira-table-row"} style={{ height: '46px' }}>
-                          <td style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
+                        <tr className={editingBookId === book.id ? "jira-table-row inline-edit-row" : "jira-table-row"} style={{ height: '46px', backgroundColor: selectedIds.includes(book.id) ? '#ebf2fc' : 'transparent' }}>
+                          <td style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                            <Form.Check
+                              type="checkbox"
+                              checked={selectedIds.includes(book.id)}
+                              onChange={() => toggleSelect(book.id)}
+                            />
+                          </td>
+                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}>
                             <div className="d-flex flex-column align-items-center gap-2">
                               <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => { setTargetCoverBookId(book.id); coverInputRef.current?.click(); }} title="Click để thay đổi ảnh bìa">
                                 <img
@@ -675,21 +703,21 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: editingBookId === book.id && activeEditField === 'title' ? '0 16px' : '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                          <td style={{ padding: editingBookId === book.id && activeEditField === 'title' ? '0 16px' : '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                             <div className="d-flex align-items-center gap-3 h-100">
                               {editingBookId === book.id && activeEditField === 'title' ? (
                                 <Form.Control
                                   value={editBookData.title || ''}
                                   onChange={(e) => setEditBookData({ ...editBookData, title: e.target.value })}
                                   onKeyDown={(e) => handleCellKeyDown(e, 'title', book)}
-                                  className="cell-edit-input text-body flex-grow-1"
+                                  className="cell-edit-input flex-grow-1"
                                   autoFocus
                                 />
                               ) : (
                                 <span
                                   onDoubleClick={() => handleCellDoubleClick(book, 'title')}
                                   className="fw-medium flex-grow-1 text-truncate"
-                                  style={{ cursor: 'text' }}
+                                  style={{ cursor: 'text', color: 'var(--jira-text)' }}
                                   title={editingBookId === book.id ? editBookData.title : book.title}
                                 >
                                   {editingBookId === book.id ? editBookData.title : book.title}
@@ -700,14 +728,14 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
 
                           <td
                             onDoubleClick={() => handleCellDoubleClick(book, 'author')}
-                            style={{ padding: editingBookId === book.id && activeEditField === 'author' ? 0 : '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}
+                            style={{ padding: editingBookId === book.id && activeEditField === 'author' ? 0 : '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}
                           >
                             {editingBookId === book.id && activeEditField === 'author' ? (
                               <Form.Control
                                 value={editBookData.author || ''}
                                 onChange={(e) => setEditBookData({ ...editBookData, author: e.target.value })}
                                 onKeyDown={(e) => handleCellKeyDown(e, 'author', book)}
-                                className="cell-edit-input text-body"
+                                className="cell-edit-input"
                                 autoFocus
                               />
                             ) : (
@@ -717,7 +745,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                           {_formatType === undefined && (
                             <td
                               onDoubleClick={() => handleCellDoubleClick(book, 'formatType')}
-                              style={{ padding: editingBookId === book.id && activeEditField === 'formatType' ? 0 : '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}
+                              style={{ padding: editingBookId === book.id && activeEditField === 'formatType' ? 0 : '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}
                             >
                               {editingBookId === book.id && activeEditField === 'formatType' ? (
                                 <Form.Select
@@ -725,7 +753,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                   value={editBookData.formatType || 1}
                                   onChange={(e) => setEditBookData({ ...editBookData, formatType: Number(e.target.value) })}
                                   onKeyDown={(e) => handleCellKeyDown(e, 'formatType', book)}
-                                  className="cell-edit-input text-body"
+                                  className="cell-edit-input"
                                   style={{ border: '2px solid #0d6efd', borderRadius: '0' }}
                                   autoFocus
                                 >
@@ -733,7 +761,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                   <option value={2}>Truyện tranh</option>
                                 </Form.Select>
                               ) : (
-                                <span className="badge bg-light text-dark border">
+                                <span className="badge border" style={{ backgroundColor: 'var(--jira-hover-bg)', color: 'var(--jira-text)' }}>
                                   {(editingBookId === book.id && editBookData.formatType !== undefined ? editBookData.formatType : book.formatType) === 1 ? 'Sách' : ((editingBookId === book.id && editBookData.formatType !== undefined ? editBookData.formatType : book.formatType) === 2 ? 'Truyện tranh' : 'Khác')}
                                 </span>
                               )}
@@ -742,10 +770,10 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
 
                           <td
                             onDoubleClick={() => handleCellDoubleClick(book, 'categories')}
-                            style={{ padding: editingBookId === book.id && activeEditField === 'categories' ? 0 : '4px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', height: '100%' }}
+                            style={{ padding: editingBookId === book.id && activeEditField === 'categories' ? 0 : '4px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)', height: '100%' }}
                           >
                             {editingBookId === book.id && activeEditField === 'categories' ? (
-                              <div style={{ height: '46px', display: 'flex', alignItems: 'center', padding: '0 8px', border: '2px solid #0d6efd', backgroundColor: '#fff', overflow: 'hidden' }}>
+                              <div style={{ height: '46px', display: 'flex', alignItems: 'center', padding: '0 8px', border: '2px solid #0d6efd', backgroundColor: 'var(--jira-table-bg)', overflow: 'hidden' }}>
                                 <Select
                                   autoFocus
                                   isMulti
@@ -792,7 +820,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                     : book.categories;
                                   if (!cats || cats.length === 0) return null;
                                   return cats.map(c => (
-                                    <span key={c.id} className="badge fw-normal text-body" style={{ backgroundColor: '#f0f2f5', border: '1px solid #d9d9d9', padding: '3px 8px', fontSize: '13px', borderRadius: '4px' }}>
+                                    <span key={c.id} className="badge fw-normal" style={{ backgroundColor: 'var(--jira-hover-bg)', border: '1px solid var(--jira-border)', color: 'var(--jira-text)', padding: '3px 8px', fontSize: '13px', borderRadius: '4px' }}>
                                       {c.name}
                                     </span>
                                   ));
@@ -803,10 +831,10 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
 
                           <td
                             onDoubleClick={() => handleCellDoubleClick(book, 'topics')}
-                            style={{ padding: editingBookId === book.id && activeEditField === 'topics' ? 0 : '4px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', height: '100%' }}
+                            style={{ padding: editingBookId === book.id && activeEditField === 'topics' ? 0 : '4px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)', height: '100%' }}
                           >
                             {editingBookId === book.id && activeEditField === 'topics' ? (
-                              <div style={{ height: '46px', display: 'flex', alignItems: 'center', padding: '0 8px', border: '2px solid #0d6efd', backgroundColor: '#fff', overflow: 'hidden' }}>
+                              <div style={{ height: '46px', display: 'flex', alignItems: 'center', padding: '0 8px', border: '2px solid #0d6efd', backgroundColor: 'var(--jira-table-bg)', overflow: 'hidden' }}>
                                 <Select
                                   autoFocus
                                   isMulti
@@ -853,7 +881,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                     : book.topics;
                                   if (!tops || tops.length === 0) return null;
                                   return tops.map(t => (
-                                    <span key={t.id} className="badge fw-normal text-body" style={{ backgroundColor: '#f0f2f5', border: '1px solid #d9d9d9', padding: '3px 8px', fontSize: '13px', borderRadius: '4px' }}>
+                                    <span key={t.id} className="badge fw-normal" style={{ backgroundColor: 'var(--jira-hover-bg)', border: '1px solid var(--jira-border)', color: 'var(--jira-text)', padding: '3px 8px', fontSize: '13px', borderRadius: '4px' }}>
                                       {t.name}
                                     </span>
                                   ));
@@ -862,42 +890,43 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                             )}
                           </td>
 
-                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                             <span className="d-block small text-muted">Tạo: {book.createdBy || 'System'}</span>
                             {book.updatedBy && <span className="d-block small text-muted mt-1">Sửa: {book.updatedBy}</span>}
                           </td>
 
-                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                             <span className="d-block small text-muted">{book.updatedAt ? new Date(book.updatedAt).toLocaleString('vi-VN') : (book.createdAt ? new Date(book.createdAt).toLocaleString('vi-VN') : '-')}</span>
                           </td>
 
-                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                            <div
-                                className="fw-medium d-flex align-items-center justify-content-center border-0 no-caret"
-                                style={{
-                                  ...getStatusStyle(book.status || 'Active'),
-                                  minWidth: '100px',
-                                  width: 'fit-content',
-                                  padding: '6px 12px',
-                                  boxShadow: 'none',
-                                  borderRadius: '20px',
-                                  gap: '8px',
-                                  margin: '0 auto'
-                                }}
-                              >
-                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getStatusStyle(book.status || 'Active').color }}></span>
+                          <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <Dropdown className="d-inline-block">
+                              <Dropdown.Toggle variant="none" className="jira-status-toggle">
                                 {book.status || 'Active'}
-                            </div>
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu className="jira-status-menu">
+                                <Dropdown.Item className="jira-status-item" onClick={() => handleSetStatus(book, 'Active')}>
+                                  <span className="jira-status-badge" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', borderColor: '#22c55e' }}>Active</span>
+                                </Dropdown.Item>
+                                <Dropdown.Item className="jira-status-item" onClick={() => handleSetStatus(book, 'On Hold')}>
+                                  <span className="jira-status-badge" style={{ backgroundColor: 'rgba(12, 102, 228, 0.1)', color: '#0c66e4', borderColor: '#0c66e4' }}>On Hold</span>
+                                </Dropdown.Item>
+                                <Dropdown.Divider style={{ borderColor: 'var(--jira-border)' }} />
+                                <Dropdown.Item className="jira-status-item text-muted">
+                                  View workflow
+                                </Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
                           </td>
 
-                          <td style={{ borderRight: 0, padding: '5px 6px', backgroundColor: 'var(--bs-body-bg)', textAlign: 'center', color: 'var(--bs-body-color)' }}>
+                          <td style={{ borderRight: 0, padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)' }}>
                             {editingBookId === book.id ? (
                               <div className="d-flex gap-2 justify-content-center">
-                                <Button variant="light" size="sm" onClick={() => handleSaveEdit(book.id)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <Button variant="light" size="sm" onClick={() => handleSaveEdit(book.id)} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                                   <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
                                   Lưu
                                 </Button>
-                                <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#6c757d', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#6c757d', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                                   <FontAwesomeIcon icon={faTimes} className="me-2" />
                                   Hủy
                                 </Button>
@@ -912,10 +941,6 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                   <FontAwesomeIcon icon={faUpload} className="me-2" />
                                   Up
                                 </Button>
-                                <Button variant="secondary" size="sm" onClick={() => handleChangeStatus(book)} className="text-nowrap text-white">
-                                  <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
-                                  Change
-                                </Button>
                                 <Button variant="danger" size="sm" onClick={() => handleDelete(book.id)} className="text-nowrap">
                                   <FontAwesomeIcon icon={faTrash} className="me-2" />
                                   Xóa
@@ -928,7 +953,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                     ))
                   ) : !isAddingNew ? (
                     <tr>
-                      <td colSpan={_formatType === undefined ? 10 : 9} style={{ border: 0, padding: 0 }}>
+                      <td colSpan={_formatType === undefined ? 11 : 10} style={{ border: 0, padding: 0 }}>
                         <div className="jira-empty-state">
                           <h4>There are no work items here yet</h4>
                           <p>You either don't have any work items or your existing ones don't match your current filters.</p>
@@ -938,45 +963,31 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                   ) : null}
                 </>
               </tbody>
-              <tbody style={{ height: 'auto' }}>
-                {/* Filler row to push the table height and extend the sticky border */}
-                <tr style={{ height: '100%' }}>
-                  <td style={{ borderBottom: 0, borderLeft: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  {_formatType === undefined && <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>}
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, borderRight: 0, padding: 0, backgroundColor: 'var(--bs-body-bg)' }}></td>
-                </tr>
-              </tbody>
+              
             </table>
           </div>
 
-          <div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr' }}>
-            <div>
-              <button className="btn-create" onClick={() => setIsAddingNew(true)}>
-                <FontAwesomeIcon icon={faPlus} /> Create (Inline)
-              </button>
-              <button className="btn-create ms-2" style={{ backgroundColor: '#17a2b8' }} onClick={handleOpenAddModal}>
-                <FontAwesomeIcon icon={faPlus} /> Create (Popup)
+          <div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', padding: '10px 16px', borderTop: 'none', backgroundColor: 'transparent' }}>
+            <div className="d-flex align-items-center">
+              <button className="btn-create" onClick={() => setIsAddingNew(true)} style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', fontWeight: 500, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', padding: 0 }}>
+                <FontAwesomeIcon icon={faPlus} /> Create
               </button>
             </div>
-            <div className="pagination-controls">
-              <span>{totalItems === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}</span>
-              <button className="icon-btn" onClick={() => setCurrentPage(1)} disabled={validCurrentPage === 1}><FontAwesomeIcon icon={faAngleDoubleLeft} /></button>
-              <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={validCurrentPage === 1}><FontAwesomeIcon icon={faAngleLeft} /></button>
-              <span>{validCurrentPage} / {totalPages || 1}</span>
-              <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={validCurrentPage === totalPages}><FontAwesomeIcon icon={faAngleRight} /></button>
-              <button className="icon-btn" onClick={() => setCurrentPage(totalPages)} disabled={validCurrentPage === totalPages}><FontAwesomeIcon icon={faAngleDoubleRight} /></button>
-              <button className="icon-btn" onClick={() => setRefreshTrigger(prev => prev + 1)} title="Refresh"><FontAwesomeIcon icon={faExchangeAlt} /></button>
+            <div className="pagination-controls d-flex align-items-center gap-2" style={{ color: 'var(--jira-text-muted)', fontSize: '12px' }}>
+              <span>{validCurrentPage} of {totalPages || 1}</span>
+              <button className="icon-btn" style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', padding: '2px', cursor: 'pointer' }} onClick={() => setRefreshTrigger(prev => prev + 1)} title="Refresh">
+                <FontAwesomeIcon icon={faSyncAlt} style={{ fontSize: '12px' }} />
+              </button>
             </div>
             <div></div>
           </div>
         </div>
       
+      <FloatingBulkActionBar 
+        selectedCount={selectedIds.length} 
+        onClearSelection={() => setSelectedIds([])} 
+      />
+
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -1018,7 +1029,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                 <p className="small text-muted mb-0">TXT, PDF, EPUB, DOC, DOCX, ZIP, CBZ, RAR, CBR</p>
               </>
             ) : (
-              <div className="d-flex align-items-center justify-content-between text-start p-2 bg-white border rounded-2 shadow-sm">
+              <div className="d-flex align-items-center justify-content-between text-start p-2  border rounded-2 shadow-sm">
                 <div className="d-flex align-items-center overflow-hidden">
                   <div className="bg-light rounded p-2 me-3 d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
                     <FontAwesomeIcon icon={faFileAlt} className="text-success fs-5" />

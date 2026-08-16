@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faFileAlt, faSync, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 import { getFiles, deleteFile, type FileItem } from '../api/uploadApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import toast from 'react-hot-toast';
 
 export const BookFiles: React.FC = () => {
@@ -13,6 +14,20 @@ export const BookFiles: React.FC = () => {
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(files.map(f => f.name));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   const fetchFiles = async () => {
     setIsLoading(true);
@@ -92,26 +107,38 @@ export const BookFiles: React.FC = () => {
         </div>
       </div>
 
-      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
         {isLoading ? (
           <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
         ) : (
-          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                  <ResizableHeader initialWidth={60} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                    <Form.Check
+                      type="checkbox"
+                      checked={files.length > 0 && selectedIds.length === files.length}
+                      ref={(input) => {
+                        if (input) {
+                          input.indeterminate = selectedIds.length > 0 && selectedIds.length < files.length;
+                        }
+                      }}
+                      onChange={handleSelectAll}
+                    />
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={60} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">#</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Tên File</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Kích thước</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Ngày tạo</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thao tác</span>
                   </ResizableHeader>
                 </tr>
@@ -119,18 +146,25 @@ export const BookFiles: React.FC = () => {
               <tbody>
                 {paginatedData.length > 0 ? (
                   paginatedData.map((file, i) => (
-                    <tr key={file.name} className="jira-table-row" style={{ height: '46px' }}>
-                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{startIndex + i + 1}</td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <tr key={file.name} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(file.name) ? '#ebf2fc' : 'transparent' }}>
+                      <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                        <Form.Check
+                          type="checkbox"
+                          checked={selectedIds.includes(file.name)}
+                          onChange={() => toggleSelect(file.name)}
+                        />
+                      </td>
+                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{startIndex + i + 1}</td>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <FontAwesomeIcon icon={faFileAlt} className="text-secondary me-2" />
                         <a href={`http://localhost:5172/${file.path}`} onClick={(e) => { e.preventDefault(); setViewingFile(file); }} className="text-decoration-none" style={{ cursor: 'pointer', color: '#0d6efd' }}>
                           {file.name}
                         </a>
                       </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{formatSize(file.size)}</td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{new Date(file.createdAt).toLocaleString('vi-VN')}</td>
-                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <Button variant="light" size="sm" className="px-2 py-1 bg-white d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleDelete(file.name)}>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{formatSize(file.size)}</td>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{new Date(file.createdAt).toLocaleString('vi-VN')}</td>
+                      <td className="text-center" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                        <Button variant="light" size="sm" className="px-2 py-1  d-inline-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} onClick={() => handleDelete(file.name)}>
                           <FontAwesomeIcon icon={faTrash} />
                         </Button>
                       </td>
@@ -138,7 +172,7 @@ export const BookFiles: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                    <td colSpan={6} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                       <div className="jira-empty-state">
                         <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                         <h4>There are no work items here yet</h4>
@@ -182,6 +216,10 @@ export const BookFiles: React.FC = () => {
             )}
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
 
       <Modal show={!!viewingFile} onHide={() => setViewingFile(null)} size="xl" centered>

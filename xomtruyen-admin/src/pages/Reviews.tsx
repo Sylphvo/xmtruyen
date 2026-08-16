@@ -4,6 +4,8 @@ import { toast } from 'react-hot-toast';
 import { MessageSquare, Trash, Star } from 'lucide-react';
 import * as api from '../api/reviewApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { Form } from 'react-bootstrap';
 
 export const Reviews: React.FC = () => {
   const [reviews, setReviews] = useState<api.Review[]>([]);
@@ -12,6 +14,20 @@ export const Reviews: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 20;
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(reviews.map(r => r.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     fetchReviews(currentPage);
@@ -61,50 +77,69 @@ export const Reviews: React.FC = () => {
         </h5>
       </div>
 
-      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-        <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+        <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                <Form.Check
+                  type="checkbox"
+                  checked={reviews.length > 0 && selectedIds.length === reviews.length}
+                  ref={(input) => {
+                    if (input) {
+                      input.indeterminate = selectedIds.length > 0 && selectedIds.length < reviews.length;
+                    }
+                  }}
+                  onChange={handleSelectAll}
+                />
+              </ResizableHeader>
+              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Người dùng</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Truyện</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Đánh giá</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Nội dung</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Ngày gửi</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Thao tác</span>
               </ResizableHeader>
             </tr>
           </thead>
           <tbody style={{ height: '1px' }}>
               {loading ? (
-                <tr><td colSpan={6} className="text-center p-4">Đang tải...</td></tr>
+                <tr><td colSpan={7} className="text-center p-4">Đang tải...</td></tr>
               ) : reviews.length === 0 ? (
-                <tr><td colSpan={6} className="text-center p-4 text-muted">Chưa có đánh giá nào.</td></tr>
+                <tr><td colSpan={7} className="text-center p-4 text-muted">Chưa có đánh giá nào.</td></tr>
               ) : (
                 reviews.map(review => (
-                  <tr key={review.id} className="jira-table-row" style={{ height: '46px' }}>
-                    <td className="px-4 fw-medium text-primary" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{review.userName}</td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}><Badge bg="info">{review.publicationTitle}</Badge></td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{renderStars(review.rating)}</td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                  <tr key={review.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(review.id) ? '#ebf2fc' : 'transparent' }}>
+                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedIds.includes(review.id)}
+                        onChange={() => toggleSelect(review.id)}
+                      />
+                    </td>
+                    <td className="px-4 fw-medium text-primary" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{review.userName}</td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}><Badge bg="info">{review.publicationTitle}</Badge></td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{renderStars(review.rating)}</td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <div className="text-wrap text-muted" style={{ fontSize: '14px' }}>
                         {review.content || <i>(Không có nội dung)</i>}
                       </div>
                     </td>
-                    <td className="text-muted small" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td className="text-muted small" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       {review.createdAt ? new Date(review.createdAt).toLocaleString() : ''}
                     </td>
-                    <td className="px-4 text-end" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td className="px-4 text-end" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <Button variant="outline-danger" size="sm" onClick={() => handleDelete(review.id, review.userName)}>
                         <Trash size={14} />
                       </Button>
@@ -129,6 +164,10 @@ export const Reviews: React.FC = () => {
             </Pagination>
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
   );
 };

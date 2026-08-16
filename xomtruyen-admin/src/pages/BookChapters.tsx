@@ -5,6 +5,7 @@ import { Book, Plus, Edit2, Trash, Save, Lock, Unlock } from 'lucide-react';
 import * as api from '../api/bookChapterApi';
 import { getTableData } from '../api/managerDbApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
@@ -24,6 +25,20 @@ export const BookChapters: React.FC = () => {
     isLocked: false,
     coinPrice: 0
   });
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(chapters.map(c => c.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     fetchPublications();
@@ -159,56 +174,75 @@ export const BookChapters: React.FC = () => {
         </div>
       </div>
 
-      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-        <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+        <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-              <ResizableHeader initialWidth={80} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                <Form.Check
+                  type="checkbox"
+                  checked={chapters.length > 0 && selectedIds.length === chapters.length}
+                  ref={(input) => {
+                    if (input) {
+                      input.indeterminate = selectedIds.length > 0 && selectedIds.length < chapters.length;
+                    }
+                  }}
+                  onChange={handleSelectAll}
+                />
+              </ResizableHeader>
+              <ResizableHeader initialWidth={80} style={{ padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">STT</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Tên chương</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={300} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Nội dung (Xem trước)</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Thu phí</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Lượt xem</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+              <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Thao tác</span>
               </ResizableHeader>
             </tr>
           </thead>
           <tbody style={{ height: '1px' }}>
               {loading ? (
-                <tr><td colSpan={6} className="text-center p-4">Đang tải...</td></tr>
+                <tr><td colSpan={7} className="text-center p-4">Đang tải...</td></tr>
               ) : !selectedPubId ? (
-                <tr><td colSpan={6} className="text-center p-4 text-muted">Vui lòng chọn một truyện để xem danh sách chương.</td></tr>
+                <tr><td colSpan={7} className="text-center p-4 text-muted">Vui lòng chọn một truyện để xem danh sách chương.</td></tr>
               ) : chapters.length === 0 ? (
-                <tr><td colSpan={6} className="text-center p-4 text-muted">Truyện này chưa có chương nào.</td></tr>
+                <tr><td colSpan={7} className="text-center p-4 text-muted">Truyện này chưa có chương nào.</td></tr>
               ) : (
                 chapters.map(chapter => (
-                  <tr key={chapter.id} className="jira-table-row" style={{ height: '46px' }}>
-                    <td className="px-4 fw-bold text-muted" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>Chương {chapter.chapterNumber}</td>
-                    <td className="fw-medium" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{chapter.title}</td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                  <tr key={chapter.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(chapter.id) ? '#ebf2fc' : 'transparent' }}>
+                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedIds.includes(chapter.id)}
+                        onChange={() => toggleSelect(chapter.id)}
+                      />
+                    </td>
+                    <td className="px-4 fw-bold text-muted" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>Chương {chapter.chapterNumber}</td>
+                    <td className="fw-medium" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{chapter.title}</td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <div className="text-muted small text-truncate" style={{ maxWidth: '300px' }}>
                         {chapter.contentPreview || <i>Trống</i>}
                       </div>
                     </td>
-                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       {chapter.isLocked ? (
                         <Badge bg="warning" text="dark"><Lock size={12} className="me-1"/>{chapter.coinPrice} Xu</Badge>
                       ) : (
                         <Badge bg="success"><Unlock size={12} className="me-1"/>Miễn phí</Badge>
                       )}
                     </td>
-                    <td className="text-muted" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>{chapter.viewCount || 0}</td>
-                    <td className="px-4 text-end" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                    <td className="text-muted" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{chapter.viewCount || 0}</td>
+                    <td className="px-4 text-end" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShowModal(chapter)}>
                         <Edit2 size={14} />
                       </Button>
@@ -222,6 +256,10 @@ export const BookChapters: React.FC = () => {
             </tbody>
           </table>
         </div>
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="xl">

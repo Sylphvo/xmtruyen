@@ -160,9 +160,27 @@ export const Dashboard: React.FC = () => {
                         <td>
                           <div className="d-flex align-items-center">
                             {pub.coverImageUrl ? (
-                              <img src={pub.coverImageUrl} alt={pub.title} className="rounded me-3" style={{ width: '40px', height: '56px', objectFit: 'cover' }} />
+                              <>
+                                <img 
+                                  src={pub.coverImageUrl} 
+                                  alt={pub.title} 
+                                  className="rounded me-3" 
+                                  style={{ width: '40px', height: '56px', minWidth: '40px', objectFit: 'cover' }} 
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (nextSibling) {
+                                      nextSibling.classList.remove('d-none');
+                                      nextSibling.classList.add('d-flex');
+                                    }
+                                  }}
+                                />
+                                <div className="rounded me-3 bg-secondary d-none align-items-center justify-content-center" style={{ width: '40px', height: '56px', minWidth: '40px' }}>
+                                  <FontAwesomeIcon icon={faBook} className="text-muted" />
+                                </div>
+                              </>
                             ) : (
-                              <div className="rounded me-3 bg-secondary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '56px' }}>
+                              <div className="rounded me-3 bg-secondary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '56px', minWidth: '40px' }}>
                                 <FontAwesomeIcon icon={faBook} className="text-muted" />
                               </div>
                             )}

@@ -294,7 +294,7 @@ export const BookDetails = () => {
                 </div>
             </div>
 
-            <div className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div className="card border-0 shadow-sm rounded-4 overflow-hidden ">
                 <div className="table-responsive">
                     <table className="table mb-0 table-hover align-middle">
                         <thead>
@@ -358,7 +358,7 @@ export const BookDetails = () => {
                     </table>
                     
                     {totalPages > 1 && (
-                        <div className="d-flex justify-content-center align-items-center py-3 bg-white border-top">
+                        <div className="d-flex justify-content-center align-items-center py-3  border-top">
                             <div className="d-flex gap-2">
                                 <button 
                                     className="btn btn-sm btn-outline-secondary" 

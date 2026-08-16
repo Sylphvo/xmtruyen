@@ -3,6 +3,7 @@ import { Button, Form, Modal, Badge } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
 import { Edit, Trash, Plus, Ticket } from 'lucide-react';
 import * as api from '../api/promotionApi';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 
 export const Promotions: React.FC = () => {
   const [promotions, setPromotions] = useState<api.Promotion[]>([]);
@@ -10,6 +11,20 @@ export const Promotions: React.FC = () => {
   
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(promotions.map(p => p.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
   
   const [formData, setFormData] = useState<api.SavePromotionRequest>({
     code: '',
@@ -140,23 +155,42 @@ export const Promotions: React.FC = () => {
       {loading ? (
         <div className="text-center p-4">Đang tải dữ liệu...</div>
       ) : (
-        <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+        <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Mã Code</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Thông tin Giảm giá</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Thời gian hiệu lực</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Lượt Dùng</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Trạng thái</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--bs-heading-color)' }}>Thao tác</th>
+                <th style={{ padding: '12px 10px', textAlign: 'center', width: '40px' }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={promotions.length > 0 && selectedIds.length === promotions.length}
+                    ref={(input) => {
+                      if (input) {
+                        input.indeterminate = selectedIds.length > 0 && selectedIds.length < promotions.length;
+                      }
+                    }}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Mã Code</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Thông tin Giảm giá</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Thời gian hiệu lực</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Lượt Dùng</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Trạng thái</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--jira-text)' }}>Thao tác</th>
               </tr>
             </thead>
               <tbody>
                 {promotions.map(promo => {
                   const isValid = promo.isActive && new Date(promo.validTo) > new Date() && promo.usedCount < promo.usageLimit;
                   return (
-                  <tr key={promo.id} className="jira-table-row" style={{ height: '46px' }}>
+                  <tr key={promo.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(promo.id) ? '#ebf2fc' : 'transparent' }}>
+                    <td style={{ padding: '12px 10px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedIds.includes(promo.id)}
+                        onChange={() => toggleSelect(promo.id)}
+                      />
+                    </td>
                     <td className="fw-bold text-primary" style={{ padding: '12px 16px', letterSpacing: '1px' }}>
                       {promo.code}
                     </td>
@@ -192,7 +226,7 @@ export const Promotions: React.FC = () => {
                 })}
                 {promotions.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                    <td colSpan={7} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                       <div className="jira-empty-state">
                         <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                         <h4>Chưa có mã khuyến mãi</h4>
@@ -205,6 +239,10 @@ export const Promotions: React.FC = () => {
             </table>
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="lg" data-bs-theme={document.documentElement.getAttribute('data-bs-theme')}>
@@ -212,7 +250,7 @@ export const Promotions: React.FC = () => {
           <Modal.Title>{editingId ? 'Sửa Khuyến mãi' : 'Tạo Mã Khuyến mãi'}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
-          <Modal.Body style={{ backgroundColor: 'var(--bs-body-bg)' }}>
+          <Modal.Body style={{ backgroundColor: 'transparent' }}>
             <div className="row">
               <div className="col-md-6">
                 <Form.Group className="mb-3">
@@ -224,7 +262,7 @@ export const Promotions: React.FC = () => {
                     onChange={(e) => setFormData(prev => ({...prev, code: e.target.value.toUpperCase()}))} 
                     required 
                     placeholder="VD: SUMMER2024"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)', letterSpacing: '2px', fontWeight: 'bold' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)', letterSpacing: '2px', fontWeight: 'bold' }}
                   />
                 </Form.Group>
               </div>
@@ -237,7 +275,7 @@ export const Promotions: React.FC = () => {
                     value={formData.description} 
                     onChange={handleChange} 
                     required 
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -254,7 +292,7 @@ export const Promotions: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     min="1" max="100"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -268,7 +306,7 @@ export const Promotions: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     min="0"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -282,7 +320,7 @@ export const Promotions: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     min="0"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -298,7 +336,7 @@ export const Promotions: React.FC = () => {
                     value={formData.validFrom} 
                     onChange={handleChange} 
                     required 
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -311,7 +349,7 @@ export const Promotions: React.FC = () => {
                     value={formData.validTo} 
                     onChange={handleChange} 
                     required 
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -325,7 +363,7 @@ export const Promotions: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     min="1"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Spinner, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt, faCheckDouble, faXmark, faEye } from '@fortawesome/free-solid-svg-icons';
 import { getUsers, updateUserStatus, createUser, updateUser, type User, type SaveUserRequest } from '../api/userApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { ExcelActionButtons } from '../components/ExcelActionButtons';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import toast from 'react-hot-toast';
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -41,7 +42,27 @@ export const Users: React.FC = () => {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<SaveUserRequest>>({});
 
+  // Bulk Selection State
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedUserIds(sortedData.map(u => u.id));
+    } else {
+      setSelectedUserIds([]);
+    }
+  };
+
+  const toggleSelectUser = (id: string) => {
+    setSelectedUserIds(prev =>
+      prev.includes(id) ? prev.filter(userId => userId !== id) : [...prev, id]
+    );
+  };
+
+  // Clear selection on page or search change
+  useEffect(() => {
+    setSelectedUserIds([]);
+  }, [currentPage, debouncedSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>, saveFunc: () => void, cancelFunc?: () => void) => {
     if (e.key === 'Enter') {
@@ -175,19 +196,19 @@ export const Users: React.FC = () => {
   const handleImportExcel = async (importedData: any[]) => {
     let successCount = 0;
     let errorCount = 0;
-    
+
     setLoading(true);
     for (const row of importedData) {
       const email = row.email || row.Email || row['Email'];
       const fullName = row.fullName || row.FullName || row['Họ tên'];
       const password = row.password || row.Password || '123456';
-      
+
       if (!email || !fullName) continue;
-      
+
       try {
-        await createUser({ 
-          email, 
-          fullName, 
+        await createUser({
+          email,
+          fullName,
           password: password,
           isActive: true,
           coinBalance: 0
@@ -198,7 +219,7 @@ export const Users: React.FC = () => {
       }
     }
     setLoading(false);
-    
+
     if (successCount > 0) {
       toast.success(`Nhập thành công ${successCount} user`);
       fetchUsersData();
@@ -240,17 +261,17 @@ export const Users: React.FC = () => {
 
   return (
     <div className="jira-table-container">
-        <div className="px-4 py-3 border-bottom d-flex justify-content-between align-items-center bg-white" style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
-          <h5 className="mb-0 fw-bold" style={{ color: '#1e293b', fontSize: '16px' }}>
-            Quản lý Người dùng
-          </h5>
-          <div className="text-muted fw-bold" style={{ cursor: 'pointer', letterSpacing: '2px' }}>...</div>
-        </div>
+      <div className="px-4 py-3 border-bottom d-flex justify-content-between align-items-center " style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
+        <h5 className="mb-0 fw-bold" style={{ color: 'var(--jira-text)', fontSize: '16px' }}>
+          Quản lý Người dùng
+        </h5>
+        <div className="text-muted fw-bold" style={{ cursor: 'pointer', letterSpacing: '2px' }}>...</div>
+      </div>
       {/* Custom Header for search and filters */}
       <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý User</h5>
         <div className="d-flex align-items-center gap-3">
-          <ExcelActionButtons 
+          <ExcelActionButtons
             dataToExport={data.map(u => ({
               'ID': u.id,
               'Họ tên': u.fullName,
@@ -267,7 +288,7 @@ export const Users: React.FC = () => {
             <FontAwesomeIcon icon={faPlus} />
             Thêm User
           </Button>
-          
+
           <div className="d-flex align-items-center gap-2">
             <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
             <Form.Select
@@ -305,299 +326,313 @@ export const Users: React.FC = () => {
       </div>
 
       {/* Table Area */}
-      <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ minHeight: '616px', maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
-        <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1300px' }}>
+      <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
+        <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1300px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-              <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <ResizableHeader initialWidth={220} style={{ borderLeft: 0, cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('fullName')}>
-                  <span className="fw-semibold text-nowrap">Họ tên {getSortIcon('fullName')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('email')}>
-                  <span className="fw-semibold text-nowrap">Email {getSortIcon('email')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('provider')}>
-                  <span className="fw-semibold text-nowrap">Nguồn {getSortIcon('provider')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('coinBalance')}>
-                  <span className="fw-semibold text-nowrap">Xu {getSortIcon('coinBalance')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('currentPlanId')}>
-                  <span className="fw-semibold text-nowrap">Gói Cước {getSortIcon('currentPlanId')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
-                  <span className="fw-semibold text-nowrap">Lượt Đọc (Ngày/Tổng)</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={130} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('createdAt')}>
-                  <span className="fw-semibold text-nowrap">Ngày tham gia {getSortIcon('createdAt')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--bs-heading-color)' }} onClick={() => handleSort('isActive')}>
-                  <span className="fw-semibold text-nowrap">Status {getSortIcon('isActive')}</span>
-                </ResizableHeader>
-                <ResizableHeader initialWidth={220} style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'var(--bs-body-bg)', textAlign: 'center', color: 'var(--bs-heading-color)', position: 'sticky', right: 0, zIndex: 11, borderLeft: '1px solid var(--bs-border-color)' }}>
-                  <span className="fw-semibold text-nowrap">Thao Tác</span>
-                </ResizableHeader>
+            <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                <Form.Check
+                  type="checkbox"
+                  checked={sortedData.length > 0 && selectedUserIds.length === sortedData.length}
+                  ref={(input) => {
+                    if (input) {
+                      input.indeterminate = selectedUserIds.length > 0 && selectedUserIds.length < sortedData.length;
+                    }
+                  }}
+                  onChange={handleSelectAll}
+                />
+              </ResizableHeader>
+              <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('fullName')}>
+                <span className="fw-semibold text-nowrap">Họ tên {getSortIcon('fullName')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('email')}>
+                <span className="fw-semibold text-nowrap">Email {getSortIcon('email')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('provider')}>
+                <span className="fw-semibold text-nowrap">Nguồn {getSortIcon('provider')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('coinBalance')}>
+                <span className="fw-semibold text-nowrap">Xu {getSortIcon('coinBalance')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('currentPlanId')}>
+                <span className="fw-semibold text-nowrap">Gói Cước {getSortIcon('currentPlanId')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                <span className="fw-semibold text-nowrap">Lượt Đọc (Ngày/Tổng)</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={130} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('createdAt')}>
+                <span className="fw-semibold text-nowrap">Ngày tham gia {getSortIcon('createdAt')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('isActive')}>
+                <span className="fw-semibold text-nowrap">Status {getSortIcon('isActive')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={220} style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, borderLeft: '1px solid var(--bs-border-color)' }}>
+                <span className="fw-semibold text-nowrap">Thao Tác</span>
+              </ResizableHeader>
+            </tr>
+          </thead>
+          <tbody style={{ height: '1px' }}>
+            {loading ? (
+              <tr>
+                <td colSpan={10} className="text-center py-5">
+                  <Spinner animation="border" variant="secondary" size="sm" />
+                  <div className="mt-2 text-muted small">Đang tải dữ liệu...</div>
+                </td>
               </tr>
-            </thead>
-            <tbody style={{ height: '1px' }}>
-              {loading ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-5">
-                    <Spinner animation="border" variant="secondary" size="sm" />
-                    <div className="mt-2 text-muted small">Đang tải dữ liệu...</div>
-                  </td>
-                </tr>
-              ) : (
-                <>
-                  {isAddingNewUser && (
-                    <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                      <td style={{ borderLeft: 0, padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <div className="d-flex align-items-center gap-3">
-                          <img
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(newUser.fullName || newUser.email || 'U')}&background=random`}
-                            alt="New User"
-                            className="rounded-circle"
-                            style={{ width: '36px', height: '36px', objectFit: 'cover' }}
-                          />
-                          <Form.Control
-                            size="sm"
-                            value={newUser.fullName || ''}
-                            onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
-                            onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
-                            placeholder="Họ tên"
-                            className="inline-edit-input text-body w-100"
-                            autoFocus
-                          />
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+            ) : (
+              <>
+                {isAddingNewUser && (
+                  <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
+                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}></td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      <div className="d-flex align-items-center gap-3">
+                        <img
+                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(newUser.fullName || newUser.email || 'U')}&background=random`}
+                          alt="New User"
+                          className="rounded-circle"
+                          style={{ width: '36px', height: '36px', objectFit: 'cover' }}
+                        />
                         <Form.Control
                           size="sm"
-                          value={newUser.email || ''}
-                          onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                          value={newUser.fullName || ''}
+                          onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
                           onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
-                          placeholder="Email"
+                          placeholder="Họ tên"
                           className="inline-edit-input text-body w-100"
+                          autoFocus
                         />
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <span className="badge bg-light text-dark border border-secondary-subtle">Local</span>
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <Form.Control
-                          size="sm"
-                          type="number"
-                          value={newUser.coinBalance ?? 0}
-                          onChange={(e) => setNewUser({ ...newUser, coinBalance: Number(e.target.value) })}
-                          onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
-                          style={{ width: '90px' }}
-                          className="inline-edit-input text-warning fw-bold"
-                        />
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <span className="text-muted small">Miễn phí</span>
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        <span className="fw-medium">0</span> / <span className="text-muted small">0</span>
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                        -
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
-                        <Form.Check
-                          type="switch"
-                          id="add-status"
-                          checked={newUser.isActive ?? true}
-                          onChange={(e) => setNewUser({ ...newUser, isActive: e.target.checked })}
-                          onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
-                          className="d-inline-block"
-                        />
-                      </td>
-                      <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'var(--bs-body-bg)', color: 'var(--bs-body-color)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
-                        <div className="d-flex gap-2 justify-content-center">
-                          <Button variant="success" size="sm" onClick={() => handleAddSubmit()} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
-                          <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                  {sortedData.length > 0 ? (
-                    sortedData.map((user) => (
-                      <React.Fragment key={user.id}>
-                        {editingUserId === user.id ? (
-                          <tr className="jira-table-row inline-edit-row" style={{ height: '46px' }}>
-                            <td style={{ borderLeft: 0, padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <div className="d-flex align-items-center gap-3">
-                                <img
-                                  src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.email || 'U')}&background=random`}
-                                  alt={user.fullName || 'User'}
-                                  className="rounded-circle"
-                                  style={{ width: '36px', height: '36px', objectFit: 'cover' }}
-                                />
-                                <Form.Control
-                                  size="sm"
-                                  value={editFormData.fullName || ''}
-                                  onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
-                                  onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
-                                  placeholder="Họ tên"
-                                  className="inline-edit-input text-body w-100"
-                                  autoFocus
-                                />
-                              </div>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      <Form.Control
+                        size="sm"
+                        value={newUser.email || ''}
+                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                        onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
+                        placeholder="Email"
+                        className="inline-edit-input text-body w-100"
+                      />
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      <span className="badge bg-light text-dark border border-secondary-subtle">Local</span>
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      <Form.Control
+                        size="sm"
+                        type="number"
+                        value={newUser.coinBalance ?? 0}
+                        onChange={(e) => setNewUser({ ...newUser, coinBalance: Number(e.target.value) })}
+                        onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
+                        style={{ width: '90px' }}
+                        className="inline-edit-input text-warning fw-bold"
+                      />
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      <span className="text-muted small">Miễn phí</span>
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      <span className="fw-medium">0</span> / <span className="text-muted small">0</span>
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                      -
+                    </td>
+                    <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}>
+                      <Form.Check
+                        type="switch"
+                        id="add-status"
+                        checked={newUser.isActive ?? true}
+                        onChange={(e) => setNewUser({ ...newUser, isActive: e.target.checked })}
+                        onKeyDown={(e) => handleKeyDown(e, () => handleAddSubmit(), handleCloseAdd)}
+                        className="d-inline-block"
+                      />
+                    </td>
+                    <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
+                      <div className="d-flex gap-2 justify-content-center">
+                        <Button variant="success" size="sm" onClick={() => handleAddSubmit()} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
+                        <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {sortedData.length > 0 ? (
+                  sortedData.map((user) => (
+                    <React.Fragment key={user.id}>
+                      {editingUserId === user.id ? (
+                        <tr className="jira-table-row inline-edit-row" style={{ height: '46px', backgroundColor: selectedUserIds.includes(user.id) ? '#ebf2fc' : 'transparent' }}>
+                          <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                            <Form.Check
+                              type="checkbox"
+                              checked={selectedUserIds.includes(user.id)}
+                              onChange={() => toggleSelectUser(user.id)}
+                            />
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <div className="d-flex align-items-center gap-3">
+                              <img
+                                src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.email || 'U')}&background=random`}
+                                alt={user.fullName || 'User'}
+                                className="rounded-circle"
+                                style={{ width: '36px', height: '36px', objectFit: 'cover' }}
+                              />
                               <Form.Control
                                 size="sm"
-                                value={editFormData.email || ''}
-                                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                                value={editFormData.fullName || ''}
+                                onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
                                 onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
-                                placeholder="Email"
+                                placeholder="Họ tên"
                                 className="inline-edit-input text-body w-100"
+                                autoFocus
                               />
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <span className="badge bg-light text-dark border border-secondary-subtle">{user.provider || 'Local'}</span>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <Form.Control
-                                size="sm"
-                                type="number"
-                                value={editFormData.coinBalance ?? 0}
-                                onChange={(e) => setEditFormData({ ...editFormData, coinBalance: Number(e.target.value) })}
-                                onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
-                                style={{ width: '90px' }}
-                                className="inline-edit-input text-warning fw-bold"
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <Form.Control
+                              size="sm"
+                              value={editFormData.email || ''}
+                              onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
+                              placeholder="Email"
+                              className="inline-edit-input text-body w-100"
+                            />
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <span className="badge bg-light text-dark border border-secondary-subtle">{user.provider || 'Local'}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <Form.Control
+                              size="sm"
+                              type="number"
+                              value={editFormData.coinBalance ?? 0}
+                              onChange={(e) => setEditFormData({ ...editFormData, coinBalance: Number(e.target.value) })}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
+                              style={{ width: '90px' }}
+                              className="inline-edit-input text-warning fw-bold"
+                            />
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            {user.currentPlanName ? (
+                              <span className="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">{user.currentPlanName}</span>
+                            ) : (
+                              <span className="text-muted small">Miễn phí</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <span className="fw-medium">{user.dailyReadCount || 0}</span> / <span className="text-muted small">{user.totalGuestReads || 0}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            {formatDate(user.createdAt)}
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}>
+                            <Form.Check
+                              type="switch"
+                              id={`edit-status-${user.id}`}
+                              checked={editFormData.isActive ?? true}
+                              onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.checked })}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
+                              className="d-inline-block"
+                            />
+                          </td>
+                          <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
+                            <div className="d-flex gap-2 justify-content-center">
+                              <Button variant="success" size="sm" onClick={() => handleSaveEdit(user.id)} className="px-3 rounded-2 fw-medium">Lưu</Button>
+                              <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        <tr className="jira-table-row" style={{ height: '46px', backgroundColor: selectedUserIds.includes(user.id) ? '#ebf2fc' : 'transparent' }} onDoubleClick={() => handleEditClick(user)}>
+                          <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                            <Form.Check
+                              type="checkbox"
+                              checked={selectedUserIds.includes(user.id)}
+                              onChange={() => toggleSelectUser(user.id)}
+                            />
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <div className="d-flex align-items-center gap-3">
+                              <img
+                                src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.email || 'U')}&background=random`}
+                                alt={user.fullName || 'User'}
+                                className="rounded-circle"
+                                style={{ width: '36px', height: '36px', objectFit: 'cover' }}
                               />
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              {user.currentPlanName ? (
-                                <span className="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">{user.currentPlanName}</span>
-                              ) : (
-                                <span className="text-muted small">Miễn phí</span>
-                              )}
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <span className="fw-medium">{user.dailyReadCount || 0}</span> / <span className="text-muted small">{user.totalGuestReads || 0}</span>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              {formatDate(user.createdAt)}
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
-                              <Form.Check
-                                type="switch"
-                                id={`edit-status-${user.id}`}
-                                checked={editFormData.isActive ?? true}
-                                onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.checked })}
-                                onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
-                                className="d-inline-block"
-                              />
-                            </td>
-                            <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'var(--bs-body-bg)', color: 'var(--bs-body-color)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
-                              <div className="d-flex gap-2 justify-content-center">
-                                <Button variant="success" size="sm" onClick={() => handleSaveEdit(user.id)} className="px-3 rounded-2 fw-medium">Lưu</Button>
-                                <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          <tr className="jira-table-row" style={{ height: '46px' }} onDoubleClick={() => handleEditClick(user)}>
-                            <td style={{ borderLeft: 0, padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <div className="d-flex align-items-center gap-3">
-                                <img
-                                  src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.email || 'U')}&background=random`}
-                                  alt={user.fullName || 'User'}
-                                  className="rounded-circle"
-                                  style={{ width: '36px', height: '36px', objectFit: 'cover' }}
-                                />
-                                <div className="fw-medium text-truncate" style={{ maxWidth: '200px' }}>{user.fullName || 'Chưa cập nhật'}</div>
-                              </div>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <div className="text-body text-truncate" style={{ maxWidth: '200px' }}>{user.email}</div>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <span className="badge bg-light text-dark border border-secondary-subtle">{user.provider || 'Local'}</span>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <span className="text-warning fw-bold">{user.coinBalance?.toLocaleString() || 0}</span>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              {user.currentPlanName ? (
-                                <span className="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">{user.currentPlanName}</span>
-                              ) : (
-                                <span className="text-muted small">Miễn phí</span>
-                              )}
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              <span className="fw-medium">{user.dailyReadCount || 0}</span> / <span className="text-muted small">{user.totalGuestReads || 0}</span>
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)' }}>
-                              {formatDate(user.createdAt)}
-                            </td>
-                            <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-body-color)', textAlign: 'center' }}>
-                              <div
-                                className={`fw-medium d-inline-flex align-items-center justify-content-center border-0 no-caret ${user.isActive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}
-                                style={{
-                                  minWidth: '90px',
-                                  padding: '6px 12px',
-                                  boxShadow: 'none',
-                                  borderRadius: '20px',
-                                  gap: '8px'
-                                }}
-                              >
-                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: user.isActive ? '#198754' : '#dc3545' }}></span>
-                                {user.isActive ? 'Hoạt động' : 'Bị khóa'}
-                              </div>
-                            </td>
-                            <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'var(--bs-body-bg)', color: 'var(--bs-body-color)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
-                              <div className="d-flex gap-2 justify-content-center">
-                                <Button variant="light" size="sm" onClick={() => handleStatusChange(user.id, !user.isActive)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                                  <FontAwesomeIcon icon={faExchangeAlt} className="me-2" style={{ color: '#9ca3af' }} />
-                                  Change
-                                </Button>
-                                <Button variant="light" size="sm" onClick={() => handleEditClick(user)} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                                  <FontAwesomeIcon icon={faPen} className="me-2" style={{ color: '#9ca3af' }} />
-                                  Sửa
-                                </Button>
-                                <Button variant="light" size="sm" onClick={() => toast.error('Chức năng đang được phát triển')} className="px-2 py-1 bg-white d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                                  <FontAwesomeIcon icon={faTrash} className="me-2" />
-                                  Xóa
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={9} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
-                        <div className="jira-empty-state">
-                          <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
-                          <h4>There are no work items here yet</h4>
-                          <p>We couldn't find any data matching your criteria. Try adjusting your filters or search terms.</p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </>
-              )}
-            </tbody>
-              <tbody style={{ height: 'auto' }}>
-                {/* Filler row to push the table height and extend the sticky border */}
-                <tr style={{ height: '100%' }}>
-                  <td style={{ borderBottom: 0, borderLeft: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                  <td style={{ borderBottom: 0, borderRight: 0, padding: 0, backgroundColor: 'var(--bs-body-bg)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}></td>
-                </tr>
-              </tbody>
-          </table>
-        </div>
+                              <div className="fw-medium text-truncate" style={{ maxWidth: '200px' }}>{user.fullName || 'Chưa cập nhật'}</div>
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <div className="text-body text-truncate" style={{ maxWidth: '200px' }}>{user.email}</div>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <span className="badge bg-light text-dark border border-secondary-subtle">{user.provider || 'Local'}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <span className="text-warning fw-bold">{user.coinBalance?.toLocaleString() || 0}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            {user.currentPlanName ? (
+                              <span className="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">{user.currentPlanName}</span>
+                            ) : (
+                              <span className="text-muted small">Miễn phí</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            <span className="fw-medium">{user.dailyReadCount || 0}</span> / <span className="text-muted small">{user.totalGuestReads || 0}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                            {formatDate(user.createdAt)}
+                          </td>
+                          <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}>
+                            <div
+                              className={`fw-medium d-inline-flex align-items-center justify-content-center border-0 no-caret ${user.isActive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}
+                              style={{
+                                minWidth: '90px',
+                                padding: '6px 12px',
+                                boxShadow: 'none',
+                                borderRadius: '20px',
+                                gap: '8px'
+                              }}
+                            >
+                              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: user.isActive ? '#198754' : '#dc3545' }}></span>
+                              {user.isActive ? 'Hoạt động' : 'Bị khóa'}
+                            </div>
+                          </td>
+                          <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
+                            <div className="d-flex gap-2 justify-content-center">
+                              <Button variant="light" size="sm" onClick={() => handleStatusChange(user.id, !user.isActive)} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <FontAwesomeIcon icon={faExchangeAlt} className="me-2" style={{ color: '#9ca3af' }} />
+                                Change
+                              </Button>
+                              <Button variant="light" size="sm" onClick={() => handleEditClick(user)} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <FontAwesomeIcon icon={faPen} className="me-2" style={{ color: '#9ca3af' }} />
+                                Sửa
+                              </Button>
+                              <Button variant="light" size="sm" onClick={() => toast.error('Chức năng đang được phát triển')} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#dc3545', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                                <FontAwesomeIcon icon={faTrash} className="me-2" />
+                                Xóa
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={10} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                      <div className="jira-empty-state">
+                        <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                        <h4>There are no work items here yet</h4>
+                        <p>We couldn't find any data matching your criteria. Try adjusting your filters or search terms.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
+            )}
+          </tbody>
+          
+        </table>
+      </div>
 
       {/* Bottom Controls */}
       <div className="jira-table-footer">
@@ -629,6 +664,12 @@ export const Users: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Floating Bulk Action Bar */}
+      <FloatingBulkActionBar 
+        selectedCount={selectedUserIds.length} 
+        onClearSelection={() => setSelectedUserIds([])} 
+      />
     </div>
   );
 };

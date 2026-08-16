@@ -3,6 +3,7 @@ import { Button, Form, Modal, Badge, ProgressBar } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
 import { Play, Trash, Search, Settings } from 'lucide-react';
 import * as api from '../api/crawlerApi';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 
 export const Crawlers: React.FC = () => {
   const [jobs, setJobs] = useState<api.CrawlJob[]>([]);
@@ -13,6 +14,20 @@ export const Crawlers: React.FC = () => {
     sourceName: 'qidian',
     targetUrl: '',
   });
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(jobs.map(j => j.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -92,23 +107,42 @@ export const Crawlers: React.FC = () => {
       {loading && jobs.length === 0 ? (
         <div className="text-center p-4">Đang tải dữ liệu...</div>
       ) : (
-        <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+        <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Source</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Target URL</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Trạng thái</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)', width: '250px' }}>Tiến độ</th>
-                <th style={{ padding: '12px 16px', color: 'var(--bs-heading-color)' }}>Bắt đầu lúc</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--bs-heading-color)' }}>Thao tác</th>
+                <th style={{ padding: '12px 10px', textAlign: 'center', width: '40px' }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={jobs.length > 0 && selectedIds.length === jobs.length}
+                    ref={(input) => {
+                      if (input) {
+                        input.indeterminate = selectedIds.length > 0 && selectedIds.length < jobs.length;
+                      }
+                    }}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Source</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Target URL</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Trạng thái</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)', width: '250px' }}>Tiến độ</th>
+                <th style={{ padding: '12px 16px', color: 'var(--jira-text)' }}>Bắt đầu lúc</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--jira-text)' }}>Thao tác</th>
               </tr>
             </thead>
               <tbody>
                 {jobs.map(job => {
                   const percent = job.totalItems > 0 ? Math.round((job.crawledItems / job.totalItems) * 100) : 0;
                   return (
-                  <tr key={job.id} className="jira-table-row" style={{ height: '46px' }}>
+                  <tr key={job.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(job.id) ? '#ebf2fc' : 'transparent' }}>
+                    <td style={{ padding: '12px 10px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedIds.includes(job.id)}
+                        onChange={() => toggleSelect(job.id)}
+                      />
+                    </td>
                     <td className="fw-bold text-uppercase" style={{ padding: '12px 16px' }}>
                       {job.sourceName}
                     </td>
@@ -148,7 +182,7 @@ export const Crawlers: React.FC = () => {
                 })}
                 {jobs.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                    <td colSpan={7} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                       <div className="jira-empty-state">
                         <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                         <h4>Chưa có tiến trình Crawl</h4>
@@ -161,6 +195,10 @@ export const Crawlers: React.FC = () => {
             </table>
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} data-bs-theme={document.documentElement.getAttribute('data-bs-theme')}>
@@ -168,13 +206,13 @@ export const Crawlers: React.FC = () => {
           <Modal.Title>Tạo Crawl Job Mới</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
-          <Modal.Body style={{ backgroundColor: 'var(--bs-body-bg)' }}>
+          <Modal.Body style={{ backgroundColor: 'transparent' }}>
             <Form.Group className="mb-3">
               <Form.Label>Nguồn (Source)</Form.Label>
               <Form.Select 
                 value={formData.sourceName}
                 onChange={(e) => setFormData({...formData, sourceName: e.target.value})}
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               >
                 <option value="qidian">QiDian (起点)</option>
                 <option value="kakaopage">Kakao Page</option>
@@ -191,7 +229,7 @@ export const Crawlers: React.FC = () => {
                 onChange={(e) => setFormData({...formData, targetUrl: e.target.value})} 
                 required 
                 placeholder="https://book.qidian.com/info/..."
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               />
               <Form.Text className="text-muted">
                 Nhập link trang chủ của truyện. Crawler sẽ tự động quét tất cả các chương.

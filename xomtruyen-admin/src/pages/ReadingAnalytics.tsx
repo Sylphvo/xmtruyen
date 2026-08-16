@@ -100,7 +100,7 @@ export const ReadingAnalytics: React.FC = () => {
             {/* Top truyện */}
             <div className="col-lg-5">
               <Card className="shadow-sm border-0 h-100">
-                <Card.Header className="bg-white border-0 pt-4 pb-0">
+                <Card.Header className=" border-0 pt-4 pb-0">
                   <h6 className="fw-bold mb-0">Top Truyện được đọc nhiều nhất</h6>
                 </Card.Header>
                 <Card.Body>
@@ -138,7 +138,7 @@ export const ReadingAnalytics: React.FC = () => {
             {/* Logs gần đây */}
             <div className="col-lg-7">
               <Card className="shadow-sm border-0 h-100">
-                <Card.Header className="bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                <Card.Header className=" border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
                   <h6 className="fw-bold mb-0">Hoạt động đọc gần đây (Live)</h6>
                   <Badge bg="light" text="dark" className="border">Top 100</Badge>
                 </Card.Header>

@@ -5,6 +5,7 @@ import { Edit, Trash, Plus, Flame } from 'lucide-react';
 import * as api from '../api/coinPackageApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { ExcelActionButtons } from '../components/ExcelActionButtons';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 
 export const CoinPackages: React.FC = () => {
   const [packages, setPackages] = useState<api.CoinPackage[]>([]);
@@ -12,6 +13,20 @@ export const CoinPackages: React.FC = () => {
   
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(packages.map(p => p.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
   
   const [formData, setFormData] = useState<api.SaveCoinPackageRequest>({
     name: '',
@@ -175,33 +190,52 @@ export const CoinPackages: React.FC = () => {
       {loading ? (
         <div className="text-center p-4">Đang tải dữ liệu...</div>
       ) : (
-        <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-          <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+        <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+          <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={packages.length > 0 && selectedIds.length === packages.length}
+                    ref={(input) => {
+                      if (input) {
+                        input.indeterminate = selectedIds.length > 0 && selectedIds.length < packages.length;
+                      }
+                    }}
+                    onChange={handleSelectAll}
+                  />
+                </ResizableHeader>
+                <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Tên Gói</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Xu Gốc</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Xu Thưởng (Bonus)</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Giá Tiền (VNĐ)</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Trạng thái</span>
                 </ResizableHeader>
-                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                   <span className="fw-semibold text-nowrap">Thao tác</span>
                 </ResizableHeader>
               </tr>
             </thead>
               <tbody>
                 {packages.map(pkg => (
-                  <tr key={pkg.id} className="jira-table-row" style={{ height: '46px' }}>
+                  <tr key={pkg.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(pkg.id) ? '#ebf2fc' : 'transparent' }}>
+                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedIds.includes(pkg.id)}
+                        onChange={() => toggleSelect(pkg.id)}
+                      />
+                    </td>
                     <td className="fw-bold" style={{ padding: '12px 16px' }}>
                       {pkg.name}
                       {pkg.isPopular && <Badge bg="danger" className="ms-2"><Flame size={12} className="me-1"/>Hot</Badge>}
@@ -226,7 +260,7 @@ export const CoinPackages: React.FC = () => {
                 ))}
                 {packages.length === 0 && (
                   <tr>
-                    <td colSpan={6} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                    <td colSpan={7} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                       <div className="jira-empty-state">
                         <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                         <h4>Chưa có gói xu nào</h4>
@@ -239,6 +273,10 @@ export const CoinPackages: React.FC = () => {
             </table>
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} data-bs-theme={document.documentElement.getAttribute('data-bs-theme')}>
@@ -246,7 +284,7 @@ export const CoinPackages: React.FC = () => {
           <Modal.Title>{editingId ? 'Sửa Gói Xu' : 'Thêm Gói Xu'}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
-          <Modal.Body style={{ backgroundColor: 'var(--bs-body-bg)' }}>
+          <Modal.Body style={{ backgroundColor: 'transparent' }}>
             <Form.Group className="mb-3">
               <Form.Label>Tên gói (VD: Gói Khởi Động)</Form.Label>
               <Form.Control 
@@ -255,7 +293,7 @@ export const CoinPackages: React.FC = () => {
                 value={formData.name} 
                 onChange={handleChange} 
                 required 
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               />
             </Form.Group>
             
@@ -270,7 +308,7 @@ export const CoinPackages: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     min="1"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -284,7 +322,7 @@ export const CoinPackages: React.FC = () => {
                     onChange={handleChange} 
                     required 
                     min="0"
-                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                    style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
                   />
                 </Form.Group>
               </div>
@@ -299,7 +337,7 @@ export const CoinPackages: React.FC = () => {
                 onChange={handleChange} 
                 required 
                 min="0"
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               />
             </Form.Group>
 
@@ -311,7 +349,7 @@ export const CoinPackages: React.FC = () => {
                 value={formData.orderIndex} 
                 onChange={handleChange} 
                 required 
-                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--bs-body-color)', borderColor: 'var(--bs-border-color)' }}
+                style={{ backgroundColor: 'var(--bs-tertiary-bg)', color: 'var(--jira-text)', borderColor: 'var(--bs-border-color)' }}
               />
             </Form.Group>
 

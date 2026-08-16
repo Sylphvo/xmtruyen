@@ -4,12 +4,27 @@ import { toast } from 'react-hot-toast';
 import { Check, RefreshCw } from 'lucide-react';
 import { getTransactions, getRevenueSummary, approveTransaction, type Transaction } from '../api/transactionApi';
 import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 
 export const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [summary, setSummary] = useState({ totalRevenue: 0, todayRevenue: 0 });
+  
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(transactions.map(t => t.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     fetchTransactions();
@@ -88,39 +103,58 @@ export const Transactions: React.FC = () => {
         {loading ? (
           <div className="p-5 text-center"><Spinner animation="border" /></div>
         ) : (
-          <div className="table-responsive flex-grow-1 d-flex flex-column jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
-            <table className="table align-middle mb-0" style={{ flexGrow: 1, borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
+          <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+            <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
               <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-                  <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                    <Form.Check
+                      type="checkbox"
+                      checked={transactions.length > 0 && selectedIds.length === transactions.length}
+                      ref={(input) => {
+                        if (input) {
+                          input.indeterminate = selectedIds.length > 0 && selectedIds.length < transactions.length;
+                        }
+                      }}
+                      onChange={handleSelectAll}
+                    />
+                  </ResizableHeader>
+                  <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Mã GD</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={200} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Người dùng</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Loại</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Số tiền / Xu</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Phương thức</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Trạng thái</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={180} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thời gian</span>
                   </ResizableHeader>
-                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--bs-heading-color)' }}>
+                  <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thao tác</span>
                   </ResizableHeader>
                 </tr>
               </thead>
               <tbody>
                 {transactions.map(t => (
-                  <tr key={t.id} className="jira-table-row" style={{ height: '46px' }}>
+                  <tr key={t.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(t.id) ? '#ebf2fc' : 'transparent' }}>
+                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedIds.includes(t.id)}
+                        onChange={() => toggleSelect(t.id)}
+                      />
+                    </td>
                     <td className="px-4 text-secondary" style={{ fontSize: '13px', padding: '12px 16px' }}>{t.id.substring(0, 8)}...</td>
                     <td style={{ padding: '12px 16px' }}>
                       <div><strong>{t.userEmail ? t.userEmail.split('@')[0] : 'Unknown'}</strong></div>
@@ -158,7 +192,7 @@ export const Transactions: React.FC = () => {
                 ))}
                 {transactions.length === 0 && (
                   <tr>
-                    <td colSpan={8} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                    <td colSpan={9} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
                       <div className="jira-empty-state">
                         <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
                         <h4>There are no work items here yet</h4>
@@ -171,6 +205,10 @@ export const Transactions: React.FC = () => {
             </table>
           </div>
         )}
+        <FloatingBulkActionBar 
+          selectedCount={selectedIds.length} 
+          onClearSelection={() => setSelectedIds([])} 
+        />
       </div>
     </div>
   );
