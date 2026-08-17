@@ -880,144 +880,758 @@ public class CoursePaymentController : ControllerBase
     <h2 id="admin">6. Giao Diện Admin Quản Trị Khóa Học</h2>
 
     <h3>6.1 Trang Quản Lý Khóa Học (Admin Portal)</h3>
+    <div class="note">
+        <strong>💡 Pattern:</strong> Theo đúng kiến trúc admin hiện tại — Bootstrap Table thủ công + ResizableHeader + React Select + Inline Edit (double-click) + FloatingBulkActionBar. Không dùng AG-Grid.
+    </div>
     <div class="code-title">📁 xomtruyen-admin/src/pages/Courses.tsx</div>
-    <pre><code>import React, { useState, useEffect } from 'react';
-import { AgGridReact } from 'ag-grid-react';
-import axios from 'axios';
+    <pre><code>import React, { useState, useEffect, useMemo } from 'react';
+import { Form, Button, Modal, Spinner, Dropdown } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSort, faSortUp, faSortDown, faPlus, faTrash, faEdit, faVideo, faEye } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select';
+import toast from 'react-hot-toast';
+import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useNavigate } from 'react-router-dom';
+import { getCourses, createCourse, updateCourse, deleteCourse, toggleCourseStatus } from '../api/courseApi';
+import type { ICourse } from '../types/course';
 
-export default function CoursesPage() {
-    const [courses, setCourses] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+type SortDirection = 'asc' | 'desc' | null;
 
-    const columnDefs = [
-        { field: 'title', headerName: 'Tên Khóa Học', flex: 2 },
-        { field: 'instructor.fullName', headerName: 'Giảng Viên', flex: 1 },
-        { field: 'price', headerName: 'Giá (VND)', flex: 1,
-          valueFormatter: (p: any) => new Intl.NumberFormat('vi-VN').format(p.value) + 'đ' },
-        { field: 'totalLessons', headerName: 'Số Bài', width: 100 },
-        { field: 'enrollmentCount', headerName: 'Học Viên', width: 110 },
-        { field: 'averageRating', headerName: 'Đánh Giá', width: 110,
-          cellRenderer: (p: any) => `⭐ ${p.value.toFixed(1)}` },
-        { field: 'status', headerName: 'Trạng Thái', width: 130,
-          cellRenderer: (p: any) => {
-              const colors: any = { Draft: '#f59e0b', Published: '#22c55e', Archived: '#6b7280' };
-              return `&lt;span style="color:${colors[p.value]}"&gt;● ${p.value}&lt;/span&gt;`;
-          }
-        },
-        { headerName: 'Hành Động', width: 200,
-          cellRenderer: () => `
-              &lt;button class="btn-edit"&gt;✏️ Sửa&lt;/button&gt;
-              &lt;button class="btn-lessons"&gt;📚 Bài học&lt;/button&gt;
-          `
-        }
-    ];
+export const Courses: React.FC = () => {
+    const navigate = useNavigate();
+    const [data, setData] = useState&lt;ICourse[]&gt;([]);
+    const [totalItems, setTotalItems] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedIds, setSelectedIds] = useState&lt;string[]&gt;([]);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [sortConfig, setSortConfig] = useState&lt;{ key: keyof ICourse | null; direction: SortDirection }&gt;({ key: null, direction: null });
+
+    // Inline editing state
+    const [editingId, setEditingId] = useState&lt;string | null&gt;(null);
+    const [editData, setEditData] = useState&lt;Partial&lt;ICourse&gt;&gt;({});
+    const [activeEditField, setActiveEditField] = useState&lt;string | null&gt;(null);
+
+    // Add modal
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newCourse, setNewCourse] = useState&lt;Partial&lt;ICourse&gt;&gt;({});
 
     useEffect(() => {
-        axios.get('/api/admin/courses').then(res => setCourses(res.data));
-    }, []);
+        const fetchCourses = async () => {
+            try {
+                setIsLoading(true);
+                const res = await getCourses({
+                    page: currentPage,
+                    pageSize: itemsPerPage,
+                    keyword: searchTerm || undefined
+                });
+                setData(res.data || []);
+                setTotalItems(res.totalCount || 0);
+            } catch (err) {
+                console.error('Failed to fetch courses', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        const timer = setTimeout(fetchCourses, 300);
+        return () => clearTimeout(timer);
+    }, [currentPage, itemsPerPage, searchTerm, refreshTrigger]);
+
+    const handleSort = (key: keyof ICourse) => {
+        let direction: SortDirection = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+        else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
+        setSortConfig({ key: direction ? key : null, direction });
+    };
+
+    const getStatusStyle = (status: string) => {
+        switch (status) {
+            case 'Published': return { backgroundColor: 'rgba(34,197,94,0.15)', color: '#22c55e' };
+            case 'Draft': return { backgroundColor: 'rgba(249,115,22,0.15)', color: '#f97316' };
+            case 'Archived': return { backgroundColor: 'rgba(107,114,128,0.15)', color: '#6b7280' };
+            default: return { backgroundColor: 'rgba(34,197,94,0.15)', color: '#22c55e' };
+        }
+    };
+
+    const handleCellDoubleClick = (course: ICourse, field: string) => {
+        if (editingId !== course.id) {
+            setEditingId(course.id);
+            setEditData({ title: course.title, price: course.price, level: course.level });
+        }
+        setActiveEditField(field);
+    };
+
+    const handleSaveEdit = async (id: string) => {
+        try {
+            await updateCourse(id, editData);
+            setEditingId(null);
+            setActiveEditField(null);
+            setRefreshTrigger(prev => prev + 1);
+            toast.success('Cập nhật thành công');
+        } catch (err) { toast.error('Lỗi cập nhật'); }
+    };
 
     return (
-        &lt;div className="page-container"&gt;
-            &lt;div className="page-header"&gt;
-                &lt;h2&gt;🎓 Quản Lý Khóa Học&lt;/h2&gt;
-                &lt;button onClick={() => setShowModal(true)} className="btn-primary"&gt;
-                    + Tạo Khóa Học Mới
-                &lt;/button&gt;
+        &lt;&gt;
+            &lt;div className="jira-table-container"&gt;
+                {/* Header: Search + Add */}
+                &lt;div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--jira-border)' }}&gt;
+                    &lt;div className="d-flex align-items-center gap-2"&gt;
+                        &lt;Form.Select size="sm" className="bg-transparent text-body border-secondary-subtle" style={{ width: '70px' }}
+                            value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}&gt;
+                            &lt;option value={5}&gt;5&lt;/option&gt;
+                            &lt;option value={10}&gt;10&lt;/option&gt;
+                            &lt;option value={20}&gt;20&lt;/option&gt;
+                        &lt;/Form.Select&gt;
+                        &lt;span className="small" style={{ color: 'var(--jira-text-muted)' }}&gt;dòng / trang&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;div className="d-flex gap-2"&gt;
+                        &lt;Form.Control size="sm" type="text" placeholder="Tìm kiếm khóa học..." className="bg-transparent text-body border-secondary-subtle" style={{ width: '250px' }}
+                            value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} /&gt;
+                        &lt;Button size="sm" variant="primary" onClick={() => setShowAddModal(true)}&gt;
+                            &lt;FontAwesomeIcon icon={faPlus} /&gt; Thêm Khóa Học
+                        &lt;/Button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+
+                {/* Table */}
+                &lt;div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto' }}&gt;
+                    &lt;table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', tableLayout: 'fixed', minWidth: '1400px' }}&gt;
+                        &lt;thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}&gt;
+                            &lt;tr&gt;
+                                &lt;ResizableHeader initialWidth={40}&gt;
+                                    &lt;Form.Check type="checkbox" checked={selectedIds.length === data.length && data.length > 0}
+                                        onChange={(e) => setSelectedIds(e.target.checked ? data.map(c => c.id) : [])} /&gt;
+                                &lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={80}&gt;&lt;span className="fw-semibold"&gt;Ảnh&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={280} onClick={() => handleSort('title')}&gt;
+                                    &lt;span className="fw-semibold"&gt;Tên Khóa Học&lt;/span&gt;
+                                &lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={150}&gt;&lt;span className="fw-semibold"&gt;Giảng Viên&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={120}&gt;&lt;span className="fw-semibold"&gt;Giá (VND)&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={90}&gt;&lt;span className="fw-semibold"&gt;Số Bài&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={100}&gt;&lt;span className="fw-semibold"&gt;Học Viên&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={90}&gt;&lt;span className="fw-semibold"&gt;⭐ Rating&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={110}&gt;&lt;span className="fw-semibold"&gt;Cấp Độ&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={130}&gt;&lt;span className="fw-semibold"&gt;Trạng Thái&lt;/span&gt;&lt;/ResizableHeader&gt;
+                                &lt;ResizableHeader initialWidth={250}&gt;&lt;span className="fw-semibold"&gt;Thao Tác&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;/tr&gt;
+                        &lt;/thead&gt;
+                        &lt;tbody&gt;
+                            {data.map(course => (
+                                &lt;tr key={course.id} className="jira-table-row"&gt;
+                                    &lt;td&gt;&lt;Form.Check type="checkbox" checked={selectedIds.includes(course.id)}
+                                        onChange={() => setSelectedIds(prev => prev.includes(course.id) ? prev.filter(i => i !== course.id) : [...prev, course.id])} /&gt;&lt;/td&gt;
+                                    &lt;td&gt;&lt;img src={course.thumbnailUrl} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} /&gt;&lt;/td&gt;
+                                    &lt;td onDoubleClick={() => handleCellDoubleClick(course, 'title')}&gt;
+                                        {editingId === course.id && activeEditField === 'title'
+                                            ? &lt;Form.Control size="sm" value={editData.title || ''} className="inline-edit-input"
+                                                onChange={e => setEditData({ ...editData, title: e.target.value })}
+                                                onKeyDown={e => { if (e.key === 'Enter') handleSaveEdit(course.id); if (e.key === 'Escape') setEditingId(null); }}
+                                                autoFocus /&gt;
+                                            : &lt;span className="fw-medium"&gt;{course.title}&lt;/span&gt;
+                                        }
+                                    &lt;/td&gt;
+                                    &lt;td&gt;{course.instructor?.fullName}&lt;/td&gt;
+                                    &lt;td onDoubleClick={() => handleCellDoubleClick(course, 'price')}&gt;
+                                        {editingId === course.id && activeEditField === 'price'
+                                            ? &lt;Form.Control size="sm" type="number" value={editData.price || 0} className="inline-edit-input"
+                                                onChange={e => setEditData({ ...editData, price: Number(e.target.value) })}
+                                                onKeyDown={e => { if (e.key === 'Enter') handleSaveEdit(course.id); }} autoFocus /&gt;
+                                            : &lt;span&gt;{new Intl.NumberFormat('vi-VN').format(course.price)}đ&lt;/span&gt;
+                                        }
+                                    &lt;/td&gt;
+                                    &lt;td style={{ textAlign: 'center' }}&gt;{course.totalLessons}&lt;/td&gt;
+                                    &lt;td style={{ textAlign: 'center' }}&gt;{course.enrollmentCount}&lt;/td&gt;
+                                    &lt;td style={{ textAlign: 'center' }}&gt;⭐ {course.averageRating.toFixed(1)}&lt;/td&gt;
+                                    &lt;td&gt;&lt;span className="badge bg-info"&gt;{course.level}&lt;/span&gt;&lt;/td&gt;
+                                    &lt;td&gt;
+                                        &lt;div className="d-flex align-items-center justify-content-center" style={{ ...getStatusStyle(course.status), padding: '4px 12px', borderRadius: 20, width: 'fit-content', margin: '0 auto' }}&gt;
+                                            &lt;span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: getStatusStyle(course.status).color, marginRight: 6 }}&gt;&lt;/span&gt;
+                                            {course.status}
+                                        &lt;/div&gt;
+                                    &lt;/td&gt;
+                                    &lt;td&gt;
+                                        &lt;div className="d-flex gap-1 justify-content-center"&gt;
+                                            &lt;Button size="sm" variant="outline-primary" onClick={() => navigate(`/courses/${course.id}/lessons`)}&gt;
+                                                &lt;FontAwesomeIcon icon={faVideo} /&gt; Bài Học
+                                            &lt;/Button&gt;
+                                            &lt;Dropdown&gt;
+                                                &lt;Dropdown.Toggle size="sm" variant="outline-secondary"&gt;⋯&lt;/Dropdown.Toggle&gt;
+                                                &lt;Dropdown.Menu&gt;
+                                                    &lt;Dropdown.Item onClick={() => toggleCourseStatus(course.id, 'Published')}&gt;✅ Xuất bản&lt;/Dropdown.Item&gt;
+                                                    &lt;Dropdown.Item onClick={() => toggleCourseStatus(course.id, 'Archived')}&gt;📦 Lưu trữ&lt;/Dropdown.Item&gt;
+                                                    &lt;Dropdown.Divider /&gt;
+                                                    &lt;Dropdown.Item className="text-danger" onClick={() => deleteCourse(course.id)}&gt;
+                                                        &lt;FontAwesomeIcon icon={faTrash} /&gt; Xóa
+                                                    &lt;/Dropdown.Item&gt;
+                                                &lt;/Dropdown.Menu&gt;
+                                            &lt;/Dropdown&gt;
+                                        &lt;/div&gt;
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            ))}
+                        &lt;/tbody&gt;
+                    &lt;/table&gt;
+                &lt;/div&gt;
             &lt;/div&gt;
-            &lt;div className="ag-theme-alpine-dark" style={{ height: 600 }}&gt;
-                &lt;AgGridReact rowData={courses} columnDefs={columnDefs} /&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
+
+            {/* Floating Bulk Actions */}
+            {selectedIds.length > 0 && (
+                &lt;FloatingBulkActionBar
+                    selectedCount={selectedIds.length}
+                    onClearSelection={() => setSelectedIds([])}
+                    actions={[
+                        { label: 'Xuất bản', icon: '✅', onClick: () => {} },
+                        { label: 'Xóa', icon: '🗑️', variant: 'danger', onClick: () => {} }
+                    ]}
+                /&gt;
+            )}
+        &lt;/&gt;
     );
 }</code></pre>
 
     <h3>6.2 Trang Quản Lý Bài Học & Upload Video</h3>
     <div class="code-title">📁 xomtruyen-admin/src/pages/CourseLessons.tsx</div>
-    <pre><code>import React, { useState } from 'react';
-import axios from 'axios';
+    <pre><code>import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { Form, Button, Modal, ProgressBar, Spinner, Dropdown } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faUpload, faTrash, faVideo, faFileAlt, faGripVertical } from '@fortawesome/free-solid-svg-icons';
+import { ResizableHeader } from '../components/ResizableHeader';
+import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import toast from 'react-hot-toast';
+import { getCourseLessons, createLesson, deleteLesson, uploadLessonVideo } from '../api/courseApi';
 
-interface Lesson {
+interface ILesson {
     id: string;
     title: string;
     type: 'Video' | 'Text' | 'Quiz';
     durationSeconds: number;
     orderIndex: number;
+    isFreePreview: boolean;
     hasVideo: boolean;
+    sectionTitle: string;
 }
 
-export default function CourseLessonsPage({ courseId }: { courseId: string }) {
-    const [lessons, setLessons] = useState&lt;Lesson[]&gt;([]);
-    const [uploading, setUploading] = useState&lt;string | null&gt;(null);
+export const CourseLessons: React.FC = () => {
+    const { courseId } = useParams();
+    const [lessons, setLessons] = useState&lt;ILesson[]&gt;([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [selectedIds, setSelectedIds] = useState&lt;string[]&gt;([]);
+
+    // Upload state
+    const [showUploadModal, setShowUploadModal] = useState(false);
+    const [uploadingLessonId, setUploadingLessonId] = useState&lt;string | null&gt;(null);
+    const [selectedFile, setSelectedFile] = useState&lt;File | null&gt;(null);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const fileInputRef = useRef&lt;HTMLInputElement&gt;(null);
 
-    const handleVideoUpload = async (lessonId: string, file: File) => {
-        setUploading(lessonId);
+    // Inline add state
+    const [isAddingNew, setIsAddingNew] = useState(false);
+    const [newLesson, setNewLesson] = useState&lt;Partial&lt;ILesson&gt;&gt;({ type: 'Video' });
+
+    useEffect(() => {
+        const fetchLessons = async () => {
+            setIsLoading(true);
+            try {
+                const res = await getCourseLessons(courseId!);
+                setLessons(res.data || []);
+            } catch (err) { console.error(err); }
+            finally { setIsLoading(false); }
+        };
+        fetchLessons();
+    }, [courseId, refreshTrigger]);
+
+    const handleUploadClick = (lessonId: string) => {
+        setUploadingLessonId(lessonId);
+        setSelectedFile(null);
         setUploadProgress(0);
+        setShowUploadModal(true);
+    };
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('lessonId', lessonId);
-
+    const handleConfirmUpload = async () => {
+        if (!selectedFile || !uploadingLessonId) return;
         try {
-            await axios.post('/api/courses/videos/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-                onUploadProgress: (e) => {
-                    const percent = Math.round((e.loaded * 100) / (e.total || 1));
-                    setUploadProgress(percent);
-                }
-            });
-            alert('✅ Upload thành công! Video đang được xử lý nền.');
-        } catch (err) {
-            alert('❌ Lỗi upload video');
-        } finally {
-            setUploading(null);
-        }
+            setIsLoading(true);
+            await uploadLessonVideo(selectedFile, uploadingLessonId, (percent) => setUploadProgress(percent));
+            toast.success('Upload video thành công! Đang xử lý nền...');
+            setShowUploadModal(false);
+            setRefreshTrigger(prev => prev + 1);
+        } catch (err) { toast.error('Lỗi upload video'); }
+        finally { setIsLoading(false); }
+    };
+
+    const handleAddLesson = async () => {
+        if (!newLesson.title) { toast.error('Nhập tên bài học'); return; }
+        try {
+            await createLesson(courseId!, newLesson);
+            setIsAddingNew(false);
+            setNewLesson({ type: 'Video' });
+            setRefreshTrigger(prev => prev + 1);
+            toast.success('Thêm bài học thành công');
+        } catch (err) { toast.error('Lỗi thêm bài học'); }
+    };
+
+    const formatDuration = (seconds: number) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${String(s).padStart(2, '0')}`;
     };
 
     return (
-        &lt;div className="lessons-manager"&gt;
-            &lt;h3&gt;📚 Danh Sách Bài Học&lt;/h3&gt;
-            {lessons.map((lesson, idx) => (
-                &lt;div key={lesson.id} className="lesson-row"&gt;
-                    &lt;span className="lesson-order"&gt;{idx + 1}&lt;/span&gt;
-                    &lt;span className="lesson-title"&gt;{lesson.title}&lt;/span&gt;
-                    &lt;span className="lesson-type"&gt;{lesson.type}&lt;/span&gt;
-                    &lt;span className="lesson-duration"&gt;
-                        {Math.floor(lesson.durationSeconds / 60)} phút
-                    &lt;/span&gt;
+        &lt;div className="jira-table-container"&gt;
+            {/* Header */}
+            &lt;div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--jira-border)' }}&gt;
+                &lt;h5 className="mb-0"&gt;📚 Quản Lý Bài Học&lt;/h5&gt;
+                &lt;Button size="sm" variant="primary" onClick={() => setIsAddingNew(true)}&gt;
+                    &lt;FontAwesomeIcon icon={faPlus} /&gt; Thêm Bài Học
+                &lt;/Button&gt;
+            &lt;/div&gt;
 
-                    {/* Upload Video Button */}
-                    {lesson.type === 'Video' && (
-                        &lt;div className="upload-zone"&gt;
-                            {uploading === lesson.id ? (
-                                &lt;div className="upload-progress"&gt;
-                                    &lt;div className="progress-bar" style={{ width: `${uploadProgress}%` }} /&gt;
-                                    &lt;span&gt;{uploadProgress}%&lt;/span&gt;
-                                &lt;/div&gt;
-                            ) : (
-                                &lt;label className="btn-upload"&gt;
-                                    📤 {lesson.hasVideo ? 'Thay Video' : 'Upload Video'}
-                                    &lt;input
-                                        type="file"
-                                        accept="video/*"
-                                        hidden
-                                        onChange={e => {
-                                            if (e.target.files?.[0])
-                                                handleVideoUpload(lesson.id, e.target.files[0]);
-                                        }}
-                                    /&gt;
-                                &lt;/label&gt;
-                            )}
-                        &lt;/div&gt;
-                    )}
-                &lt;/div&gt;
-            ))}
+            {/* Table */}
+            &lt;div className="table-responsive jira-scroll"&gt;
+                &lt;table className="table align-middle mb-0" style={{ tableLayout: 'fixed', minWidth: '1100px' }}&gt;
+                    &lt;thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}&gt;
+                        &lt;tr&gt;
+                            &lt;ResizableHeader initialWidth={40}&gt;
+                                &lt;Form.Check type="checkbox" checked={selectedIds.length === lessons.length && lessons.length > 0}
+                                    onChange={(e) => setSelectedIds(e.target.checked ? lessons.map(l => l.id) : [])} /&gt;
+                            &lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={50}&gt;&lt;span className="fw-semibold"&gt;STT&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={300}&gt;&lt;span className="fw-semibold"&gt;Tên Bài Học&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={120}&gt;&lt;span className="fw-semibold"&gt;Phân Mục&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={100}&gt;&lt;span className="fw-semibold"&gt;Loại&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={100}&gt;&lt;span className="fw-semibold"&gt;Thời Lượng&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={100}&gt;&lt;span className="fw-semibold"&gt;Miễn Phí?&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={80}&gt;&lt;span className="fw-semibold"&gt;Video&lt;/span&gt;&lt;/ResizableHeader&gt;
+                            &lt;ResizableHeader initialWidth={200}&gt;&lt;span className="fw-semibold"&gt;Thao Tác&lt;/span&gt;&lt;/ResizableHeader&gt;
+                        &lt;/tr&gt;
+                    &lt;/thead&gt;
+                    &lt;tbody&gt;
+                        {/* Inline Add Row */}
+                        {isAddingNew && (
+                            &lt;tr className="jira-table-row inline-edit-row"&gt;
+                                &lt;td&gt;&lt;/td&gt;
+                                &lt;td&gt;—&lt;/td&gt;
+                                &lt;td&gt;&lt;Form.Control size="sm" placeholder="Tên bài học..." value={newLesson.title || ''}
+                                    onChange={e => setNewLesson({ ...newLesson, title: e.target.value })}
+                                    onKeyDown={e => { if (e.key === 'Enter') handleAddLesson(); if (e.key === 'Escape') setIsAddingNew(false); }}
+                                    autoFocus className="inline-edit-input" /&gt;&lt;/td&gt;
+                                &lt;td&gt;&lt;/td&gt;
+                                &lt;td&gt;
+                                    &lt;Form.Select size="sm" value={newLesson.type} onChange={e => setNewLesson({ ...newLesson, type: e.target.value as any })} className="inline-edit-input"&gt;
+                                        &lt;option value="Video"&gt;Video&lt;/option&gt;
+                                        &lt;option value="Text"&gt;Văn bản&lt;/option&gt;
+                                        &lt;option value="Quiz"&gt;Quiz&lt;/option&gt;
+                                    &lt;/Form.Select&gt;
+                                &lt;/td&gt;
+                                &lt;td&gt;—&lt;/td&gt;
+                                &lt;td&gt;&lt;Form.Check type="switch" checked={newLesson.isFreePreview || false}
+                                    onChange={e => setNewLesson({ ...newLesson, isFreePreview: e.target.checked })} /&gt;&lt;/td&gt;
+                                &lt;td&gt;—&lt;/td&gt;
+                                &lt;td&gt;
+                                    &lt;Button size="sm" variant="success" onClick={handleAddLesson}&gt;Lưu&lt;/Button&gt;{' '}
+                                    &lt;Button size="sm" variant="secondary" onClick={() => setIsAddingNew(false)}&gt;Hủy&lt;/Button&gt;
+                                &lt;/td&gt;
+                            &lt;/tr&gt;
+                        )}
+
+                        {/* Data Rows */}
+                        {lessons.map((lesson, idx) => (
+                            &lt;tr key={lesson.id} className="jira-table-row"&gt;
+                                &lt;td&gt;&lt;Form.Check type="checkbox" checked={selectedIds.includes(lesson.id)}
+                                    onChange={() => setSelectedIds(prev => prev.includes(lesson.id) ? prev.filter(i => i !== lesson.id) : [...prev, lesson.id])} /&gt;&lt;/td&gt;
+                                &lt;td style={{ textAlign: 'center' }}&gt;{idx + 1}&lt;/td&gt;
+                                &lt;td&gt;&lt;span className="fw-medium"&gt;{lesson.title}&lt;/span&gt;&lt;/td&gt;
+                                &lt;td&gt;&lt;span className="badge bg-secondary"&gt;{lesson.sectionTitle}&lt;/span&gt;&lt;/td&gt;
+                                &lt;td&gt;
+                                    {lesson.type === 'Video' && &lt;span&gt;&lt;FontAwesomeIcon icon={faVideo} className="text-primary" /&gt; Video&lt;/span&gt;}
+                                    {lesson.type === 'Text' && &lt;span&gt;&lt;FontAwesomeIcon icon={faFileAlt} className="text-warning" /&gt; Text&lt;/span&gt;}
+                                &lt;/td&gt;
+                                &lt;td style={{ textAlign: 'center' }}&gt;{formatDuration(lesson.durationSeconds)}&lt;/td&gt;
+                                &lt;td style={{ textAlign: 'center' }}&gt;{lesson.isFreePreview ? '✅ Có' : '—'}&lt;/td&gt;
+                                &lt;td style={{ textAlign: 'center' }}&gt;
+                                    {lesson.hasVideo
+                                        ? &lt;span style={{ color: '#22c55e' }}&gt;● Có&lt;/span&gt;
+                                        : &lt;span style={{ color: '#ef4444' }}&gt;● Chưa&lt;/span&gt;
+                                    }
+                                &lt;/td&gt;
+                                &lt;td&gt;
+                                    &lt;div className="d-flex gap-1"&gt;
+                                        &lt;Button size="sm" variant="outline-info" onClick={() => handleUploadClick(lesson.id)} title="Upload Video"&gt;
+                                            &lt;FontAwesomeIcon icon={faUpload} /&gt;
+                                        &lt;/Button&gt;
+                                        &lt;Button size="sm" variant="outline-danger" onClick={() => deleteLesson(lesson.id)} title="Xóa"&gt;
+                                            &lt;FontAwesomeIcon icon={faTrash} /&gt;
+                                        &lt;/Button&gt;
+                                    &lt;/div&gt;
+                                &lt;/td&gt;
+                            &lt;/tr&gt;
+                        ))}
+                    &lt;/tbody&gt;
+                &lt;/table&gt;
+            &lt;/div&gt;
+
+            {/* Upload Video Modal */}
+            &lt;Modal show={showUploadModal} onHide={() => setShowUploadModal(false)} centered&gt;
+                &lt;Modal.Header closeButton&gt;
+                    &lt;Modal.Title&gt;📤 Upload Video Bài Học&lt;/Modal.Title&gt;
+                &lt;/Modal.Header&gt;
+                &lt;Modal.Body&gt;
+                    &lt;div className="upload-drop-zone p-4 text-center border border-dashed rounded"
+                        onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) setSelectedFile(e.dataTransfer.files[0]); }}&gt;
+                        {selectedFile ? (
+                            &lt;div&gt;
+                                &lt;p className="mb-1"&gt;&lt;strong&gt;{selectedFile.name}&lt;/strong&gt;&lt;/p&gt;
+                                &lt;p className="text-muted small"&gt;{(selectedFile.size / (1024 * 1024)).toFixed(1)} MB&lt;/p&gt;
+                            &lt;/div&gt;
+                        ) : (
+                            &lt;div&gt;
+                                &lt;p&gt;Kéo thả file video vào đây hoặc&lt;/p&gt;
+                                &lt;Button size="sm" variant="outline-primary" onClick={() => fileInputRef.current?.click()}&gt;Chọn File&lt;/Button&gt;
+                            &lt;/div&gt;
+                        )}
+                        &lt;input ref={fileInputRef} type="file" accept="video/*" hidden onChange={e => { if (e.target.files?.[0]) setSelectedFile(e.target.files[0]); }} /&gt;
+                    &lt;/div&gt;
+                    {uploadProgress > 0 && &lt;ProgressBar now={uploadProgress} label={`${uploadProgress}%`} className="mt-3" animated /&gt;}
+                    &lt;p className="text-muted small mt-2"&gt;Hỗ trợ: .mp4, .mkv, .webm, .mov (tối đa 2GB)&lt;/p&gt;
+                &lt;/Modal.Body&gt;
+                &lt;Modal.Footer&gt;
+                    &lt;Button variant="secondary" onClick={() => setShowUploadModal(false)}&gt;Hủy&lt;/Button&gt;
+                    &lt;Button variant="primary" onClick={handleConfirmUpload} disabled={!selectedFile || isLoading}&gt;
+                        {isLoading ? &lt;Spinner size="sm" /&gt; : 'Upload & Xử Lý'}
+                    &lt;/Button&gt;
+                &lt;/Modal.Footer&gt;
+            &lt;/Modal&gt;
+
+            {/* Floating Bulk Actions */}
+            {selectedIds.length > 0 && (
+                &lt;FloatingBulkActionBar selectedCount={selectedIds.length} onClearSelection={() => setSelectedIds([])}
+                    actions={[{ label: 'Xóa', icon: '🗑️', variant: 'danger', onClick: () => {} }]} /&gt;
+            )}
         &lt;/div&gt;
     );
 }</code></pre>
 
     <!-- 7. CLIENT -->
     <h2 id="client">7. Giao Diện Client Học Viên</h2>
+
+    <h3>7.0 Infinite Scroll — Load More Khi Cuộn (Optimize Bảng Lớn)</h3>
+
+    <div class="note">
+        <strong>💡 Pattern:</strong> Thay vì phân trang truyền thống (1, 2, 3...), khi người dùng cuộn xuống cuối bảng → tự động fetch thêm dữ liệu và append vào danh sách hiện có. Hiển thị "Loading more" indicator ở cuối bảng giống Jira. Footer hiển thị "50 of 149" cho biết đã load bao nhiêu.
+    </div>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────┐
+│  LUỒNG INFINITE SCROLL (LOAD MORE)                                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+  Lần đầu Load:  GET /api/courses?page=1&pageSize=50  → Hiển thị 50 dòng
+                                                         Footer: "50 of 149"
+
+  Cuộn xuống:    Intersection Observer phát hiện sentinel element
+                                  │
+                                  ▼
+                    Hiển thị "⟳ Loading more" tooltip
+                                  │
+                                  ▼
+                  GET /api/courses?page=2&pageSize=50  → Append 50 dòng tiếp
+                                                         Footer: "100 of 149"
+
+  Cuộn tiếp:     GET /api/courses?page=3&pageSize=50  → Append 49 dòng cuối
+                                                         Footer: "149 of 149"
+                                                         → Ẩn sentinel, ngừng fetch
+    </div>
+
+    <h4>7.0.1 Custom Hook: useInfiniteScroll</h4>
+    <div class="code-title">📁 xomtruyen-admin/src/hooks/useInfiniteScroll.ts</div>
+    <pre><code>import { useState, useCallback, useRef, useEffect } from 'react';
+
+interface UseInfiniteScrollOptions&lt;T&gt; {
+    fetchFn: (page: number, pageSize: number) => Promise&lt;{ data: T[]; totalCount: number }&gt;;
+    pageSize?: number;
+    keyword?: string;
+}
+
+interface UseInfiniteScrollReturn&lt;T&gt; {
+    items: T[];
+    totalCount: number;
+    isLoading: boolean;
+    isLoadingMore: boolean;
+    hasMore: boolean;
+    sentinelRef: React.RefObject&lt;HTMLDivElement | null&gt;;
+    reset: () => void;
+    loadedCount: number;
+}
+
+export function useInfiniteScroll&lt;T&gt;({
+    fetchFn,
+    pageSize = 50,
+    keyword
+}: UseInfiniteScrollOptions&lt;T&gt;): UseInfiniteScrollReturn&lt;T&gt; {
+    const [items, setItems] = useState&lt;T[]&gt;([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [page, setPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const sentinelRef = useRef&lt;HTMLDivElement | null&gt;(null);
+    const observerRef = useRef&lt;IntersectionObserver | null&gt;(null);
+
+    const hasMore = items.length &lt; totalCount;
+
+    // Fetch trang đầu tiên
+    const fetchInitial = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetchFn(1, pageSize);
+            setItems(res.data);
+            setTotalCount(res.totalCount);
+            setPage(1);
+        } catch (err) {
+            console.error('Fetch initial failed:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [fetchFn, pageSize]);
+
+    // Fetch trang tiếp theo (append)
+    const fetchMore = useCallback(async () => {
+        if (isLoadingMore || !hasMore) return;
+        setIsLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const res = await fetchFn(nextPage, pageSize);
+            setItems(prev => [...prev, ...res.data]);
+            setTotalCount(res.totalCount);
+            setPage(nextPage);
+        } catch (err) {
+            console.error('Fetch more failed:', err);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [fetchFn, page, pageSize, isLoadingMore, hasMore]);
+
+    // Reset khi keyword thay đổi
+    useEffect(() => {
+        setItems([]);
+        setPage(1);
+        fetchInitial();
+    }, [keyword]);
+
+    // Intersection Observer — phát hiện khi sentinel element vào viewport
+    useEffect(() => {
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+                    fetchMore();
+                }
+            },
+            { threshold: 0.1, rootMargin: '100px' }
+        );
+
+        if (sentinelRef.current) {
+            observerRef.current.observe(sentinelRef.current);
+        }
+
+        return () => observerRef.current?.disconnect();
+    }, [hasMore, isLoadingMore, fetchMore]);
+
+    const reset = useCallback(() => {
+        setItems([]);
+        setPage(1);
+        fetchInitial();
+    }, [fetchInitial]);
+
+    return {
+        items,
+        totalCount,
+        isLoading,
+        isLoadingMore,
+        hasMore,
+        sentinelRef,
+        reset,
+        loadedCount: items.length
+    };
+}</code></pre>
+
+    <h4>7.0.2 Áp Dụng Trong Trang Courses (Admin)</h4>
+    <div class="code-title">📁 xomtruyen-admin/src/pages/Courses.tsx (phần infinite scroll)</div>
+    <pre><code>import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { getCourses } from '../api/courseApi';
+
+export const Courses: React.FC = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Dùng infinite scroll thay vì pagination
+    const {
+        items: courses,
+        totalCount,
+        isLoading,
+        isLoadingMore,
+        hasMore,
+        sentinelRef,
+        reset,
+        loadedCount
+    } = useInfiniteScroll({
+        fetchFn: (page, pageSize) => getCourses({ page, pageSize, keyword: searchTerm }),
+        pageSize: 50,
+        keyword: searchTerm
+    });
+
+    return (
+        &lt;div className="jira-table-container"&gt;
+            {/* ... Header, Search ... */}
+
+            &lt;div className="table-responsive jira-scroll" style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}&gt;
+                &lt;table className="table align-middle mb-0" style={{ tableLayout: 'fixed', minWidth: '1400px' }}&gt;
+                    &lt;thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}&gt;
+                        {/* ... columns ... */}
+                    &lt;/thead&gt;
+                    &lt;tbody&gt;
+                        {isLoading ? (
+                            &lt;tr&gt;&lt;td colSpan={11} className="text-center py-4"&gt;Đang tải dữ liệu...&lt;/td&gt;&lt;/tr&gt;
+                        ) : (
+                            courses.map(course => (
+                                &lt;tr key={course.id} className="jira-table-row"&gt;
+                                    {/* ... render cells ... */}
+                                &lt;/tr&gt;
+                            ))
+                        )}
+
+                        {/* Loading More Indicator (giống Jira) */}
+                        {isLoadingMore && (
+                            &lt;tr&gt;
+                                &lt;td colSpan={11} style={{ border: 0, padding: '12px 0' }}&gt;
+                                    &lt;div className="d-flex align-items-center justify-content-center gap-2"&gt;
+                                        &lt;div className="loading-more-tooltip"&gt;
+                                            &lt;span className="loading-spinner"&gt;⟳&lt;/span&gt;
+                                            &lt;span&gt;Loading more&lt;/span&gt;
+                                        &lt;/div&gt;
+                                    &lt;/div&gt;
+                                &lt;/td&gt;
+                            &lt;/tr&gt;
+                        )}
+                    &lt;/tbody&gt;
+                &lt;/table&gt;
+
+                {/* Sentinel Element — khi cuộn tới đây sẽ trigger fetch thêm */}
+                {hasMore && &lt;div ref={sentinelRef} style={{ height: '1px' }} /&gt;}
+            &lt;/div&gt;
+
+            {/* Footer: "50 of 149" style Jira */}
+            &lt;div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', padding: '10px 16px' }}&gt;
+                &lt;div className="d-flex align-items-center"&gt;
+                    &lt;button className="btn-create" onClick={() => {}} style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', fontWeight: 500, fontSize: '13px' }}&gt;
+                        + Create
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                &lt;div className="d-flex align-items-center gap-2" style={{ color: 'var(--jira-text-muted)', fontSize: '12px' }}&gt;
+                    &lt;span&gt;{loadedCount} of {totalCount}&lt;/span&gt;
+                    &lt;button className="icon-btn" style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', cursor: 'pointer' }} onClick={reset} title="Refresh"&gt;
+                        ⟳
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                &lt;div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <h4>7.0.3 CSS cho Loading More Tooltip</h4>
+    <div class="code-title">📁 xomtruyen-admin/src/assets/scss/app.scss (thêm vào cuối)</div>
+    <pre><code>/* Infinite Scroll - Loading More Tooltip (Jira-style) */
+.loading-more-tooltip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: #1d2125;
+    color: #b6c2cf;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: fadeInUp 0.2s ease;
+}
+
+.loading-more-tooltip .loading-spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    font-size: 14px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sentinel element - invisible trigger */
+.scroll-sentinel {
+    height: 1px;
+    width: 100%;
+    pointer-events: none;
+}</code></pre>
+
+    <h4>7.0.4 Sơ Đồ Kỹ Thuật</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Thành Phần</th>
+                <th>Vai Trò</th>
+                <th>Chi Tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>useInfiniteScroll</strong></td>
+                <td>Custom Hook</td>
+                <td>Quản lý state (items, page, loading), tự động fetch khi sentinel vào viewport</td>
+            </tr>
+            <tr>
+                <td><strong>IntersectionObserver</strong></td>
+                <td>Browser API</td>
+                <td>Phát hiện khi sentinel element (div 1px ở cuối bảng) hiện lên → gọi fetchMore</td>
+            </tr>
+            <tr>
+                <td><strong>sentinelRef</strong></td>
+                <td>React ref</td>
+                <td>Element vô hình ở cuối tbody, khi scroll tới → trigger load thêm</td>
+            </tr>
+            <tr>
+                <td><strong>Loading More Tooltip</strong></td>
+                <td>UI Component</td>
+                <td>Popup nhỏ "⟳ Loading more" hiện ở cuối bảng khi đang fetch (giống Jira)</td>
+            </tr>
+            <tr>
+                <td><strong>Footer Counter</strong></td>
+                <td>UI</td>
+                <td>Hiển thị "50 of 149" — số dòng đã load / tổng số từ API</td>
+            </tr>
+            <tr>
+                <td><strong>API Backend</strong></td>
+                <td>Pagination</td>
+                <td>Không thay đổi — vẫn dùng ?page=X&pageSize=Y, chỉ client append kết quả</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warn">
+        <strong>⚠️ Lưu ý:</strong> Pattern này áp dụng cho tất cả bảng có nhiều dữ liệu (Books, Courses, Users, Transactions...). Hook <code>useInfiniteScroll</code> là reusable — chỉ cần truyền <code>fetchFn</code> khác nhau cho mỗi trang.
+    </div>
+
 
     <h3>7.1 Trang Danh Sách Khóa Học</h3>
     <div class="code-title">📁 xom-truyen/src/pages/CoursesPage.tsx</div>
@@ -1302,9 +1916,13 @@ export default function CourseLearnPage() {
             <ul>
                 <li><strong>React 19 + TypeScript</strong> – UI Components</li>
                 <li><strong>Video.js / HTML5 Video</strong> – Player với adaptive quality</li>
-                <li><strong>AG-Grid Enterprise</strong> – Bảng quản trị khóa học</li>
+                <li><strong>Bootstrap 5 + React Bootstrap</strong> – Bảng quản trị, Modal, Form</li>
+                <li><strong>ResizableHeader</strong> – Table header resize (pattern hiện tại)</li>
+                <li><strong>React Select</strong> – Multi-select dropdown</li>
+                <li><strong>FloatingBulkActionBar</strong> – Bulk actions bar</li>
                 <li><strong>Axios</strong> – HTTP client + upload progress</li>
                 <li><strong>React Router v7</strong> – Navigation</li>
+                <li><strong>React Hot Toast</strong> – Notifications</li>
             </ul>
         </div>
         <div class="section-card">
