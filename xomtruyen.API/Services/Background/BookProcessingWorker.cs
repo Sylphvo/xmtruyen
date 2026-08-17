@@ -2,6 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.SignalR;
+using XomTruyen.API.Hubs;
+using XomTruyen.API.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using XomTruyen.API.Services.Interfaces;
@@ -70,8 +73,70 @@ namespace XomTruyen.API.Services.Background
                                 }
                                 publication.Status = "Active";
                                 publication.UpdatedAt = DateTime.UtcNow;
-                                await dbContext.SaveChangesAsync(stoppingToken);
+
+                                // Antigravity: Create Chapter if it's a comic archive and has pages
+                                if (result.Output?.TotalPage > 0 && workItem.FileName != null)
+                                {
+                                    float nextChapterNumber = 1;
+                                    var maxChapter = dbContext.ComicChapters.Where(c => c.PublicationId == pubGuid).Max(c => (float?)c.ChapterNumber);
+                                    if (maxChapter.HasValue) nextChapterNumber = maxChapter.Value + 1;
+
+                                    var chapterId = Guid.NewGuid();
+                                    var isLocked = publication.AccessLevel == XomTruyen.API.Models.Enums.AccessLevel.Vip;
+                                    var chapter = new XomTruyen.API.Models.ComicChapter
+                                    {
+                                        Id = chapterId,
+                                        PublicationId = pubGuid,
+                                        ChapterNumber = nextChapterNumber,
+                                        Title = Path.GetFileNameWithoutExtension(workItem.FileName),
+                                        CreatedAt = DateTime.UtcNow,
+                                        IsLocked = isLocked,
+                                        CoinPrice = isLocked ? 100 : 0
+                                    };
+
+                                    var pages = new List<XomTruyen.API.Models.ComicPage>();
+                                    for (int i = 0; i < result.Output.TotalPage; i++)
+                                    {
+                                        pages.Add(new XomTruyen.API.Models.ComicPage
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            ComicChapterId = chapterId,
+                                            OrderIndex = i + 1,
+                                            ImageUrl = $"{result.Output.PagesUrl}page_{i + 1:D3}.webp"
+                                        });
+                                    }
+
+                                    dbContext.ComicChapters.Add(chapter);
+                                    dbContext.ComicPages.AddRange(pages);
+                                    _logger.LogInformation("Created ComicChapter {ChapterId} with {TotalPages} pages for Publication {PublicationId}", chapterId, result.Output.TotalPage, pubGuid);
+                                }
+
+await dbContext.SaveChangesAsync(stoppingToken);
                                 _logger.LogInformation("Updated Publication {PublicationId} CoverImageUrl to {CoverImageUrl}", pubGuid, publication.CoverImageUrl);
+
+                                // Broadcast Notification
+                                try
+                                {
+                                    var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
+                                    var notif = new Notification
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Title = "Chương mới cập nhật",
+                                        Message = $"Truyện {publication.Title} vừa có chương mới. Vào đọc ngay nhé!",
+                                        Type = "NEW_CHAPTER",
+                                        ReferenceId = publication.Id,
+                                        ReferenceType = "PUBLICATION",
+                                        IsRead = false,
+                                        CreatedAt = DateTime.UtcNow
+                                    };
+                                    dbContext.Notifications.Add(notif);
+                                    await dbContext.SaveChangesAsync(stoppingToken);
+                                    await hubContext.Clients.All.SendAsync("ReceiveNotification", notif, cancellationToken: stoppingToken);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Failed to send notification for publication {PublicationId}", pubGuid);
+                                }
                             }
                         }
                     }

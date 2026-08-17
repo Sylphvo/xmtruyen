@@ -1,14 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Form, Modal, Table } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
 import { Edit, Trash, Plus } from 'lucide-react';
 import * as planApi from '../api/subscriptionPlanApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const SubscriptionPlans = () => {
-  const [plans, setPlans] = useState<planApi.ISubscriptionPlan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    items: plans,
+    totalCount,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh
+  } = useInfiniteScroll<planApi.ISubscriptionPlan>({
+    fetchFn: async () => {
+      const data = await planApi.getPlans();
+      return {
+        data,
+        totalCount: data.length,
+        page: 1,
+        pageSize: data.length
+      };
+    },
+    pageSize: 50
+  });
   
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -36,21 +60,6 @@ export const SubscriptionPlans = () => {
     removeAds: false
   });
 
-  useEffect(() => {
-    fetchPlans();
-  }, []);
-
-  const fetchPlans = async () => {
-    setLoading(true);
-    try {
-      const data = await planApi.getPlans();
-      setPlans(data);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách gói VIP');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShowModal = (plan?: planApi.ISubscriptionPlan) => {
     if (plan) {
@@ -101,7 +110,7 @@ export const SubscriptionPlans = () => {
         toast.success('Thêm gói VIP thành công');
       }
       handleCloseModal();
-      fetchPlans();
+      refresh();
     } catch (error) {
       toast.error('Có lỗi xảy ra khi lưu gói VIP');
     }
@@ -113,7 +122,7 @@ export const SubscriptionPlans = () => {
     try {
       await planApi.deletePlan(id);
       toast.success('Xóa gói VIP thành công');
-      fetchPlans();
+      refresh();
     } catch (error) {
       toast.error('Lỗi khi xóa gói VIP');
     }
@@ -212,9 +221,19 @@ export const SubscriptionPlans = () => {
                     </td>
                   </tr>
                 )}
+              {!loading && <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />}
               </tbody>
             </table>
+            {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
           </div>
+        )}
+        {!loading && (
+          <InfiniteScrollFooter
+            loadedCount={loadedCount}
+            totalCount={totalCount}
+            onRefresh={refresh}
+            showCreate={false}
+          />
         )}
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 

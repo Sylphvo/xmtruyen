@@ -149,7 +149,7 @@ public class PublicationRepository : IPublicationRepository
 
         if (!string.IsNullOrWhiteSpace(filter.SearchKeyword))
         {
-            whereClause += " AND b.\"Title\" ILIKE @SearchKeyword";
+            whereClause += " AND (b.\"Title\" ILIKE @SearchKeyword OR b.\"AuthorName\" ILIKE @SearchKeyword)";
             parameters.Add("SearchKeyword", $"%{filter.SearchKeyword}%");
         }
 

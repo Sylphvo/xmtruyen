@@ -80,7 +80,7 @@ export default function BookDetailPage() {
         </button>
 
         {/* Book Details */}
-        <BookInfo book={displayBook} />
+        <BookInfo book={displayBook} isLoading={loading} />
 
         {/* Similar Books Section */}
         {similarBooks.length > 0 && (

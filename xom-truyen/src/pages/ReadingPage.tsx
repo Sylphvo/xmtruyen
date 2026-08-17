@@ -4,7 +4,9 @@ import ReadingHeader from "../components/Reading/ReadingHeader";
 import ReadingContent from "../components/Reading/ReadingContent";
 import ComicReadingContent from "../components/Reading/ComicReadingContent";
 import { useBookDetail } from "../hooks/useBooks";
-import { getComicChapters, getTextChapters, getChapterContent, incrementViewCount } from "../services/bookService";
+import { getComicChapters, getTextChapters, getChapterContent, incrementViewCount, purchaseChapter } from "../services/bookService";
+import { Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { saveHistory, toggleBookmark } from "../services/engagementService";
 import { Bookmark } from "lucide-react";
 
@@ -12,6 +14,7 @@ export default function ReadingPage() {
   const { id } = useParams<{ id: string }>();
   const { book, loading: bookLoading } = useBookDetail(id);
   const location = useLocation();
+  const navigate = useNavigate();
   
   // States for chapters and contents
   const [chapters, setChapters] = useState<any[]>([]);
@@ -20,6 +23,9 @@ export default function ReadingPage() {
   const [textContent, setTextContent] = useState<string>("");
   const [contentLoading, setContentLoading] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [unlockPrice, setUnlockPrice] = useState(0);
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   // Mode toggling
   const isComicFromState = location.state?.isComic;
@@ -52,15 +58,23 @@ export default function ReadingPage() {
       const chapterId = chapters[currentChapterIndex].id;
       setContentLoading(true);
       getChapterContent(chapterId).then(data => {
-        if (data && data.imageUrls) {
-          setImageUrls(data.imageUrls);
-        } else {
+        if (data?.isLocked) {
+          setIsLocked(true);
+          setUnlockPrice(data.unlockPrice);
           setImageUrls([]);
-        }
-        if (data && data.content) {
-          setTextContent(data.content);
+          setTextContent("");
         } else {
-          setTextContent(chapters[currentChapterIndex].content || "");
+          setIsLocked(false);
+          if (data && data.imageUrls) {
+            setImageUrls(data.imageUrls);
+          } else {
+            setImageUrls([]);
+          }
+          if (data && data.content) {
+            setTextContent(data.content);
+          } else {
+            setTextContent(chapters[currentChapterIndex].content || "");
+          }
         }
         setContentLoading(false);
         
@@ -101,6 +115,31 @@ export default function ReadingPage() {
 
   const handleNextPage = () => {
     setCurrentChapterIndex(prev => Math.min(chapters.length - 1, prev + 1));
+  };
+
+  const handlePurchase = async () => {
+    if (chapters.length > 0 && chapters[currentChapterIndex]) {
+      const chapterId = chapters[currentChapterIndex].id;
+      setIsPurchasing(true);
+      const res = await purchaseChapter(chapterId);
+      setIsPurchasing(false);
+      if (res.success || res === true) {
+        alert("Mua chương thành công!");
+        setContentLoading(true);
+        getChapterContent(chapterId).then(data => {
+          if (!data?.isLocked) {
+            setIsLocked(false);
+            setImageUrls(data?.imageUrls || []);
+            setTextContent(data?.content || chapters[currentChapterIndex].content || "");
+          }
+          setContentLoading(false);
+        });
+      } else {
+        if (window.confirm("Tài khoản không đủ xu. Bạn có muốn nạp thêm không?")) {
+          navigate("/wallet");
+        }
+      }
+    }
   };
 
   const toggleMode = () => {

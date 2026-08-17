@@ -107,12 +107,27 @@ public class ReadingService : IReadingService
         }
 
         var price = chapter.CoinPrice ?? 0;
+        throw new Exception($"LOCKED_CHAPTER|{price}");
+    }
+
+    public async Task<bool> PurchaseChapterAsync(Guid chapterId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var chapter = await _chapterRepository.GetChapterByIdAsync(chapterId, cancellationToken);
+        if (chapter == null) throw new Exception("Chapter not found");
+
+        var user = await _userRepository.GetUserByIdAsync(userId, cancellationToken);
+        if (user == null) throw new Exception("User not found");
+
+        bool hasPurchased = await _purchaseRepository.HasPurchasedChapterAsync(userId, chapterId, cancellationToken);
+        if (hasPurchased) return true;
+
+        var price = chapter.CoinPrice ?? 0;
         if ((user.CoinBalance ?? 0) >= price)
         {
             user.CoinBalance -= price;
             await _userRepository.UpdateUserAsync(user, cancellationToken);
-            await _purchaseRepository.AddPurchaseAsync(user.Id, chapterId, price, cancellationToken);
-            return response;
+            await _purchaseRepository.AddPurchaseAsync(userId, chapterId, price, cancellationToken);
+            return true;
         }
 
         throw new Exception("Tài khoản không đủ xu, vui lòng nạp thêm");

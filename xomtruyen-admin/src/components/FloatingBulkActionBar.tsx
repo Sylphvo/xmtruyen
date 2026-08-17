@@ -7,12 +7,20 @@ interface FloatingBulkActionBarProps {
   selectedCount: number;
   onClearSelection: () => void;
   onSelectAll?: () => void;
+  onBulkEdit?: () => void;
+  onBulkStatusChange?: () => void;
+  onBulkWatch?: () => void;
+  onBulkDelete?: () => void;
 }
 
 export const FloatingBulkActionBar: React.FC<FloatingBulkActionBarProps> = ({ 
   selectedCount, 
   onClearSelection,
-  onSelectAll
+  onSelectAll,
+  onBulkEdit,
+  onBulkStatusChange,
+  onBulkWatch,
+  onBulkDelete
 }) => {
   if (selectedCount === 0) return null;
 
@@ -47,19 +55,19 @@ export const FloatingBulkActionBar: React.FC<FloatingBulkActionBarProps> = ({
 
       <div className="separator" style={{ width: '1px', height: '20px' }}></div>
 
-      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={() => toast.error('Tính năng đang phát triển')}>
+      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkEdit || (() => toast.error('Tính năng đang phát triển'))}>
         <FontAwesomeIcon icon={faPen} className="me-2" />
         Edit fields
       </div>
-      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={() => toast.error('Tính năng đang phát triển')}>
+      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkStatusChange || (() => toast.error('Tính năng đang phát triển'))}>
         <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
         Change status
       </div>
-      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={() => toast.error('Tính năng đang phát triển')}>
+      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkWatch || (() => toast.error('Tính năng đang phát triển'))}>
         <FontAwesomeIcon icon={faEye} className="me-2" />
         Watch options
       </div>
-      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={() => toast.error('Tính năng đang phát triển')}>
+      <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkDelete || (() => toast.error('Tính năng đang phát triển'))}>
         <FontAwesomeIcon icon={faTrash} className="me-2" />
         Delete
       </div>

@@ -4,10 +4,30 @@ import { toast } from 'react-hot-toast';
 import { Play, Trash, Search, Settings } from 'lucide-react';
 import * as api from '../api/crawlerApi';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const Crawlers: React.FC = () => {
-  const [jobs, setJobs] = useState<api.CrawlJob[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    items: jobs,
+    totalCount: totalItems,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem
+  } = useInfiniteScroll<api.CrawlJob>({
+    fetchFn: async () => {
+      const data = await api.getAllCrawlJobs();
+      return { data, totalCount: data.length, page: 1, pageSize: data.length };
+    },
+    pageSize: 50,
+  });
   
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState<api.StartCrawlRequest>({
@@ -30,23 +50,12 @@ export const Crawlers: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchJobs();
-    
-    // Auto refresh every 10 seconds to simulate real-time updates
-    const interval = setInterval(fetchJobs, 10000);
+    const interval = setInterval(() => {
+      // Refresh without resetting loaded count to simulate real-time updates silently
+      refresh();
+    }, 10000);
     return () => clearInterval(interval);
-  }, []);
-
-  const fetchJobs = async () => {
-    try {
-      const data = await api.getAllCrawlJobs();
-      setJobs(data);
-    } catch (error) {
-      console.error('Lỗi khi tải danh sách crawler', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [refresh]);
 
   const handleShowModal = () => {
     setFormData({ sourceName: 'qidian', targetUrl: '' });
@@ -61,7 +70,7 @@ export const Crawlers: React.FC = () => {
       await api.startCrawlJob(formData);
       toast.success('Đã bắt đầu Crawl Job');
       handleCloseModal();
-      fetchJobs();
+      refresh();
     } catch (error) {
       toast.error('Có lỗi xảy ra khi bắt đầu Crawl');
     }
@@ -73,7 +82,7 @@ export const Crawlers: React.FC = () => {
     try {
       await api.deleteCrawlJob(id);
       toast.success('Xóa thành công');
-      fetchJobs();
+      removeItem(id);
     } catch (error) {
       toast.error('Lỗi khi xóa');
     }
@@ -191,10 +200,20 @@ export const Crawlers: React.FC = () => {
                     </td>
                   </tr>
                 )}
+                <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />
               </tbody>
             </table>
+            {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
           </div>
         )}
+
+        <InfiniteScrollFooter
+          loadedCount={loadedCount}
+          totalCount={totalItems}
+          onRefresh={refresh}
+          showCreate={false}
+        />
+
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 

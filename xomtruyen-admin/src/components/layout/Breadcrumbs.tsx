@@ -5,6 +5,10 @@ import { Share2, Zap, MessageSquare, Maximize2, Users, MoreHorizontal, LayoutLis
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
 
+  if (location.pathname === '/' || location.pathname === '/dashboard') {
+    return null;
+  }
+
   // Active tab logic (just visual for now)
   const activeTab = 'List';
 

@@ -7,7 +7,7 @@ import { getCategories } from '../api/categoryApi';
 import { getTopics } from '../api/topicApi';
 import { Form, Button, Modal, ProgressBar, Spinner, Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faPlus, faExchangeAlt, faTrash, faUpload, faFileAlt, faTimes, faCheckCircle, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select';
 import defaultBookImage from '../assets/images/default.png';
 import toast from 'react-hot-toast';
@@ -22,6 +22,13 @@ interface SortConfig {
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { useNavigate } from 'react-router-dom';
+import { TableSkeleton } from '../components/Skeleton/TableSkeleton';
+import { useSkeleton } from '../hooks/useSkeleton';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatType }) => {
   const navigate = useNavigate();
@@ -30,12 +37,48 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     if (url.startsWith('http') || url.startsWith('data:')) return url;
     return `http://localhost:5172/${url}`;
   };
-  const [data, setData] = useState<IBook[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const {
+    items: data,
+    totalCount: totalItems,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    prependItem,
+    updateItem
+  } = useInfiniteScroll<IBook>({
+    fetchFn: async (params) => {
+      const res = await getBooks({
+        page: params.page,
+        pageSize: params.pageSize,
+        keyword: params.debouncedSearchTerm || undefined,
+        formatType: _formatType !== undefined ? _formatType : undefined
+      });
+      return {
+        data: res.data || [],
+        totalCount: res.totalCount || 0,
+        page: params.page,
+        pageSize: params.pageSize
+      };
+    },
+    pageSize: 20,
+    params: { debouncedSearchTerm, refreshTrigger, _formatType }
+  });
+
+  const { showSkeleton } = useSkeleton({ isLoading });
 
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,8 +103,6 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [popupNewItem, setPopupNewItem] = useState<Partial<SaveBookRequest>>({});
-
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingBookId, setUploadingBookId] = useState<string | null>(null);
@@ -92,31 +133,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     fetchSelectData();
   }, []);
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        setIsLoading(true);
-        const res = await getBooks({
-          page: currentPage,
-          pageSize: itemsPerPage,
-          keyword: searchTerm || undefined,
-          formatType: _formatType !== undefined ? _formatType : undefined
-        });
-        setData(res.data || []);
-        setTotalItems(res.totalCount || 0);
-      } catch (error) {
-        console.error('Failed to fetch books', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    // Simple debounce for search
-    const timer = setTimeout(() => {
-      fetchBooks();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [currentPage, itemsPerPage, searchTerm, refreshTrigger, _formatType]);
 
   const handleUploadClick = (bookId: string) => {
     setUploadingBookId(bookId);
@@ -193,8 +210,8 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
 
   const handleConfirmUpload = async () => {
     if (!selectedFile || !uploadingBookId) return;
+    const toastId = toast.loading('Đang xử lý...');
     try {
-      setIsLoading(true);
       setUploadProgress(20);
       
       const progressInterval = setInterval(() => {
@@ -210,13 +227,13 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
         toast.success('Upload file thành công. Tệp đang được xử lý ngầm.');
         setRefreshTrigger(prev => prev + 1);
         setShowUploadModal(false);
-        setIsLoading(false);
+        toast.dismiss(toastId);
       }, 500);
       
     } catch (err) {
       console.error(err);
       toast.error('Lỗi khi upload file');
-      setIsLoading(false);
+      toast.dismiss(toastId);
       setUploadProgress(0);
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -253,16 +270,6 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     }
   };
 
-
-  const handleOpenAddModal = () => {
-    setPopupNewItem({
-      formatType: _formatType !== undefined ? _formatType : 1,
-      accessLevel: 1,
-      categoryIds: [],
-      topicIds: []
-    });
-    setShowAddModal(true);
-  };
 
   const handlePopupAddSubmit = async () => {
     if (!popupNewItem.title || !popupNewItem.author) {
@@ -406,6 +413,25 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} sách đã chọn?`)) {
+      const deletePromise = Promise.all(selectedIds.map(id => deleteBook(id)));
+      toast.promise(deletePromise, {
+        loading: 'Đang xóa...',
+        success: 'Xóa thành công!',
+        error: 'Có lỗi xảy ra khi xóa'
+      });
+      
+      try {
+        await deletePromise;
+        setRefreshTrigger(prev => prev + 1);
+        setSelectedIds([]);
+      } catch (error) {
+        console.error('Lỗi khi xóa hàng loạt:', error);
+      }
+    }
+  };
+
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'id', direction: 'asc' });
 
   const handleSort = (key: keyof IBook) => {
@@ -437,12 +463,6 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
       return 0;
     });
   }, [data, sortConfig]);
-
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const validCurrentPage = Math.min(currentPage, Math.max(1, totalPages || 1));
-
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
 
 
 
@@ -487,39 +507,28 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
       <div className="jira-table-container">
         {/* Custom Header for search and filters */}
         <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--jira-border)' }}>
-          <div className="d-flex align-items-center gap-2">
-            <Form.Select
-              size="sm"
-              className="bg-transparent text-body border-secondary-subtle"
-              style={{ width: '70px' }}
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-              <option value={20}>20</option>
-            </Form.Select>
-            <span className="small" style={{ color: 'var(--jira-text-muted)' }}>dòng / trang</span>
-          </div>
-
-          <div style={{ width: '250px' }}>
-            <Form.Control
-              size="sm"
-              type="text"
-              className="bg-transparent text-body border-secondary-subtle"
-              style={{}}
-              placeholder="Tìm kiếm..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </div>
+          <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý Sách</h5>
+          <div className="d-flex align-items-center gap-3">
+            
+            <div style={{ width: '250px' }}>
+              <Form.Control
+                size="sm"
+                type="text"
+                className="bg-transparent text-body border-secondary-subtle"
+                style={{}}
+                placeholder="Tìm kiếm..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                }}
+              />
+            </div>
+          <ExcelActionButtons 
+              dataToExport={data || []}
+              exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Books'}
+              onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
+              isLoading={typeof loading !== 'undefined' ? loading : false}
+            /></div>
         </div>
 
         <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
@@ -671,9 +680,11 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                       </td>
                     </tr>
                   )}
-                  {isLoading ? (
+                  {showSkeleton ? (
                     <tr>
-                      <td colSpan={_formatType === undefined ? 11 : 10} style={{ borderLeft: 0, borderRight: 0 }} className="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                      <td colSpan={_formatType === undefined ? 11 : 10} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                        <TableSkeleton rows={50} columns={8} hasCheckbox hasImage hasActions />
+                      </td>
                     </tr>
                   ) : sortedData.length > 0 ? (
                     sortedData.map((book) => (
@@ -709,7 +720,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                 <Form.Control
                                   value={editBookData.title || ''}
                                   onChange={(e) => setEditBookData({ ...editBookData, title: e.target.value })}
-                                  onKeyDown={(e) => handleCellKeyDown(e, 'title', book)}
+                                  onKeyDown={(e) => handleCellKeyDown(e, 'title', book)} onBlur={() => handleSaveEdit(book.id)}
                                   className="cell-edit-input flex-grow-1"
                                   autoFocus
                                 />
@@ -734,7 +745,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                               <Form.Control
                                 value={editBookData.author || ''}
                                 onChange={(e) => setEditBookData({ ...editBookData, author: e.target.value })}
-                                onKeyDown={(e) => handleCellKeyDown(e, 'author', book)}
+                                onKeyDown={(e) => handleCellKeyDown(e, 'author', book)} onBlur={() => handleSaveEdit(book.id)}
                                 className="cell-edit-input"
                                 autoFocus
                               />
@@ -752,7 +763,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                   size="sm"
                                   value={editBookData.formatType || 1}
                                   onChange={(e) => setEditBookData({ ...editBookData, formatType: Number(e.target.value) })}
-                                  onKeyDown={(e) => handleCellKeyDown(e, 'formatType', book)}
+                                  onKeyDown={(e) => handleCellKeyDown(e, 'formatType', book)} onBlur={() => handleSaveEdit(book.id)}
                                   className="cell-edit-input"
                                   style={{ border: '2px solid #0d6efd', borderRadius: '0' }}
                                   autoFocus
@@ -783,7 +794,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                   options={categories.map(c => ({ value: c.id, label: c.name }))}
                                   value={categories.filter(c => editBookData.categoryIds?.includes(c.id as any)).map(c => ({ value: c.id, label: c.name }))}
                                   onChange={(selected) => setEditBookData({ ...editBookData, categoryIds: selected.map(s => s.value as any) })}
-                                  onKeyDown={(e) => handleCellKeyDown(e, 'categories', book)}
+                                  onKeyDown={(e) => handleCellKeyDown(e, 'categories', book)} onBlur={() => handleSaveEdit(book.id)}
                                   styles={{
                                     ...selectStyles,
                                     control: (base: any) => ({
@@ -844,7 +855,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                   options={topics.map(t => ({ value: t.id, label: t.name }))}
                                   value={topics.filter(t => editBookData.topicIds?.includes(t.id as any)).map(t => ({ value: t.id, label: t.name }))}
                                   onChange={(selected) => setEditBookData({ ...editBookData, topicIds: selected.map(s => s.value as any) })}
-                                  onKeyDown={(e) => handleCellKeyDown(e, 'topics', book)}
+                                  onKeyDown={(e) => handleCellKeyDown(e, 'topics', book)} onBlur={() => handleSaveEdit(book.id)}
                                   styles={{
                                     ...selectStyles,
                                     control: (base: any) => ({
@@ -962,30 +973,25 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                     </tr>
                   ) : null}
                 </>
+                {!isLoading && <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={_formatType === undefined ? 11 : 10} />}
               </tbody>
               
             </table>
+            {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
           </div>
 
-          <div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', padding: '10px 16px', borderTop: 'none', backgroundColor: 'transparent' }}>
-            <div className="d-flex align-items-center">
-              <button className="btn-create" onClick={() => setIsAddingNew(true)} style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', fontWeight: 500, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', padding: 0 }}>
-                <FontAwesomeIcon icon={faPlus} /> Create
-              </button>
-            </div>
-            <div className="pagination-controls d-flex align-items-center gap-2" style={{ color: 'var(--jira-text-muted)', fontSize: '12px' }}>
-              <span>{validCurrentPage} of {totalPages || 1}</span>
-              <button className="icon-btn" style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', padding: '2px', cursor: 'pointer' }} onClick={() => setRefreshTrigger(prev => prev + 1)} title="Refresh">
-                <FontAwesomeIcon icon={faSyncAlt} style={{ fontSize: '12px' }} />
-              </button>
-            </div>
-            <div></div>
-          </div>
+          <InfiniteScrollFooter
+            loadedCount={loadedCount}
+            totalCount={totalItems}
+            onRefresh={refresh}
+            onCreateClick={() => setIsAddingNew(true)}
+          />
         </div>
       
       <FloatingBulkActionBar 
         selectedCount={selectedIds.length} 
         onClearSelection={() => setSelectedIds([])} 
+        onBulkDelete={handleBulkDelete}
       />
 
       <input 

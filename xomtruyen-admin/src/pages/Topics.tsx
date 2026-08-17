@@ -8,6 +8,9 @@ import { ResizableHeader } from '../components/ResizableHeader';
 import { ExcelActionButtons } from '../components/ExcelActionButtons';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import toast from 'react-hot-toast';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -17,13 +20,8 @@ interface SortConfig {
 }
 
 export const Topics: React.FC = () => {
-  const [data, setData] = useState<ITopic[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'id', direction: 'asc' });
 
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -52,28 +50,29 @@ export const Topics: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const fetchTopics = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await getTopics({
-        page: currentPage,
-        pageSize: itemsPerPage,
-        searchKeyword: debouncedSearch || undefined,
-        sortBy: sortConfig.key || undefined,
-        isDescending: sortConfig.direction === 'desc',
-      });
-      setData(response.data || []);
-      setTotalItems(response.totalCount || 0);
-    } catch (error) {
-      console.error('Lỗi load danh sách topic:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, itemsPerPage, debouncedSearch, sortConfig]);
-
-  useEffect(() => {
-    fetchTopics();
-  }, [fetchTopics]);
+  const {
+    items: data,
+    totalCount: totalItems,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem,
+    prependItem,
+    updateItem
+  } = useInfiniteScroll<ITopic>({
+    fetchFn: (params) => getTopics({
+      page: params.page,
+      pageSize: params.pageSize,
+      searchKeyword: params.searchKeyword || undefined,
+      sortBy: params.sortBy || undefined,
+      isDescending: params.isDescending,
+    }),
+    pageSize: 50,
+    params: { searchKeyword: debouncedSearch, sortBy: sortConfig.key, isDescending: sortConfig.direction === 'desc' }
+  });
 
   const handleSort = (key: keyof ITopic) => {
     let direction: SortDirection = 'asc';
@@ -116,11 +115,7 @@ export const Topics: React.FC = () => {
     try {
       await createTopic({ name: newItem.name });
       handleCloseAdd();
-      if (currentPage !== 1) {
-        setCurrentPage(1);
-      } else {
-        fetchTopics();
-      }
+      refresh();
     } catch (error: any) {
       console.error('Lỗi khi tạo topic:', error);
       toast.error(error.message || 'Không thể tạo topic.');
@@ -146,7 +141,7 @@ export const Topics: React.FC = () => {
     }
     try {
       await updateTopic(id, { name: editData.name });
-      setData(prev => prev.map(c => c.id === id ? { ...c, ...editData } as ITopic : c));
+      updateItem(id, (cat) => ({ ...cat, ...editData }));
       setEditingId(null);
     } catch (error: any) {
       console.error('Lỗi khi cập nhật topic:', error);
@@ -158,7 +153,7 @@ export const Topics: React.FC = () => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa chủ đề này? Không thể xóa nếu đang có sách liên kết.')) return;
     try {
       await deleteTopic(id);
-      fetchTopics();
+      removeItem(id);
     } catch (error: any) {
       console.error('Lỗi khi xóa topic:', error);
       toast.error(error.message || 'Không thể xóa topic.');
@@ -169,7 +164,7 @@ export const Topics: React.FC = () => {
     let successCount = 0;
     let errorCount = 0;
     
-    setLoading(true);
+    const toastId = toast.loading('Đang xử lý dữ liệu import...');
     for (const row of importedData) {
       const name = row.name || row.Name || row.Tên;
       if (!name) continue;
@@ -181,54 +176,31 @@ export const Topics: React.FC = () => {
         errorCount++;
       }
     }
-    setLoading(false);
+    toast.dismiss(toastId);
     
     if (successCount > 0) {
       toast.success(`Nhập thành công ${successCount} chủ đề`);
-      fetchTopics();
+      refresh();
     }
     if (errorCount > 0) {
       toast.error(`Lỗi khi nhập ${errorCount} chủ đề`);
     }
   };
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
+
 
   return (
     <div className="jira-table-container">
       <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý Chủ đề</h5>
         <div className="d-flex align-items-center gap-3">
-          <ExcelActionButtons 
-            dataToExport={data.map(c => ({ ID: c.id, Tên: c.name }))}
-            exportFileName="Topics"
-            onImport={handleImportExcel}
-            isLoading={loading}
-          />
+          
           <Button variant="primary" size="sm" onClick={() => setIsAddingNew(true)} className="d-flex align-items-center gap-2 rounded-2">
             <FontAwesomeIcon icon={faPlus} />
             Thêm Mới
           </Button>
           
-          <div className="d-flex align-items-center gap-2">
-            <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
-            <Form.Select
-              size="sm"
-              className="bg-transparent text-body border-secondary-subtle"
-              style={{ width: '70px', height: '32px', fontSize: '13px' }}
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-              <option value={20}>20</option>
-            </Form.Select>
-          </div>
+
 
           <div style={{ width: '250px' }}>
             <Form.Control
@@ -238,10 +210,7 @@ export const Topics: React.FC = () => {
               style={{ height: '32px', fontSize: '13px', border: '1px solid #dfe1e6', borderRadius: '4px' }}
               placeholder="Tìm kiếm..."
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
@@ -303,7 +272,12 @@ export const Topics: React.FC = () => {
                         <div className="d-flex gap-2 justify-content-end">
                           <Button variant="success" size="sm" onClick={handleAddSubmit} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
                           <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
-                        </div>
+                        <ExcelActionButtons 
+            dataToExport={data.map(c => ({ ID: c.id, Tên: c.name }))}
+            exportFileName="Topics"
+            onImport={handleImportExcel}
+            isLoading={loading}
+          /></div>
                       </td>
                     </tr>
                   )}
@@ -316,7 +290,7 @@ export const Topics: React.FC = () => {
                             <span className="text-muted small">{topic.id}</span>
                           </td>
                           <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
-                            <Form.Control autoFocus size="sm" value={editData.name || ''} onChange={(e) => setEditData({ ...editData, name: e.target.value })} onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(topic.id), handleCancelEdit)} placeholder="Tên chủ đề" className="inline-edit-input text-body w-100" />
+                            <Form.Control autoFocus size="sm" value={editData.name || ''} onChange={(e) => setEditData({ ...editData, name: e.target.value })} onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(topic.id), handleCancelEdit)} onBlur={() => handleSaveEdit(topic.id)} placeholder="Tên chủ đề" className="inline-edit-input text-body w-100" />
                           </td>
                           <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                             <span className="text-muted small">{topic.slug}</span>
@@ -374,46 +348,24 @@ export const Topics: React.FC = () => {
                   )}
                 </>
               )}
+              
+              <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={5} />
             </tbody>
             <tbody style={{ height: 'auto' }}>
               <tr style={{ height: '100%' }}>
-                <td style={{ borderBottom: 0, borderLeft: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                <td style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
-                <td style={{ borderBottom: 0, borderRight: 0, padding: 0, backgroundColor: 'transparent' }}></td>
+                <td colSpan={5} style={{ borderBottom: 0, padding: 0, backgroundColor: 'transparent' }}></td>
               </tr>
             </tbody>
           </table>
+          {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
         </div>
 
-      <div className="jira-table-footer">
-        <div style={{ visibility: 'hidden' }}>
-          <Button variant="light" size="sm" className="btn-create">
-            <FontAwesomeIcon icon={faPlus} /> Create
-          </Button>
-        </div>
-
-        {totalPages > 1 && (
-          <div className="pagination-controls">
-            <span className="text-muted" style={{ fontSize: '13px' }}>
-              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
-            </span>
-            <button className="icon-btn" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-              <FontAwesomeIcon icon={faAngleDoubleLeft} />
-            </button>
-            <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>
-              <FontAwesomeIcon icon={faAngleLeft} />
-            </button>
-            <span className="text-muted px-2">{currentPage}</span>
-            <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
-              <FontAwesomeIcon icon={faAngleRight} />
-            </button>
-            <button className="icon-btn" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
-              <FontAwesomeIcon icon={faAngleDoubleRight} />
-            </button>
-          </div>
-        )}
-      </div>
+      <InfiniteScrollFooter
+        loadedCount={loadedCount}
+        totalCount={totalItems}
+        onRefresh={refresh}
+        onCreateClick={() => setIsAddingNew(true)}
+      />
       <FloatingBulkActionBar 
         selectedCount={selectedIds.length} 
         onClearSelection={() => setSelectedIds([])} 

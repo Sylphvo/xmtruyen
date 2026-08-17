@@ -8,18 +8,47 @@ import toast from 'react-hot-toast';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { getTableInfo, getColumnInfo } from '../constants/databaseDictionary';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const DatabaseTableViewer: React.FC = () => {
   const { tableName } = useParams<{ tableName: string }>();
   const navigate = useNavigate();
   
-  const [data, setData] = useState<any[]>([]);
   const [schemaColumns, setSchemaColumns] = useState<TableSchemaColumn[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const {
+    items: data,
+    totalCount: totalItems,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh
+  } = useInfiniteScroll<any>({
+    fetchFn: async (params) => {
+      if (!tableName) return { data: [], totalCount: 0, page: 1, pageSize: 50 };
+      
+      const schema = await getTableSchema(tableName);
+      setSchemaColumns(schema || []);
+
+      const res = await getTableData(tableName, params.page, params.pageSize);
+      return {
+        data: res.data || [],
+        totalCount: res.totalCount || 0,
+        page: params.page,
+        pageSize: params.pageSize
+      };
+    },
+    pageSize: 50,
+    params: { tableName, refreshTrigger }
+  });
   
   const [showModal, setShowModal] = useState(false);
   const [showDictionaryModal, setShowDictionaryModal] = useState(false);
@@ -66,29 +95,6 @@ export const DatabaseTableViewer: React.FC = () => {
     return 170;
   };
 
-  useEffect(() => {
-    if (tableName) {
-      setSelectedIds([]);
-      loadData();
-    }
-  }, [tableName, page, pageSize]);
-
-  const loadData = async () => {
-    setIsLoading(true);
-    try {
-      const schema = await getTableSchema(tableName!);
-      setSchemaColumns(schema || []);
-
-      const res = await getTableData(tableName!, page, pageSize);
-      setData(res.data || []);
-      setTotalItems(res.totalCount || 0);
-    } catch (error) {
-      console.error(error);
-      toast.error('Không thể tải dữ liệu bảng ' + tableName);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const columns = useMemo(() => {
     if (schemaColumns.length > 0) {
@@ -150,7 +156,7 @@ export const DatabaseTableViewer: React.FC = () => {
     if (window.confirm(`Xóa bản ghi có ${idKey}=${idValue}?`)) {
       try {
         await deleteRow(tableName!, idValue);
-        loadData();
+        refresh();
       } catch (error) {
         console.error(error);
         toast.error('Lỗi xóa dữ liệu');
@@ -180,7 +186,7 @@ export const DatabaseTableViewer: React.FC = () => {
         await insertRow(tableName!, payload);
       }
       setShowModal(false);
-      loadData();
+      refresh();
     } catch (error: any) {
       console.error(error);
       toast.error('Lỗi lưu dữ liệu: ' + (error.message || ''));
@@ -191,8 +197,6 @@ export const DatabaseTableViewer: React.FC = () => {
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startIndex = (page - 1) * pageSize;
 
   return (
     <>
@@ -205,6 +209,13 @@ export const DatabaseTableViewer: React.FC = () => {
           </Button>
           <div>
             <div className="d-flex align-items-center gap-2 flex-wrap">
+          <ExcelActionButtons 
+            dataToExport={data || []}
+            exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Export'}
+            onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
+            isLoading={typeof loading !== 'undefined' ? loading : false}
+          />
+
               <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Chi tiết bảng: {tableName}</h5>
               <Badge bg="primary-subtle" className="text-primary border border-primary-subtle px-2 py-1" style={{ fontSize: '12px', fontWeight: 600 }}>
                 {tableMeta.vietnameseName}
@@ -253,24 +264,6 @@ export const DatabaseTableViewer: React.FC = () => {
       </div>
 
       <div className="d-flex justify-content-between align-items-center mb-3 mt-3 px-3">
-        <div className="d-flex align-items-center gap-2">
-          <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
-          <Form.Select
-            size="sm"
-            className="bg-transparent text-body border-secondary-subtle"
-            style={{ width: '70px', height: '32px', fontSize: '13px' }}
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </Form.Select>
-        </div>
       </div>
 
       <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
@@ -412,40 +405,20 @@ export const DatabaseTableViewer: React.FC = () => {
                     </td>
                   </tr>
                 )}
+              {!isLoading && <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={columns.length + 2} />}
               </tbody>
             </table>
           )}
+          {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
         </div>
 
         {!isLoading && (
-          <div className="jira-table-footer">
-            <div style={{ visibility: 'hidden' }}>
-              <Button variant="light" size="sm" className="btn-create">
-                <FontAwesomeIcon icon={faPlus} /> Create
-              </Button>
-            </div>
-
-            {totalPages > 1 && (
-              <div className="pagination-controls">
-                <span className="text-muted" style={{ fontSize: '13px' }}>
-                  {startIndex + 1}-{Math.min(startIndex + pageSize, totalItems)} of {totalItems}
-                </span>
-                <button className="icon-btn" onClick={() => setPage(1)} disabled={page === 1}>
-                  <FontAwesomeIcon icon={faAngleDoubleLeft} />
-                </button>
-                <button className="icon-btn" onClick={() => setPage(prev => Math.max(1, prev - 1))} disabled={page === 1}>
-                  <FontAwesomeIcon icon={faAngleLeft} />
-                </button>
-                <span className="text-muted px-2">{page}</span>
-                <button className="icon-btn" onClick={() => setPage(prev => Math.min(totalPages, prev + 1))} disabled={page === totalPages}>
-                  <FontAwesomeIcon icon={faAngleRight} />
-                </button>
-                <button className="icon-btn" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
-                  <FontAwesomeIcon icon={faAngleDoubleRight} />
-                </button>
-              </div>
-            )}
-          </div>
+          <InfiniteScrollFooter
+            loadedCount={loadedCount}
+            totalCount={totalItems}
+            onRefresh={refresh}
+            showCreate={false}
+          />
         )}
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 

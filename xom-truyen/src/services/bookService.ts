@@ -228,8 +228,25 @@ export async function getChapterContent(chapterId: string | number): Promise<any
     }
     
     return data;
-  } catch {
+  } catch (err: any) {
+    const message = err.response?.data?.message || "";
+    if (message.startsWith("LOCKED_CHAPTER|")) {
+      const price = parseInt(message.split("|")[1]);
+      return { isLocked: true, unlockPrice: price };
+    }
     return null;
+  }
+}
+
+export async function purchaseChapter(chapterId: string | number): Promise<any> {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/Reading/chapter/${chapterId}/purchase`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (err: any) {
+    return { success: false, message: err.response?.data?.message || "Mua chương thất bại" };
   }
 }
 

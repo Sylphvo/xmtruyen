@@ -39,9 +39,13 @@ public class AuthController : BaseApiController
             var result = await _authService.LoginAsync(request);
             return Ok(ApiResponse<AuthResponse>.Ok(result));
         }
-        catch (Exception ex)
+        catch (UnauthorizedAccessException ex)
         {
             return Unauthorized(ApiResponse<AuthResponse>.Error(ex.Message));
+        }
+        catch (Exception)
+        {
+            return StatusCode(503, ApiResponse<AuthResponse>.Error("Service Unavailable: Could not process your request at this time. Please try again later."));
         }
     }
 

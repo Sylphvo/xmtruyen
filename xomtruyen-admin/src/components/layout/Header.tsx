@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Bell, ChevronsLeft, Moon, Sun, ClipboardList, ChevronDown, User, Settings, ArrowUpCircle, LogOut, Lock, ShoppingCart } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 

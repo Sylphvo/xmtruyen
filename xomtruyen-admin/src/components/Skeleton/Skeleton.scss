@@ -1,0 +1,81 @@
+﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SKELETON SCREEN â€” Animation System
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+// Variables
+$skeleton-bg: var(--skeleton-bg, #2a2a3e);
+$skeleton-highlight: var(--skeleton-highlight, #3a3a4e);
+$skeleton-radius: 4px;
+$skeleton-animation-duration: 1.5s;
+
+// Base bone style
+.skeleton-bone {
+    background: linear-gradient(
+        90deg,
+        $skeleton-bg 25%,
+        $skeleton-highlight 50%,
+        $skeleton-bg 75%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer $skeleton-animation-duration infinite ease-in-out;
+    border-radius: $skeleton-radius;
+}
+
+// Variants
+.skeleton-text {
+    border-radius: $skeleton-radius;
+}
+
+.skeleton-circular {
+    border-radius: 50%;
+}
+
+.skeleton-rectangular {
+    border-radius: 0;
+}
+
+.skeleton-rounded {
+    border-radius: 8px;
+}
+
+// Shimmer animation
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+// Fade transitions
+.skeleton-fade-out {
+    opacity: 0;
+    transition: opacity 200ms ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.skeleton-content-enter {
+    animation: fadeIn 200ms ease;
+}
+
+// â”€â”€â”€ Light Theme Override â”€â”€â”€
+[data-theme="light"],
+.light-mode {
+    --skeleton-bg: #e9ecef;
+    --skeleton-highlight: #f8f9fa;
+}
+
+// â”€â”€â”€ Dark Theme (default) â”€â”€â”€
+:root {
+    --skeleton-bg: #2a2a3e;
+    --skeleton-highlight: #3a3a4e;
+}
+
+// â”€â”€â”€ Responsive â”€â”€â”€
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-bone {
+        animation: none;
+        background: $skeleton-bg;
+    }
+}

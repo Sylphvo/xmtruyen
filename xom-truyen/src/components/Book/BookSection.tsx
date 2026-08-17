@@ -8,14 +8,15 @@ export default function BookSection({
   subtitle,
   books,
   size = "normal",
-}: SectionData) {
+  isLoading,
+}: SectionData & { isLoading?: boolean }) {
   return (
     <section key={id} style={{ marginBottom: 30 }}>
       <SectionHeader title={title} subtitle={subtitle} />
 
       {/* Sử dụng component BookSlider thay cho div overflow-x thông thường */}
       <div style={{ marginTop: "16px" }}>
-        <BookSlider books={books} size={size} />
+        <BookSlider books={books} size={size} isLoading={isLoading} />
       </div>
     </section>
   );

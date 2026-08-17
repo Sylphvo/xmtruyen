@@ -6,10 +6,30 @@ import * as api from '../api/coinPackageApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { ExcelActionButtons } from '../components/ExcelActionButtons';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
 
 export const CoinPackages: React.FC = () => {
-  const [packages, setPackages] = useState<api.CoinPackage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    items: packages,
+    totalCount: totalItems,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem,
+    prependItem,
+    updateItem
+  } = useInfiniteScroll<api.CoinPackage>({
+    fetchFn: async () => {
+      const data = await api.getAllCoinPackages();
+      return { data, totalCount: data.length, page: 1, pageSize: data.length };
+    },
+    pageSize: 50,
+  });
   
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -38,21 +58,6 @@ export const CoinPackages: React.FC = () => {
     orderIndex: 0
   });
 
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  const fetchPackages = async () => {
-    setLoading(true);
-    try {
-      const data = await api.getAllCoinPackages();
-      setPackages(data);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách gói xu');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShowModal = (pkg?: api.CoinPackage) => {
     if (pkg) {
@@ -105,7 +110,7 @@ export const CoinPackages: React.FC = () => {
         toast.success('Thêm gói xu thành công');
       }
       handleCloseModal();
-      fetchPackages();
+      refresh();
     } catch (error) {
       toast.error('Có lỗi xảy ra khi lưu gói xu');
     }
@@ -117,7 +122,7 @@ export const CoinPackages: React.FC = () => {
     try {
       await api.deleteCoinPackage(id);
       toast.success('Xóa gói xu thành công');
-      fetchPackages();
+      removeItem(id);
     } catch (error) {
       toast.error('Lỗi khi xóa gói xu');
     }
@@ -127,7 +132,7 @@ export const CoinPackages: React.FC = () => {
     let successCount = 0;
     let errorCount = 0;
     
-    setLoading(true);
+    const toastId = toast.loading('Đang xử lý dữ liệu import...');
     for (const row of importedData) {
       const name = row.name || row.Name || row['Tên Gói'];
       const coinAmount = Number(row.coinAmount || row.CoinAmount || row['Xu Gốc']) || 0;
@@ -137,24 +142,25 @@ export const CoinPackages: React.FC = () => {
       if (!name) continue;
       
       try {
-        await api.saveCoinPackage({
+        await api.createCoinPackage({
           name,
           coinAmount,
           bonusCoins,
           priceVND,
           isPopular: false,
-          isActive: true
+          isActive: true,
+          orderIndex: 0
         });
         successCount++;
       } catch (error) {
         errorCount++;
       }
     }
-    setLoading(false);
+    toast.dismiss(toastId);
     
     if (successCount > 0) {
       toast.success(`Nhập thành công ${successCount} gói xu`);
-      fetchPackages();
+      refresh();
     }
     if (errorCount > 0) {
       toast.error(`Lỗi khi nhập ${errorCount} gói xu`);
@@ -167,7 +173,12 @@ export const CoinPackages: React.FC = () => {
         <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý Gói Xu</h5>
         <div className="d-flex gap-2 align-items-center">
-          <ExcelActionButtons 
+          
+          <Button variant="primary" size="sm" onClick={() => handleShowModal()}>
+            <Plus size={16} className="me-2" />
+            Thêm Gói Mới
+          </Button>
+        <ExcelActionButtons 
             dataToExport={packages.map(p => ({
               'ID': p.id,
               'Tên Gói': p.name,
@@ -179,12 +190,7 @@ export const CoinPackages: React.FC = () => {
             exportFileName="CoinPackages"
             onImport={handleImportExcel}
             isLoading={loading}
-          />
-          <Button variant="primary" size="sm" onClick={() => handleShowModal()}>
-            <Plus size={16} className="me-2" />
-            Thêm Gói Mới
-          </Button>
-        </div>
+          /></div>
       </div>
 
       {loading ? (
@@ -269,10 +275,21 @@ export const CoinPackages: React.FC = () => {
                     </td>
                   </tr>
                 )}
+                
+                <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />
               </tbody>
             </table>
+            {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
           </div>
         )}
+
+        <InfiniteScrollFooter
+          loadedCount={loadedCount}
+          totalCount={totalItems}
+          onRefresh={refresh}
+          showCreate={false}
+        />
+
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, NavLink } from "react-router-dom";
-import { Home, Bookmark, History, BookOpen, User, Library, Image } from "lucide-react";
+import { Home, Bookmark, History, BookOpen, User, Library, Image, PlayCircle } from "lucide-react";
 import { ACCENT } from "../../constants";
 
 export default function Sidebar() {
@@ -164,6 +164,10 @@ export default function Sidebar() {
               <NavLink to="/comics" style={() => menuLinkStyle(path === '/comics' || (path.startsWith('/book/') && fromPath === '/comics'))}>
                 <Image size={18} style={{ marginRight: 12 }} />
                 <span>Truyện tranh</span>
+              </NavLink>
+              <NavLink to="/courses" style={() => menuLinkStyle(path === '/courses' || (path.startsWith('/course/')))}>
+                <PlayCircle size={18} style={{ marginRight: 12 }} />
+                <span>Khóa học</span>
               </NavLink>
               <NavLink to="/library" style={() => menuLinkStyle(path === '/library' || (path.startsWith('/book/') && fromPath === '/library'))}>
                 <BookOpen size={18} style={{ marginRight: 12 }} />

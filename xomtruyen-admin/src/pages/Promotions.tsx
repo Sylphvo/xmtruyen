@@ -4,10 +4,32 @@ import { toast } from 'react-hot-toast';
 import { Edit, Trash, Plus, Ticket } from 'lucide-react';
 import * as api from '../api/promotionApi';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const Promotions: React.FC = () => {
-  const [promotions, setPromotions] = useState<api.Promotion[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    items: promotions,
+    totalCount: totalItems,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem,
+    prependItem,
+    updateItem
+  } = useInfiniteScroll<api.Promotion>({
+    fetchFn: async () => {
+      const data = await api.getAllPromotions();
+      return { data, totalCount: data.length, page: 1, pageSize: data.length };
+    },
+    pageSize: 50,
+  });
   
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -38,21 +60,6 @@ export const Promotions: React.FC = () => {
     isActive: true
   });
 
-  useEffect(() => {
-    fetchPromotions();
-  }, []);
-
-  const fetchPromotions = async () => {
-    setLoading(true);
-    try {
-      const data = await api.getAllPromotions();
-      setPromotions(data);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách khuyến mãi');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShowModal = (promo?: api.Promotion) => {
     if (promo) {
@@ -118,7 +125,7 @@ export const Promotions: React.FC = () => {
         toast.success('Thêm khuyến mãi thành công');
       }
       handleCloseModal();
-      fetchPromotions();
+      refresh();
     } catch (error) {
       toast.error('Có lỗi xảy ra khi lưu khuyến mãi');
     }
@@ -130,7 +137,7 @@ export const Promotions: React.FC = () => {
     try {
       await api.deletePromotion(id);
       toast.success('Xóa khuyến mãi thành công');
-      fetchPromotions();
+      removeItem(id);
     } catch (error) {
       toast.error('Lỗi khi xóa khuyến mãi');
     }
@@ -235,10 +242,21 @@ export const Promotions: React.FC = () => {
                     </td>
                   </tr>
                 )}
+                
+                <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />
               </tbody>
             </table>
+            {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
           </div>
         )}
+
+        <InfiniteScrollFooter
+          loadedCount={loadedCount}
+          totalCount={totalItems}
+          onRefresh={refresh}
+          showCreate={false}
+        />
+
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 

@@ -261,15 +261,25 @@ export const SystemConfigs: React.FC = () => {
 
             <Form.Group className="mb-3">
               <Form.Label>Giá trị (Value) <span className="text-danger">*</span></Form.Label>
-              <Form.Control 
-                as={formData.dataType === 'json' ? 'textarea' : 'input'}
-                rows={formData.dataType === 'json' ? 6 : 1}
-                required 
-                value={formData.value} 
-                onChange={e => setFormData({...formData, value: e.target.value})} 
-                style={{ fontFamily: formData.dataType === 'json' ? 'monospace' : 'inherit' }}
-                placeholder={formData.dataType === 'json' ? '{"key": "value"}' : 'Nhập giá trị...'}
-              />
+              {formData.dataType === 'json' ? (
+                <Form.Control 
+                  as="textarea"
+                  rows={6}
+                  required 
+                  value={formData.value} 
+                  onChange={e => setFormData({...formData, value: e.target.value})} 
+                  style={{ fontFamily: 'monospace' }}
+                  placeholder='{"key": "value"}'
+                />
+              ) : (
+                <Form.Control 
+                  type="text"
+                  required 
+                  value={formData.value} 
+                  onChange={e => setFormData({...formData, value: e.target.value})} 
+                  placeholder="Nhập giá trị..."
+                />
+              )}
             </Form.Group>
 
             <Form.Group className="mb-3">

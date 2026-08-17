@@ -1,0 +1,108 @@
+﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// INFINITE SCROLL STYLES â€” Jira-style Load More
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+// Loading More Tooltip
+.loading-more-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.loading-more-tooltip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--jira-tooltip-bg, #1d2125);
+    color: var(--jira-tooltip-text, #b6c2cf);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.31);
+    animation: loadMoreFadeIn 0.2s ease;
+    white-space: nowrap;
+}
+
+// Light theme override
+[data-theme="light"] .loading-more-tooltip,
+.light-mode .loading-more-tooltip {
+    background: #fff;
+    color: #44546f;
+    box-shadow: 0 4px 12px rgba(9, 30, 66, 0.15), 0 0 1px rgba(9, 30, 66, 0.31);
+}
+
+.loading-spinner {
+    display: inline-block;
+    animation: spinLoader 1s linear infinite;
+    font-size: 14px;
+    line-height: 1;
+}
+
+// Sentinel Element (invisible trigger)
+.scroll-sentinel {
+    height: 1px;
+    width: 100%;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+// Footer Counter
+.infinite-scroll-counter {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 12px;
+    letter-spacing: -0.2px;
+}
+
+// Loading More Row â€” no hover effect
+.loading-more-row {
+    &:hover {
+        background: transparent !important;
+    }
+    td {
+        background: transparent !important;
+    }
+}
+
+// Animations
+@keyframes loadMoreFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spinLoader {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+// Scroll container â€” Ä‘áº£m báº£o chiá»u cao Ä‘áº§y Ä‘á»§
+.jira-scroll {
+    // Thay max-height cá»‘ Ä‘á»‹nh báº±ng calc viewport
+    max-height: calc(100vh - 180px) !important;
+    overflow-y: auto;
+
+    // Smooth scroll behavior
+    scroll-behavior: smooth;
+
+    // Scrollbar styling
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.3);
+        border-radius: 4px;
+        &:hover {
+            background: rgba(128, 128, 128, 0.5);
+        }
+    }
+}

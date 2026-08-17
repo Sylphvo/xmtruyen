@@ -7,6 +7,11 @@ import { getTables } from '../api/managerDbApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { getTableInfo } from '../constants/databaseDictionary';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -40,13 +45,46 @@ const CustomToggle = React.forwardRef(({ children, onClick }: any, ref: any) => 
 
 export const Database: React.FC = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<DatabaseTable[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'asc' });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const {
+    items: data,
+    totalCount: totalItems,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh
+  } = useInfiniteScroll<DatabaseTable>({
+    fetchFn: async () => {
+      const tables = await getTables();
+      const tableData = tables.map((t, i) => ({
+        id: String(i + 1),
+        name: t,
+        rowCount: 0,
+        size: 'N/A',
+        lastBackup: new Date().toISOString(),
+        status: 'Active' as const
+      }));
+      return {
+        data: tableData,
+        totalCount: tableData.length,
+        page: 1,
+        pageSize: tableData.length
+      };
+    },
+    pageSize: 50
+  });
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -62,34 +100,11 @@ export const Database: React.FC = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  useEffect(() => {
-    fetchTables();
-  }, []);
-
-  const fetchTables = async () => {
-    setIsLoading(true);
-    try {
-      const tables = await getTables();
-      const tableData = tables.map((t, i) => ({
-        id: String(i + 1),
-        name: t,
-        rowCount: 0,
-        size: 'N/A',
-        lastBackup: new Date().toISOString(),
-        status: 'Active' as const
-      }));
-      setData(tableData);
-    } catch (error) {
-      console.error('Failed to fetch tables:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const sortedData = useMemo(() => {
     let filterData = data;
-    if (searchTerm) {
-        filterData = data.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (debouncedSearch) {
+        filterData = data.filter(item => item.name.toLowerCase().includes(debouncedSearch.toLowerCase()));
     }
     
     if (!sortConfig.key || !sortConfig.direction) return filterData;
@@ -106,13 +121,7 @@ export const Database: React.FC = () => {
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, sortConfig, searchTerm]);
-
-  const totalItems = sortedData.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const validCurrentPage = Math.min(currentPage, Math.max(1, totalPages || 1));
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
+  }, [data, sortConfig, debouncedSearch]);
 
   const handleSort = (key: keyof DatabaseTable) => {
     let direction: SortDirection = 'asc';
@@ -142,30 +151,46 @@ export const Database: React.FC = () => {
       <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý Database</h5>
         <div className="d-flex align-items-center gap-3">
+          
+                    <div className="mt-2 text-muted small">Đang tải danh sách bảng...</div>
+                  </td>
+                </tr>
+              ) : sortedData.length > 0 ? (
+                sortedData.map((table) => {
+                  const info = getTableInfo(table.name);
+                  return (
+                    <tr key={table.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(table.id) ? '#ebf2fc' : 'transparent' }}>
+                      <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                        <Form.Check
+                          type="checkbox"
+                          checked={selectedIds.includes(table.id)}
+                          onChange={() => toggleSelect(table.id)}
+                        />
+                      </td>
+                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                        <div className="d-flex flex-column gap-1">
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="fw-bold text-primary font-monospace" style={{ fontSize: '13.5px' }}>{table.name}</span>
+                            <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-1.5 py-0.5" style={{ fontSize: '10.5px' }}>
+                              {info.vietnameseName}
+                            </span>
+                          </div>
+                          <div className="text-secondary small text-truncate" style={{ maxWidth: '280px', fontSize: '12px' }} title={info.summary}>
+                            {info.summary}
+                          </div>
+                        <ExcelActionButtons 
+            dataToExport={data || []}
+            exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Export'}
+            onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
+            isLoading={typeof loading !== 'undefined' ? loading : false}
+          />
+
           <Button variant="primary" size="sm" className="d-flex align-items-center gap-2 rounded-2">
             <FontAwesomeIcon icon={faDatabase} />
             Backup Data
           </Button>
           
-          <div className="d-flex align-items-center gap-2">
-            <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
-            <Form.Select
-              size="sm"
-              className="bg-transparent text-body border-secondary-subtle"
-              style={{ width: '70px', height: '32px', fontSize: '13px' }}
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Form.Select>
-          </div>
-          
+
           <div style={{ width: '250px' }}>
             <Form.Control 
               size="sm" 
@@ -176,7 +201,6 @@ export const Database: React.FC = () => {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setCurrentPage(1);
               }}
             />
           </div>
@@ -223,34 +247,7 @@ export const Database: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="text-center py-5">
-                    <Spinner animation="border" variant="secondary" size="sm" />
-                    <div className="mt-2 text-muted small">Đang tải danh sách bảng...</div>
-                  </td>
-                </tr>
-              ) : paginatedData.length > 0 ? (
-                paginatedData.map((table) => {
-                  const info = getTableInfo(table.name);
-                  return (
-                    <tr key={table.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(table.id) ? '#ebf2fc' : 'transparent' }}>
-                      <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-                        <Form.Check
-                          type="checkbox"
-                          checked={selectedIds.includes(table.id)}
-                          onChange={() => toggleSelect(table.id)}
-                        />
-                      </td>
-                      <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
-                        <div className="d-flex flex-column gap-1">
-                          <div className="d-flex align-items-center gap-2">
-                            <span className="fw-bold text-primary font-monospace" style={{ fontSize: '13.5px' }}>{table.name}</span>
-                            <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-1.5 py-0.5" style={{ fontSize: '10.5px' }}>
-                              {info.vietnameseName}
-                            </span>
-                          </div>
-                          <div className="text-secondary small text-truncate" style={{ maxWidth: '280px', fontSize: '12px' }} title={info.summary}>
-                            {info.summary}
-                          </div>
-                        </div>
+                    <Spinner animation="border" variant="secondary" size="sm" /></div>
                       </td>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <span className="text-body">{table.rowCount.toLocaleString()}</span>
@@ -300,68 +297,20 @@ export const Database: React.FC = () => {
                   </td>
                 </tr>
               )}
+              {!isLoading && <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />}
             </tbody>
           </table>
+          {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
         </div>
         
-        <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top bg-transparent">
-          <div className="text-muted" style={{ fontSize: '13px' }}>
-            Hiển thị {totalItems === 0 ? 0 : startIndex + 1} đến {Math.min(startIndex + itemsPerPage, totalItems)} trong {totalItems} bảng
-          </div>
-
-          {totalPages > 1 && (
-            <div className="d-flex" style={{ gap: '4px' }}>
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                onClick={() => setCurrentPage(1)}
-                disabled={validCurrentPage === 1}
-              >
-                <FontAwesomeIcon icon={faAngleDoubleLeft} style={{ fontSize: '12px' }} />
-              </button>
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === 1 ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={validCurrentPage === 1}
-              >
-                <FontAwesomeIcon icon={faAngleLeft} style={{ fontSize: '12px' }} />
-              </button>
-
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2 fw-medium"
-                  style={{
-                    width: '32px', height: '32px', fontSize: '13px',
-                    backgroundColor: i + 1 === validCurrentPage ? '#5955D1' : 'var(--bs-tertiary-bg)',
-                    color: i + 1 === validCurrentPage ? '#fff' : '#5955D1'
-                  }}
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={validCurrentPage === totalPages}
-              >
-                <FontAwesomeIcon icon={faAngleRight} style={{ fontSize: '12px' }} />
-              </button>
-              <button
-                className="btn btn-sm border-0 d-flex align-items-center justify-content-center rounded-2"
-                style={{ width: '32px', height: '32px', backgroundColor: 'var(--bs-tertiary-bg)', color: validCurrentPage === totalPages ? 'var(--bs-secondary-color)' : '#5955D1' }}
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={validCurrentPage === totalPages}
-              >
-                <FontAwesomeIcon icon={faAngleDoubleRight} style={{ fontSize: '12px' }} />
-              </button>
-            </div>
-          )}
-        </div>
+        {!isLoading && (
+          <InfiniteScrollFooter
+            loadedCount={loadedCount}
+            totalCount={totalItems}
+            onRefresh={refresh}
+            showCreate={false}
+          />
+        )}
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 

@@ -1,16 +1,37 @@
-import React, { useRef } from 'react';
-import { Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload, faDownload } from '@fortawesome/free-solid-svg-icons';
 import * as XLSX from 'xlsx';
 import { toast } from 'react-hot-toast';
+import { MoreHorizontal } from 'lucide-react';
+import { ImportExcelModal } from './ImportExcelModal';
 
 interface ExcelActionButtonsProps {
   dataToExport: any[];
   exportFileName?: string;
   onImport?: (data: any[]) => void;
   isLoading?: boolean;
+  onRefresh?: () => void; // Keeping it in interface to not break pages that still pass it
 }
+
+const CustomToggle = React.forwardRef<HTMLButtonElement, { children: React.ReactNode, onClick: (e: React.MouseEvent) => void, disabled?: boolean }>(
+  ({ children, onClick, disabled }, ref) => (
+    <button
+      ref={ref}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e);
+      }}
+      disabled={disabled}
+      className="btn btn-light btn-sm d-flex align-items-center justify-content-center border shadow-sm bg-white"
+      style={{ width: '32px', height: '32px', padding: 0 }}
+    >
+      {children}
+    </button>
+  )
+);
+CustomToggle.displayName = 'CustomToggle';
 
 export const ExcelActionButtons: React.FC<ExcelActionButtonsProps> = ({
   dataToExport,
@@ -18,7 +39,7 @@ export const ExcelActionButtons: React.FC<ExcelActionButtonsProps> = ({
   onImport,
   isLoading = false
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const handleExport = () => {
     if (!dataToExport || dataToExport.length === 0) {
@@ -40,92 +61,43 @@ export const ExcelActionButtons: React.FC<ExcelActionButtonsProps> = ({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Kiểm tra định dạng file
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
-      toast.error('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
+  const handleImportClick = () => {
+    if (onImport) {
+      setShowImportModal(true);
+    } else {
+      toast.error('Chức năng import đang được phát triển');
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = event.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        
-        // Lấy sheet đầu tiên
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        
-        // Convert sang JSON
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        
-        if (jsonData && jsonData.length > 0) {
-          if (onImport) {
-            onImport(jsonData);
-          }
-        } else {
-          toast.error('File Excel không có dữ liệu');
-        }
-      } catch (error) {
-        console.error('Lỗi khi đọc file Excel:', error);
-        toast.error('Có lỗi xảy ra khi đọc file Excel');
-      } finally {
-        // Reset file input
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-      }
-    };
-
-    reader.onerror = () => {
-      toast.error('Không thể đọc file');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
-    reader.readAsBinaryString(file);
   };
 
   return (
-    <div className="d-flex align-items-center gap-2">
-      <Button 
-        variant="success" 
-        size="sm" 
-        onClick={handleExport}
-        disabled={isLoading || !dataToExport || dataToExport.length === 0}
-        className="d-flex align-items-center gap-2 rounded-2"
-        style={{ backgroundColor: '#217346', borderColor: '#217346' }} // Màu chuẩn của Excel
-      >
-        <FontAwesomeIcon icon={faDownload} />
-        Xuất
-      </Button>
+    <>
+      <Dropdown align="end" className="ms-auto">
+        <Dropdown.Toggle as={CustomToggle} disabled={isLoading}>
+          <MoreHorizontal size={16} />
+        </Dropdown.Toggle>
 
-      {onImport && (
-        <>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".xlsx, .xls"
-            style={{ display: 'none' }}
-          />
-          <Button 
-            variant="outline-success" 
-            size="sm" 
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
-            className="d-flex align-items-center gap-2 rounded-2"
-          >
-            <FontAwesomeIcon icon={faUpload} />
-            Nhập
-          </Button>
-        </>
+        <Dropdown.Menu className="shadow-sm border-0 py-2">
+          <Dropdown.Item onClick={handleExport} disabled={!dataToExport || dataToExport.length === 0} className="py-2 px-3 text-body" style={{ fontSize: '14px' }}>
+            <FontAwesomeIcon icon={faDownload} className="me-2 text-success" />
+            Xuất Excel
+          </Dropdown.Item>
+          <Dropdown.Item onClick={handleImportClick} className="py-2 px-3 text-body" style={{ fontSize: '14px' }}>
+            <FontAwesomeIcon icon={faUpload} className="me-2 text-primary" />
+            Nhập Excel
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+
+      {showImportModal && onImport && (
+        <ImportExcelModal
+          show={showImportModal}
+          onHide={() => setShowImportModal(false)}
+          onConfirm={(data) => {
+            onImport(data);
+            setShowImportModal(false);
+          }}
+        />
       )}
-    </div>
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings } from 'lucide-react';
 import { getTables } from '../../api/managerDbApi';
@@ -15,9 +15,49 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [dbTables, setDbTables] = useState<string[]>([]);
 
+  // Resize states
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const savedWidth = localStorage.getItem('appSidebarWidth');
+    return savedWidth ? parseInt(savedWidth, 10) : 280;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+
   useEffect(() => {
     getTables().then(setDbTables).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('appSidebarWidth', sidebarWidth.toString());
+  }, [sidebarWidth]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      // 80 is the width of .app-sidebar-icon
+      const newWidth = Math.max(200, Math.min(e.clientX - 80, 800));
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'col-resize';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+  }, [isResizing]);
 
   useEffect(() => {
     if (path.startsWith('/all-books') || path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/book-files') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-chapters') || path.startsWith('/authors') || path.startsWith('/reading-analytics')) {
@@ -124,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
       </aside>
 
       {/* Menu Sidebar */}
-      <aside className="app-sidebar-menu" style={{ display: isCollapsed ? 'none' : 'flex' }}>
+      <aside className="app-sidebar-menu" style={{ display: isCollapsed ? 'none' : 'flex', width: sidebarWidth, minWidth: sidebarWidth, position: 'relative' }}>
         <div className="sidebar-header">
           Xóm Truyện
         </div>
@@ -312,6 +352,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
             </>
           )}
         </div>
+
+        {/* Resizer Handle */}
+        <div
+          onMouseDown={() => setIsResizing(true)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: -3,
+            width: 6,
+            height: '100%',
+            cursor: 'col-resize',
+            zIndex: 9999,
+          }}
+          title="Kéo để thay đổi kích thước"
+        />
       </aside>
     </div>
   );

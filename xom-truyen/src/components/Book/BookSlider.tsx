@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/free-mode";
 
 import BookCard from "./BookCard";
+import Skeleton from "../common/Skeleton";
 import type { Book } from "../../types";
 
 import "../../styles/BookSlider.css"; // Import CSS tùy chỉnh cho BookSlider
@@ -16,11 +17,13 @@ import "../../styles/BookSlider.css"; // Import CSS tùy chỉnh cho BookSlider
 interface BookSliderProps {
   books: Book[];
   size?: "normal" | "large";
+  isLoading?: boolean;
 }
 
 export default function BookSlider({
   books,
   size = "normal",
+  isLoading,
 }: BookSliderProps) {
   return (
     <div className="py-4">
@@ -39,11 +42,20 @@ export default function BookSlider({
         className="comic-swiper"
         style={{ paddingBottom: "16px", overflow: "visible" }}
       >
-        {books.map((book) => (
-          <SwiperSlide key={book.id}>
-            <BookCard book={book} size={size} />
-          </SwiperSlide>
-        ))}
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <SwiperSlide key={`skeleton-${i}`}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <Skeleton type="rectangular" width="100%" height={size === "large" ? "260px" : "180px"} borderRadius="12px" />
+                  <Skeleton type="text" width="80%" height="16px" />
+                </div>
+              </SwiperSlide>
+            ))
+          : books.map((book) => (
+              <SwiperSlide key={book.id}>
+                <BookCard book={book} size={size} />
+              </SwiperSlide>
+            ))}
       </Swiper>
     </div>
   );

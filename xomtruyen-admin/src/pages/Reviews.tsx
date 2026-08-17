@@ -1,19 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Card, Badge, Pagination } from 'react-bootstrap';
+import { Button, Badge, Pagination } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
 import { MessageSquare, Trash, Star } from 'lucide-react';
 import * as api from '../api/reviewApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { Form } from 'react-bootstrap';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const Reviews: React.FC = () => {
-  const [reviews, setReviews] = useState<api.Review[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 20;
+  const {
+    items: reviews,
+    totalCount: totalItems,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem
+  } = useInfiniteScroll<api.Review>({
+    fetchFn: async (params) => {
+      const data = await api.getReviews(undefined, params.page, params.pageSize);
+      return { data: data.data, totalCount: data.totalCount, page: params.page, pageSize: params.pageSize };
+    },
+    pageSize: 50,
+  });
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -29,29 +45,13 @@ export const Reviews: React.FC = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  useEffect(() => {
-    fetchReviews(currentPage);
-  }, [currentPage]);
-
-  const fetchReviews = async (page: number) => {
-    setLoading(true);
-    try {
-      const data = await api.getReviews(undefined, page, pageSize);
-      setReviews(data.items);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách đánh giá');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (id: string, userName: string) => {
     if (!window.confirm(`Bạn có chắc muốn xóa đánh giá của [${userName}] không?`)) return;
     try {
       await api.deleteReview(id);
       toast.success('Xóa đánh giá thành công');
-      fetchReviews(currentPage);
+      removeItem(id);
     } catch (error) {
       toast.error('Lỗi khi xóa đánh giá');
     }
@@ -75,6 +75,14 @@ export const Reviews: React.FC = () => {
           <MessageSquare className="me-2 text-primary" size={18} />
           Quản lý Đánh giá (Reviews)
         </h5>
+        <div className="d-flex align-items-center gap-3">
+          <ExcelActionButtons 
+            dataToExport={reviews || []}
+            exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Reviews'}
+            onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
+            isLoading={typeof loading !== 'undefined' ? loading : false}
+          />
+        </div>
       </div>
 
       <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
@@ -116,10 +124,19 @@ export const Reviews: React.FC = () => {
           <tbody style={{ height: '1px' }}>
               {loading ? (
                 <tr><td colSpan={7} className="text-center p-4">Đang tải...</td></tr>
-              ) : reviews.length === 0 ? (
-                <tr><td colSpan={7} className="text-center p-4 text-muted">Chưa có đánh giá nào.</td></tr>
               ) : (
-                reviews.map(review => (
+                <>
+                  {reviews.length === 0 && (
+                    <tr>
+                      <td colSpan={7} style={{ borderLeft: 0, borderRight: 0, padding: 0 }}>
+                        <div className="jira-empty-state">
+                          <img src="/empty-state.svg" alt="No data" style={{ width: '120px', marginBottom: '20px', opacity: 0.5 }} onError={(e) => e.currentTarget.style.display = 'none'} />
+                          <h4>Chưa có đánh giá nào</h4>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  {reviews.map(review => (
                   <tr key={review.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(review.id) ? '#ebf2fc' : 'transparent' }}>
                     <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
@@ -145,25 +162,22 @@ export const Reviews: React.FC = () => {
                       </Button>
                     </td>
                   </tr>
-                ))
+                ))}
+                  <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />
+                </>
               )}
             </tbody>
           </table>
+          {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
         </div>
         
-        {totalPages > 1 && (
-          <div className="d-flex justify-content-center p-3 border-top" style={{ borderColor: 'var(--bs-border-color)' }}>
-            <Pagination className="mb-0">
-              <Pagination.Prev disabled={currentPage === 1} onClick={() => setCurrentPage(c => c - 1)} />
-              {Array.from({ length: totalPages }).map((_, idx) => (
-                <Pagination.Item key={idx + 1} active={idx + 1 === currentPage} onClick={() => setCurrentPage(idx + 1)}>
-                  {idx + 1}
-                </Pagination.Item>
-              ))}
-              <Pagination.Next disabled={currentPage === totalPages} onClick={() => setCurrentPage(c => c + 1)} />
-            </Pagination>
-          </div>
-        )}
+        <InfiniteScrollFooter
+          loadedCount={loadedCount}
+          totalCount={totalItems}
+          onRefresh={refresh}
+          showCreate={false}
+        />
+
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 

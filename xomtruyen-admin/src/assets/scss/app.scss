@@ -93,7 +93,7 @@ h6 {
   border-right: 1px solid $app-border-color;
 
   .sidebar-header {
-    height: $header-height;
+    height: $header-height + 5;
     display: flex;
     align-items: center;
     padding: 0 1.5rem;
@@ -139,7 +139,7 @@ h6 {
 
 // Header
 .app-header {
-  height: $header-height;
+  height: $header-height !important;
   background-color: $app-bg-header;
   display: flex;
   align-items: center;
@@ -474,7 +474,7 @@ html[data-bs-theme="dark"] body {
   justify-content: space-between !important;
   align-items: center !important;
   color: var(--jira-text-muted) !important;
-  
+
   .btn-create {
     background: transparent !important;
     border: none !important;
@@ -704,3 +704,5 @@ html[data-bs-theme="dark"] body {
   font-weight: 500;
   border: 1px solid transparent;
 }
+
+@import '_infinite-scroll';

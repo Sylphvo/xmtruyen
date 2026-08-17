@@ -61,7 +61,7 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetUserByEmailAsync(request.Email, cancellationToken);
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedAccessException("Invalid email or password");
 
         var token = GenerateJwtToken(user);
         var refreshToken = GenerateRandomString();
@@ -191,7 +191,7 @@ public class AuthService : IAuthService
 
         await _userRepository.RevokeAllUserTokensAsync(user.Id, "ResetPassword", cancellationToken);
 
-        var resetToken = GenerateRandomString();
+        var resetToken = new Random().Next(100000, 999999).ToString();
         var userToken = new UserToken
         {
             Id = Guid.NewGuid(),

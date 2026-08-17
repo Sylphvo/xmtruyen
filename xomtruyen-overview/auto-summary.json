@@ -1,49 +1,24 @@
 {
-  "generatedAt": "2026-08-17T02:21:28.077Z",
+  "generatedAt": "2026-08-17T11:53:24.857Z",
   "workspace": "XomTruyen_Workspace",
   "latestVersion": "v0.0.0",
-  "totalCommits": 44,
+  "totalCommits": 50,
   "totalProjects": 4,
   "totalTechnologies": 53,
   "latestCommit": {
-    "commitHash": "edafea0b",
-    "diffStat": "xomtruyen-admin/src/assets/scss/_variables.scss    |  42 +-\n xomtruyen-admin/src/assets/scss/app.scss           | 417 +++++++++++---\n .../src/components/FloatingBulkActionBar.tsx       |  74 +++\n .../src/components/layout/Breadcrumbs.tsx          | 187 ++++--\n xomtruyen-admin/src/components/layout/Sidebar.tsx  |   9 +-\n xomtruyen-admin/src/pages/BookChapters.tsx         |  74 ++-\n xomtruyen-admin/src/pages/BookDetails.tsx          |   4 +-\n xomtruyen-admin/src/pages/BookFiles.tsx            |  68 ++-\n xomtruyen-admin/src/pages/Books.tsx                | 229 ++++----\n xomtruyen-admin/src/pages/Categories.tsx           |  96 ++--\n xomtruyen-admin/src/pages/CoinPackages.tsx         |  70 ++-\n xomtruyen-admin/src/pages/Crawlers.tsx             |  64 ++-\n xomtruyen-admin/src/pages/Dashboard.tsx            |  22 +-\n xomtruyen-admin/src/pages/Database.tsx             |  74 ++-\n xomtruyen-admin/src/pages/DatabaseTableViewer.tsx  |  80 ++-\n xomtruyen-admin/src/pages/Login.tsx                |   2 +-\n xomtruyen-admin/src/pages/Notifications.tsx        |  68 ++-\n xomtruyen-admin/src/pages/Promotions.tsx           |  76 ++-\n xomtruyen-admin/src/pages/ReadingAnalytics.tsx     |   4 +-\n xomtruyen-admin/src/pages/Reviews.tsx              |  73 ++-\n xomtruyen-admin/src/pages/SubscriptionPlans.tsx    |  68 ++-\n xomtruyen-admin/src/pages/SystemConfigs.tsx        |  20 +-\n xomtruyen-admin/src/pages/Topics.tsx               |  84 ++-\n xomtruyen-admin/src/pages/Transactions.tsx         |  62 +-\n xomtruyen-admin/src/pages/Users.tsx                | 633 +++++++++++----------\n 25 files changed, 1787 insertions(+), 813 deletions(-)",
+    "commitHash": "b14b4376",
+    "diffStat": ".../pending/netflix-tech-optimization.html         | 815 +++++++++++++++++++++\n 1 file changed, 815 insertions(+)",
     "summary": {
       "added": [
-        "xomtruyen-admin/src/components/FloatingBulkActionBar.tsx"
+        "xomtruyen-overview/pending/netflix-tech-optimization.html"
       ],
-      "modified": [
-        "xomtruyen-admin/src/assets/scss/_variables.scss",
-        "xomtruyen-admin/src/assets/scss/app.scss",
-        "xomtruyen-admin/src/components/layout/Breadcrumbs.tsx",
-        "xomtruyen-admin/src/components/layout/Sidebar.tsx",
-        "xomtruyen-admin/src/pages/BookChapters.tsx",
-        "xomtruyen-admin/src/pages/BookDetails.tsx",
-        "xomtruyen-admin/src/pages/BookFiles.tsx",
-        "xomtruyen-admin/src/pages/Books.tsx",
-        "xomtruyen-admin/src/pages/Categories.tsx",
-        "xomtruyen-admin/src/pages/CoinPackages.tsx",
-        "xomtruyen-admin/src/pages/Crawlers.tsx",
-        "xomtruyen-admin/src/pages/Dashboard.tsx",
-        "xomtruyen-admin/src/pages/Database.tsx",
-        "xomtruyen-admin/src/pages/DatabaseTableViewer.tsx",
-        "xomtruyen-admin/src/pages/Login.tsx",
-        "xomtruyen-admin/src/pages/Notifications.tsx",
-        "xomtruyen-admin/src/pages/Promotions.tsx",
-        "xomtruyen-admin/src/pages/ReadingAnalytics.tsx",
-        "xomtruyen-admin/src/pages/Reviews.tsx",
-        "xomtruyen-admin/src/pages/SubscriptionPlans.tsx",
-        "xomtruyen-admin/src/pages/SystemConfigs.tsx",
-        "xomtruyen-admin/src/pages/Topics.tsx",
-        "xomtruyen-admin/src/pages/Transactions.tsx",
-        "xomtruyen-admin/src/pages/Users.tsx"
-      ],
+      "modified": [],
       "deleted": [],
       "renamed": []
     },
-    "totalFiles": 25,
+    "totalFiles": 1,
     "totalAdded": 1,
-    "totalModified": 24,
+    "totalModified": 0,
     "totalDeleted": 0
   },
   "outputFiles": [

@@ -343,3 +343,8 @@
 .swiper-free-mode > .swiper-wrapper {
     padding: 0px 18px;
 }
+@media (max-width: 375px) {
+    .book-card-item {
+        min-width: 110px;
+    }
+}

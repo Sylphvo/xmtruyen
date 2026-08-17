@@ -30,6 +30,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserToken> UserTokens { get; set; }
     public DbSet<CoinPackage> CoinPackages { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<CourseSection> CourseSections { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<LessonVideo> LessonVideos { get; set; }
+    public DbSet<LessonProgress> LessonProgresses { get; set; }
+    public DbSet<CourseEnrollment> CourseEnrollments { get; set; }
+    public DbSet<CoursePayment> CoursePayments { get; set; }
     public DbSet<Promotion> Promotions { get; set; }
     public DbSet<UserPromotionUsage> UserPromotionUsages { get; set; }
     public DbSet<CrawlJob> CrawlJobs { get; set; }

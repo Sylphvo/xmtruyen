@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal, Badge, Pagination } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
-import { Trash, Plus, Bell, Send } from 'lucide-react';
+import { Trash, Bell, Send } from 'lucide-react';
 import * as api from '../api/notificationApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const Notifications: React.FC = () => {
-  const [notifications, setNotifications] = useState<api.Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
-  const [page, setPage] = useState(1);
-  const pageSize = 20;
   const [typeFilter, setTypeFilter] = useState('');
+  
+  const {
+    items: notifications,
+    totalCount,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem,
+    prependItem
+  } = useInfiniteScroll<api.Notification>({
+    fetchFn: (params) => api.getNotifications(params.typeFilter || undefined, params.page, params.pageSize),
+    pageSize: 50,
+    params: { typeFilter }
+  });
   
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -36,22 +53,7 @@ export const Notifications: React.FC = () => {
     userId: null
   });
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [page, typeFilter]);
 
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const res = await api.getNotifications(typeFilter || undefined, page, pageSize);
-      setNotifications(res.data);
-      setTotalCount(res.totalCount);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách thông báo');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShowModal = () => {
     setFormData({
@@ -81,8 +83,7 @@ export const Notifications: React.FC = () => {
       await api.createNotification(formData);
       toast.success('Gửi thông báo thành công');
       handleCloseModal();
-      setPage(1);
-      fetchNotifications();
+      refresh();
     } catch (error) {
       toast.error('Có lỗi xảy ra khi gửi thông báo');
     }
@@ -94,13 +95,13 @@ export const Notifications: React.FC = () => {
     try {
       await api.deleteNotification(id);
       toast.success('Xóa thông báo thành công');
-      fetchNotifications();
+      removeItem(id);
     } catch (error) {
       toast.error('Lỗi khi xóa thông báo');
     }
   };
 
-  const totalPages = Math.ceil(totalCount / pageSize);
+
 
   return (
     <>
@@ -114,7 +115,7 @@ export const Notifications: React.FC = () => {
             <Form.Select 
               size="sm"
               value={typeFilter} 
-              onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
+              onChange={e => { setTypeFilter(e.target.value); }}
               style={{ width: '180px' }}
             >
               <option value="">Tất cả loại</option>
@@ -225,22 +226,16 @@ export const Notifications: React.FC = () => {
                   )}
                 </tbody>
               </table>
-              
-              {totalPages > 1 && (
-                <div className="p-3 border-top d-flex justify-content-end">
-                  <Pagination size="sm" className="mb-0">
-                    <Pagination.Prev disabled={page === 1} onClick={() => setPage(p => p - 1)} />
-                    {[...Array(totalPages)].map((_, i) => (
-                      <Pagination.Item key={i + 1} active={page === i + 1} onClick={() => setPage(i + 1)}>
-                        {i + 1}
-                      </Pagination.Item>
-                    ))}
-                    <Pagination.Next disabled={page === totalPages} onClick={() => setPage(p => p + 1)} />
-                  </Pagination>
-                </div>
-              )}
+              <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />
+              <div ref={sentinelRef} className="scroll-sentinel" />
             </div>
           )}
+          <InfiniteScrollFooter
+            loadedCount={loadedCount}
+            totalCount={totalCount}
+            onRefresh={refresh}
+            showCreate={false}
+          />
           <FloatingBulkActionBar 
             selectedCount={selectedIds.length} 
             onClearSelection={() => setSelectedIds([])} 

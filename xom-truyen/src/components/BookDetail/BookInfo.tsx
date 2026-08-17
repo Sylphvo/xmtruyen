@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, Bookmark, Heart, Share2, BookOpen } from "lucide-react";
 import BookCover from "../Book/BookCover";
+import Skeleton from "../common/Skeleton";
 import type { Book } from "../../types";
 import { checkFavorite, toggleFavorite } from "../../services/engagementService";
 
 interface BookInfoProps {
+  isLoading?: boolean;
   book: Book;
 }
 
-export default function BookInfo({ book }: BookInfoProps) {
+export default function BookInfo({ book, isLoading }: BookInfoProps) {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -39,29 +41,29 @@ export default function BookInfo({ book }: BookInfoProps) {
       {/* Book Cover */}
       <div style={{ flexShrink: 0 }}>
         {/* Reusing BookCover component, using a larger size */}
-        <BookCover book={book} width={240} height={340} />
+        isLoading ? <Skeleton type="rectangular" width={240} height={340} borderRadius="12px" /> : <BookCover book={book} width={240} height={340} />
       </div>
 
       {/* Book Details */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", paddingTop: "10px" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#1a1a1a", marginBottom: "8px" }}>
-          {book.title}
-        </h1>
+        {isLoading ? <Skeleton type="text" width="60%" height="34px" /> : <h1 style={{ fontSize: "28px", fontWeight: 700, color: "var(--text-h, #1a1a1a)", marginBottom: "8px" }}>{book.title}</h1>}
         
         {/* Rating */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
-          <span style={{ fontSize: "16px", fontWeight: 600 }}>4</span>
-          <div style={{ display: "flex", gap: "4px" }}>
-            {[...Array(4)].map((_, i) => (
-              <Star key={i} size={16} fill="#facc15" color="#facc15" />
-            ))}
-            <Star size={16} color="#d1d5db" />
+        {isLoading ? <Skeleton type="text" width="200px" height="20px" /> : (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
+            <span style={{ fontSize: "16px", fontWeight: 600 }}>4</span>
+            <div style={{ display: "flex", gap: "4px" }}>
+              {[...Array(4)].map((_, i) => (
+                <Star key={i} size={16} fill="#facc15" color="#facc15" />
+              ))}
+              <Star size={16} color="#d1d5db" />
+            </div>
+            <span style={{ fontSize: "14px", color: "#6b7280" }}>• 1 đánh giá</span>
           </div>
-          <span style={{ fontSize: "14px", color: "#6b7280" }}>• 1 đánh giá</span>
-        </div>
+        )}
 
         {/* Info Grid */}
-        <div style={{ 
+        {isLoading ? <Skeleton type="rectangular" width="100%" height="80px" /> : <div style={{ 
           display: "grid", 
           gridTemplateColumns: "repeat(4, 1fr)", 
           gap: "20px", 
@@ -85,10 +87,10 @@ export default function BookInfo({ book }: BookInfoProps) {
             <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "4px" }}>Tình trạng ra</div>
             <div style={{ fontSize: "14px", fontWeight: 500, color: "#374151" }}>25/50</div>
           </div>
-        </div>
+        </div>}
 
         {/* Action Buttons */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
+        {isLoading ? <Skeleton type="rectangular" width="300px" height="40px" /> : <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
           <button 
             onClick={() => navigate(`/book/${book.id}/read`, { state: { isComic: book.genres?.includes("Truyện tranh") || book.genres?.includes("Ngôn tình") } })}
             style={{
@@ -151,10 +153,16 @@ export default function BookInfo({ book }: BookInfoProps) {
           }}>
             <Share2 size={22} />
           </button>
-        </div>
+        </div>}
 
         {/* Description */}
-        <div style={{ fontSize: "14px", color: "#4b5563", lineHeight: 1.6 }}>
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <Skeleton type="text" width="100%" height="20px" />
+            <Skeleton type="text" width="100%" height="20px" />
+            <Skeleton type="text" width="80%" height="20px" />
+          </div>
+        ) : <div style={{ fontSize: "14px", color: "#4b5563", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
             Tống Thiên Thị luôn cảm thấy hàng xóm mới là một người không dễ sống chung, bởi hắn không chỉ lạnh lùng mà lời nói ra cũng chẳng dễ lọt tai. Mãi cho đến một ngày cô bị hàng xóm chặn trên hành lang.
           </p>
@@ -170,7 +178,7 @@ export default function BookInfo({ book }: BookInfoProps) {
           <p style={{ margin: "4px 0 0 0" }}>
             Cô cho rằng... <span style={{ color: "#2196f3", cursor: "pointer", fontWeight: 500 }}>Xem thêm</span>
           </p>
-        </div>
+        </div>}
       </div>
     </div>
   );

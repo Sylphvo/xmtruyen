@@ -46,6 +46,37 @@ export function useAuth() {
     }
   };
 
-  return { login, register, loading, error };
+  
+  const forgotPassword = async (email: string): Promise<ApiResponse<string>> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post<ApiResponse<string>>(`${baseUrl}/api/Auth/forgot-password`, { email });
+      return response.data;
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Lỗi kết nối";
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (data: any): Promise<ApiResponse<string>> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post<ApiResponse<string>>(`${baseUrl}/api/Auth/reset-password`, data);
+      return response.data;
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Lỗi kết nối";
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { login, register, forgotPassword, resetPassword, loading, error };
 }
 

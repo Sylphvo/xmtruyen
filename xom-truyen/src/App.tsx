@@ -17,6 +17,10 @@ import ProfilePage from "./pages/ProfilePage";
 import WalletPage from "./pages/WalletPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import { BG } from "./constants";
+import CourseListPage from "./pages/CourseListPage";
+import CourseDetailPage from "./pages/CourseDetailPage";
+import LearningPage from "./pages/LearningPage";
+
 
 // ─── COMPONENT LAYOUT CHÍNH ──────────────────────────────────────────────────
 // Gom Sidebar và Header cũ thành một Layout dùng chung cho Trang chủ, Chi tiết truyện,...
@@ -105,6 +109,32 @@ export default function App() {
             <MainLayout>
               <SearchPage />
             </MainLayout>
+          }
+        />
+
+        {/* Tuyến đường Khóa học */}
+        <Route
+          path="/courses"
+          element={
+            <MainLayout>
+              <CourseListPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/course/:id"
+          element={
+            <MainLayout>
+              <CourseDetailPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/course/:id/learn"
+          element={
+            <ReadingLayout>
+              <LearningPage />
+            </ReadingLayout>
           }
         />
 

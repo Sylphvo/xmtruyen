@@ -1,20 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Modal, Table, Card, Badge } from 'react-bootstrap';
+import { Button, Form, Modal, Badge } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
-import { Book, Plus, Edit2, Trash, Save, Lock, Unlock } from 'lucide-react';
+import { Book, Edit2, Trash, Save, Lock, Unlock } from 'lucide-react';
 import * as api from '../api/bookChapterApi';
 import { getTableData } from '../api/managerDbApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const BookChapters: React.FC = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [selectedPubId, setSelectedPubId] = useState<string>('');
   
-  const [chapters, setChapters] = useState<api.BookChapter[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    items: chapters,
+    totalCount,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh
+  } = useInfiniteScroll<api.BookChapter>({
+    fetchFn: async () => {
+      if (!selectedPubId) return { data: [], totalCount: 0, page: 1, pageSize: 50 };
+      const data = await api.getChapters(selectedPubId);
+      return {
+        data,
+        totalCount: data.length,
+        page: 1,
+        pageSize: data.length
+      };
+    },
+    pageSize: 50,
+    params: { selectedPubId }
+  });
   
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,7 +74,7 @@ export const BookChapters: React.FC = () => {
     try {
       const res = await getTableData('Publications', 1, 500);
       // Giả định FormatType = 0 là Text (hoặc lấy tất cả)
-      const textPubs = res.items.filter((p: any) => p.formatType === 0 || p.formatType === 'Text');
+      const textPubs = res.data.filter((p: any) => p.formatType === 0 || p.formatType === 'Text');
       setPublications(textPubs);
       if (textPubs.length > 0) {
         setSelectedPubId(textPubs[0].id);
@@ -58,26 +84,6 @@ export const BookChapters: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedPubId) {
-      fetchChapters();
-    } else {
-      setChapters([]);
-    }
-  }, [selectedPubId]);
-
-  const fetchChapters = async () => {
-    if (!selectedPubId) return;
-    setLoading(true);
-    try {
-      const data = await api.getChapters(selectedPubId);
-      setChapters(data);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách chương');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShowModal = async (chapter?: api.BookChapter) => {
     if (chapter) {
@@ -127,7 +133,7 @@ export const BookChapters: React.FC = () => {
         toast.success('Thêm chương mới thành công');
       }
       handleCloseModal();
-      fetchChapters();
+      refresh();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Lỗi khi lưu chương');
     }
@@ -138,7 +144,7 @@ export const BookChapters: React.FC = () => {
     try {
       await api.deleteChapter(id);
       toast.success('Xóa chương thành công');
-      fetchChapters();
+      refresh();
     } catch (error) {
       toast.error('Lỗi khi xóa chương');
     }
@@ -153,6 +159,8 @@ export const BookChapters: React.FC = () => {
           Quản lý Chương truyện chữ
         </h5>
         <div className="d-flex align-items-center gap-3">
+          
+
           <div className="d-flex align-items-center gap-2">
             <span className="text-muted" style={{ fontSize: '13px' }}>Chọn truyện:</span>
             <Form.Select 
@@ -172,7 +180,12 @@ export const BookChapters: React.FC = () => {
             Thêm Chương mới
           </Button>
         </div>
-      </div>
+      <ExcelActionButtons 
+            dataToExport={data || []}
+            exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Export'}
+            onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
+            isLoading={typeof loading !== 'undefined' ? loading : false}
+          /></div>
 
       <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
         <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
@@ -253,9 +266,21 @@ export const BookChapters: React.FC = () => {
                   </tr>
                 ))
               )}
+              
+              {!loading && <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={7} />}
             </tbody>
           </table>
+          {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
         </div>
+        
+        {!loading && (
+          <InfiniteScrollFooter
+            loadedCount={loadedCount}
+            totalCount={totalCount}
+            onRefresh={refresh}
+            showCreate={false}
+          />
+        )}
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 

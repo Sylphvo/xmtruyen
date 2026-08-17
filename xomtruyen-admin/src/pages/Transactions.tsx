@@ -5,12 +5,33 @@ import { Check, RefreshCw } from 'lucide-react';
 import { getTransactions, getRevenueSummary, approveTransaction, type Transaction } from '../api/transactionApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+import { ExcelActionButtons } from '../components/ExcelActionButtons';
+
 
 export const Transactions: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [summary, setSummary] = useState({ totalRevenue: 0, todayRevenue: 0 });
+  
+  const {
+    items: transactions,
+    totalCount: totalItems,
+    isLoading: loading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    updateItem
+  } = useInfiniteScroll<Transaction>({
+    fetchFn: async (params) => {
+      return getTransactions({ status: params.statusFilter || undefined, page: params.page, pageSize: params.pageSize });
+    },
+    pageSize: 50,
+    params: { statusFilter }
+  });
   
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -27,21 +48,8 @@ export const Transactions: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTransactions();
     fetchSummary();
-  }, [statusFilter]);
-
-  const fetchTransactions = async () => {
-    setLoading(true);
-    try {
-      const res = await getTransactions({ status: statusFilter || undefined, page: 1, pageSize: 50 });
-      setTransactions(res.data);
-    } catch (error) {
-      toast.error('Lỗi khi tải danh sách giao dịch');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, []);
 
   const fetchSummary = async () => {
     try {
@@ -58,7 +66,7 @@ export const Transactions: React.FC = () => {
     try {
       await approveTransaction(id);
       toast.success('Duyệt giao dịch thành công');
-      fetchTransactions();
+      updateItem(id, (t) => ({ ...t, status: 'Completed' }));
       fetchSummary();
     } catch (error: any) {
       toast.error(error.message || 'Lỗi khi duyệt giao dịch');
@@ -83,7 +91,7 @@ export const Transactions: React.FC = () => {
 
       <div className="jira-table-container">
         <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
-          <div className="d-flex gap-2">
+          <div className="d-flex gap-2 align-items-center w-100 justify-content-between">
             <Form.Select 
               size="sm"
               className="bg-transparent text-body border-secondary-subtle"
@@ -96,7 +104,12 @@ export const Transactions: React.FC = () => {
               <option value="Completed">Hoàn thành (Completed)</option>
               <option value="Failed">Thất bại (Failed)</option>
             </Form.Select>
-            <Button variant="light" size="sm" onClick={fetchTransactions}><RefreshCw size={16} /></Button>
+            <ExcelActionButtons 
+              dataToExport={transactions || []}
+              exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Transactions'}
+              onRefresh={refresh}
+              isLoading={loading}
+            />
           </div>
         </div>
 
@@ -201,10 +214,21 @@ export const Transactions: React.FC = () => {
                     </td>
                   </tr>
                 )}
+                
+                <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={9} />
               </tbody>
             </table>
+            {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
           </div>
         )}
+
+        <InfiniteScrollFooter
+          loadedCount={loadedCount}
+          totalCount={totalItems}
+          onRefresh={refresh}
+          showCreate={false}
+        />
+
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
