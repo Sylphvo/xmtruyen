@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen — Hướng Dẫn Test API & Client — Test Cases, Bug Log & Giải Pháp</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-api { background: rgba(168,85,247,0.15); color: #a78bfa; border: 1px solid #a78bfa; }
+        .badge-client { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-plan { background: rgba(255,107,157,0.15); color: #ff6b9d; border: 1px solid #ff6b9d; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.85em; }
+        th, td { border: 1px solid #333; padding: 8px 10px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; font-size: 0.8em; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .status-pass { color: #22c55e; font-weight: 600; }
+        .status-fail { color: #ef4444; font-weight: 600; }
+        .status-skip { color: #f59e0b; font-weight: 600; }
+        .status-na { color: #6b7280; }
+        .bug-id { color: #ff6b9d; font-weight: 700; font-family: monospace; }
+        .severity-critical { color: #ef4444; font-weight: 700; }
+        .severity-high { color: #f97316; font-weight: 700; }
+        .severity-medium { color: #f59e0b; font-weight: 700; }
+        .severity-low { color: #22c55e; font-weight: 700; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🧪 Hướng Dẫn Test API & Client — Full Test Cases</h1>
+    <p class="subtitle">
+        <span class="badge badge-api">Luồng 1: Test API</span>
+        <span class="badge badge-client">Luồng 2: Test Client</span>
+        <span class="badge badge-plan">Chưa Triển Khai</span>
+        Quy trình kiểm thử chi tiết — Test Cases, Bug Log, Giải pháp Fix Bug cho toàn hệ thống
+    </p>
+
+    <!-- MỤC LỤC -->
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#overview">1. Quy Trình Test & Công Cụ</a>
+        <a href="#api-auth">2. [API] Test Cases: Xác Thực (Auth)</a>
+        <a href="#api-books">3. [API] Test Cases: Quản Lý Sách (Publications)</a>
+        <a href="#api-chapters">4. [API] Test Cases: Chương & Upload</a>
+        <a href="#api-categories">5. [API] Test Cases: Danh Mục & Chủ Đề</a>
+        <a href="#api-users">6. [API] Test Cases: Quản Lý Người Dùng</a>
+        <a href="#api-reading">7. [API] Test Cases: Đọc Sách & Tiến Độ</a>
+        <a href="#api-bug-log">8. [API] Bug Log Template & Giải Pháp</a>
+        <a href="#client-home">9. [Client] Test Cases: Trang Chủ & Navigation</a>
+        <a href="#client-detail">10. [Client] Test Cases: Chi Tiết Sách & Đọc Truyện</a>
+        <a href="#client-auth">11. [Client] Test Cases: Đăng Nhập / Đăng Ký</a>
+        <a href="#client-library">12. [Client] Test Cases: Thư Viện & Bookmark</a>
+        <a href="#client-admin">13. [Client] Test Cases: Admin Portal</a>
+        <a href="#client-bug-log">14. [Client] Bug Log Template & Chức Năng Thiếu</a>
+        <a href="#templates">15. Templates JSON Export (Bug Report)</a>
+    </div>
+
+    <!-- 1. QUY TRÌNH -->
+    <h2 id="overview">1. Quy Trình Test & Công Cụ</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        QUY TRÌNH KIỂM THỬ                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌────────────┐    ┌──────────────┐    ┌──────────────┐    ┌────────────────┐
+  │ Viết Test  │───▶│ Chạy Test    │───▶│ Ghi Log Lỗi │───▶│ Đề Xuất Fix    │
+  │ Cases      │    │ (Manual/Auto)│    │ (Bug Report) │    │ (Giải Pháp)    │
+  └────────────┘    └──────────────┘    └──────────────┘    └────────────────┘
+       │                   │                   │                    │
+       ▼                   ▼                   ▼                    ▼
+  Theo từng         Postman (API)        JSON bug log         Code fix +
+  chức năng         Browser (Client)     với severity         file/line cụ thể
+    </div>
+
+    <h3>1.1 Công cụ sử dụng</h3>
+    <table>
+        <thead><tr><th>Luồng</th><th>Công cụ</th><th>Mục đích</th></tr></thead>
+        <tbody>
+            <tr><td>API Test</td><td>Postman / Thunder Client / curl</td><td>Gửi request, kiểm tra response</td></tr>
+            <tr><td>API Test</td><td>Scalar UI (/scalar/v1)</td><td>Test trực tiếp trên browser</td></tr>
+            <tr><td>Client Test</td><td>Chrome DevTools (F12)</td><td>Console errors, Network tab, Performance</td></tr>
+            <tr><td>Client Test</td><td>Manual Testing</td><td>Thao tác trên giao diện, kiểm tra UX</td></tr>
+            <tr><td>Bug Log</td><td>JSON file (bug-log-api.json, bug-log-client.json)</td><td>Ghi nhận tất cả lỗi</td></tr>
+        </tbody>
+    </table>
+
+    <h3>1.2 Quy ước trạng thái Test Case</h3>
+    <table>
+        <thead><tr><th>Trạng thái</th><th>Ý nghĩa</th></tr></thead>
+        <tbody>
+            <tr><td><span class="status-pass">✅ PASS</span></td><td>Test case chạy đúng expected result</td></tr>
+            <tr><td><span class="status-fail">❌ FAIL</span></td><td>Có bug — ghi vào Bug Log</td></tr>
+            <tr><td><span class="status-skip">⚠️ SKIP</span></td><td>Chức năng chưa implement — ghi vào "Missing Features"</td></tr>
+            <tr><td><span class="status-na">— N/A</span></td><td>Không áp dụng cho môi trường test hiện tại</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LUỒNG 1: TEST API                                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <h2 id="api-auth">2. [API] Test Cases: Xác Thực (Auth)</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:60px">TC-ID</th>
+                <th style="width:200px">Test Case</th>
+                <th>Endpoint</th>
+                <th>Input / Precondition</th>
+                <th>Expected Result</th>
+                <th style="width:60px">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>AUTH-01</td>
+                <td>Đăng ký tài khoản mới</td>
+                <td><code>POST /api/auth/register</code></td>
+                <td>Body: { email, password, fullName } — email chưa tồn tại</td>
+                <td>200 OK, trả về { success: true, token, user }</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-02</td>
+                <td>Đăng ký email đã tồn tại</td>
+                <td><code>POST /api/auth/register</code></td>
+                <td>Body: { email đã có trong DB }</td>
+                <td>400 Bad Request, message "Email đã được sử dụng"</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-03</td>
+                <td>Đăng nhập thành công</td>
+                <td><code>POST /api/auth/login</code></td>
+                <td>Body: { email, password } — đúng credentials</td>
+                <td>200 OK, trả về JWT token (expire 1440 phút)</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-04</td>
+                <td>Đăng nhập sai mật khẩu</td>
+                <td><code>POST /api/auth/login</code></td>
+                <td>Body: { email đúng, password sai }</td>
+                <td>401 Unauthorized</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-05</td>
+                <td>Đăng nhập email không tồn tại</td>
+                <td><code>POST /api/auth/login</code></td>
+                <td>Body: { email không có trong DB }</td>
+                <td>401 Unauthorized</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-06</td>
+                <td>Truy cập API protected không token</td>
+                <td><code>GET /api/admin/users</code></td>
+                <td>Không gửi header Authorization</td>
+                <td>401 Unauthorized</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-07</td>
+                <td>Truy cập API protected token hết hạn</td>
+                <td><code>GET /api/admin/users</code></td>
+                <td>Token đã expired</td>
+                <td>401 Unauthorized</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>AUTH-08</td>
+                <td>Truy cập API admin với role Member</td>
+                <td><code>DELETE /api/Publications/{id}</code></td>
+                <td>Token của user role "Member"</td>
+                <td>403 Forbidden</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 id="api-books">3. [API] Test Cases: Quản Lý Sách (Publications)</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:60px">TC-ID</th>
+                <th style="width:200px">Test Case</th>
+                <th>Endpoint</th>
+                <th>Input / Precondition</th>
+                <th>Expected Result</th>
+                <th style="width:60px">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>BOOK-01</td>
+                <td>Lấy danh sách sách (default)</td>
+                <td><code>GET /api/Publications</code></td>
+                <td>Không param → page=1, pageSize=10</td>
+                <td>200 OK, { data: [...], totalCount, page: 1, pageSize: 10 }</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-02</td>
+                <td>Lấy danh sách có filter keyword</td>
+                <td><code>GET /api/Publications?keyword=harry</code></td>
+                <td>keyword="harry"</td>
+                <td>200 OK, data chỉ chứa sách có "harry" trong title</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-03</td>
+                <td>Lấy danh sách filter formatType</td>
+                <td><code>GET /api/Publications?formatType=2</code></td>
+                <td>formatType=2 (Comic)</td>
+                <td>200 OK, tất cả item có formatType=2</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-04</td>
+                <td>Phân trang chính xác</td>
+                <td><code>GET /api/Publications?page=2&pageSize=5</code></td>
+                <td>DB có ≥6 sách</td>
+                <td>200 OK, data.length ≤ 5, page=2</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-05</td>
+                <td>Tạo sách mới thành công</td>
+                <td><code>POST /api/Publications</code></td>
+                <td>Body: { title, author, formatType, accessLevel, categoryIds }</td>
+                <td>201 Created, trả về object book mới có id</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-06</td>
+                <td>Tạo sách thiếu title (validation)</td>
+                <td><code>POST /api/Publications</code></td>
+                <td>Body: { author: "abc" } — thiếu title</td>
+                <td>400 Bad Request, message validation error</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-07</td>
+                <td>Cập nhật sách</td>
+                <td><code>PUT /api/Publications/{id}</code></td>
+                <td>ID hợp lệ, body có title mới</td>
+                <td>204 No Content</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-08</td>
+                <td>Cập nhật sách không tồn tại</td>
+                <td><code>PUT /api/Publications/{invalid-guid}</code></td>
+                <td>ID không tồn tại trong DB</td>
+                <td>404 Not Found</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-09</td>
+                <td>Xóa sách</td>
+                <td><code>DELETE /api/Publications/{id}</code></td>
+                <td>ID hợp lệ, có token Admin</td>
+                <td>204 No Content, GET lại → 404</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-10</td>
+                <td>Toggle trạng thái sách</td>
+                <td><code>PATCH /api/Publications/{id}/status</code></td>
+                <td>Body: "Active" hoặc "On Hold"</td>
+                <td>200 OK, GET lại → status đã đổi</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-11</td>
+                <td>Upload ảnh bìa</td>
+                <td><code>POST /api/Upload/cover-image</code></td>
+                <td>multipart/form-data: file (image/png), publicationId</td>
+                <td>200 OK, { success: true, url: "uploads/..." }</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BOOK-12</td>
+                <td>Upload file sách (500MB queue)</td>
+                <td><code>POST /api/Upload/Publication-file</code></td>
+                <td>multipart: file (.zip), PublicationId</td>
+                <td>202 Accepted, { taskId, status: "PROCESSING" }</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 id="api-chapters">4. [API] Test Cases: Chương & Upload</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:200px">Test Case</th><th>Endpoint</th><th>Input</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>CHAP-01</td><td>Lấy danh sách chương theo sách</td><td><code>GET /api/chapters?publicationId={id}</code></td><td>publicationId hợp lệ</td><td>200 OK, mảng chapters theo orderIndex</td><td></td></tr>
+            <tr><td>CHAP-02</td><td>Tạo chương truyện chữ</td><td><code>POST /api/chapters</code></td><td>{ publicationId, title, content, orderIndex }</td><td>201 Created</td><td></td></tr>
+            <tr><td>CHAP-03</td><td>Tạo chương truyện tranh (upload ảnh)</td><td><code>POST /api/comic-chapters/upload</code></td><td>multipart: files[], publicationId, chapterTitle</td><td>201 Created, comic pages tạo đúng số lượng</td><td></td></tr>
+            <tr><td>CHAP-04</td><td>Lấy nội dung chương để đọc</td><td><code>GET /api/reading/chapter/{chapterId}</code></td><td>chapterId hợp lệ</td><td>200 OK, { content / comicPages }</td><td></td></tr>
+            <tr><td>CHAP-05</td><td>Đọc chương VIP khi chưa mua</td><td><code>GET /api/reading/chapter/{vipChapterId}</code></td><td>Chương có accessLevel=2, user chưa mua</td><td>403 hoặc message "Cần mua chương"</td><td></td></tr>
+            <tr><td>CHAP-06</td><td>Upload file quá giới hạn (>500MB)</td><td><code>POST /api/Upload/Publication-file</code></td><td>File >500MB</td><td>413 Payload Too Large</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="api-categories">5. [API] Test Cases: Danh Mục & Chủ Đề</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:200px">Test Case</th><th>Endpoint</th><th>Input</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>CAT-01</td><td>Lấy danh sách thể loại</td><td><code>GET /api/categories</code></td><td>Không param</td><td>200 OK, mảng categories</td><td></td></tr>
+            <tr><td>CAT-02</td><td>Tạo thể loại mới</td><td><code>POST /api/categories</code></td><td>{ name: "Kiếm Hiệp" }</td><td>201, id + slug tự sinh</td><td></td></tr>
+            <tr><td>CAT-03</td><td>Tạo thể loại trùng tên</td><td><code>POST /api/categories</code></td><td>name đã tồn tại</td><td>400 hoặc 409 Conflict</td><td></td></tr>
+            <tr><td>CAT-04</td><td>Xóa thể loại đang được sách sử dụng</td><td><code>DELETE /api/categories/{id}</code></td><td>Category có sách liên kết</td><td>400 "Không thể xóa" hoặc cascade</td><td></td></tr>
+            <tr><td>TOP-01</td><td>Lấy danh sách chủ đề</td><td><code>GET /api/topics</code></td><td>Không param</td><td>200 OK, mảng topics</td><td></td></tr>
+            <tr><td>TOP-02</td><td>CRUD chủ đề</td><td><code>POST/PUT/DELETE /api/topics</code></td><td>Tạo, sửa, xóa</td><td>201/204/204</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="api-users">6. [API] Test Cases: Quản Lý Người Dùng</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:200px">Test Case</th><th>Endpoint</th><th>Input</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>USER-01</td><td>Lấy danh sách users (phân trang)</td><td><code>GET /api/admin/users?page=1&pageSize=20</code></td><td>Token Admin</td><td>200 OK, { data, totalCount }</td><td></td></tr>
+            <tr><td>USER-02</td><td>Tìm user theo email</td><td><code>GET /api/admin/users?searchKeyword=test@</code></td><td>keyword tìm kiếm</td><td>200 OK, data chứa user match</td><td></td></tr>
+            <tr><td>USER-03</td><td>Lọc user theo isActive</td><td><code>GET /api/admin/users?isActive=false</code></td><td>Filter inactive</td><td>200 OK, tất cả user có isActive=false</td><td></td></tr>
+            <tr><td>USER-04</td><td>Cập nhật thông tin user</td><td><code>PUT /api/admin/users/{id}</code></td><td>{ fullName, coinBalance }</td><td>204 No Content</td><td></td></tr>
+            <tr><td>USER-05</td><td>Khóa tài khoản user</td><td><code>PATCH /api/admin/users/{id}/lock</code></td><td>Token Admin</td><td>200 OK, user.isActive = false</td><td></td></tr>
+            <tr><td>USER-06</td><td>Mở khóa tài khoản</td><td><code>PATCH /api/admin/users/{id}/unlock</code></td><td>Token Admin</td><td>200 OK, user.isActive = true</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="api-reading">7. [API] Test Cases: Đọc Sách & Tiến Độ</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:200px">Test Case</th><th>Endpoint</th><th>Input</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>READ-01</td><td>Lấy nội dung chương (anonymous)</td><td><code>GET /api/reading/chapter/{id}</code></td><td>Không token, chương free</td><td>200 OK, trả nội dung</td><td></td></tr>
+            <tr><td>READ-02</td><td>Lưu tiến độ đọc</td><td><code>POST /api/reading/progress</code></td><td>{ chapterId, percent, position }</td><td>200 OK</td><td></td></tr>
+            <tr><td>READ-03</td><td>Lấy lịch sử đọc</td><td><code>GET /api/reading/history</code></td><td>Token user</td><td>200 OK, mảng reading history</td><td></td></tr>
+            <tr><td>READ-04</td><td>Thêm bookmark</td><td><code>POST /api/bookmarks</code></td><td>{ publicationId }</td><td>201 Created</td><td></td></tr>
+            <tr><td>READ-05</td><td>Xóa bookmark</td><td><code>DELETE /api/bookmarks/{id}</code></td><td>ID bookmark</td><td>204 No Content</td><td></td></tr>
+            <tr><td>READ-06</td><td>Lấy trang truyện tranh (comic pages)</td><td><code>GET /api/reading/chapter/{id}</code></td><td>Chapter loại comic</td><td>200 OK, { comicPages: [{ pageNumber, imageUrl }] }</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 8. BUG LOG API -->
+    <h2 id="api-bug-log">8. [API] Bug Log Template & Giải Pháp</h2>
+
+    <h3>8.1 Template Bug Report</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:70px">Bug ID</th>
+                <th style="width:70px">Severity</th>
+                <th>TC-ID</th>
+                <th>Mô tả lỗi</th>
+                <th>Actual Result</th>
+                <th>Giải pháp Fix</th>
+                <th style="width:70px">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="bug-id">BUG-API-001</span></td>
+                <td><span class="severity-critical">Critical</span></td>
+                <td>AUTH-03</td>
+                <td>Login trả về 500 khi DB connection string sai</td>
+                <td>500 Internal Server Error, stack trace lộ ra client</td>
+                <td>Bắt exception ở AuthService, trả 503 + message generic. Kiểm tra connection string.</td>
+                <td><span class="status-fail">Open</span></td>
+            </tr>
+            <tr>
+                <td><span class="bug-id">BUG-API-002</span></td>
+                <td><span class="severity-high">High</span></td>
+                <td>BOOK-12</td>
+                <td>Upload file .zip nhưng worker không tự extract</td>
+                <td>TaskId trả về OK nhưng không tạo chapters</td>
+                <td>Kiểm tra BookProcessingWorker có đang chạy, check log. Đảm bảo HostedService registered.</td>
+                <td><span class="status-fail">Open</span></td>
+            </tr>
+            <tr>
+                <td><span class="bug-id">BUG-API-003</span></td>
+                <td><span class="severity-medium">Medium</span></td>
+                <td>BOOK-02</td>
+                <td>Search keyword không tìm theo author</td>
+                <td>Chỉ match title, bỏ qua author field</td>
+                <td>Sửa query ở PublicationService: thêm <code>.Where(b => b.Author.Contains(keyword))</code></td>
+                <td><span class="status-fail">Open</span></td>
+            </tr>
+            <tr><td colspan="7" style="text-align: center; color: #666;">... thêm bugs khi test ...</td></tr>
+        </tbody>
+    </table>
+
+    <h3>8.2 Script chạy test API tự động (Postman Collection Runner)</h3>
+    <div class="code-title">📁 xomtruyen-overview/test-api-collection.json (Postman format)</div>
+    <pre><code>// Cách sử dụng:
+// 1. Import file JSON vào Postman
+// 2. Set environment variable: {{BASE_URL}} = http://localhost:5000
+// 3. Chạy Collection Runner → tất cả test cases chạy tự động
+// 4. Xem report → export kết quả
+
+// Ví dụ 1 request trong collection:
+{
+    "name": "AUTH-03: Login thành công",
+    "request": {
+        "method": "POST",
+        "url": "{{BASE_URL}}/api/auth/login",
+        "body": {
+            "mode": "raw",
+            "raw": "{\"email\":\"admin@xomtruyen.com\",\"password\":\"Admin123!\"}"
+        }
+    },
+    "event": [{
+        "listen": "test",
+        "script": {
+            "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Has token', () => {",
+                "    const json = pm.response.json();",
+                "    pm.expect(json.data.token).to.be.a('string');",
+                "    pm.environment.set('AUTH_TOKEN', json.data.token);",
+                "});"
+            ]
+        }
+    }]
+}</code></pre>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LUỒNG 2: TEST CLIENT                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <h2 id="client-home">9. [Client] Test Cases: Trang Chủ & Navigation</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:60px">TC-ID</th>
+                <th style="width:220px">Test Case</th>
+                <th>Steps</th>
+                <th>Expected Result</th>
+                <th style="width:60px">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>WEB-01</td><td>Trang chủ load danh sách sách</td><td>Mở http://localhost:5173/</td><td>Hiển thị grid sách với ảnh bìa, tên, tác giả. Không lỗi console.</td><td></td></tr>
+            <tr><td>WEB-02</td><td>Hiển thị các section (Mới nhất, Đề xuất...)</td><td>Quan sát trang chủ</td><td>Có ít nhất 1 section với slider/grid sách</td><td></td></tr>
+            <tr><td>WEB-03</td><td>Click vào sách → mở chi tiết</td><td>Click bất kỳ book card</td><td>Navigate sang /book/{id}, hiển thị thông tin chi tiết</td><td></td></tr>
+            <tr><td>WEB-04</td><td>Header hiển thị đúng</td><td>Quan sát header</td><td>Logo, thanh tìm kiếm, nút đăng nhập/avatar</td><td></td></tr>
+            <tr><td>WEB-05</td><td>Footer hiển thị</td><td>Cuộn xuống cuối trang</td><td>Footer với thông tin, links</td><td></td></tr>
+            <tr><td>WEB-06</td><td>Responsive mobile (375px)</td><td>F12 → Device mode → iPhone SE</td><td>Layout không bị vỡ, text không tràn</td><td></td></tr>
+            <tr><td>WEB-07</td><td>Tìm kiếm sách</td><td>Gõ keyword vào ô search → Enter</td><td>Navigate sang /search?q=keyword, hiển thị kết quả</td><td></td></tr>
+            <tr><td>WEB-08</td><td>Không có kết quả tìm kiếm</td><td>Search keyword không match ("xyzabc123")</td><td>Hiển thị message "Không tìm thấy"</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="client-detail">10. [Client] Test Cases: Chi Tiết Sách & Đọc Truyện</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:220px">Test Case</th><th>Steps</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>DET-01</td><td>Hiển thị thông tin sách</td><td>Mở /book/{id}</td><td>Ảnh bìa, tên, tác giả, mô tả, thể loại, rating</td><td></td></tr>
+            <tr><td>DET-02</td><td>Danh sách chương hiển thị</td><td>Cuộn xuống section chương</td><td>Liệt kê chapters theo orderIndex, có tiêu đề + thời gian</td><td></td></tr>
+            <tr><td>DET-03</td><td>Click "Bắt đầu đọc"</td><td>Click nút "Đọc ngay"</td><td>Navigate sang /read/{chapterId} (chương đầu tiên)</td><td></td></tr>
+            <tr><td>DET-04</td><td>Đọc truyện chữ — hiển thị nội dung</td><td>Mở trang đọc chương truyện chữ</td><td>Nội dung text hiển thị đúng, font dễ đọc</td><td></td></tr>
+            <tr><td>DET-05</td><td>Đọc truyện tranh — hiển thị ảnh</td><td>Mở trang đọc chương comic</td><td>Ảnh comic load từ API, không 404, đúng thứ tự page</td><td></td></tr>
+            <tr><td>DET-06</td><td>Chuyển chương (Trước/Sau)</td><td>Click nút "Chương trước" / "Chương sau"</td><td>Navigate đúng chương, nội dung thay đổi</td><td></td></tr>
+            <tr><td>DET-07</td><td>Đổi chế độ đọc (Sáng/Tối/Sepia)</td><td>Click nút đổi theme trong reader</td><td>Background + text color thay đổi tương ứng</td><td></td></tr>
+            <tr><td>DET-08</td><td>Thay đổi cỡ chữ (A-/A+)</td><td>Click nút tăng/giảm font size</td><td>Text to hơn / nhỏ hơn rõ rệt</td><td></td></tr>
+            <tr><td>DET-09</td><td>Sách không tồn tại (404)</td><td>Mở /book/invalid-uuid</td><td>Hiển thị trang 404 hoặc message "Không tìm thấy"</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="client-auth">11. [Client] Test Cases: Đăng Nhập / Đăng Ký</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:220px">Test Case</th><th>Steps</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>CAUTH-01</td><td>Form đăng nhập hiển thị</td><td>Mở /login</td><td>Form có email, password, nút submit</td><td></td></tr>
+            <tr><td>CAUTH-02</td><td>Đăng nhập thành công</td><td>Nhập đúng email/password → Submit</td><td>Redirect về trang chủ, header hiện tên user/avatar</td><td></td></tr>
+            <tr><td>CAUTH-03</td><td>Đăng nhập sai → hiện lỗi</td><td>Nhập sai password → Submit</td><td>Toast/message "Sai thông tin đăng nhập"</td><td></td></tr>
+            <tr><td>CAUTH-04</td><td>Form validation (email trống)</td><td>Để trống email → Submit</td><td>Hiện validation "Vui lòng nhập email"</td><td></td></tr>
+            <tr><td>CAUTH-05</td><td>Form đăng ký hiển thị</td><td>Mở /register</td><td>Form có email, password, confirm password, fullName</td><td></td></tr>
+            <tr><td>CAUTH-06</td><td>Đăng ký thành công</td><td>Nhập thông tin hợp lệ → Submit</td><td>Tạo tài khoản → auto login → redirect trang chủ</td><td></td></tr>
+            <tr><td>CAUTH-07</td><td>Đăng ký password mismatch</td><td>Password ≠ Confirm Password</td><td>Hiện lỗi "Mật khẩu không khớp"</td><td></td></tr>
+            <tr><td>CAUTH-08</td><td>Đăng xuất</td><td>Click nút "Đăng xuất" trên header</td><td>Xóa token, redirect về /login hoặc trang chủ guest</td><td></td></tr>
+            <tr><td>CAUTH-09</td><td>Quên mật khẩu</td><td>Mở /forgot-password, nhập email</td><td>Hiện message "Đã gửi email reset" hoặc chức năng chưa có</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="client-library">12. [Client] Test Cases: Thư Viện & Bookmark</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:220px">Test Case</th><th>Steps</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>LIB-01</td><td>Trang thư viện hiển thị</td><td>Mở /library (đã đăng nhập)</td><td>Hiển thị grid sách trong thư viện cá nhân</td><td></td></tr>
+            <tr><td>LIB-02</td><td>Thêm sách vào bookmark</td><td>Tại trang chi tiết sách → click icon bookmark</td><td>Icon đổi trạng thái, toast "Đã lưu"</td><td></td></tr>
+            <tr><td>LIB-03</td><td>Xóa bookmark</td><td>Tại /bookmarks → click xóa</td><td>Sách biến mất khỏi danh sách</td><td></td></tr>
+            <tr><td>LIB-04</td><td>Lịch sử đọc hiển thị</td><td>Mở /history</td><td>Danh sách chương đã đọc, thời gian, % tiến độ</td><td></td></tr>
+            <tr><td>LIB-05</td><td>Resume đọc từ lịch sử</td><td>Click vào item trong history</td><td>Mở chương đó tại vị trí đã dừng lần trước</td><td></td></tr>
+            <tr><td>LIB-06</td><td>Thư viện khi chưa đăng nhập</td><td>Mở /library khi chưa login</td><td>Redirect về /login hoặc hiện "Cần đăng nhập"</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="client-admin">13. [Client] Test Cases: Admin Portal</h2>
+
+    <table>
+        <thead>
+            <tr><th style="width:60px">TC-ID</th><th style="width:220px">Test Case</th><th>Steps</th><th>Expected</th><th style="width:60px">Status</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>ADM-01</td><td>Login admin portal</td><td>Mở http://localhost:5174/login</td><td>Form login, nhập admin credentials → vào Dashboard</td><td></td></tr>
+            <tr><td>ADM-02</td><td>Dashboard hiển thị stats</td><td>Trang chủ sau login</td><td>Stat cards (tổng sách, user, lượt đọc), biểu đồ</td><td></td></tr>
+            <tr><td>ADM-03</td><td>Bảng sách — hiển thị dữ liệu</td><td>Mở menu "Sách"</td><td>Table load dữ liệu từ API, có pagination/infinite scroll</td><td></td></tr>
+            <tr><td>ADM-04</td><td>Thêm sách mới (inline / modal)</td><td>Click "+ Create" hoặc "Thêm mới"</td><td>Form hiện, nhập data → submit → sách xuất hiện trong bảng</td><td></td></tr>
+            <tr><td>ADM-05</td><td>Inline edit sách (double-click)</td><td>Double-click vào ô "Tên sách"</td><td>Ô chuyển thành input, Enter → save, Escape → cancel</td><td></td></tr>
+            <tr><td>ADM-06</td><td>Upload file sách từ admin</td><td>Click nút Upload → chọn file .zip</td><td>Progress bar hiện, upload xong → toast success</td><td></td></tr>
+            <tr><td>ADM-07</td><td>Xóa sách (confirm dialog)</td><td>Click nút Xóa → confirm</td><td>Sách biến mất khỏi bảng</td><td></td></tr>
+            <tr><td>ADM-08</td><td>Bulk select + bulk delete</td><td>Tick nhiều checkbox → click "Xóa" trên FloatingBar</td><td>Tất cả sách được chọn bị xóa</td><td></td></tr>
+            <tr><td>ADM-09</td><td>Quản lý Users — lock/unlock</td><td>Mở "Users" → click lock icon</td><td>User bị khóa, trạng thái đổi</td><td></td></tr>
+            <tr><td>ADM-10</td><td>Quản lý Categories — CRUD</td><td>Thêm/Sửa/Xóa thể loại</td><td>Tất cả operations thành công</td><td></td></tr>
+            <tr><td>ADM-11</td><td>Database viewer — xem bảng</td><td>Mở "Database" → chọn bảng</td><td>Hiển thị data từ bảng PostgreSQL</td><td></td></tr>
+            <tr><td>ADM-12</td><td>Search trong bảng</td><td>Gõ keyword vào ô tìm kiếm</td><td>Bảng filter theo keyword (debounce)</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 14. CLIENT BUG LOG -->
+    <h2 id="client-bug-log">14. [Client] Bug Log Template & Chức Năng Thiếu</h2>
+
+    <h3>14.1 Bug Log Template</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:80px">Bug ID</th>
+                <th style="width:70px">Severity</th>
+                <th>TC-ID</th>
+                <th>Mô tả lỗi</th>
+                <th>Steps to Reproduce</th>
+                <th>Giải pháp Fix</th>
+                <th style="width:60px">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="bug-id">BUG-WEB-001</span></td>
+                <td><span class="severity-high">High</span></td>
+                <td>DET-05</td>
+                <td>Ảnh truyện tranh 404 — URL relative thiếu domain</td>
+                <td>Mở chương comic → ảnh hiện icon broken</td>
+                <td>Trong bookService.ts: kiểm tra URL, nếu relative thì prepend API_BASE_URL</td>
+                <td><span class="status-fail">Open</span></td>
+            </tr>
+            <tr>
+                <td><span class="bug-id">BUG-WEB-002</span></td>
+                <td><span class="severity-medium">Medium</span></td>
+                <td>WEB-06</td>
+                <td>Layout vỡ trên mobile 375px — card sách tràn</td>
+                <td>F12 → iPhone SE → trang chủ</td>
+                <td>Sửa CSS grid: min-width BookCard, thêm media query @375px</td>
+                <td><span class="status-fail">Open</span></td>
+            </tr>
+            <tr>
+                <td><span class="bug-id">BUG-ADM-001</span></td>
+                <td><span class="severity-medium">Medium</span></td>
+                <td>ADM-05</td>
+                <td>Inline edit không lưu khi click ra ngoài</td>
+                <td>Double-click edit → click vùng khác (không nhấn Enter)</td>
+                <td>Thêm onBlur handler → auto save hoặc cancel</td>
+                <td><span class="status-fail">Open</span></td>
+            </tr>
+            <tr><td colspan="7" style="text-align: center; color: #666;">... thêm bugs khi test ...</td></tr>
+        </tbody>
+    </table>
+
+    <h3>14.2 Chức Năng Chưa Implement (Missing Features)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:60px">MF-ID</th>
+                <th>Chức Năng</th>
+                <th>Trang / Module</th>
+                <th>TC-ID liên quan</th>
+                <th>Mức độ cần thiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>MF-01</td><td>Quên mật khẩu / Reset password</td><td>Web Client /forgot-password</td><td>CAUTH-09</td><td><span class="severity-high">High</span></td></tr>
+            <tr><td>MF-02</td><td>Thanh toán mua chương VIP</td><td>Web Client + API</td><td>CHAP-05</td><td><span class="severity-high">High</span></td></tr>
+            <tr><td>MF-03</td><td>Đánh giá / Review sách</td><td>Web Client /book/{id}</td><td>—</td><td><span class="severity-medium">Medium</span></td></tr>
+            <tr><td>MF-04</td><td>Thông báo chương mới (real-time)</td><td>Web Client header bell icon</td><td>—</td><td><span class="severity-medium">Medium</span></td></tr>
+            <tr><td>MF-05</td><td>Infinite Scroll cho bảng admin</td><td>Admin Portal (tất cả bảng)</td><td>ADM-03</td><td><span class="severity-medium">Medium</span></td></tr>
+            <tr><td>MF-06</td><td>Skeleton Loading</td><td>Toàn hệ thống</td><td>WEB-01, ADM-03</td><td><span class="severity-low">Low</span></td></tr>
+            <tr><td>MF-07</td><td>Export data (Excel/CSV)</td><td>Admin Portal</td><td>—</td><td><span class="severity-low">Low</span></td></tr>
+            <tr><td>MF-08</td><td>Module Khóa Học (LMS)</td><td>Toàn hệ thống</td><td>—</td><td><span class="severity-medium">Medium</span></td></tr>
+            <tr><td colspan="5" style="text-align: center; color: #666;">... cập nhật khi phát hiện thêm ...</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 15. TEMPLATES -->
+    <h2 id="templates">15. Templates JSON Export (Bug Report)</h2>
+
+    <h3>15.1 File ghi log bugs API</h3>
+    <div class="code-title">📁 xomtruyen-overview/test-results/bug-log-api.json</div>
+    <pre><code>{
+    "project": "XomTruyen API",
+    "testedAt": "2026-08-XX",
+    "baseUrl": "http://localhost:5000",
+    "tester": "Tên người test",
+    "summary": {
+        "totalTestCases": 32,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0
+    },
+    "bugs": [
+        {
+            "id": "BUG-API-001",
+            "severity": "Critical",
+            "testCaseId": "AUTH-03",
+            "endpoint": "POST /api/auth/login",
+            "description": "Login trả 500 khi DB connection sai",
+            "actualResult": "500 Internal Server Error, stack trace lộ",
+            "expectedResult": "503 Service Unavailable, message generic",
+            "stepsToReproduce": [
+                "1. Sửa connection string sai",
+                "2. Gọi POST /api/auth/login",
+                "3. Quan sát response"
+            ],
+            "suggestedFix": "Wrap try-catch ở AuthService.LoginAsync, trả ApiResponse.Error()",
+            "affectedFile": "Controllers/AuthController.cs:25",
+            "status": "Open",
+            "assignedTo": "",
+            "fixedAt": ""
+        }
+    ]
+}</code></pre>
+
+    <h3>15.2 File ghi log bugs Client</h3>
+    <div class="code-title">📁 xomtruyen-overview/test-results/bug-log-client.json</div>
+    <pre><code>{
+    "project": "XomTruyen Web Client + Admin Portal",
+    "testedAt": "2026-08-XX",
+    "webClientUrl": "http://localhost:5173",
+    "adminUrl": "http://localhost:5174",
+    "tester": "Tên người test",
+    "summary": {
+        "totalTestCases": 35,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "missingFeatures": 0
+    },
+    "bugs": [
+        {
+            "id": "BUG-WEB-001",
+            "severity": "High",
+            "testCaseId": "DET-05",
+            "page": "/read/{chapterId} (comic)",
+            "description": "Ảnh truyện tranh 404 — URL thiếu domain",
+            "stepsToReproduce": [
+                "1. Mở sách có formatType=2 (truyện tranh)",
+                "2. Click vào chương bất kỳ",
+                "3. Quan sát ảnh → broken image icon"
+            ],
+            "actualResult": "Ảnh src='uploads/chapters/...' → 404 vì browser ghép vào localhost:5173",
+            "expectedResult": "Ảnh src='http://localhost:5000/uploads/chapters/...' → hiển thị OK",
+            "suggestedFix": "bookService.ts: Nếu URL không bắt đầu bằng http, prepend VITE_API_BASE_URL",
+            "affectedFile": "src/services/bookService.ts:45",
+            "screenshot": "",
+            "status": "Open"
+        }
+    ],
+    "missingFeatures": [
+        {
+            "id": "MF-01",
+            "feature": "Quên mật khẩu / Reset password",
+            "page": "/forgot-password",
+            "priority": "High",
+            "relatedTestCase": "CAUTH-09",
+            "notes": "Trang có UI nhưng chưa kết nối API gửi email"
+        }
+    ]
+}</code></pre>
+
+    <h3>15.3 Cách sử dụng</h3>
+    <div class="section-card">
+        <ol>
+            <li><strong>Trước khi test:</strong> Copy template JSON, đổi ngày + tên tester</li>
+            <li><strong>Trong khi test:</strong> Mỗi test case → ghi status (PASS/FAIL/SKIP). Nếu FAIL → thêm entry vào mảng <code>bugs</code></li>
+            <li><strong>Sau khi test:</strong> Update summary counts. Gửi file JSON cho developer</li>
+            <li><strong>Developer fix:</strong> Cập nhật <code>status: "Fixed"</code>, <code>fixedAt: "2026-08-XX"</code></li>
+            <li><strong>Re-test:</strong> Chạy lại test case đã fix → đổi status thành "Verified" hoặc "Reopened"</li>
+        </ol>
+    </div>
+
+    <div class="note">
+        <strong>💡 Tip:</strong> Tạo thư mục <code>xomtruyen-overview/test-results/</code> để lưu tất cả file JSON kết quả test. Mỗi lần test mới → tạo file mới với ngày (vd: <code>bug-log-api-2026-08-17.json</code>).
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Test API & Client — Xóm Truyện Workspace<br>
+        Tổng: 32 API Test Cases + 35 Client Test Cases + Bug Log Templates<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
