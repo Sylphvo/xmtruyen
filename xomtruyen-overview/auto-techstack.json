@@ -1,0 +1,741 @@
+{
+  "generatedAt": "2026-08-17T02:21:25.949Z",
+  "totalProjects": 4,
+  "totalUniqueTechnologies": 53,
+  "projects": [
+    {
+      "project": "xom-truyen (Web Client)",
+      "type": "Node.js / NPM",
+      "configFile": "xom-truyen\\package.json",
+      "version": "0.0.0",
+      "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "lint": "eslint .",
+        "preview": "vite preview"
+      },
+      "dependencies": [
+        {
+          "name": "@fortawesome/fontawesome-svg-core",
+          "version": "^7.3.1",
+          "type": "dependency"
+        },
+        {
+          "name": "@fortawesome/free-solid-svg-icons",
+          "version": "^7.3.1",
+          "type": "dependency"
+        },
+        {
+          "name": "@fortawesome/react-fontawesome",
+          "version": "^3.5.0",
+          "type": "dependency"
+        },
+        {
+          "name": "axios",
+          "version": "^1.18.1",
+          "type": "dependency"
+        },
+        {
+          "name": "bootstrap",
+          "version": "^5.3.8",
+          "type": "dependency"
+        },
+        {
+          "name": "lucide-react",
+          "version": "^1.16.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react",
+          "version": "^19.2.6",
+          "type": "dependency"
+        },
+        {
+          "name": "react-bootstrap",
+          "version": "^2.10.10",
+          "type": "dependency"
+        },
+        {
+          "name": "react-dom",
+          "version": "^19.2.6",
+          "type": "dependency"
+        },
+        {
+          "name": "react-hot-toast",
+          "version": "^2.6.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react-router-dom",
+          "version": "^7.17.0",
+          "type": "dependency"
+        },
+        {
+          "name": "swiper",
+          "version": "^12.2.0",
+          "type": "dependency"
+        }
+      ],
+      "devDependencies": [
+        {
+          "name": "@eslint/js",
+          "version": "^10.0.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/node",
+          "version": "^24.12.3",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/react",
+          "version": "^19.2.14",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/react-dom",
+          "version": "^19.2.3",
+          "type": "devDependency"
+        },
+        {
+          "name": "@vitejs/plugin-react",
+          "version": "^6.0.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint",
+          "version": "^10.3.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react-hooks",
+          "version": "^7.1.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react-refresh",
+          "version": "^0.5.2",
+          "type": "devDependency"
+        },
+        {
+          "name": "globals",
+          "version": "^17.6.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "typescript",
+          "version": "~6.0.2",
+          "type": "devDependency"
+        },
+        {
+          "name": "typescript-eslint",
+          "version": "^8.59.2",
+          "type": "devDependency"
+        },
+        {
+          "name": "vite",
+          "version": "^8.0.12",
+          "type": "devDependency"
+        }
+      ],
+      "totalDeps": 24
+    },
+    {
+      "project": "xomtruyen-admin (Admin Portal)",
+      "type": "Node.js / NPM",
+      "configFile": "xomtruyen-admin\\package.json",
+      "version": "0.0.0",
+      "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "preview": "vite preview"
+      },
+      "dependencies": [
+        {
+          "name": "@fortawesome/fontawesome-svg-core",
+          "version": "^7.2.0",
+          "type": "dependency"
+        },
+        {
+          "name": "@fortawesome/free-solid-svg-icons",
+          "version": "^7.2.0",
+          "type": "dependency"
+        },
+        {
+          "name": "@fortawesome/react-fontawesome",
+          "version": "^3.3.1",
+          "type": "dependency"
+        },
+        {
+          "name": "ag-grid-community",
+          "version": "^36.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "ag-grid-enterprise",
+          "version": "^36.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "ag-grid-react",
+          "version": "^36.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "apexcharts",
+          "version": "^5.15.2",
+          "type": "dependency"
+        },
+        {
+          "name": "axios",
+          "version": "^1.18.1",
+          "type": "dependency"
+        },
+        {
+          "name": "bootstrap",
+          "version": "^5.3.8",
+          "type": "dependency"
+        },
+        {
+          "name": "chart.js",
+          "version": "^4.5.1",
+          "type": "dependency"
+        },
+        {
+          "name": "datatables.net-dt",
+          "version": "^2.3.8",
+          "type": "dependency"
+        },
+        {
+          "name": "datatables.net-react",
+          "version": "^1.0.2",
+          "type": "dependency"
+        },
+        {
+          "name": "date-fns",
+          "version": "^4.4.0",
+          "type": "dependency"
+        },
+        {
+          "name": "flatpickr",
+          "version": "^4.6.13",
+          "type": "dependency"
+        },
+        {
+          "name": "jquery",
+          "version": "^4.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "jwt-decode",
+          "version": "^4.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "lucide-react",
+          "version": "^0.454.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react",
+          "version": "^19.2.7",
+          "type": "dependency"
+        },
+        {
+          "name": "react-apexcharts",
+          "version": "^2.1.1",
+          "type": "dependency"
+        },
+        {
+          "name": "react-bootstrap",
+          "version": "^2.10.10",
+          "type": "dependency"
+        },
+        {
+          "name": "react-chartjs-2",
+          "version": "^5.3.1",
+          "type": "dependency"
+        },
+        {
+          "name": "react-dom",
+          "version": "^19.2.7",
+          "type": "dependency"
+        },
+        {
+          "name": "react-flatpickr",
+          "version": "^4.0.11",
+          "type": "dependency"
+        },
+        {
+          "name": "react-hot-toast",
+          "version": "^2.6.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react-router-dom",
+          "version": "^7.18.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react-select",
+          "version": "^5.10.2",
+          "type": "dependency"
+        },
+        {
+          "name": "sass",
+          "version": "^1.101.0",
+          "type": "dependency"
+        },
+        {
+          "name": "swiper",
+          "version": "^12.2.0",
+          "type": "dependency"
+        },
+        {
+          "name": "xlsx",
+          "version": "^0.18.5",
+          "type": "dependency"
+        }
+      ],
+      "devDependencies": [
+        {
+          "name": "@eslint/js",
+          "version": "^10.0.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/jquery",
+          "version": "^4.0.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/node",
+          "version": "^24.13.2",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/react",
+          "version": "^19.2.17",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/react-dom",
+          "version": "^19.2.3",
+          "type": "devDependency"
+        },
+        {
+          "name": "@vitejs/plugin-react",
+          "version": "^4.3.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint",
+          "version": "^10.5.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react-hooks",
+          "version": "^7.1.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react-refresh",
+          "version": "^0.5.3",
+          "type": "devDependency"
+        },
+        {
+          "name": "globals",
+          "version": "^17.6.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "typescript",
+          "version": "~5.5.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "typescript-eslint",
+          "version": "^8.61.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "vite",
+          "version": "^5.4.8",
+          "type": "devDependency"
+        }
+      ],
+      "totalDeps": 42
+    },
+    {
+      "project": "xomtruyen-app (Mobile App)",
+      "type": "Node.js / NPM",
+      "configFile": "xomtruyen-app\\package.json",
+      "version": "0.0.1",
+      "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "test.e2e": "cypress run",
+        "test.unit": "vitest",
+        "lint": "eslint"
+      },
+      "dependencies": [
+        {
+          "name": "@capacitor/android",
+          "version": "^8.4.2",
+          "type": "dependency"
+        },
+        {
+          "name": "@capacitor/app",
+          "version": "8.1.1",
+          "type": "dependency"
+        },
+        {
+          "name": "@capacitor/core",
+          "version": "8.4.2",
+          "type": "dependency"
+        },
+        {
+          "name": "@capacitor/haptics",
+          "version": "8.0.2",
+          "type": "dependency"
+        },
+        {
+          "name": "@capacitor/ios",
+          "version": "^8.4.2",
+          "type": "dependency"
+        },
+        {
+          "name": "@capacitor/keyboard",
+          "version": "8.0.5",
+          "type": "dependency"
+        },
+        {
+          "name": "@capacitor/status-bar",
+          "version": "8.0.3",
+          "type": "dependency"
+        },
+        {
+          "name": "@ionic/react",
+          "version": "^8.5.0",
+          "type": "dependency"
+        },
+        {
+          "name": "@ionic/react-router",
+          "version": "^8.5.0",
+          "type": "dependency"
+        },
+        {
+          "name": "@types/react-router",
+          "version": "^5.1.20",
+          "type": "dependency"
+        },
+        {
+          "name": "@types/react-router-dom",
+          "version": "^5.3.3",
+          "type": "dependency"
+        },
+        {
+          "name": "ionicons",
+          "version": "^7.4.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react",
+          "version": "19.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react-dom",
+          "version": "19.0.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react-router",
+          "version": "^5.3.4",
+          "type": "dependency"
+        },
+        {
+          "name": "react-router-dom",
+          "version": "^5.3.4",
+          "type": "dependency"
+        },
+        {
+          "name": "swiper",
+          "version": "^14.0.6",
+          "type": "dependency"
+        }
+      ],
+      "devDependencies": [
+        {
+          "name": "@capacitor/cli",
+          "version": "8.4.2",
+          "type": "devDependency"
+        },
+        {
+          "name": "@testing-library/dom",
+          "version": ">=7.21.4",
+          "type": "devDependency"
+        },
+        {
+          "name": "@testing-library/jest-dom",
+          "version": "^5.16.5",
+          "type": "devDependency"
+        },
+        {
+          "name": "@testing-library/react",
+          "version": "^16.2.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "@testing-library/user-event",
+          "version": "^14.4.3",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/react",
+          "version": "19.0.10",
+          "type": "devDependency"
+        },
+        {
+          "name": "@types/react-dom",
+          "version": "19.0.4",
+          "type": "devDependency"
+        },
+        {
+          "name": "@vitejs/plugin-legacy",
+          "version": "^5.0.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "@vitejs/plugin-react",
+          "version": "^4.0.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "cypress",
+          "version": "^13.5.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint",
+          "version": "^9.20.1",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react",
+          "version": "^7.32.2",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react-hooks",
+          "version": "^5.1.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "eslint-plugin-react-refresh",
+          "version": "^0.4.19",
+          "type": "devDependency"
+        },
+        {
+          "name": "globals",
+          "version": "^15.15.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "jsdom",
+          "version": "^22.1.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "terser",
+          "version": "^5.4.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "typescript",
+          "version": "~5.9.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "typescript-eslint",
+          "version": "^8.24.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "vite",
+          "version": "^5.0.0",
+          "type": "devDependency"
+        },
+        {
+          "name": "vitest",
+          "version": "^0.34.6",
+          "type": "devDependency"
+        }
+      ],
+      "totalDeps": 38
+    },
+    {
+      "project": "xomtruyen.API (Backend API)",
+      "type": ".NET / C#",
+      "configFile": "xomtruyen.API\\xomtruyen.API.csproj",
+      "framework": "net9.0",
+      "dependencies": [
+        {
+          "name": "BCrypt.Net-Next",
+          "version": "4.2.0",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "Dapper",
+          "version": "2.1.79",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "Microsoft.AspNetCore.Authentication.JwtBearer",
+          "version": "9.0.2",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "Microsoft.AspNetCore.OpenApi",
+          "version": "9.0.2",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "Microsoft.EntityFrameworkCore.Design",
+          "version": "9.0.2",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "Npgsql.EntityFrameworkCore.PostgreSQL",
+          "version": "9.0.4",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "Scalar.AspNetCore",
+          "version": "2.16.5",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "SharpCompress",
+          "version": "0.50.0",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "SixLabors.ImageSharp",
+          "version": "4.1.0",
+          "type": "NuGet Package"
+        },
+        {
+          "name": "UglyToad.PdfPig",
+          "version": "1.7.0-custom-5",
+          "type": "NuGet Package"
+        }
+      ],
+      "totalDeps": 10
+    }
+  ],
+  "importAnalysis": [
+    {
+      "project": "xom-truyen (Web Client)",
+      "importedPackages": [
+        "@fortawesome",
+        "axios",
+        "lucide-react",
+        "react",
+        "react-bootstrap",
+        "react-dom",
+        "react-hot-toast",
+        "react-router-dom",
+        "swiper"
+      ]
+    },
+    {
+      "project": "xomtruyen-admin (Admin Portal)",
+      "importedPackages": [
+        "@fortawesome",
+        "apexcharts",
+        "axios",
+        "date-fns",
+        "jwt-decode",
+        "lucide-react",
+        "react",
+        "react-bootstrap",
+        "react-dom",
+        "react-hot-toast",
+        "react-router-dom",
+        "react-select",
+        "xlsx"
+      ]
+    },
+    {
+      "project": "xomtruyen-app (Mobile App)",
+      "importedPackages": [
+        "@ionic",
+        "@testing-library",
+        "ionicons",
+        "react",
+        "react-dom",
+        "react-router",
+        "react-router-dom",
+        "swiper"
+      ]
+    }
+  ],
+  "allTechnologies": [
+    "@capacitor/android",
+    "@capacitor/app",
+    "@capacitor/core",
+    "@capacitor/haptics",
+    "@capacitor/ios",
+    "@capacitor/keyboard",
+    "@capacitor/status-bar",
+    "@fortawesome/fontawesome-svg-core",
+    "@fortawesome/free-solid-svg-icons",
+    "@fortawesome/react-fontawesome",
+    "@ionic/react",
+    "@ionic/react-router",
+    "@types/react-router",
+    "@types/react-router-dom",
+    "BCrypt.Net-Next",
+    "Dapper",
+    "Microsoft.AspNetCore.Authentication.JwtBearer",
+    "Microsoft.AspNetCore.OpenApi",
+    "Microsoft.EntityFrameworkCore.Design",
+    "Npgsql.EntityFrameworkCore.PostgreSQL",
+    "Scalar.AspNetCore",
+    "SharpCompress",
+    "SixLabors.ImageSharp",
+    "UglyToad.PdfPig",
+    "ag-grid-community",
+    "ag-grid-enterprise",
+    "ag-grid-react",
+    "apexcharts",
+    "axios",
+    "bootstrap",
+    "chart.js",
+    "datatables.net-dt",
+    "datatables.net-react",
+    "date-fns",
+    "flatpickr",
+    "ionicons",
+    "jquery",
+    "jwt-decode",
+    "lucide-react",
+    "net9.0",
+    "react",
+    "react-apexcharts",
+    "react-bootstrap",
+    "react-chartjs-2",
+    "react-dom",
+    "react-flatpickr",
+    "react-hot-toast",
+    "react-router",
+    "react-router-dom",
+    "react-select",
+    "sass",
+    "swiper",
+    "xlsx"
+  ]
+}
