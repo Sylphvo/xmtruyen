@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen — Module Khóa Học (LMS) — Quản lý, Player & Thanh toán</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-new { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-plan { background: rgba(168,85,247,0.15); color: #a78bfa; border: 1px solid #a78bfa; }
+        .badge-priority { background: rgba(255,107,157,0.15); color: #ff6b9d; border: 1px solid #ff6b9d; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.85em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        .endpoint-card { background: #12121f; border: 1px solid #333; border-radius: 8px; padding: 15px; margin: 10px 0; }
+        .method { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 10px; }
+        .method-get { background: #22c55e; color: #000; }
+        .method-post { background: #3b82f6; color: #fff; }
+        .method-put { background: #f59e0b; color: #000; }
+        .method-delete { background: #ef4444; color: #fff; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🎓 Module Khóa Học (LMS) — Xóm Truyện</h1>
+    <p class="subtitle">
+        <span class="badge badge-new">Tính Năng Mới</span>
+        <span class="badge badge-plan">Chưa Triển Khai</span>
+        <span class="badge badge-priority">Ưu Tiên Cao</span>
+        Hệ thống quản lý khóa học trực tuyến: Upload video, tổ chức bài học, Player theo dõi tiến độ & Thanh toán gói học
+    </p>
+
+    <!-- MỤC LỤC -->
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#overview">1. Tổng Quan & Kiến Trúc</a>
+        <a href="#database">2. Cơ Sở Dữ Liệu (Database Schema)</a>
+        <a href="#api-upload">3. Module Upload Video & Quản Lý Khóa Học</a>
+        <a href="#player">4. Video Player & Theo Dõi Tiến Độ</a>
+        <a href="#payment">5. Hệ Thống Thanh Toán Khóa Học</a>
+        <a href="#admin">6. Giao Diện Admin Quản Trị Khóa Học</a>
+        <a href="#client">7. Giao Diện Client Học Viên</a>
+        <a href="#api-endpoints">8. Danh Sách API Endpoints</a>
+        <a href="#tech-stack">9. Công Nghệ & Thư Viện</a>
+        <a href="#deployment">10. Triển Khai & Cấu Hình</a>
+    </div>
+
+    <!-- 1. TỔNG QUAN -->
+    <h2 id="overview">1. Tổng Quan & Kiến Trúc</h2>
+
+    <p>Module LMS (Learning Management System) mở rộng hệ sinh thái Xóm Truyện thêm khả năng cung cấp nội dung video giáo dục, tổ chức thành các khóa học có cấu trúc (Course → Section → Lesson), theo dõi tiến độ học viên và tích hợp thanh toán mua khóa.</p>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        KIẾN TRÚC MODULE KHÓA HỌC                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+  │  Web Client  │     │ Mobile App   │     │ Admin Portal │
+  │  (React 19)  │     │ (Ionic 8)    │     │ (AG-Grid)    │
+  └──────┬───────┘     └──────┬───────┘     └──────┬───────┘
+         │                    │                     │
+         └────────────────────┼─────────────────────┘
+                              │
+                    ┌─────────▼──────────┐
+                    │   API Gateway      │
+                    │  (ASP.NET Core 9)  │
+                    └─────────┬──────────┘
+                              │
+         ┌────────────────────┼────────────────────┐
+         │                    │                    │
+  ┌──────▼───────┐   ┌───────▼──────┐   ┌────────▼───────┐
+  │ CourseController│ │VideoController│  │PaymentController│
+  │ (CRUD Khóa)   │ │(Upload/Stream)│  │ (VNPay/Momo)    │
+  └──────┬───────┘   └───────┬──────┘   └────────┬───────┘
+         │                    │                    │
+         └────────────────────┼────────────────────┘
+                              │
+                    ┌─────────▼──────────┐
+                    │   PostgreSQL DB    │
+                    │  (Course Schema)   │
+                    └─────────┬──────────┘
+                              │
+                    ┌─────────▼──────────┐
+                    │  File Storage      │
+                    │ (Local / S3 / CDN) │
+                    └────────────────────┘
+    </div>
+
+    <div class="note">
+        <strong>💡 Nguyên tắc thiết kế:</strong> Module LMS tái sử dụng hoàn toàn hạ tầng hiện có (Auth JWT, PostgreSQL, Upload chunked, Background Worker) — chỉ thêm các Controller, Service và Entity mới.
+    </div>
+
+    <!-- 2. DATABASE -->
+    <h2 id="database">2. Cơ Sở Dữ Liệu (Database Schema)</h2>
+
+    <h3>2.1 Danh Sách Bảng Mới</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Bảng</th>
+                <th>Khóa Chính</th>
+                <th>Quan Hệ</th>
+                <th>Mô Tả</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Courses</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>InstructorId → Users</td>
+                <td>Thông tin khóa học: tên, mô tả, ảnh bìa, giá, trạng thái (Draft/Published/Archived)</td>
+            </tr>
+            <tr>
+                <td><strong>CourseSections</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>CourseId → Courses</td>
+                <td>Phân mục trong khóa học (ví dụ: "Chương 1: Giới thiệu")</td>
+            </tr>
+            <tr>
+                <td><strong>Lessons</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>SectionId → CourseSections</td>
+                <td>Bài học cụ thể: tiêu đề, loại (video/text/quiz), thứ tự, thời lượng</td>
+            </tr>
+            <tr>
+                <td><strong>LessonVideos</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>LessonId → Lessons</td>
+                <td>File video: URL gốc, URL CDN, dung lượng, codec, resolution, thời lượng giây</td>
+            </tr>
+            <tr>
+                <td><strong>CourseEnrollments</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>UserId → Users, CourseId → Courses</td>
+                <td>Ghi danh học viên: ngày đăng ký, trạng thái thanh toán, ngày hết hạn</td>
+            </tr>
+            <tr>
+                <td><strong>LessonProgress</strong></td>
+                <td>Composite (UserId + LessonId)</td>
+                <td>UserId → Users, LessonId → Lessons</td>
+                <td>Tiến độ xem video: phần trăm đã xem, thời điểm cuối, đã hoàn thành hay chưa</td>
+            </tr>
+            <tr>
+                <td><strong>CoursePayments</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>UserId → Users, CourseId → Courses</td>
+                <td>Giao dịch thanh toán: số tiền, phương thức, mã giao dịch, trạng thái</td>
+            </tr>
+            <tr>
+                <td><strong>CourseReviews</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>UserId → Users, CourseId → Courses</td>
+                <td>Đánh giá khóa học: điểm sao (1-5), nội dung review</td>
+            </tr>
+            <tr>
+                <td><strong>CourseCertificates</strong></td>
+                <td>Id (Guid PK)</td>
+                <td>UserId → Users, CourseId → Courses</td>
+                <td>Chứng chỉ hoàn thành: mã chứng chỉ, ngày cấp, URL file PDF</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 Entity Framework Migration</h3>
+    <div class="code-title">📁 xomtruyen.API/Data/Entities/Course.cs</div>
+    <pre><code>public class Course
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Title { get; set; } = string.Empty;
+    public string? Slug { get; set; }
+    public string? Description { get; set; }
+    public string? ThumbnailUrl { get; set; }
+    public string? PreviewVideoUrl { get; set; }
+    public decimal Price { get; set; }
+    public decimal? DiscountPrice { get; set; }
+    public string Currency { get; set; } = "VND";
+    public CourseStatus Status { get; set; } = CourseStatus.Draft;
+    public CourseLevel Level { get; set; } = CourseLevel.Beginner;
+    public string? Language { get; set; } = "vi";
+    public int TotalLessons { get; set; }
+    public int TotalDurationMinutes { get; set; }
+    public int EnrollmentCount { get; set; }
+    public double AverageRating { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? PublishedAt { get; set; }
+
+    // Relationships
+    public Guid InstructorId { get; set; }
+    public User Instructor { get; set; } = null!;
+    public ICollection&lt;CourseSection&gt; Sections { get; set; } = new List&lt;CourseSection&gt;();
+    public ICollection&lt;CourseEnrollment&gt; Enrollments { get; set; } = new List&lt;CourseEnrollment&gt;();
+    public ICollection&lt;CourseReview&gt; Reviews { get; set; } = new List&lt;CourseReview&gt;();
+}
+
+public enum CourseStatus { Draft, Published, Archived }
+public enum CourseLevel { Beginner, Intermediate, Advanced, Expert }</code></pre>
+
+    <div class="code-title">📁 xomtruyen.API/Data/Entities/Lesson.cs</div>
+    <pre><code>public class Lesson
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public LessonType Type { get; set; } = LessonType.Video;
+    public int OrderIndex { get; set; }
+    public int DurationSeconds { get; set; }
+    public bool IsFreePreview { get; set; } = false;
+    public string? TextContent { get; set; }  // For text-based lessons
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Relationships
+    public Guid SectionId { get; set; }
+    public CourseSection Section { get; set; } = null!;
+    public LessonVideo? Video { get; set; }
+    public ICollection&lt;LessonProgress&gt; Progresses { get; set; } = new List&lt;LessonProgress&gt;();
+}
+
+public enum LessonType { Video, Text, Quiz, Assignment }</code></pre>
+
+    <div class="code-title">📁 xomtruyen.API/Data/Entities/LessonProgress.cs</div>
+    <pre><code>public class LessonProgress
+{
+    public Guid UserId { get; set; }
+    public Guid LessonId { get; set; }
+    public double WatchedPercent { get; set; }       // 0.0 → 100.0
+    public int LastPositionSeconds { get; set; }     // Vị trí giây cuối cùng
+    public bool IsCompleted { get; set; } = false;
+    public DateTime? CompletedAt { get; set; }
+    public DateTime LastAccessedAt { get; set; } = DateTime.UtcNow;
+
+    // Relationships
+    public User User { get; set; } = null!;
+    public Lesson Lesson { get; set; } = null!;
+}</code></pre>
+
+    <div class="code-title">📁 xomtruyen.API/Data/Entities/CoursePayment.cs</div>
+    <pre><code>public class CoursePayment
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public Guid CourseId { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = "VND";
+    public PaymentMethod Method { get; set; }
+    public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+    public string? TransactionCode { get; set; }     // Mã từ cổng thanh toán
+    public string? GatewayResponse { get; set; }     // JSON response từ VNPay/Momo
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? PaidAt { get; set; }
+
+    // Relationships
+    public User User { get; set; } = null!;
+    public Course Course { get; set; } = null!;
+}
+
+public enum PaymentMethod { VNPay, MoMo, BankTransfer, CoinBalance, Free }
+public enum PaymentStatus { Pending, Completed, Failed, Refunded, Cancelled }</code></pre>
+
+    <!-- 3. UPLOAD VIDEO -->
+    <h2 id="api-upload">3. Module Upload Video & Quản Lý Khóa Học</h2>
+
+    <h3>3.1 Quy Trình Upload Video</h3>
+    <div class="flow-diagram">
+┌──────────────┐    ┌────────────────┐    ┌─────────────────┐    ┌──────────────┐
+│ Admin Portal │───▶│ UploadController│───▶│BackgroundWorker │───▶│ File Storage │
+│ (Chọn file)  │    │ (Chunked 5MB)  │    │ (Transcode)     │    │ (Local/S3)   │
+└──────────────┘    └────────────────┘    └─────────────────┘    └──────────────┘
+                                                   │
+                                                   ▼
+                                          ┌─────────────────┐
+                                          │ PostgreSQL      │
+                                          │ (LessonVideos)  │
+                                          └─────────────────┘
+    </div>
+
+    <h3>3.2 Upload Controller</h3>
+    <div class="code-title">📁 xomtruyen.API/Controllers/CourseVideoController.cs</div>
+    <pre><code>[Route("api/courses/videos")]
+[ApiController]
+[Authorize(Roles = "Admin,Instructor")]
+public class CourseVideoController : ControllerBase
+{
+    private readonly IVideoService _videoService;
+    private readonly IBackgroundTaskQueue _taskQueue;
+
+    public CourseVideoController(IVideoService videoService, IBackgroundTaskQueue taskQueue)
+    {
+        _videoService = videoService;
+        _taskQueue = taskQueue;
+    }
+
+    /// &lt;summary&gt;
+    /// Upload video bài học (hỗ trợ file lớn qua chunked upload)
+    /// &lt;/summary&gt;
+    [HttpPost("upload")]
+    [RequestSizeLimit(2_147_483_648)] // 2GB max
+    [RequestFormLimits(MultipartBodyLengthLimit = 2_147_483_648)]
+    public async Task&lt;IActionResult&gt; UploadLessonVideo(
+        IFormFile file,
+        [FromForm] Guid lessonId)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("File video không hợp lệ");
+
+        // Validate video format
+        var allowedExtensions = new[] { ".mp4", ".mkv", ".webm", ".mov", ".avi" };
+        var ext = Path.GetExtension(file.FileName).ToLower();
+        if (!allowedExtensions.Contains(ext))
+            return BadRequest($"Định dạng {ext} không được hỗ trợ");
+
+        // 1. Lưu file gốc
+        var savedPath = await _videoService.SaveOriginalAsync(file, lessonId);
+
+        // 2. Đẩy vào hàng đợi xử lý nền (transcode → multiple resolutions)
+        await _taskQueue.QueueBackgroundWorkItemAsync(new VideoProcessingTask
+        {
+            TaskId = Guid.NewGuid().ToString(),
+            LessonId = lessonId,
+            SourcePath = savedPath,
+            OriginalFileName = file.FileName,
+            FileSize = file.Length
+        });
+
+        return Accepted(new
+        {
+            message = "Video đã được nhận, đang xử lý nền",
+            lessonId = lessonId,
+            fileName = file.FileName,
+            fileSize = file.Length
+        });
+    }
+
+    /// &lt;summary&gt;
+    /// Stream video cho học viên (có kiểm tra quyền truy cập)
+    /// &lt;/summary&gt;
+    [HttpGet("stream/{lessonId}")]
+    [Authorize]
+    public async Task&lt;IActionResult&gt; StreamVideo(Guid lessonId, [FromQuery] string quality = "720p")
+    {
+        var userId = GetCurrentUserId();
+        var hasAccess = await _videoService.CheckAccessAsync(userId, lessonId);
+        if (!hasAccess)
+            return Forbid("Bạn chưa đăng ký khóa học này");
+
+        var videoPath = await _videoService.GetVideoPathAsync(lessonId, quality);
+        if (string.IsNullOrEmpty(videoPath) || !System.IO.File.Exists(videoPath))
+            return NotFound("Video không tồn tại");
+
+        var stream = new FileStream(videoPath, FileMode.Open, FileAccess.Read);
+        return File(stream, "video/mp4", enableRangeProcessing: true);
+    }
+}</code></pre>
+
+    <h3>3.3 Video Processing Worker (Transcode)</h3>
+    <div class="code-title">📁 xomtruyen.API/Services/Workers/VideoProcessingWorker.cs</div>
+    <pre><code>public class VideoProcessingWorker : BackgroundService
+{
+    private readonly IBackgroundTaskQueue _taskQueue;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger&lt;VideoProcessingWorker&gt; _logger;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            var task = await _taskQueue.DequeueAsync(stoppingToken);
+            if (task is VideoProcessingTask videoTask)
+            {
+                await ProcessVideoAsync(videoTask);
+            }
+        }
+    }
+
+    private async Task ProcessVideoAsync(VideoProcessingTask task)
+    {
+        _logger.LogInformation("Bắt đầu xử lý video: {FileName}", task.OriginalFileName);
+
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService&lt;ApplicationDbContext&gt;();
+
+        try
+        {
+            // 1. Trích xuất metadata (duration, resolution, codec)
+            var metadata = await ExtractMetadataAsync(task.SourcePath);
+
+            // 2. Transcode sang nhiều chất lượng (480p, 720p, 1080p)
+            var outputs = new Dictionary&lt;string, string&gt;();
+            foreach (var quality in new[] { "480p", "720p", "1080p" })
+            {
+                var outputPath = await TranscodeAsync(task.SourcePath, quality);
+                outputs[quality] = outputPath;
+            }
+
+            // 3. Tạo thumbnail từ frame giữa video
+            var thumbnailPath = await GenerateThumbnailAsync(task.SourcePath);
+
+            // 4. Lưu thông tin vào DB
+            var lessonVideo = new LessonVideo
+            {
+                LessonId = Guid.Parse(task.LessonId.ToString()),
+                OriginalUrl = task.SourcePath,
+                Url480p = outputs.GetValueOrDefault("480p"),
+                Url720p = outputs.GetValueOrDefault("720p"),
+                Url1080p = outputs.GetValueOrDefault("1080p"),
+                ThumbnailUrl = thumbnailPath,
+                DurationSeconds = metadata.DurationSeconds,
+                FileSizeBytes = task.FileSize,
+                Resolution = metadata.Resolution,
+                Codec = metadata.Codec,
+                Status = VideoStatus.Ready
+            };
+
+            db.LessonVideos.Add(lessonVideo);
+
+            // Cập nhật duration cho Lesson
+            var lesson = await db.Lessons.FindAsync(task.LessonId);
+            if (lesson != null)
+                lesson.DurationSeconds = metadata.DurationSeconds;
+
+            await db.SaveChangesAsync();
+            _logger.LogInformation("✅ Video xử lý xong: {FileName}", task.OriginalFileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Lỗi xử lý video: {FileName}", task.OriginalFileName);
+        }
+    }
+
+    /// &lt;summary&gt; Sử dụng FFmpeg để transcode video &lt;/summary&gt;
+    private async Task&lt;string&gt; TranscodeAsync(string inputPath, string quality)
+    {
+        var resolutions = new Dictionary&lt;string, string&gt;
+        {
+            ["480p"] = "854:480",
+            ["720p"] = "1280:720",
+            ["1080p"] = "1920:1080"
+        };
+
+        var outputDir = Path.GetDirectoryName(inputPath)!;
+        var outputFile = Path.Combine(outputDir, $"{Path.GetFileNameWithoutExtension(inputPath)}_{quality}.mp4");
+
+        var args = $"-i \"{inputPath}\" -vf scale={resolutions[quality]} " +
+                   $"-c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k " +
+                   $"-movflags +faststart \"{outputFile}\"";
+
+        await RunFFmpegAsync(args);
+        return outputFile;
+    }
+}</code></pre>
+
+    <!-- 4. PLAYER -->
+    <h2 id="player">4. Video Player & Theo Dõi Tiến Độ</h2>
+
+    <h3>4.1 Kiến Trúc Player</h3>
+    <div class="section-card">
+        <ul>
+            <li><strong>Thư viện:</strong> Video.js hoặc Plyr (hỗ trợ HLS adaptive streaming)</li>
+            <li><strong>Tính năng:</strong> Chuyển chất lượng (480p/720p/1080p), tốc độ phát (0.5x → 2x), Picture-in-Picture, Fullscreen</li>
+            <li><strong>Theo dõi:</strong> Mỗi 10 giây gửi heartbeat API cập nhật vị trí xem → LessonProgress</li>
+            <li><strong>Hoàn thành:</strong> Khi xem ≥90% video → đánh dấu IsCompleted = true</li>
+            <li><strong>Bảo mật:</strong> Video stream qua API có token, không expose URL trực tiếp</li>
+        </ul>
+    </div>
+
+    <h3>4.2 React Video Player Component</h3>
+    <div class="code-title">📁 xom-truyen/src/components/Course/VideoPlayer.tsx</div>
+    <pre><code>import React, { useRef, useEffect, useCallback, useState } from 'react';
+import axios from 'axios';
+
+interface VideoPlayerProps {
+    lessonId: string;
+    videoUrl: string;
+    initialPosition?: number;  // Giây bắt đầu (resume)
+    onComplete?: () => void;
+}
+
+export default function VideoPlayer({ lessonId, videoUrl, initialPosition = 0, onComplete }: VideoPlayerProps) {
+    const videoRef = useRef&lt;HTMLVideoElement&gt;(null);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [quality, setQuality] = useState('720p');
+    const [playbackRate, setPlaybackRate] = useState(1);
+    const progressInterval = useRef&lt;number&gt;();
+
+    // Gửi tiến độ lên server mỗi 10 giây
+    const saveProgress = useCallback(async () => {
+        if (!videoRef.current || !duration) return;
+
+        const percent = (videoRef.current.currentTime / duration) * 100;
+        const position = Math.floor(videoRef.current.currentTime);
+
+        try {
+            await axios.post('/api/courses/progress/update', {
+                lessonId,
+                watchedPercent: Math.min(percent, 100),
+                lastPositionSeconds: position,
+                isCompleted: percent >= 90
+            });
+
+            // Nếu xem >= 90% → gọi callback hoàn thành
+            if (percent >= 90 && onComplete) {
+                onComplete();
+            }
+        } catch (err) {
+            console.warn('Không thể lưu tiến độ:', err);
+        }
+    }, [lessonId, duration, onComplete]);
+
+    useEffect(() => {
+        // Bắt đầu interval gửi progress
+        progressInterval.current = window.setInterval(saveProgress, 10000);
+        return () => {
+            clearInterval(progressInterval.current);
+            saveProgress(); // Lưu lần cuối khi unmount
+        };
+    }, [saveProgress]);
+
+    useEffect(() => {
+        // Resume từ vị trí cuối
+        if (videoRef.current && initialPosition > 0) {
+            videoRef.current.currentTime = initialPosition;
+        }
+    }, [initialPosition]);
+
+    const handleQualityChange = (newQuality: string) => {
+        const currentPos = videoRef.current?.currentTime || 0;
+        setQuality(newQuality);
+        // URL sẽ thay đổi theo quality, video tự load lại
+        setTimeout(() => {
+            if (videoRef.current) videoRef.current.currentTime = currentPos;
+        }, 500);
+    };
+
+    return (
+        &lt;div className="video-player-container"&gt;
+            &lt;video
+                ref={videoRef}
+                src={`${videoUrl}?quality=${quality}`}
+                controls
+                onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
+                onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
+                style={{ width: '100%', borderRadius: '8px', background: '#000' }}
+            /&gt;
+
+            {/* Controls Bar */}
+            &lt;div className="player-controls"&gt;
+                {/* Quality Selector */}
+                &lt;select value={quality} onChange={e => handleQualityChange(e.target.value)}&gt;
+                    &lt;option value="480p"&gt;480p&lt;/option&gt;
+                    &lt;option value="720p"&gt;720p (HD)&lt;/option&gt;
+                    &lt;option value="1080p"&gt;1080p (Full HD)&lt;/option&gt;
+                &lt;/select&gt;
+
+                {/* Playback Speed */}
+                &lt;select value={playbackRate} onChange={e => {
+                    const rate = parseFloat(e.target.value);
+                    setPlaybackRate(rate);
+                    if (videoRef.current) videoRef.current.playbackRate = rate;
+                }}&gt;
+                    &lt;option value="0.5"&gt;0.5x&lt;/option&gt;
+                    &lt;option value="0.75"&gt;0.75x&lt;/option&gt;
+                    &lt;option value="1"&gt;1x (Bình thường)&lt;/option&gt;
+                    &lt;option value="1.25"&gt;1.25x&lt;/option&gt;
+                    &lt;option value="1.5"&gt;1.5x&lt;/option&gt;
+                    &lt;option value="2"&gt;2x&lt;/option&gt;
+                &lt;/select&gt;
+
+                {/* Progress Info */}
+                &lt;span className="progress-info"&gt;
+                    {Math.floor(currentTime / 60)}:{String(Math.floor(currentTime % 60)).padStart(2, '0')}
+                    {' / '}
+                    {Math.floor(duration / 60)}:{String(Math.floor(duration % 60)).padStart(2, '0')}
+                    {' • '}
+                    {duration ? Math.floor((currentTime / duration) * 100) : 0}% hoàn thành
+                &lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <h3>4.3 API Theo Dõi Tiến Độ</h3>
+    <div class="code-title">📁 xomtruyen.API/Controllers/CourseProgressController.cs</div>
+    <pre><code>[Route("api/courses/progress")]
+[ApiController]
+[Authorize]
+public class CourseProgressController : ControllerBase
+{
+    private readonly ApplicationDbContext _db;
+
+    [HttpPost("update")]
+    public async Task&lt;IActionResult&gt; UpdateProgress([FromBody] UpdateProgressRequest request)
+    {
+        var userId = GetCurrentUserId();
+
+        var progress = await _db.LessonProgresses
+            .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == request.LessonId);
+
+        if (progress == null)
+        {
+            progress = new LessonProgress
+            {
+                UserId = userId,
+                LessonId = request.LessonId
+            };
+            _db.LessonProgresses.Add(progress);
+        }
+
+        progress.WatchedPercent = Math.Max(progress.WatchedPercent, request.WatchedPercent);
+        progress.LastPositionSeconds = request.LastPositionSeconds;
+        progress.LastAccessedAt = DateTime.UtcNow;
+
+        if (request.IsCompleted && !progress.IsCompleted)
+        {
+            progress.IsCompleted = true;
+            progress.CompletedAt = DateTime.UtcNow;
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(new { success = true });
+    }
+
+    [HttpGet("course/{courseId}")]
+    public async Task&lt;IActionResult&gt; GetCourseProgress(Guid courseId)
+    {
+        var userId = GetCurrentUserId();
+
+        var lessons = await _db.Lessons
+            .Where(l => l.Section.CourseId == courseId)
+            .Select(l => l.Id)
+            .ToListAsync();
+
+        var progresses = await _db.LessonProgresses
+            .Where(p => p.UserId == userId && lessons.Contains(p.LessonId))
+            .ToListAsync();
+
+        var totalLessons = lessons.Count;
+        var completedLessons = progresses.Count(p => p.IsCompleted);
+        var overallPercent = totalLessons > 0 ? (double)completedLessons / totalLessons * 100 : 0;
+
+        return Ok(new
+        {
+            courseId,
+            totalLessons,
+            completedLessons,
+            overallPercent = Math.Round(overallPercent, 1),
+            lessons = progresses.Select(p => new
+            {
+                p.LessonId,
+                p.WatchedPercent,
+                p.LastPositionSeconds,
+                p.IsCompleted,
+                p.LastAccessedAt
+            })
+        });
+    }
+}</code></pre>
+
+    <!-- 5. THANH TOÁN -->
+    <h2 id="payment">5. Hệ Thống Thanh Toán Khóa Học</h2>
+
+    <h3>5.1 Luồng Thanh Toán</h3>
+    <div class="flow-diagram">
+┌──────────┐    ┌──────────────┐    ┌─────────────┐    ┌──────────────┐
+│ Học viên │───▶│ CoursePayment│───▶│ Payment     │───▶│ VNPay / MoMo │
+│ Bấm Mua │    │ Controller   │    │ Gateway     │    │ (Redirect)   │
+└──────────┘    └──────────────┘    └─────────────┘    └──────┬───────┘
+                                                              │
+                       ┌──────────────────────────────────────┘
+                       ▼
+              ┌─────────────────┐    ┌────────────────┐    ┌──────────────┐
+              │ Callback/IPN    │───▶│ Xác nhận       │───▶│ Enrollment   │
+              │ (Server nhận)   │    │ Thanh toán OK  │    │ Được tạo     │
+              └─────────────────┘    └────────────────┘    └──────────────┘
+    </div>
+
+    <h3>5.2 Payment Controller</h3>
+    <div class="code-title">📁 xomtruyen.API/Controllers/CoursePaymentController.cs</div>
+    <pre><code>[Route("api/courses/payment")]
+[ApiController]
+[Authorize]
+public class CoursePaymentController : ControllerBase
+{
+    private readonly IPaymentService _paymentService;
+    private readonly ApplicationDbContext _db;
+
+    /// &lt;summary&gt;
+    /// Tạo đơn thanh toán và redirect đến cổng thanh toán
+    /// &lt;/summary&gt;
+    [HttpPost("create")]
+    public async Task&lt;IActionResult&gt; CreatePayment([FromBody] CreatePaymentRequest request)
+    {
+        var userId = GetCurrentUserId();
+
+        // Kiểm tra đã mua chưa
+        var existing = await _db.CourseEnrollments
+            .AnyAsync(e => e.UserId == userId && e.CourseId == request.CourseId);
+        if (existing)
+            return BadRequest("Bạn đã đăng ký khóa học này rồi");
+
+        var course = await _db.Courses.FindAsync(request.CourseId);
+        if (course == null) return NotFound("Khóa học không tồn tại");
+
+        // Tính giá (áp dụng giảm giá nếu có)
+        var amount = course.DiscountPrice ?? course.Price;
+
+        // Nếu miễn phí → tự động enroll
+        if (amount == 0)
+        {
+            await EnrollUser(userId, request.CourseId);
+            return Ok(new { success = true, message = "Đăng ký thành công (miễn phí)", redirectUrl = "" });
+        }
+
+        // Tạo payment record
+        var payment = new CoursePayment
+        {
+            UserId = userId,
+            CourseId = request.CourseId,
+            Amount = amount,
+            Method = request.Method,
+            Status = PaymentStatus.Pending
+        };
+        _db.CoursePayments.Add(payment);
+        await _db.SaveChangesAsync();
+
+        // Tạo URL thanh toán từ cổng
+        var paymentUrl = request.Method switch
+        {
+            PaymentMethod.VNPay => await _paymentService.CreateVNPayUrlAsync(payment),
+            PaymentMethod.MoMo => await _paymentService.CreateMoMoUrlAsync(payment),
+            _ => throw new Exception("Phương thức thanh toán không hỗ trợ")
+        };
+
+        return Ok(new { success = true, paymentId = payment.Id, redirectUrl = paymentUrl });
+    }
+
+    /// &lt;summary&gt;
+    /// Callback từ VNPay (IPN - Instant Payment Notification)
+    /// &lt;/summary&gt;
+    [HttpGet("vnpay-callback")]
+    [AllowAnonymous]
+    public async Task&lt;IActionResult&gt; VNPayCallback([FromQuery] Dictionary&lt;string, string&gt; queryParams)
+    {
+        var isValid = _paymentService.ValidateVNPaySignature(queryParams);
+        if (!isValid)
+            return BadRequest("Chữ ký không hợp lệ");
+
+        var paymentId = Guid.Parse(queryParams["vnp_TxnRef"]);
+        var payment = await _db.CoursePayments.FindAsync(paymentId);
+        if (payment == null) return NotFound();
+
+        var responseCode = queryParams["vnp_ResponseCode"];
+        if (responseCode == "00") // Thành công
+        {
+            payment.Status = PaymentStatus.Completed;
+            payment.TransactionCode = queryParams["vnp_TransactionNo"];
+            payment.PaidAt = DateTime.UtcNow;
+            payment.GatewayResponse = System.Text.Json.JsonSerializer.Serialize(queryParams);
+
+            // Tự động tạo enrollment
+            await EnrollUser(payment.UserId, payment.CourseId);
+        }
+        else
+        {
+            payment.Status = PaymentStatus.Failed;
+            payment.GatewayResponse = System.Text.Json.JsonSerializer.Serialize(queryParams);
+        }
+
+        await _db.SaveChangesAsync();
+
+        // Redirect về trang kết quả trên client
+        var clientUrl = responseCode == "00"
+            ? $"http://localhost:5173/courses/{payment.CourseId}/success"
+            : $"http://localhost:5173/courses/{payment.CourseId}/failed";
+
+        return Redirect(clientUrl);
+    }
+
+    private async Task EnrollUser(Guid userId, Guid courseId)
+    {
+        var enrollment = new CourseEnrollment
+        {
+            UserId = userId,
+            CourseId = courseId,
+            EnrolledAt = DateTime.UtcNow,
+            Status = EnrollmentStatus.Active
+        };
+        _db.CourseEnrollments.Add(enrollment);
+
+        // Tăng enrollment count
+        var course = await _db.Courses.FindAsync(courseId);
+        if (course != null) course.EnrollmentCount++;
+
+        await _db.SaveChangesAsync();
+    }
+}</code></pre>
+
+    <h3>5.3 VNPay Service</h3>
+    <div class="code-title">📁 xomtruyen.API/Services/Implementations/VNPayService.cs</div>
+    <pre><code>public class VNPayService : IPaymentService
+{
+    private readonly IConfiguration _config;
+
+    public async Task&lt;string&gt; CreateVNPayUrlAsync(CoursePayment payment)
+    {
+        var vnp_Url = _config["VNPay:Url"];           // https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+        var vnp_TmnCode = _config["VNPay:TmnCode"];   // Mã website tại VNPay
+        var vnp_HashSecret = _config["VNPay:HashSecret"];
+        var vnp_ReturnUrl = _config["VNPay:ReturnUrl"]; // /api/courses/payment/vnpay-callback
+
+        var vnpay = new SortedDictionary&lt;string, string&gt;
+        {
+            ["vnp_Version"] = "2.1.0",
+            ["vnp_Command"] = "pay",
+            ["vnp_TmnCode"] = vnp_TmnCode,
+            ["vnp_Amount"] = ((long)(payment.Amount * 100)).ToString(), // VNPay nhận đơn vị: đồng * 100
+            ["vnp_CurrCode"] = "VND",
+            ["vnp_TxnRef"] = payment.Id.ToString(),
+            ["vnp_OrderInfo"] = $"Thanh toan khoa hoc - {payment.CourseId}",
+            ["vnp_OrderType"] = "education",
+            ["vnp_Locale"] = "vn",
+            ["vnp_ReturnUrl"] = vnp_ReturnUrl,
+            ["vnp_IpAddr"] = "127.0.0.1",
+            ["vnp_CreateDate"] = DateTime.Now.ToString("yyyyMMddHHmmss")
+        };
+
+        // Tạo chuỗi ký (HMAC SHA512)
+        var signData = string.Join("&", vnpay.Select(kv => $"{kv.Key}={kv.Value}"));
+        var vnp_SecureHash = HmacSHA512(vnp_HashSecret, signData);
+        var paymentUrl = $"{vnp_Url}?{signData}&vnp_SecureHash={vnp_SecureHash}";
+
+        return paymentUrl;
+    }
+
+    private string HmacSHA512(string key, string data)
+    {
+        using var hmac = new System.Security.Cryptography.HMACSHA512(Encoding.UTF8.GetBytes(key));
+        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+        return BitConverter.ToString(hash).Replace("-", "").ToLower();
+    }
+}</code></pre>
+
+    <!-- 6. ADMIN -->
+    <h2 id="admin">6. Giao Diện Admin Quản Trị Khóa Học</h2>
+
+    <h3>6.1 Trang Quản Lý Khóa Học (Admin Portal)</h3>
+    <div class="code-title">📁 xomtruyen-admin/src/pages/Courses.tsx</div>
+    <pre><code>import React, { useState, useEffect } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import axios from 'axios';
+
+export default function CoursesPage() {
+    const [courses, setCourses] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+
+    const columnDefs = [
+        { field: 'title', headerName: 'Tên Khóa Học', flex: 2 },
+        { field: 'instructor.fullName', headerName: 'Giảng Viên', flex: 1 },
+        { field: 'price', headerName: 'Giá (VND)', flex: 1,
+          valueFormatter: (p: any) => new Intl.NumberFormat('vi-VN').format(p.value) + 'đ' },
+        { field: 'totalLessons', headerName: 'Số Bài', width: 100 },
+        { field: 'enrollmentCount', headerName: 'Học Viên', width: 110 },
+        { field: 'averageRating', headerName: 'Đánh Giá', width: 110,
+          cellRenderer: (p: any) => `⭐ ${p.value.toFixed(1)}` },
+        { field: 'status', headerName: 'Trạng Thái', width: 130,
+          cellRenderer: (p: any) => {
+              const colors: any = { Draft: '#f59e0b', Published: '#22c55e', Archived: '#6b7280' };
+              return `&lt;span style="color:${colors[p.value]}"&gt;● ${p.value}&lt;/span&gt;`;
+          }
+        },
+        { headerName: 'Hành Động', width: 200,
+          cellRenderer: () => `
+              &lt;button class="btn-edit"&gt;✏️ Sửa&lt;/button&gt;
+              &lt;button class="btn-lessons"&gt;📚 Bài học&lt;/button&gt;
+          `
+        }
+    ];
+
+    useEffect(() => {
+        axios.get('/api/admin/courses').then(res => setCourses(res.data));
+    }, []);
+
+    return (
+        &lt;div className="page-container"&gt;
+            &lt;div className="page-header"&gt;
+                &lt;h2&gt;🎓 Quản Lý Khóa Học&lt;/h2&gt;
+                &lt;button onClick={() => setShowModal(true)} className="btn-primary"&gt;
+                    + Tạo Khóa Học Mới
+                &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;div className="ag-theme-alpine-dark" style={{ height: 600 }}&gt;
+                &lt;AgGridReact rowData={courses} columnDefs={columnDefs} /&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <h3>6.2 Trang Quản Lý Bài Học & Upload Video</h3>
+    <div class="code-title">📁 xomtruyen-admin/src/pages/CourseLessons.tsx</div>
+    <pre><code>import React, { useState } from 'react';
+import axios from 'axios';
+
+interface Lesson {
+    id: string;
+    title: string;
+    type: 'Video' | 'Text' | 'Quiz';
+    durationSeconds: number;
+    orderIndex: number;
+    hasVideo: boolean;
+}
+
+export default function CourseLessonsPage({ courseId }: { courseId: string }) {
+    const [lessons, setLessons] = useState&lt;Lesson[]&gt;([]);
+    const [uploading, setUploading] = useState&lt;string | null&gt;(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+
+    const handleVideoUpload = async (lessonId: string, file: File) => {
+        setUploading(lessonId);
+        setUploadProgress(0);
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('lessonId', lessonId);
+
+        try {
+            await axios.post('/api/courses/videos/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                onUploadProgress: (e) => {
+                    const percent = Math.round((e.loaded * 100) / (e.total || 1));
+                    setUploadProgress(percent);
+                }
+            });
+            alert('✅ Upload thành công! Video đang được xử lý nền.');
+        } catch (err) {
+            alert('❌ Lỗi upload video');
+        } finally {
+            setUploading(null);
+        }
+    };
+
+    return (
+        &lt;div className="lessons-manager"&gt;
+            &lt;h3&gt;📚 Danh Sách Bài Học&lt;/h3&gt;
+            {lessons.map((lesson, idx) => (
+                &lt;div key={lesson.id} className="lesson-row"&gt;
+                    &lt;span className="lesson-order"&gt;{idx + 1}&lt;/span&gt;
+                    &lt;span className="lesson-title"&gt;{lesson.title}&lt;/span&gt;
+                    &lt;span className="lesson-type"&gt;{lesson.type}&lt;/span&gt;
+                    &lt;span className="lesson-duration"&gt;
+                        {Math.floor(lesson.durationSeconds / 60)} phút
+                    &lt;/span&gt;
+
+                    {/* Upload Video Button */}
+                    {lesson.type === 'Video' && (
+                        &lt;div className="upload-zone"&gt;
+                            {uploading === lesson.id ? (
+                                &lt;div className="upload-progress"&gt;
+                                    &lt;div className="progress-bar" style={{ width: `${uploadProgress}%` }} /&gt;
+                                    &lt;span&gt;{uploadProgress}%&lt;/span&gt;
+                                &lt;/div&gt;
+                            ) : (
+                                &lt;label className="btn-upload"&gt;
+                                    📤 {lesson.hasVideo ? 'Thay Video' : 'Upload Video'}
+                                    &lt;input
+                                        type="file"
+                                        accept="video/*"
+                                        hidden
+                                        onChange={e => {
+                                            if (e.target.files?.[0])
+                                                handleVideoUpload(lesson.id, e.target.files[0]);
+                                        }}
+                                    /&gt;
+                                &lt;/label&gt;
+                            )}
+                        &lt;/div&gt;
+                    )}
+                &lt;/div&gt;
+            ))}
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <!-- 7. CLIENT -->
+    <h2 id="client">7. Giao Diện Client Học Viên</h2>
+
+    <h3>7.1 Trang Danh Sách Khóa Học</h3>
+    <div class="code-title">📁 xom-truyen/src/pages/CoursesPage.tsx</div>
+    <pre><code>import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+interface Course {
+    id: string;
+    title: string;
+    thumbnailUrl: string;
+    price: number;
+    discountPrice?: number;
+    totalLessons: number;
+    totalDurationMinutes: number;
+    enrollmentCount: number;
+    averageRating: number;
+    instructor: { fullName: string; avatarUrl: string };
+    level: string;
+}
+
+export default function CoursesPage() {
+    const [courses, setCourses] = useState&lt;Course[]&gt;([]);
+    const [filter, setFilter] = useState({ level: '', sort: 'newest' });
+
+    useEffect(() => {
+        axios.get('/api/courses', { params: filter }).then(res => setCourses(res.data));
+    }, [filter]);
+
+    return (
+        &lt;div className="courses-page"&gt;
+            &lt;h1&gt;🎓 Khóa Học Trực Tuyến&lt;/h1&gt;
+
+            {/* Filter Bar */}
+            &lt;div className="filter-bar"&gt;
+                &lt;select onChange={e => setFilter(f => ({ ...f, level: e.target.value }))}&gt;
+                    &lt;option value=""&gt;Tất cả cấp độ&lt;/option&gt;
+                    &lt;option value="Beginner"&gt;Cơ bản&lt;/option&gt;
+                    &lt;option value="Intermediate"&gt;Trung cấp&lt;/option&gt;
+                    &lt;option value="Advanced"&gt;Nâng cao&lt;/option&gt;
+                &lt;/select&gt;
+                &lt;select onChange={e => setFilter(f => ({ ...f, sort: e.target.value }))}&gt;
+                    &lt;option value="newest"&gt;Mới nhất&lt;/option&gt;
+                    &lt;option value="popular"&gt;Phổ biến nhất&lt;/option&gt;
+                    &lt;option value="rating"&gt;Đánh giá cao&lt;/option&gt;
+                    &lt;option value="price_asc"&gt;Giá tăng dần&lt;/option&gt;
+                &lt;/select&gt;
+            &lt;/div&gt;
+
+            {/* Course Grid */}
+            &lt;div className="courses-grid"&gt;
+                {courses.map(course => (
+                    &lt;Link to={`/courses/${course.id}`} key={course.id} className="course-card"&gt;
+                        &lt;img src={course.thumbnailUrl} alt={course.title} className="course-thumb" /&gt;
+                        &lt;div className="course-info"&gt;
+                            &lt;h3&gt;{course.title}&lt;/h3&gt;
+                            &lt;p className="instructor"&gt;{course.instructor.fullName}&lt;/p&gt;
+                            &lt;div className="course-meta"&gt;
+                                &lt;span&gt;⭐ {course.averageRating.toFixed(1)}&lt;/span&gt;
+                                &lt;span&gt;👥 {course.enrollmentCount}&lt;/span&gt;
+                                &lt;span&gt;📚 {course.totalLessons} bài&lt;/span&gt;
+                                &lt;span&gt;⏱️ {course.totalDurationMinutes} phút&lt;/span&gt;
+                            &lt;/div&gt;
+                            &lt;div className="course-price"&gt;
+                                {course.discountPrice ? (
+                                    &lt;&gt;
+                                        &lt;span className="price-old"&gt;{course.price.toLocaleString('vi-VN')}đ&lt;/span&gt;
+                                        &lt;span className="price-new"&gt;{course.discountPrice.toLocaleString('vi-VN')}đ&lt;/span&gt;
+                                    &lt;/&gt;
+                                ) : course.price === 0 ? (
+                                    &lt;span className="price-free"&gt;Miễn phí&lt;/span&gt;
+                                ) : (
+                                    &lt;span className="price-new"&gt;{course.price.toLocaleString('vi-VN')}đ&lt;/span&gt;
+                                )}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/Link&gt;
+                ))}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <h3>7.2 Trang Học (Course Learning Page)</h3>
+    <div class="code-title">📁 xom-truyen/src/pages/CourseLearnPage.tsx</div>
+    <pre><code>import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import VideoPlayer from '../components/Course/VideoPlayer';
+
+export default function CourseLearnPage() {
+    const { courseId } = useParams();
+    const [course, setCourse] = useState&lt;any&gt;(null);
+    const [currentLesson, setCurrentLesson] = useState&lt;any&gt;(null);
+    const [progress, setProgress] = useState&lt;any&gt;(null);
+
+    useEffect(() => {
+        // Load course structure
+        axios.get(`/api/courses/${courseId}/full`).then(res => {
+            setCourse(res.data);
+            // Mở bài đầu tiên hoặc bài đang dở
+            const firstLesson = res.data.sections[0]?.lessons[0];
+            setCurrentLesson(firstLesson);
+        });
+
+        // Load progress
+        axios.get(`/api/courses/progress/course/${courseId}`).then(res => {
+            setProgress(res.data);
+        });
+    }, [courseId]);
+
+    const handleLessonComplete = () => {
+        // Refresh progress
+        axios.get(`/api/courses/progress/course/${courseId}`).then(res => setProgress(res.data));
+    };
+
+    if (!course) return &lt;div&gt;Đang tải...&lt;/div&gt;;
+
+    return (
+        &lt;div className="course-learn-layout"&gt;
+            {/* Main Content - Video Player */}
+            &lt;div className="learn-main"&gt;
+                {currentLesson?.type === 'Video' && currentLesson?.video && (
+                    &lt;VideoPlayer
+                        lessonId={currentLesson.id}
+                        videoUrl={`/api/courses/videos/stream/${currentLesson.id}`}
+                        initialPosition={progress?.lessons?.find((l: any) => l.lessonId === currentLesson.id)?.lastPositionSeconds || 0}
+                        onComplete={handleLessonComplete}
+                    /&gt;
+                )}
+
+                {currentLesson?.type === 'Text' && (
+                    &lt;div className="text-lesson-content"
+                         dangerouslySetInnerHTML={{ __html: currentLesson.textContent }} /&gt;
+                )}
+
+                &lt;div className="lesson-info"&gt;
+                    &lt;h2&gt;{currentLesson?.title}&lt;/h2&gt;
+                    &lt;p&gt;{currentLesson?.description}&lt;/p&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+
+            {/* Sidebar - Course Outline */}
+            &lt;aside className="learn-sidebar"&gt;
+                &lt;div className="progress-overview"&gt;
+                    &lt;div className="progress-bar-container"&gt;
+                        &lt;div className="progress-bar-fill"
+                             style={{ width: `${progress?.overallPercent || 0}%` }} /&gt;
+                    &lt;/div&gt;
+                    &lt;span&gt;{progress?.completedLessons || 0}/{progress?.totalLessons || 0} bài hoàn thành
+                        ({Math.round(progress?.overallPercent || 0)}%)&lt;/span&gt;
+                &lt;/div&gt;
+
+                {course.sections.map((section: any) => (
+                    &lt;div key={section.id} className="section-group"&gt;
+                        &lt;h4 className="section-title"&gt;{section.title}&lt;/h4&gt;
+                        {section.lessons.map((lesson: any) => {
+                            const lessonProgress = progress?.lessons?.find((l: any) => l.lessonId === lesson.id);
+                            const isActive = currentLesson?.id === lesson.id;
+                            const isCompleted = lessonProgress?.isCompleted;
+
+                            return (
+                                &lt;div
+                                    key={lesson.id}
+                                    className={`lesson-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                                    onClick={() => setCurrentLesson(lesson)}
+                                &gt;
+                                    &lt;span className="lesson-status"&gt;
+                                        {isCompleted ? '✅' : isActive ? '▶️' : '⬜'}
+                                    &lt;/span&gt;
+                                    &lt;span className="lesson-title"&gt;{lesson.title}&lt;/span&gt;
+                                    &lt;span className="lesson-duration"&gt;
+                                        {Math.floor(lesson.durationSeconds / 60)} phút
+                                    &lt;/span&gt;
+                                &lt;/div&gt;
+                            );
+                        })}
+                    &lt;/div&gt;
+                ))}
+            &lt;/aside&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <!-- 8. API ENDPOINTS -->
+    <h2 id="api-endpoints">8. Danh Sách API Endpoints</h2>
+
+    <h3>8.1 Course Management (Admin)</h3>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/admin/courses</code>
+        <p>Lấy danh sách tất cả khóa học (có phân trang, filter theo status)</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/admin/courses</code>
+        <p>Tạo khóa học mới (title, description, price, level, thumbnailUrl)</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-put">PUT</span> <code>/api/admin/courses/{id}</code>
+        <p>Cập nhật thông tin khóa học</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-delete">DELETE</span> <code>/api/admin/courses/{id}</code>
+        <p>Xóa khóa học (soft delete → status = Archived)</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/admin/courses/{courseId}/sections</code>
+        <p>Thêm phân mục (Section) cho khóa học</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/admin/courses/sections/{sectionId}/lessons</code>
+        <p>Thêm bài học vào phân mục</p>
+    </div>
+
+    <h3>8.2 Video Upload & Streaming</h3>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/courses/videos/upload</code>
+        <p>Upload video bài học (multipart/form-data, max 2GB). Yêu cầu role Admin/Instructor</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses/videos/stream/{lessonId}?quality=720p</code>
+        <p>Stream video cho học viên đã đăng ký. Hỗ trợ Range requests (seek)</p>
+    </div>
+
+    <h3>8.3 Student Course Access</h3>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses</code>
+        <p>Danh sách khóa học công khai (filter: level, sort, search)</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses/{id}</code>
+        <p>Chi tiết khóa học (thông tin + danh sách sections/lessons)</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses/{id}/full</code>
+        <p>Toàn bộ cấu trúc khóa (dành cho học viên đã đăng ký)</p>
+    </div>
+
+    <h3>8.4 Progress Tracking</h3>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/courses/progress/update</code>
+        <p>Cập nhật tiến độ xem bài học (gửi mỗi 10 giây từ Player)</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses/progress/course/{courseId}</code>
+        <p>Lấy tiến độ tổng thể của user với một khóa học</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses/my-courses</code>
+        <p>Danh sách khóa học đã đăng ký của user hiện tại</p>
+    </div>
+
+    <h3>8.5 Payment</h3>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/courses/payment/create</code>
+        <p>Tạo đơn thanh toán → nhận redirect URL đến VNPay/MoMo</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-get">GET</span> <code>/api/courses/payment/vnpay-callback</code>
+        <p>Callback IPN từ VNPay xác nhận thanh toán thành công</p>
+    </div>
+    <div class="endpoint-card">
+        <span class="method method-post">POST</span> <code>/api/courses/payment/momo-callback</code>
+        <p>Callback IPN từ MoMo</p>
+    </div>
+
+    <!-- 9. TECH STACK -->
+    <h2 id="tech-stack">9. Công Nghệ & Thư Viện</h2>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>Backend (.NET 9)</h4>
+            <ul>
+                <li><strong>ASP.NET Core 9 Web API</strong> – Controllers, JWT Auth</li>
+                <li><strong>Entity Framework Core</strong> – PostgreSQL, Migrations</li>
+                <li><strong>FFmpeg</strong> – Transcode video (480p/720p/1080p)</li>
+                <li><strong>BackgroundService</strong> – Worker queue xử lý video</li>
+                <li><strong>HMAC SHA512</strong> – Ký xác thực VNPay</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Frontend (React 19)</h4>
+            <ul>
+                <li><strong>React 19 + TypeScript</strong> – UI Components</li>
+                <li><strong>Video.js / HTML5 Video</strong> – Player với adaptive quality</li>
+                <li><strong>AG-Grid Enterprise</strong> – Bảng quản trị khóa học</li>
+                <li><strong>Axios</strong> – HTTP client + upload progress</li>
+                <li><strong>React Router v7</strong> – Navigation</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Storage & CDN</h4>
+            <ul>
+                <li><strong>Local Storage</strong> – Dev: wwwroot/uploads/videos/</li>
+                <li><strong>AWS S3 / MinIO</strong> – Production: Object storage</li>
+                <li><strong>CloudFront / Bunny CDN</strong> – Video delivery</li>
+                <li><strong>HLS Streaming</strong> – Adaptive bitrate (tương lai)</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Payment Gateways</h4>
+            <ul>
+                <li><strong>VNPay</strong> – Thẻ nội địa, QR, ví điện tử</li>
+                <li><strong>MoMo</strong> – Ví MoMo, QR code</li>
+                <li><strong>Bank Transfer</strong> – Chuyển khoản thủ công</li>
+                <li><strong>Coin Balance</strong> – Thanh toán bằng xu trong app</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 10. DEPLOYMENT -->
+    <h2 id="deployment">10. Triển Khai & Cấu Hình</h2>
+
+    <h3>10.1 Cấu Hình appsettings.json</h3>
+    <pre><code>{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=xomtruyen_db;Username=postgres;Password=***"
+  },
+  "VNPay": {
+    "Url": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+    "TmnCode": "YOUR_TMN_CODE",
+    "HashSecret": "YOUR_HASH_SECRET",
+    "ReturnUrl": "http://localhost:5000/api/courses/payment/vnpay-callback"
+  },
+  "MoMo": {
+    "PartnerCode": "YOUR_PARTNER_CODE",
+    "AccessKey": "YOUR_ACCESS_KEY",
+    "SecretKey": "YOUR_SECRET_KEY",
+    "Endpoint": "https://test-payment.momo.vn/v2/gateway/api/create"
+  },
+  "VideoStorage": {
+    "Provider": "Local",
+    "LocalPath": "wwwroot/uploads/videos",
+    "S3Bucket": "xomtruyen-videos",
+    "CDNBaseUrl": "https://cdn.xomtruyen.com/videos"
+  },
+  "FFmpeg": {
+    "Path": "/usr/bin/ffmpeg"
+  }
+}</code></pre>
+
+    <h3>10.2 EF Core Migration Commands</h3>
+    <pre><code># Tạo migration cho module LMS
+dotnet ef migrations add AddCourseModule --project xomtruyen.API
+
+# Áp dụng migration
+dotnet ef database update --project xomtruyen.API
+
+# Kiểm tra bảng đã tạo
+psql -U postgres -d xomtruyen_db -c "\dt *course*"</code></pre>
+
+    <h3>10.3 Cài đặt FFmpeg (cho Video Transcode)</h3>
+    <pre><code># Windows (via Chocolatey)
+choco install ffmpeg
+
+# Ubuntu/Debian
+sudo apt install ffmpeg
+
+# Kiểm tra
+ffmpeg -version</code></pre>
+
+    <h3>10.4 Cấu Trúc Thư Mục Video Storage</h3>
+    <pre><code>wwwroot/uploads/videos/
+├── {lessonId}/
+│   ├── original.mp4          ← File gốc upload
+│   ├── video_480p.mp4        ← Transcode 480p
+│   ├── video_720p.mp4        ← Transcode 720p
+│   ├── video_1080p.mp4       ← Transcode 1080p
+│   └── thumbnail.jpg         ← Auto-generated thumbnail
+└── ...</code></pre>
+
+    <div class="warn">
+        <strong>⚠️ Lưu ý bảo mật:</strong> Video files KHÔNG được serve trực tiếp qua static files. 
+        Phải đi qua API Controller có kiểm tra JWT token và enrollment status để tránh truy cập trái phép.
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu đặc tả Module Khóa Học (LMS) — Xóm Truyện Workspace<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
