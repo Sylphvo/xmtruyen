@@ -1,10 +1,18 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 const net = require('net');
 
 const PORT = 5555; // Changed from 5500 to avoid Live Server conflict
+
+// Import auto-analyzer
+let autoAnalyzer;
+try {
+    autoAnalyzer = require('./auto-analyze.js');
+} catch (e) {
+    console.warn('[WARN] auto-analyze.js not loaded:', e.message);
+}
 
 const runCommand = (cmd, cwd) => {
     exec(`start cmd.exe /k "cd /d ${cwd} && ${cmd}"`);
@@ -66,6 +74,71 @@ const server = http.createServer(async (req, res) => {
             admin: adminStatus, 
             api: apiStatus 
         }));
+    }
+
+    // === AUTO ANALYZER APIs ===
+    
+    // Trigger phân tích thủ công (nút bấm trên Dashboard)
+    if (req.url === '/api/analyze') {
+        try {
+            if (autoAnalyzer) {
+                const changelog = autoAnalyzer.buildChangelog();
+                const techstack = autoAnalyzer.buildTechStack();
+                const latestDiff = autoAnalyzer.analyzeLatestCommitDiff();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ 
+                    success: true, 
+                    message: 'Phân tích hoàn tất!',
+                    commits: changelog.totalCommits,
+                    technologies: techstack.totalUniqueTechnologies
+                }));
+            } else {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ success: false, message: 'Auto analyzer not loaded' }));
+            }
+        } catch (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ success: false, message: err.message }));
+        }
+    }
+
+    // Đọc changelog JSON
+    if (req.url === '/api/changelog') {
+        const filePath2 = path.join(__dirname, 'auto-changelog.json');
+        if (fs.existsSync(filePath2)) {
+            const data = fs.readFileSync(filePath2, 'utf-8');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(data);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Chưa có dữ liệu. Hãy chạy /api/analyze trước.' }));
+        }
+    }
+
+    // Đọc techstack JSON
+    if (req.url === '/api/techstack') {
+        const filePath2 = path.join(__dirname, 'auto-techstack.json');
+        if (fs.existsSync(filePath2)) {
+            const data = fs.readFileSync(filePath2, 'utf-8');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(data);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Chưa có dữ liệu. Hãy chạy /api/analyze trước.' }));
+        }
+    }
+
+    // Đọc summary JSON
+    if (req.url === '/api/summary') {
+        const filePath2 = path.join(__dirname, 'auto-summary.json');
+        if (fs.existsSync(filePath2)) {
+            const data = fs.readFileSync(filePath2, 'utf-8');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(data);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Chưa có dữ liệu. Hãy chạy /api/analyze trước.' }));
+        }
     }
 
     let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
