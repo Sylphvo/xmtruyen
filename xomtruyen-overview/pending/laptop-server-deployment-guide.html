@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen — Hướng Dẫn Chi Tiết Setup Laptop Thành Server Deploy Full Stack</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-done { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .success { background: rgba(34,197,94,0.08); border-left: 3px solid #22c55e;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.85em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .step-num { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; background: #00d4ff; color: #000; border-radius: 50%; font-weight: 700; font-size: 0.85em; margin-right: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🖥️ Hướng Dẫn Setup Laptop Thành Server — Deploy Full Stack</h1>
+    <p class="subtitle">
+        <span class="badge badge-done">Tài Liệu Hoàn Chỉnh</span>
+        Biến laptop Windows thành server chạy: Web Client + Admin Portal + .NET API + PostgreSQL — truy cập qua mạng LAN/Internet
+    </p>
+
+    <!-- MỤC LỤC -->
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#overview">1. Tổng Quan Kiến Trúc Deploy</a>
+        <a href="#requirements">2. Yêu Cầu Phần Cứng & Phần Mềm</a>
+        <a href="#postgres">3. Cài Đặt & Cấu Hình PostgreSQL</a>
+        <a href="#dotnet">4. Build & Deploy Backend API (.NET 9)</a>
+        <a href="#web-client">5. Build & Deploy Web Client (React/Vite)</a>
+        <a href="#admin">6. Build & Deploy Admin Portal (React/Vite)</a>
+        <a href="#nginx">7. Cấu Hình Reverse Proxy (Nginx hoặc IIS)</a>
+        <a href="#firewall">8. Mở Port & Cấu Hình Firewall Windows</a>
+        <a href="#domain">9. Domain & HTTPS (Tùy Chọn)</a>
+        <a href="#autostart">10. Tự Động Khởi Động Khi Bật Máy</a>
+        <a href="#monitoring">11. Giám Sát & Logs</a>
+        <a href="#troubleshoot">12. Xử Lý Sự Cố Thường Gặp</a>
+        <a href="#checklist">13. Checklist Hoàn Tất</a>
+    </div>
+
+    <!-- 1. TỔNG QUAN -->
+    <h2 id="overview">1. Tổng Quan Kiến Trúc Deploy</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LAPTOP SERVER — KIẾN TRÚC DEPLOY                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Internet / LAN Users
+        │
+        ▼
+  ┌──────────────┐
+  │   NGINX      │  (Reverse Proxy — Port 80/443)
+  │   hoặc IIS   │
+  └──────┬───────┘
+         │
+    ┌────┼─────────────────────────────┐
+    │    │                             │
+    ▼    ▼                             ▼
+┌────────────┐  ┌────────────────┐  ┌────────────────┐
+│ Web Client │  │ Admin Portal   │  │  .NET API      │
+│ (Static)   │  │ (Static)       │  │  (Kestrel)     │
+│ Port: 3000 │  │ Port: 3001     │  │  Port: 5000    │
+│ /var/www/  │  │ /var/www/admin │  │  Service/IIS   │
+└────────────┘  └────────────────┘  └───────┬────────┘
+                                            │
+                                    ┌───────▼────────┐
+                                    │  PostgreSQL    │
+                                    │  Port: 5432   │
+                                    │  (Local DB)   │
+                                    └────────────────┘
+
+  Ports mở ra ngoài (Firewall):
+  • 80   → HTTP (Nginx)
+  • 443  → HTTPS (Nginx + SSL)
+  • 5432 → PostgreSQL (chỉ nếu cần remote access)
+    </div>
+
+    <div class="note">
+        <strong>💡 Nguyên tắc:</strong> Tất cả service chạy trên 1 laptop duy nhất. Nginx làm reverse proxy điều hướng request đến đúng service dựa trên domain/path.
+    </div>
+
+    <!-- 2. YÊU CẦU -->
+    <h2 id="requirements">2. Yêu Cầu Phần Cứng & Phần Mềm</h2>
+
+    <h3>2.1 Phần cứng tối thiểu</h3>
+    <table>
+        <thead><tr><th>Thành phần</th><th>Tối thiểu</th><th>Khuyến nghị</th></tr></thead>
+        <tbody>
+            <tr><td>CPU</td><td>Intel i5 / Ryzen 5 (4 cores)</td><td>Intel i7 / Ryzen 7 (8 cores)</td></tr>
+            <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+            <tr><td>Ổ cứng</td><td>50 GB trống (SSD)</td><td>256 GB+ SSD</td></tr>
+            <tr><td>Mạng</td><td>Ethernet / WiFi ổn định</td><td>Ethernet có dây (LAN)</td></tr>
+            <tr><td>OS</td><td>Windows 10/11 Pro</td><td>Windows 11 Pro (IIS sẵn)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 Phần mềm cần cài</h3>
+    <table>
+        <thead><tr><th>Phần mềm</th><th>Version</th><th>Mục đích</th><th>Link tải</th></tr></thead>
+        <tbody>
+            <tr><td>.NET SDK</td><td>9.0+</td><td>Build & chạy Backend API</td><td>dotnet.microsoft.com/download</td></tr>
+            <tr><td>Node.js</td><td>20 LTS+</td><td>Build Web Client & Admin</td><td>nodejs.org</td></tr>
+            <tr><td>PostgreSQL</td><td>16+</td><td>Database</td><td>postgresql.org/download/windows</td></tr>
+            <tr><td>Nginx for Windows</td><td>1.25+</td><td>Reverse proxy</td><td>nginx.org/en/download.html</td></tr>
+            <tr><td>Git</td><td>Latest</td><td>Pull source code</td><td>git-scm.com</td></tr>
+            <tr><td>NSSM</td><td>Latest</td><td>Chạy app như Windows Service</td><td>nssm.cc</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 3. POSTGRESQL -->
+    <h2 id="postgres">3. Cài Đặt & Cấu Hình PostgreSQL</h2>
+
+    <h3><span class="step-num">1</span> Cài đặt PostgreSQL</h3>
+    <pre><code># Tải installer từ: https://www.postgresql.org/download/windows/
+# Chạy installer, chọn:
+#   - Port: 5432 (default)
+#   - Password cho user 'postgres': đặt mật khẩu mạnh
+#   - Locale: Vietnamese hoặc English
+#   - Tick: pgAdmin 4 (để quản lý qua GUI)</code></pre>
+
+    <h3><span class="step-num">2</span> Tạo Database</h3>
+    <pre><code># Mở Command Prompt hoặc psql:
+psql -U postgres
+
+# Tạo database:
+CREATE DATABASE xomtruyen_db;
+
+# Tạo user riêng (khuyến nghị):
+CREATE USER xomtruyen_user WITH PASSWORD 'YourStrongPassword123!';
+GRANT ALL PRIVILEGES ON DATABASE xomtruyen_db TO xomtruyen_user;
+ALTER USER xomtruyen_user CREATEDB;
+
+# Thoát:
+\q</code></pre>
+
+    <h3><span class="step-num">3</span> Cấu hình cho phép kết nối từ xa (nếu cần)</h3>
+    <div class="code-title">📁 C:\Program Files\PostgreSQL\16\data\postgresql.conf</div>
+    <pre><code># Tìm dòng listen_addresses và sửa:
+listen_addresses = '*'    # Cho phép kết nối từ mọi IP (hoặc chỉ định IP cụ thể)</code></pre>
+
+    <div class="code-title">📁 C:\Program Files\PostgreSQL\16\data\pg_hba.conf (thêm dòng cuối)</div>
+    <pre><code># Cho phép kết nối từ mạng LAN (ví dụ 192.168.1.0/24)
+host    all    all    192.168.1.0/24    scram-sha-256
+
+# Hoặc cho phép tất cả (KHÔNG khuyến nghị cho production):
+# host    all    all    0.0.0.0/0    scram-sha-256</code></pre>
+
+    <h3><span class="step-num">4</span> Khởi động lại PostgreSQL service</h3>
+    <pre><code># Mở Services (Win+R → services.msc)
+# Tìm "postgresql-x64-16" → Restart
+
+# Hoặc CMD (Admin):
+net stop postgresql-x64-16
+net start postgresql-x64-16</code></pre>
+
+    <h3><span class="step-num">5</span> Kiểm tra kết nối</h3>
+    <pre><code>psql -U xomtruyen_user -d xomtruyen_db -h localhost
+# Nếu thấy prompt "xomtruyen_db=>" → OK</code></pre>
+
+    <!-- 4. BACKEND API -->
+    <h2 id="dotnet">4. Build & Deploy Backend API (.NET 9)</h2>
+
+    <h3><span class="step-num">1</span> Clone source & restore</h3>
+    <pre><code>cd D:\deploy
+git clone &lt;your-repo-url&gt; xomtruyen
+cd xomtruyen\xomtruyen.API
+
+# Restore packages
+dotnet restore</code></pre>
+
+    <h3><span class="step-num">2</span> Cấu hình appsettings.Production.json</h3>
+    <div class="code-title">📁 xomtruyen.API/appsettings.Production.json</div>
+    <pre><code>{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=xomtruyen_db;Username=xomtruyen_user;Password=YourStrongPassword123!"
+  },
+  "Jwt": {
+    "Key": "YourSuperSecretJwtKey_AtLeast32Characters!@#$",
+    "Issuer": "XomTruyenAPI",
+    "Audience": "XomTruyenClients",
+    "ExpireMinutes": 1440
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://192.168.1.100",
+      "http://192.168.1.100:3000",
+      "http://192.168.1.100:3001",
+      "https://yourdomain.com"
+    ]
+  },
+  "Upload": {
+    "MaxFileSize": 524288000,
+    "BasePath": "D:/deploy/xomtruyen/uploads"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}</code></pre>
+
+    <div class="warn">
+        <strong>⚠️ Quan trọng:</strong> Thay <code>192.168.1.100</code> bằng IP thực của laptop trong mạng LAN. Kiểm tra bằng <code>ipconfig</code>.
+    </div>
+
+    <h3><span class="step-num">3</span> Chạy EF Migration (tạo bảng DB)</h3>
+    <pre><code>cd xomtruyen.API
+
+# Cập nhật database schema:
+set ASPNETCORE_ENVIRONMENT=Production
+dotnet ef database update
+
+# Kiểm tra bảng đã tạo:
+psql -U xomtruyen_user -d xomtruyen_db -c "\dt"</code></pre>
+
+    <h3><span class="step-num">4</span> Build production</h3>
+    <pre><code># Build release:
+dotnet publish -c Release -o D:\deploy\api-publish
+
+# Kiểm tra output:
+dir D:\deploy\api-publish\xomtruyen.API.exe</code></pre>
+
+    <h3><span class="step-num">5</span> Test chạy thử</h3>
+    <pre><code># Chạy API:
+cd D:\deploy\api-publish
+set ASPNETCORE_ENVIRONMENT=Production
+set ASPNETCORE_URLS=http://0.0.0.0:5000
+xomtruyen.API.exe
+
+# Mở trình duyệt: http://localhost:5000/scalar/v1
+# Thấy Swagger/Scalar UI → OK</code></pre>
+
+    <h3><span class="step-num">6</span> Cài đặt như Windows Service (NSSM)</h3>
+    <pre><code># Tải NSSM: https://nssm.cc/download
+# Giải nén vào D:\tools\nssm\
+
+# Cài service:
+D:\tools\nssm\nssm.exe install XomTruyenAPI
+
+# Trong GUI NSSM:
+#   Path:         D:\deploy\api-publish\xomtruyen.API.exe
+#   Startup Dir:  D:\deploy\api-publish
+#   Arguments:    (để trống)
+#
+# Tab Environment:
+#   ASPNETCORE_ENVIRONMENT=Production
+#   ASPNETCORE_URLS=http://0.0.0.0:5000
+
+# Khởi động service:
+D:\tools\nssm\nssm.exe start XomTruyenAPI
+
+# Kiểm tra:
+curl http://localhost:5000/api/system/health</code></pre>
+
+    <div class="success">
+        <strong>✅ API đã chạy:</strong> http://localhost:5000 — tự khởi động khi bật máy.
+    </div>
+
+    <!-- 5. WEB CLIENT -->
+    <h2 id="web-client">5. Build & Deploy Web Client (React/Vite)</h2>
+
+    <h3><span class="step-num">1</span> Cấu hình environment production</h3>
+    <div class="code-title">📁 xom-truyen/.env.production</div>
+    <pre><code># IP laptop trong mạng LAN (hoặc domain nếu có):
+VITE_API_BASE_URL=http://192.168.1.100:5000</code></pre>
+
+    <h3><span class="step-num">2</span> Build static files</h3>
+    <pre><code>cd D:\deploy\xomtruyen\xom-truyen
+
+# Install dependencies:
+npm install
+
+# Build production:
+npm run build
+
+# Output ở thư mục: dist/
+# Copy sang thư mục serve:
+xcopy /E /I dist D:\deploy\www\web-client</code></pre>
+
+    <h3><span class="step-num">3</span> Kiểm tra build output</h3>
+    <pre><code>dir D:\deploy\www\web-client
+# Phải có: index.html, assets/ (JS, CSS chunks)</code></pre>
+
+    <!-- 6. ADMIN PORTAL -->
+    <h2 id="admin">6. Build & Deploy Admin Portal (React/Vite)</h2>
+
+    <h3><span class="step-num">1</span> Cấu hình environment</h3>
+    <div class="code-title">📁 xomtruyen-admin/.env.production</div>
+    <pre><code>VITE_API_BASE_URL=http://192.168.1.100:5000</code></pre>
+
+    <h3><span class="step-num">2</span> Build static files</h3>
+    <pre><code>cd D:\deploy\xomtruyen\xomtruyen-admin
+
+# Install dependencies:
+npm install
+
+# Build production:
+npm run build
+
+# Copy sang thư mục serve:
+xcopy /E /I dist D:\deploy\www\admin-portal</code></pre>
+
+    <!-- 7. NGINX -->
+    <h2 id="nginx">7. Cấu Hình Reverse Proxy (Nginx)</h2>
+
+    <h3><span class="step-num">1</span> Cài đặt Nginx for Windows</h3>
+    <pre><code># Tải: http://nginx.org/en/download.html (Windows stable)
+# Giải nén vào: D:\tools\nginx\
+
+# Test khởi động:
+cd D:\tools\nginx
+nginx.exe
+
+# Mở http://localhost → thấy "Welcome to nginx!" → OK
+# Dừng: nginx.exe -s stop</code></pre>
+
+    <h3><span class="step-num">2</span> Cấu hình nginx.conf</h3>
+    <div class="code-title">📁 D:\tools\nginx\conf\nginx.conf</div>
+    <pre><code>worker_processes  auto;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile      on;
+    keepalive_timeout  65;
+    client_max_body_size 500M;  # Cho phép upload file lớn
+
+    # ═══════════════════════════════════════════
+    # WEB CLIENT — Port 80 (hoặc domain chính)
+    # ═══════════════════════════════════════════
+    server {
+        listen       80;
+        server_name  localhost 192.168.1.100;
+
+        # Web Client (React SPA)
+        location / {
+            root   D:/deploy/www/web-client;
+            index  index.html;
+            try_files $uri $uri/ /index.html;  # SPA routing fallback
+        }
+
+        # API Proxy — forward /api requests to .NET backend
+        location /api/ {
+            proxy_pass http://127.0.0.1:5000/api/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 300s;
+            proxy_send_timeout 300s;
+        }
+
+        # Uploads — serve static uploaded files
+        location /uploads/ {
+            alias D:/deploy/xomtruyen/uploads/;
+            expires 30d;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+
+    # ═══════════════════════════════════════════
+    # ADMIN PORTAL — Port 3001
+    # ═══════════════════════════════════════════
+    server {
+        listen       3001;
+        server_name  localhost 192.168.1.100;
+
+        # Admin Portal (React SPA)
+        location / {
+            root   D:/deploy/www/admin-portal;
+            index  index.html;
+            try_files $uri $uri/ /index.html;
+        }
+
+        # API Proxy
+        location /api/ {
+            proxy_pass http://127.0.0.1:5000/api/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 300s;
+        }
+
+        # Uploads
+        location /uploads/ {
+            alias D:/deploy/xomtruyen/uploads/;
+        }
+    }
+
+    # ═══════════════════════════════════════════
+    # API TRỰC TIẾP — Port 5000 (optional, dev)
+    # ═══════════════════════════════════════════
+    # API đã chạy trực tiếp trên port 5000 qua Kestrel
+    # Không cần Nginx proxy nếu truy cập trực tiếp
+}</code></pre>
+
+    <h3><span class="step-num">3</span> Test cấu hình & khởi động</h3>
+    <pre><code># Kiểm tra syntax:
+cd D:\tools\nginx
+nginx.exe -t
+# Phải thấy: "syntax is ok" và "test is successful"
+
+# Khởi động:
+nginx.exe
+
+# Reload sau khi sửa config:
+nginx.exe -s reload</code></pre>
+
+    <h3><span class="step-num">4</span> Cài Nginx như Windows Service (NSSM)</h3>
+    <pre><code>D:\tools\nssm\nssm.exe install NginxService
+
+# Trong GUI:
+#   Path:         D:\tools\nginx\nginx.exe
+#   Startup Dir:  D:\tools\nginx
+#   Arguments:    (để trống)
+
+D:\tools\nssm\nssm.exe start NginxService</code></pre>
+
+    <!-- 8. FIREWALL -->
+    <h2 id="firewall">8. Mở Port & Cấu Hình Firewall Windows</h2>
+
+    <h3><span class="step-num">1</span> Mở ports qua PowerShell (Admin)</h3>
+    <pre><code># Mở PowerShell với quyền Administrator:
+
+# Port 80 (Web Client qua Nginx):
+New-NetFirewallRule -DisplayName "XomTruyen Web (HTTP)" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+
+# Port 443 (HTTPS - nếu dùng SSL):
+New-NetFirewallRule -DisplayName "XomTruyen Web (HTTPS)" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
+
+# Port 3001 (Admin Portal):
+New-NetFirewallRule -DisplayName "XomTruyen Admin" -Direction Inbound -Protocol TCP -LocalPort 3001 -Action Allow
+
+# Port 5000 (API trực tiếp - tùy chọn):
+New-NetFirewallRule -DisplayName "XomTruyen API" -Direction Inbound -Protocol TCP -LocalPort 5000 -Action Allow
+
+# Port 5432 (PostgreSQL remote - CHỈ nếu cần):
+# New-NetFirewallRule -DisplayName "PostgreSQL" -Direction Inbound -Protocol TCP -LocalPort 5432 -Action Allow</code></pre>
+
+    <h3><span class="step-num">2</span> Kiểm tra Firewall</h3>
+    <pre><code># Liệt kê rules đã tạo:
+Get-NetFirewallRule -DisplayName "XomTruyen*" | Format-Table DisplayName, Enabled, Direction
+
+# Test từ máy khác trong LAN:
+# Trên máy khác: mở trình duyệt → http://192.168.1.100
+# Phải thấy Web Client</code></pre>
+
+    <h3><span class="step-num">3</span> Tắt Windows Defender Firewall (nếu vẫn bị chặn)</h3>
+    <div class="warn">
+        <strong>⚠️ Không khuyến nghị:</strong> Chỉ tắt tạm để test. Sau đó bật lại và chỉ mở đúng ports cần thiết.
+    </div>
+    <pre><code># Tắt firewall tạm thời (PowerShell Admin):
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# Bật lại:
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True</code></pre>
+
+    <!-- 9. DOMAIN & HTTPS -->
+    <h2 id="domain">9. Domain & HTTPS (Tùy Chọn)</h2>
+
+    <h3>9.1 Truy cập qua mạng LAN (không cần domain)</h3>
+    <div class="section-card">
+        <p>Nếu chỉ dùng trong mạng nội bộ:</p>
+        <ul>
+            <li><strong>Web Client:</strong> http://192.168.1.100</li>
+            <li><strong>Admin:</strong> http://192.168.1.100:3001</li>
+            <li><strong>API:</strong> http://192.168.1.100:5000/scalar/v1</li>
+        </ul>
+        <p>Không cần domain, không cần HTTPS.</p>
+    </div>
+
+    <h3>9.2 Truy cập từ Internet (cần domain + DDNS)</h3>
+    <pre><code># Bước 1: Đăng ký Dynamic DNS (miễn phí)
+#   - noip.com
+#   - duckdns.org
+#   - freedns.afraid.org
+# Ví dụ: xomtruyen.duckdns.org → trỏ về IP công cộng của bạn
+
+# Bước 2: Port forwarding trên Router
+#   - Vào trang quản trị router (thường 192.168.1.1)
+#   - Port Forwarding:
+#     External Port 80 → Internal 192.168.1.100:80
+#     External Port 443 → Internal 192.168.1.100:443
+
+# Bước 3: Kiểm tra IP công cộng
+curl ifconfig.me</code></pre>
+
+    <h3>9.3 HTTPS với Let's Encrypt (win-acme)</h3>
+    <pre><code># Tải win-acme: https://www.win-acme.com/
+# Giải nén vào D:\tools\win-acme\
+
+# Chạy:
+D:\tools\win-acme\wacs.exe
+
+# Chọn:
+#   N: Create certificate (default settings)
+#   → Nhập domain: xomtruyen.duckdns.org
+#   → Chọn: Save to path
+#   → Path: D:\tools\nginx\ssl\
+#   → Auto-renew: Yes</code></pre>
+
+    <div class="code-title">📁 nginx.conf — Thêm HTTPS server block</div>
+    <pre><code>server {
+    listen       443 ssl;
+    server_name  xomtruyen.duckdns.org;
+
+    ssl_certificate      D:/tools/nginx/ssl/xomtruyen.duckdns.org-chain.pem;
+    ssl_certificate_key  D:/tools/nginx/ssl/xomtruyen.duckdns.org-key.pem;
+
+    # ... giữ nguyên location blocks từ server port 80 ...
+}
+
+# Redirect HTTP → HTTPS
+server {
+    listen 80;
+    server_name xomtruyen.duckdns.org;
+    return 301 https://$host$request_uri;
+}</code></pre>
+
+    <!-- 10. AUTOSTART -->
+    <h2 id="autostart">10. Tự Động Khởi Động Khi Bật Máy</h2>
+
+    <h3>10.1 Danh sách services</h3>
+    <table>
+        <thead><tr><th>Service</th><th>Tool</th><th>Kiểm tra</th></tr></thead>
+        <tbody>
+            <tr><td>PostgreSQL</td><td>Tự cài service khi install</td><td><code>sc query postgresql-x64-16</code></td></tr>
+            <tr><td>XomTruyen API</td><td>NSSM</td><td><code>sc query XomTruyenAPI</code></td></tr>
+            <tr><td>Nginx</td><td>NSSM</td><td><code>sc query NginxService</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>10.2 Script kiểm tra tất cả services</h3>
+    <div class="code-title">📁 D:\deploy\check-services.bat</div>
+    <pre><code>@echo off
+echo ========================================
+echo   XomTruyen Server — Kiem Tra Services
+echo ========================================
+echo.
+
+echo [1] PostgreSQL:
+sc query postgresql-x64-16 | find "RUNNING"
+if %errorlevel%==0 (echo     OK - Dang chay) else (echo     LOI - Khong chay!)
+echo.
+
+echo [2] XomTruyen API (.NET):
+sc query XomTruyenAPI | find "RUNNING"
+if %errorlevel%==0 (echo     OK - Dang chay) else (echo     LOI - Khong chay!)
+echo.
+
+echo [3] Nginx (Reverse Proxy):
+sc query NginxService | find "RUNNING"
+if %errorlevel%==0 (echo     OK - Dang chay) else (echo     LOI - Khong chay!)
+echo.
+
+echo ========================================
+echo   Kiem tra endpoints:
+echo ========================================
+curl -s -o nul -w "  Web Client (80): %%{http_code}\n" http://localhost/
+curl -s -o nul -w "  Admin (3001):    %%{http_code}\n" http://localhost:3001/
+curl -s -o nul -w "  API (5000):      %%{http_code}\n" http://localhost:5000/api/system/health
+echo.
+pause</code></pre>
+
+    <h3>10.3 Script khởi động lại tất cả</h3>
+    <div class="code-title">📁 D:\deploy\restart-all.bat (Chạy với quyền Admin)</div>
+    <pre><code>@echo off
+echo Restarting all XomTruyen services...
+
+net stop NginxService
+net stop XomTruyenAPI
+net stop postgresql-x64-16
+
+timeout /t 3 /nobreak > nul
+
+net start postgresql-x64-16
+net start XomTruyenAPI
+net start NginxService
+
+echo.
+echo All services restarted!
+pause</code></pre>
+
+    <!-- 11. MONITORING -->
+    <h2 id="monitoring">11. Giám Sát & Logs</h2>
+
+    <h3>11.1 Vị trí file log</h3>
+    <table>
+        <thead><tr><th>Service</th><th>Log Path</th></tr></thead>
+        <tbody>
+            <tr><td>PostgreSQL</td><td><code>C:\Program Files\PostgreSQL\16\data\log\</code></td></tr>
+            <tr><td>.NET API</td><td><code>D:\deploy\api-publish\logs\</code> (cấu hình Serilog)</td></tr>
+            <tr><td>Nginx Access</td><td><code>D:\tools\nginx\logs\access.log</code></td></tr>
+            <tr><td>Nginx Error</td><td><code>D:\tools\nginx\logs\error.log</code></td></tr>
+            <tr><td>NSSM Services</td><td>Windows Event Viewer → Applications</td></tr>
+        </tbody>
+    </table>
+
+    <h3>11.2 Theo dõi real-time</h3>
+    <pre><code># Xem log Nginx real-time (PowerShell):
+Get-Content D:\tools\nginx\logs\access.log -Wait -Tail 20
+
+# Xem log API:
+Get-Content D:\deploy\api-publish\logs\app-*.log -Wait -Tail 20
+
+# Kiểm tra port đang listen:
+netstat -ano | findstr ":80 :3001 :5000 :5432"</code></pre>
+
+    <!-- 12. TROUBLESHOOT -->
+    <h2 id="troubleshoot">12. Xử Lý Sự Cố Thường Gặp</h2>
+
+    <table>
+        <thead><tr><th>Triệu chứng</th><th>Nguyên nhân</th><th>Cách khắc phục</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Truy cập http://IP → timeout</td>
+                <td>Firewall chặn port 80</td>
+                <td>Chạy lại lệnh <code>New-NetFirewallRule</code> (mục 8)</td>
+            </tr>
+            <tr>
+                <td>Web Client hiện blank / 404</td>
+                <td>Thiếu <code>try_files</code> trong nginx.conf</td>
+                <td>Thêm <code>try_files $uri $uri/ /index.html;</code></td>
+            </tr>
+            <tr>
+                <td>API trả về 500 Internal Server Error</td>
+                <td>Connection string sai hoặc DB chưa migrate</td>
+                <td>Kiểm tra appsettings.Production.json + chạy <code>dotnet ef database update</code></td>
+            </tr>
+            <tr>
+                <td>CORS error trên browser</td>
+                <td>IP client không nằm trong AllowedOrigins</td>
+                <td>Thêm IP/domain vào appsettings.Production.json → restart API</td>
+            </tr>
+            <tr>
+                <td>Upload file lỗi 413 (Request Entity Too Large)</td>
+                <td>Nginx giới hạn body size</td>
+                <td>Thêm <code>client_max_body_size 500M;</code> vào nginx.conf</td>
+            </tr>
+            <tr>
+                <td>Ảnh/video không load (404)</td>
+                <td>Đường dẫn uploads sai</td>
+                <td>Kiểm tra <code>location /uploads/</code> trỏ đúng thư mục có file</td>
+            </tr>
+            <tr>
+                <td>API service tự dừng sau vài giờ</td>
+                <td>Kestrel crash, NSSM không restart</td>
+                <td>NSSM → Edit XomTruyenAPI → tab "Exit actions" → chọn "Restart"</td></tr>
+            <tr>
+                <td>Không truy cập được từ Internet</td>
+                <td>Router chưa port forward</td>
+                <td>Cấu hình port forwarding trên router (mục 9.2)</td>
+            </tr>
+            <tr>
+                <td>PostgreSQL từ chối kết nối</td>
+                <td>Service chưa start hoặc pg_hba.conf thiếu rule</td>
+                <td>Kiểm tra service + thêm rule vào pg_hba.conf (mục 3)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 13. CHECKLIST -->
+    <h2 id="checklist">13. Checklist Hoàn Tất</h2>
+
+    <div class="section-card">
+        <h4>Trước khi hoàn thành, kiểm tra tất cả:</h4>
+        <pre><code>☐ PostgreSQL service chạy, database xomtruyen_db đã có tables
+☐ .NET API chạy trên port 5000, health check OK
+☐ Web Client build thành công, file nằm ở D:\deploy\www\web-client\
+☐ Admin Portal build thành công, file nằm ở D:\deploy\www\admin-portal\
+☐ Nginx chạy, truy cập http://localhost/ → thấy Web Client
+☐ Nginx proxy API: http://localhost/api/system/health → OK
+☐ Truy cập http://localhost:3001/ → thấy Admin Portal
+☐ Firewall đã mở port 80, 3001
+☐ Từ máy khác trong LAN: http://192.168.1.100 → thấy Web Client
+☐ Upload file qua Admin → file lưu thành công
+☐ Đăng nhập/đăng ký → JWT hoạt động
+☐ Tất cả 3 services (PostgreSQL, API, Nginx) auto-start khi reboot
+☐ Restart laptop → chạy check-services.bat → tất cả "RUNNING"</code></pre>
+    </div>
+
+    <div class="success">
+        <strong>🎉 Hoàn tất!</strong> Laptop của bạn giờ là server chạy full stack Xóm Truyện. Truy cập từ bất kỳ thiết bị nào trong mạng LAN qua IP laptop.
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+
+    <h2>📋 Tóm Tắt Ports & URLs</h2>
+    <table>
+        <thead><tr><th>Service</th><th>Port</th><th>URL truy cập</th><th>Ghi chú</th></tr></thead>
+        <tbody>
+            <tr><td>Web Client</td><td>80</td><td>http://192.168.1.100/</td><td>Qua Nginx, SPA routing</td></tr>
+            <tr><td>Admin Portal</td><td>3001</td><td>http://192.168.1.100:3001/</td><td>Qua Nginx, SPA routing</td></tr>
+            <tr><td>.NET API</td><td>5000</td><td>http://192.168.1.100:5000/</td><td>Kestrel trực tiếp + Nginx proxy</td></tr>
+            <tr><td>PostgreSQL</td><td>5432</td><td>localhost:5432</td><td>Chỉ local (mặc định)</td></tr>
+            <tr><td>API Docs</td><td>5000</td><td>http://192.168.1.100:5000/scalar/v1</td><td>Swagger/Scalar UI</td></tr>
+        </tbody>
+    </table>
+
+    <hr style="border-color: #333; margin: 30px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Setup Laptop Server — Deploy Full Stack Xóm Truyện<br>
+        Trạng thái: <span style="color: #22c55e;">🟢 Tài liệu hoàn chỉnh</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
