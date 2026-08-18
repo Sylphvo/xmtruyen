@@ -60,6 +60,7 @@
 
     <div class="toc">
         <h3>📋 Mục Lục</h3>
+        <a href="#research">0. Nghiên Cứu UX Từ Các Nền Tảng Lớn (WEBTOON, Kindle, Tachiyomi...)</a>
         <a href="#reading-utils">1. Tiện Ích Hỗ Trợ Đọc Sách (Reading Utilities)</a>
         <a href="#reading-settings">2. Bảng Cài Đặt Đọc (Settings Panel)</a>
         <a href="#progress-bar">3. Thanh Tiến Độ & Resume Đọc</a>
@@ -69,6 +70,185 @@
         <a href="#micro-interactions">7. Micro-interactions & Feedback Animations</a>
         <a href="#css-system">8. CSS Animation System (Framer Motion / CSS)</a>
         <a href="#implementation">9. Triển Khai Code Chi Tiết</a>
+    </div>
+
+    <!-- 0. NGHIÊN CỨU -->
+    <h2 id="research">0. Nghiên Cứu UX Từ Các Nền Tảng Đọc Truyện Lớn</h2>
+
+    <div class="note">
+        <strong>💡 Nguồn tham khảo:</strong> Phân tích UX patterns từ 8 nền tảng hàng đầu thế giới và Việt Nam — áp dụng các best practices phù hợp cho Xóm Truyện.
+    </div>
+
+    <h3>0.1 WEBTOON (Naver) — Chuẩn mực đọc truyện tranh cuộn dọc</h3>
+    <div class="section-card">
+        <h4>Patterns nổi bật:</h4>
+        <ul>
+            <li><strong>Infinite vertical scroll:</strong> Ảnh nối liền nhau không gap, tạo cảm giác đọc "liên tục như cuộn giấy"</li>
+            <li><strong>Episode-end comments:</strong> Sau khi đọc hết episode → section bình luận xuất hiện ngay bên dưới (không cần chuyển trang). User đọc xong → cuộn thêm chút = thấy comments. Tạo engagement tự nhiên.</li>
+            <li><strong>"Like" per episode:</strong> Nút ❤️ ngay cuối mỗi episode (không phải tổng truyện) — micro-feedback nhanh</li>
+            <li><strong>Khoảng đen giữa panels:</strong> Background đen (#000) giữa các panel giúp mắt không bị rối khi cuộn nhanh</li>
+            <li><strong>Auto-unlock next episode:</strong> Sau 1 tuần episode mới sẽ tự mở miễn phí (mô hình "fast pass" = trả tiền đọc sớm)</li>
+            <li><strong>Sound effects (SFX):</strong> Một số series có âm thanh/nhạc nền khi đọc (tùy chọn bật/tắt)</li>
+        </ul>
+        <h4>Áp dụng cho Xóm Truyện:</h4>
+        <ul>
+            <li>✅ Cuộn dọc liền mạch (đã có)</li>
+            <li>🆕 Comments section ngay cuối chương (không cần quay lại trang detail)</li>
+            <li>🆕 Like/React nhanh cuối mỗi chương</li>
+            <li>🆕 Background đen cho comic reader</li>
+        </ul>
+    </div>
+
+    <h3>0.2 Tachiyomi / Mihon — Open-source reader tùy biến cao nhất</h3>
+    <div class="section-card">
+        <h4>Patterns nổi bật:</h4>
+        <ul>
+            <li><strong>Reading modes:</strong> 3 chế độ: Webtoon (cuộn dọc), Left-to-Right (lật trang ←→), Right-to-Left (manga Nhật)</li>
+            <li><strong>Crop borders:</strong> Tự động cắt viền trắng/đen thừa của ảnh scan → ảnh lấp đầy màn hình</li>
+            <li><strong>Color filter:</strong> Bộ lọc màu (warm/cool/custom) overlay lên ảnh — giảm mỏi mắt ban đêm</li>
+            <li><strong>Keep screen on:</strong> Tự động giữ màn hình không tắt khi đang đọc</li>
+            <li><strong>Custom swipe zones:</strong> Chia màn hình thành 9 vùng (3x3), user tùy chỉnh mỗi vùng tap làm gì (next page, prev page, menu...)</li>
+            <li><strong>Page preloading:</strong> Preload 3-6 trang tiếp theo trong background</li>
+            <li><strong>Double-page mode:</strong> Trên tablet/landscape → ghép 2 trang cạnh nhau (manga spread)</li>
+            <li><strong>Chapter transition:</strong> Khi hết chương → hiện banner "Chương tiếp: [tên]" → cuộn thêm = auto load chương tiếp (seamless)</li>
+        </ul>
+        <h4>Áp dụng cho Xóm Truyện:</h4>
+        <ul>
+            <li>🆕 Chapter transition seamless (cuộn qua cuối = auto chương tiếp)</li>
+            <li>🆕 Page preloading (3 trang tiếp)</li>
+            <li>🆕 Color filter / Blue light filter cho đọc đêm</li>
+            <li>🆕 Keep screen on khi đang đọc (<code>navigator.wakeLock</code>)</li>
+            <li>🆕 Multiple reading modes (cuộn dọc / lật trang)</li>
+        </ul>
+    </div>
+
+    <h3>0.3 Kindle / Apple Books — Chuẩn mực đọc sách chữ</h3>
+    <div class="section-card">
+        <h4>Patterns nổi bật:</h4>
+        <ul>
+            <li><strong>X-Ray:</strong> Tap vào tên nhân vật → popup giải thích nhân vật đó là ai, xuất hiện ở đâu trong truyện</li>
+            <li><strong>Popular Highlights:</strong> Hiển thị các đoạn được nhiều người highlight (gạch chân nhẹ) → social reading</li>
+            <li><strong>Time to read:</strong> Hiện "15 min left in chapter" tính bằng tốc độ đọc thực tế của user (học từ lịch sử)</li>
+            <li><strong>Sync across devices:</strong> Đọc trên điện thoại → mở laptop → tự nhảy đến đúng trang đang đọc (WhisperSync)</li>
+            <li><strong>Dictionary popup:</strong> Long-press từ → tra từ điển ngay tại chỗ (không cần rời app)</li>
+            <li><strong>Font settings deep:</strong> 12+ fonts, custom margins, line spacing, text alignment, bold/thin weight</li>
+            <li><strong>Page flip animation:</strong> Animation giả lật trang sách giấy (skeuomorphic) cho cảm giác thật</li>
+            <li><strong>Reading stats:</strong> Thống kê: thời gian đọc/tuần, sách đã hoàn thành, streak ngày liên tục đọc</li>
+        </ul>
+        <h4>Áp dụng cho Xóm Truyện:</h4>
+        <ul>
+            <li>🆕 Time to read (ước tính dựa trên words remaining ÷ reading speed)</li>
+            <li>🆕 Sync position across devices (đã có API, cần hoàn thiện client)</li>
+            <li>🆕 Highlight text + share quote</li>
+            <li>🆕 Reading streak / stats (gamification nhẹ)</li>
+            <li>🆕 Deep font settings (nhiều font hơn, margins, weight)</li>
+        </ul>
+    </div>
+
+    <h3>0.4 Wattpad — Social reading & engagement</h3>
+    <div class="section-card">
+        <h4>Patterns nổi bật:</h4>
+        <ul>
+            <li><strong>Inline comments (paragraph-level):</strong> Tap vào bất kỳ đoạn văn nào → xem comments của đoạn đó + viết comment. Số comments hiện bên cạnh dòng (💬 12).</li>
+            <li><strong>Vote per chapter:</strong> Nút ⭐ "Vote" cuối mỗi chương (1 vote/chapter/user) — xếp hạng truyện theo tổng votes</li>
+            <li><strong>Reading list:</strong> Tạo nhiều "Reading Lists" (giống playlist Spotify) — phân loại sách theo mood</li>
+            <li><strong>Mute/Unmute:</strong> Tắt thông báo cho 1 truyện cụ thể mà vẫn follow</li>
+            <li><strong>Dedication page:</strong> Tác giả có thể dedicate 1 chương cho reader → tạo connection</li>
+            <li><strong>Dark mode with OLED black:</strong> True black (#000000) cho màn AMOLED tiết kiệm pin</li>
+        </ul>
+        <h4>Áp dụng cho Xóm Truyện:</h4>
+        <ul>
+            <li>🆕 Inline paragraph comments (hiện số 💬 bên phải mỗi đoạn)</li>
+            <li>🆕 Vote/React cuối mỗi chương</li>
+            <li>🆕 Multiple reading lists (tủ sách phân loại)</li>
+            <li>🆕 True dark mode (#000) cho OLED</li>
+        </ul>
+    </div>
+
+    <h3>0.5 TruyenQQ / NetTruyen (Việt Nam) — UX quen thuộc với user Việt</h3>
+    <div class="section-card">
+        <h4>Patterns nổi bật:</h4>
+        <ul>
+            <li><strong>Server ảnh (đổi server):</strong> Nút "Server 1 / Server 2" — khi server chính lag, user tự đổi sang CDN backup</li>
+            <li><strong>Navigation bar bottom:</strong> Thanh nav dưới cùng: [← Prev] [Chapter list] [Next →] luôn dính (sticky)</li>
+            <li><strong>Zoom trên image:</strong> Click vào ảnh → zoom full width. Pinch zoom trên mobile</li>
+            <li><strong>Load chapter liền:</strong> Cuộn hết ảnh chương hiện tại → hiện divider "=== Chương XX ===" → tiếp tục cuộn = ảnh chương tiếp tự load (không reload page)</li>
+            <li><strong>Comments per chapter:</strong> Mỗi chương có box comments riêng (tách biệt với comments tổng của truyện)</li>
+            <li><strong>Report ảnh lỗi:</strong> Nút "Báo lỗi" nếu ảnh 404 → thông báo admin fix</li>
+            <li><strong>Đọc từ trái/phải (manga):</strong> Toggle cho manga đọc theo kiểu Nhật (phải → trái)</li>
+            <li><strong>Lưu truyện offline:</strong> Download chapter về máy để đọc không cần mạng</li>
+        </ul>
+        <h4>Áp dụng cho Xóm Truyện:</h4>
+        <ul>
+            <li>🆕 Đổi server CDN (Server 1 / Server 2) — fallback khi ảnh lỗi</li>
+            <li>🆕 Sticky bottom navigation bar</li>
+            <li>🆕 Auto-load chương tiếp khi cuộn hết (seamless chapter transition)</li>
+            <li>🆕 Comments per chapter (cuối mỗi chương)</li>
+            <li>🆕 Report ảnh lỗi (nút báo lỗi ảnh 404)</li>
+        </ul>
+    </div>
+
+    <h3>0.6 Bảng tổng hợp — Features ưu tiên áp dụng</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Nguồn</th>
+                <th>Mô tả ngắn</th>
+                <th>Effort</th>
+                <th>Impact UX</th>
+                <th>Ưu tiên</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Seamless chapter transition</td><td>Tachiyomi, TruyenQQ</td><td>Cuộn hết chương → auto load chương tiếp, không reload</td><td>Trung bình</td><td>Rất cao</td><td>⭐⭐⭐</td></tr>
+            <tr><td>Comments cuối chương</td><td>WEBTOON, TruyenQQ</td><td>Section comments ngay sau nội dung chương (inline)</td><td>Thấp</td><td>Cao</td><td>⭐⭐⭐</td></tr>
+            <tr><td>Page preloading</td><td>Tachiyomi</td><td>Prefetch 3 trang/chương tiếp khi đọc gần cuối</td><td>Thấp</td><td>Cao</td><td>⭐⭐⭐</td></tr>
+            <tr><td>Reading time estimate</td><td>Kindle</td><td>"~8 phút còn lại" dựa trên tốc độ đọc user</td><td>Thấp</td><td>Trung bình</td><td>⭐⭐</td></tr>
+            <tr><td>Đổi server CDN</td><td>TruyenQQ</td><td>Button đổi server khi ảnh lag/lỗi</td><td>Thấp</td><td>Cao (VN context)</td><td>⭐⭐⭐</td></tr>
+            <tr><td>Color filter (đọc đêm)</td><td>Tachiyomi</td><td>Overlay warm/sepia filter giảm ánh sáng xanh</td><td>Thấp</td><td>Trung bình</td><td>⭐⭐</td></tr>
+            <tr><td>Inline paragraph comments</td><td>Wattpad</td><td>Tap đoạn văn → xem comments đoạn đó</td><td>Cao</td><td>Cao</td><td>⭐⭐ (tương lai)</td></tr>
+            <tr><td>Keep screen on</td><td>Tachiyomi</td><td>Không tắt màn hình khi đang đọc</td><td>Rất thấp</td><td>Cao (mobile)</td><td>⭐⭐⭐</td></tr>
+            <tr><td>Highlight + share quote</td><td>Kindle, Wattpad</td><td>Bôi đen text → lưu highlight / share lên mạng xã hội</td><td>Trung bình</td><td>Trung bình</td><td>⭐⭐</td></tr>
+            <tr><td>Vote/React cuối chương</td><td>WEBTOON, Wattpad</td><td>Nút ❤️/⭐ nhanh cuối chương (1 tap)</td><td>Thấp</td><td>Cao</td><td>⭐⭐⭐</td></tr>
+            <tr><td>Reading streak (gamification)</td><td>Kindle, Duolingo</td><td>Streak ngày liên tục đọc, huy hiệu, stats</td><td>Trung bình</td><td>Cao (retention)</td><td>⭐⭐</td></tr>
+            <tr><td>Report ảnh lỗi</td><td>TruyenQQ</td><td>Nút báo lỗi khi ảnh 404 → admin biết fix</td><td>Thấp</td><td>Trung bình</td><td>⭐⭐</td></tr>
+            <tr><td>Background đen (comic)</td><td>WEBTOON</td><td>Nền #000 khi đọc truyện tranh (không trắng)</td><td>Rất thấp</td><td>Trung bình</td><td>⭐⭐⭐</td></tr>
+            <tr><td>WakeLock API</td><td>Tachiyomi</td><td>navigator.wakeLock.request('screen') khi đọc</td><td>Rất thấp</td><td>Cao (mobile)</td><td>⭐⭐⭐</td></tr>
+        </tbody>
+    </table>
+
+    <h3>0.7 Lộ trình áp dụng theo pha</h3>
+    <div class="section-card">
+        <h4>Pha 1 — Quick wins (1-2 ngày, impact lớn):</h4>
+        <ul>
+            <li>Background đen cho comic reader</li>
+            <li>WakeLock (giữ màn hình sáng)</li>
+            <li>Vote/React cuối chương</li>
+            <li>Keep screen on</li>
+        </ul>
+        <h4>Pha 2 — Core improvements (1 tuần):</h4>
+        <ul>
+            <li>Seamless chapter transition (cuộn qua = chương tiếp)</li>
+            <li>Page preloading (3 trang tiếp)</li>
+            <li>Comments cuối chương (inline)</li>
+            <li>Đổi server CDN</li>
+            <li>Reading time estimate</li>
+        </ul>
+        <h4>Pha 3 — Advanced (2-3 tuần):</h4>
+        <ul>
+            <li>Color filter / Blue light</li>
+            <li>Highlight + share quote</li>
+            <li>Reading streak / stats</li>
+            <li>Report ảnh lỗi</li>
+            <li>Multiple reading modes (cuộn/lật)</li>
+        </ul>
+        <h4>Pha 4 — Social features (tương lai):</h4>
+        <ul>
+            <li>Inline paragraph comments (Wattpad-style)</li>
+            <li>Popular highlights (social reading)</li>
+            <li>Multiple reading lists</li>
+        </ul>
     </div>
 
     <!-- 1. TIỆN ÍCH ĐỌC -->
