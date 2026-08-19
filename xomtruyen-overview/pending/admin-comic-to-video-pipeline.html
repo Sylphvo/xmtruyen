@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen Admin — Convert Truyện Tranh Thành Video + TTS Đa Ngôn Ngữ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-new { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-plan { background: rgba(168,85,247,0.15); color: #a78bfa; border: 1px solid #a78bfa; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.88em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🎬 Convert Truyện Tranh Thành Video + TTS Đa Ngôn Ngữ</h1>
+    <p class="subtitle">
+        <span class="badge badge-new">Tính Năng Mới</span>
+        <span class="badge badge-plan">Chưa Triển Khai</span>
+        Luồng tự động chuyển ảnh truyện tranh → video slideshow + AI Text-to-Speech đọc nội dung → xuất MP4 nhiều ngôn ngữ
+    </p>
+
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#overview">1. Tổng Quan Luồng Xử Lý</a>
+        <a href="#architecture">2. Kiến Trúc Pipeline (Comic → Video)</a>
+        <a href="#admin-ui">3. Giao Diện Admin — Trang Convert Video</a>
+        <a href="#tts">4. Text-to-Speech Engine (AI Voice, Đa Ngôn Ngữ)</a>
+        <a href="#video-gen">5. Video Generation (FFmpeg + Ảnh + Audio)</a>
+        <a href="#api">6. API Endpoints</a>
+        <a href="#worker">7. Background Worker Pipeline</a>
+        <a href="#database">8. Database Schema</a>
+        <a href="#output">9. Output & Phân Phối Video</a>
+        <a href="#tech">10. Tech Stack & Thư Viện</a>
+    </div>
+
+    <!-- 1. TỔNG QUAN -->
+    <h2 id="overview">1. Tổng Quan Luồng Xử Lý</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│          LUỒNG CONVERT TRUYỆN TRANH → VIDEO + TTS                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ADMIN chọn truyện + chương + ngôn ngữ
+        │
+        ▼
+  ┌──────────────────────────────────┐
+  │  1. Thu thập dữ liệu            │
+  │  • Ảnh comic pages (từ DB/CDN)  │
+  │  • Nội dung text (lời thoại,    │
+  │    narration từ truyện chữ)     │
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  2. Text-to-Speech (TTS)         │
+  │  • Chọn ngôn ngữ (VI/EN/ZH/JP) │
+  │  • Chọn giọng (Nam/Nữ/AI)      │
+  │  • Tạo audio từng đoạn          │
+  │  • Output: audio segments (.mp3)│
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  3. Video Generation (FFmpeg)    │
+  │  • Ghép ảnh thành slideshow      │
+  │  • Mỗi ảnh hiển thị X giây     │
+  │    (sync với audio duration)     │
+  │  • Thêm hiệu ứng (pan, zoom)   │
+  │  • Ghép audio track             │
+  │  • Thêm subtitle (tùy chọn)    │
+  │  • Output: video.mp4            │
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  4. Post-processing              │
+  │  • Encode nhiều resolution       │
+  │    (720p, 1080p)                 │
+  │  • Generate thumbnail            │
+  │  • Upload lên Storage/CDN        │
+  │  • Cập nhật DB (status, URL)    │
+  └──────────────────────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  5. Kết quả                      │
+  │  • Admin xem preview             │
+  │  • Download MP4                   │
+  │  • Publish lên platform (YT...)  │
+  └──────────────────────────────────┘
+    </div>
+
+    <!-- 2. KIẾN TRÚC -->
+    <h2 id="architecture">2. Kiến Trúc Pipeline</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ARCHITECTURE DIAGRAM                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌────────────────┐          ┌─────────────────────────────────────────────┐
+  │  Admin Portal  │──POST──▶│  .NET API — VideoConvertController          │
+  │  (React UI)    │          │  POST /api/admin/video-convert/create       │
+  └────────────────┘          └──────────────────┬──────────────────────────┘
+                                                 │
+                                                 ▼
+                              ┌─────────────────────────────────────────────┐
+                              │  Background Task Queue                       │
+                              │  (VideoConvertTask added to queue)           │
+                              └──────────────────┬──────────────────────────┘
+                                                 │
+                              ┌──────────────────▼──────────────────────────┐
+                              │  VideoConvertWorker (HostedService)          │
+                              │                                              │
+                              │  Step 1: Fetch comic pages from DB/Storage  │
+                              │           ↓                                  │
+                              │  Step 2: Fetch text content (narration)     │
+                              │           ↓                                  │
+                              │  Step 3: Call TTS API → generate audio      │
+                              │           ↓                                  │
+                              │  Step 4: FFmpeg → combine images + audio    │
+                              │           ↓                                  │
+                              │  Step 5: Encode + Upload + Update DB        │
+                              └──────────────────┬──────────────────────────┘
+                                                 │
+                    ┌────────────────────────────┼───────────────────────┐
+                    │                            │                       │
+                    ▼                            ▼                       ▼
+          ┌──────────────┐            ┌──────────────┐        ┌──────────────┐
+          │  TTS Service │            │   FFmpeg     │        │   Storage    │
+          │ (Edge TTS /  │            │  (CLI tool)  │        │ (Local/S3)   │
+          │  Azure /     │            │              │        │              │
+          │  Google TTS) │            │ Images→Video │        │ Output .mp4  │
+          └──────────────┘            └──────────────┘        └──────────────┘
+    </div>
+
+    <!-- 3. ADMIN UI -->
+    <h2 id="admin-ui">3. Giao Diện Admin — Trang Convert Video</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  ADMIN PORTAL — /admin/video-convert                             │
+└─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │  🎬 Chuyển Đổi Truyện Tranh Thành Video                     │
+  ├─────────────────────────────────────────────────────────────┤
+  │                                                              │
+  │  ╔═══ BƯỚC 1: CHỌN TRUYỆN & CHƯƠNG ═══════════════════════╗│
+  │  ║                                                          ║│
+  │  ║  Truyện: [  Đấu Phá Thương Khung  ▼  ]  (Searchable)  ║│
+  │  ║                                                          ║│
+  │  ║  Chương: [✓] Chương 1: Khởi Đầu                        ║│
+  │  ║          [✓] Chương 2: Gặp Gỡ                          ║│
+  │  ║          [✓] Chương 3: Thử Thách                        ║│
+  │  ║          [ ] Chương 4: Biến Cố                          ║│
+  │  ║          ...                                            ║│
+  │  ║  [Chọn tất cả] [Bỏ chọn tất cả]                       ║│
+  │  ║                                                          ║│
+  │  ╚══════════════════════════════════════════════════════════╝│
+  │                                                              │
+  │  ╔═══ BƯỚC 2: CẤU HÌNH AUDIO (TTS) ══════════════════════╗│
+  │  ║                                                          ║│
+  │  ║  Ngôn ngữ:    [🇻🇳 Tiếng Việt ▼]                       ║│
+  │  ║                 • 🇻🇳 Tiếng Việt                         ║│
+  │  ║                 • 🇺🇸 English                            ║│
+  │  ║                 • 🇨🇳 中文 (Trung Quốc)                  ║│
+  │  ║                 • 🇯🇵 日本語 (Nhật Bản)                   ║│
+  │  ║                 • 🇰🇷 한국어 (Hàn Quốc)                   ║│
+  │  ║                                                          ║│
+  │  ║  Giọng đọc:   [Nữ — Tự nhiên (HoaiMy) ▼]              ║│
+  │  ║                 • Nữ — Tự nhiên (HoaiMy)                ║│
+  │  ║                 • Nam — Trầm (NamMinh)                   ║│
+  │  ║                 • Nữ — Trẻ (LinhSan)                    ║│
+  │  ║                 • Nam — Sôi động (DucAnh)                ║│
+  │  ║                                                          ║│
+  │  ║  Tốc độ đọc:  [Bình thường ▼] (0.8x / 1x / 1.2x)     ║│
+  │  ║                                                          ║│
+  │  ║  [🔊 Nghe thử giọng mẫu]                                ║│
+  │  ║                                                          ║│
+  │  ╚══════════════════════════════════════════════════════════╝│
+  │                                                              │
+  │  ╔═══ BƯỚC 3: CẤU HÌNH VIDEO ═════════════════════════════╗│
+  │  ║                                                          ║│
+  │  ║  Độ phân giải:  (●) 1080p (1920x1080)                  ║│
+  │  ║                  ( ) 720p (1280x720)                    ║│
+  │  ║                  ( ) 480p (854x480)                     ║│
+  │  ║                                                          ║│
+  │  ║  Thời gian mỗi ảnh:  [Auto — theo audio ▼]             ║│
+  │  ║                        • Auto (sync với narration)       ║│
+  │  ║                        • 3 giây / ảnh                    ║│
+  │  ║                        • 5 giây / ảnh                    ║│
+  │  ║                        • 8 giây / ảnh                    ║│
+  │  ║                                                          ║│
+  │  ║  Hiệu ứng chuyển cảnh:  [Ken Burns (pan + zoom) ▼]     ║│
+  │  ║                           • Không (cut)                  ║│
+  │  ║                           • Crossfade                    ║│
+  │  ║                           • Ken Burns (pan + zoom)       ║│
+  │  ║                           • Slide Left                   ║│
+  │  ║                                                          ║│
+  │  ║  Phụ đề:   [✓] Thêm phụ đề vào video                  ║│
+  │  ║            [✓] Embed subtitle (hardcode)                ║│
+  │  ║            [ ] File .srt riêng                           ║│
+  │  ║                                                          ║│
+  │  ║  Nhạc nền:  [ ] Thêm nhạc nền                          ║│
+  │  ║             Volume: [30%]                                ║│
+  │  ║             File: [Chọn file .mp3...]                   ║│
+  │  ║                                                          ║│
+  │  ╚══════════════════════════════════════════════════════════╝│
+  │                                                              │
+  │  ┌──────────────────────────────────────────────────────────┐│
+  │  │  📊 Ước tính:                                            ││
+  │  │  • 3 chương × ~15 ảnh/chương = 45 ảnh                   ││
+  │  │  • Audio: ~8 phút (ước tính 2000 từ)                    ││
+  │  │  • Video output: ~8 phút, ~120MB (1080p)                ││
+  │  │  • Thời gian xử lý: ~5-10 phút                         ││
+  │  └──────────────────────────────────────────────────────────┘│
+  │                                                              │
+  │  [  🎬 BẮT ĐẦU CONVERT VIDEO  ]                             │
+  │                                                              │
+  └─────────────────────────────────────────────────────────────┘
+
+  ═══════════════════════════════════════════════════════════════
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │  📋 LỊCH SỬ CONVERT                                         │
+  ├─────────────────────────────────────────────────────────────┤
+  │  Truyện           │ Chương   │ Ngôn ngữ │ Status   │ Action│
+  │  ─────────────────┼──────────┼──────────┼──────────┼───────│
+  │  Đấu Phá TK      │ 1-3      │ 🇻🇳 VI   │ ✅ Done  │ [⬇️📺]│
+  │  One Piece        │ 1089     │ 🇺🇸 EN   │ ⏳ 65%   │ [...]│
+  │  Solo Leveling    │ 1-5      │ 🇰🇷 KR   │ ❌ Fail  │ [🔄] │
+  │  Naruto           │ 700      │ 🇯🇵 JP   │ 🔄 Queue │ [...] │
+  └─────────────────────────────────────────────────────────────┘
+    </div>
+
+    <!-- 4. TTS -->
+    <h2 id="tts">4. Text-to-Speech Engine (AI Voice, Đa Ngôn Ngữ)</h2>
+
+    <h3>4.1 Nguồn text cho TTS</h3>
+    <div class="section-card">
+        <p><strong>Vấn đề:</strong> Truyện tranh chỉ có ảnh, không có text sẵn. Cần nguồn narration để AI đọc.</p>
+        <h4>Giải pháp — 3 nguồn text:</h4>
+        <ol>
+            <li><strong>Từ truyện chữ (nếu có):</strong> Nếu cùng bộ truyện có phiên bản text (formatType=1) → dùng content text làm narration</li>
+            <li><strong>Admin nhập thủ công:</strong> Admin soạn script narration cho mỗi ảnh (field "narration" trong form)</li>
+            <li><strong>AI OCR + Translate:</strong> Dùng OCR đọc text trong ảnh truyện (speech bubbles) → dịch sang ngôn ngữ target → TTS</li>
+        </ol>
+    </div>
+
+    <h3>4.2 TTS Service Options</h3>
+    <table>
+        <thead>
+            <tr><th>Service</th><th>Ngôn ngữ</th><th>Chất lượng</th><th>Giá</th><th>Ghi chú</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Edge TTS (Microsoft)</strong></td>
+                <td>🇻🇳🇺🇸🇨🇳🇯🇵🇰🇷 + 40 ngôn ngữ</td>
+                <td>Rất tốt (Neural)</td>
+                <td>Miễn phí</td>
+                <td>✅ Khuyến nghị dùng trước. Package: <code>edge-tts</code> (Python)</td>
+            </tr>
+            <tr>
+                <td>Google Cloud TTS</td>
+                <td>40+ ngôn ngữ</td>
+                <td>Xuất sắc (WaveNet)</td>
+                <td>$4/1M ký tự (Neural)</td>
+                <td>Chất lượng cao nhất, có SSML control</td>
+            </tr>
+            <tr>
+                <td>Azure Cognitive TTS</td>
+                <td>60+ ngôn ngữ</td>
+                <td>Xuất sắc</td>
+                <td>$4/1M ký tự</td>
+                <td>Nhiều giọng Việt Nam nhất</td>
+            </tr>
+            <tr>
+                <td>ElevenLabs</td>
+                <td>29 ngôn ngữ</td>
+                <td>Tốt nhất (AI Clone)</td>
+                <td>$5/mo (30 phút)</td>
+                <td>Giọng tự nhiên nhất, có voice cloning</td>
+            </tr>
+            <tr>
+                <td>OpenAI TTS</td>
+                <td>Đa ngôn ngữ</td>
+                <td>Rất tốt</td>
+                <td>$15/1M ký tự</td>
+                <td>API đơn giản, 6 voices</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>4.3 Giọng đọc Tiếng Việt (Edge TTS — miễn phí)</h3>
+    <table>
+        <thead><tr><th>Voice ID</th><th>Tên</th><th>Giới tính</th><th>Phong cách</th></tr></thead>
+        <tbody>
+            <tr><td><code>vi-VN-HoaiMyNeural</code></td><td>Hoài My</td><td>Nữ</td><td>Tự nhiên, rõ ràng</td></tr>
+            <tr><td><code>vi-VN-NamMinhNeural</code></td><td>Nam Minh</td><td>Nam</td><td>Trầm, chuyên nghiệp</td></tr>
+            <tr><td><code>en-US-JennyNeural</code></td><td>Jenny</td><td>Nữ</td><td>English — friendly</td></tr>
+            <tr><td><code>en-US-GuyNeural</code></td><td>Guy</td><td>Nam</td><td>English — narrator</td></tr>
+            <tr><td><code>zh-CN-XiaoxiaoNeural</code></td><td>Xiaoxiao</td><td>Nữ</td><td>Chinese — warm</td></tr>
+            <tr><td><code>ja-JP-NanamiNeural</code></td><td>Nanami</td><td>Nữ</td><td>Japanese — natural</td></tr>
+            <tr><td><code>ko-KR-SunHiNeural</code></td><td>Sun Hi</td><td>Nữ</td><td>Korean — cheerful</td></tr>
+        </tbody>
+    </table>
+
+    <h3>4.4 Code TTS Service</h3>
+    <div class="code-title">📁 xomtruyen.API/Services/TtsService.cs</div>
+    <pre><code>using System.Diagnostics;
+
+/// &lt;summary&gt;
+/// Gọi edge-tts (Python CLI) để tạo audio từ text.
+/// Edge TTS miễn phí, chất lượng Neural, hỗ trợ Tiếng Việt.
+/// &lt;/summary&gt;
+public class TtsService : ITtsService
+{
+    /// &lt;summary&gt;
+    /// Tạo file audio từ text
+    /// &lt;/summary&gt;
+    /// &lt;param name="text"&gt;Nội dung cần đọc&lt;/param&gt;
+    /// &lt;param name="voice"&gt;Voice ID (vd: vi-VN-HoaiMyNeural)&lt;/param&gt;
+    /// &lt;param name="outputPath"&gt;Đường dẫn file output .mp3&lt;/param&gt;
+    /// &lt;param name="rate"&gt;Tốc độ: "+0%" (bình thường), "-20%" (chậm), "+20%" (nhanh)&lt;/param&gt;
+    public async Task&lt;TtsResult&gt; GenerateAudioAsync(string text, string voice, string outputPath, string rate = "+0%")
+    {
+        // Lưu text vào file tạm (tránh lỗi escape ký tự)
+        var textFile = Path.GetTempFileName();
+        await File.WriteAllTextAsync(textFile, text);
+
+        // Gọi edge-tts CLI
+        var args = $"--voice \"{voice}\" --rate=\"{rate}\" --file \"{textFile}\" --write-media \"{outputPath}\"";
+        
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "edge-tts",  // Cài: pip install edge-tts
+                Arguments = args,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+
+        process.Start();
+        await process.WaitForExitAsync();
+        File.Delete(textFile);
+
+        if (process.ExitCode != 0)
+        {
+            var error = await process.StandardError.ReadToEndAsync();
+            throw new Exception($"TTS failed: {error}");
+        }
+
+        // Lấy duration của audio file
+        var duration = await GetAudioDurationAsync(outputPath);
+
+        return new TtsResult
+        {
+            AudioPath = outputPath,
+            DurationSeconds = duration,
+            Voice = voice,
+            CharacterCount = text.Length
+        };
+    }
+
+    /// &lt;summary&gt;
+    /// Tạo audio cho nhiều đoạn (1 đoạn = 1 ảnh comic page)
+    /// &lt;/summary&gt;
+    public async Task&lt;List&lt;TtsResult&gt;&gt; GenerateBatchAsync(
+        List&lt;string&gt; textSegments, string voice, string outputDir, string rate = "+0%")
+    {
+        var results = new List&lt;TtsResult&gt;();
+        
+        for (int i = 0; i &lt; textSegments.Count; i++)
+        {
+            var outputPath = Path.Combine(outputDir, $"audio_{i:D3}.mp3");
+            var result = await GenerateAudioAsync(textSegments[i], voice, outputPath, rate);
+            results.Add(result);
+        }
+
+        return results;
+    }
+
+    private async Task&lt;double&gt; GetAudioDurationAsync(string filePath)
+    {
+        var args = $"-i \"{filePath}\" -show_entries format=duration -v quiet -of csv=\"p=0\"";
+        var process = Process.Start(new ProcessStartInfo("ffprobe", args)
+        {
+            RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true
+        })!;
+        var output = await process.StandardOutput.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        return double.TryParse(output.Trim(), out var d) ? d : 0;
+    }
+}</code></pre>
+
+    <!-- 5. VIDEO GEN -->
+    <h2 id="video-gen">5. Video Generation (FFmpeg + Ảnh + Audio)</h2>
+
+    <h3>5.1 Logic ghép video</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  VIDEO GENERATION PIPELINE                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+  Input:
+  • images/: page_001.webp, page_002.webp, ... page_015.webp
+  • audio/:  audio_001.mp3 (5.2s), audio_002.mp3 (4.8s), ...
+  • config:  resolution=1080p, transition=crossfade
+
+  Process:
+  ┌────────────────────────────────────────────────────┐
+  │  Ảnh 1 (page_001.webp)                             │
+  │  Hiển thị: 5.2 giây (= duration audio_001.mp3)    │
+  │  Audio: audio_001.mp3 phát đồng thời              │
+  │  Hiệu ứng: Ken Burns (zoom in nhẹ 5%)            │
+  ├──── crossfade 0.5s ────────────────────────────────┤
+  │  Ảnh 2 (page_002.webp)                             │
+  │  Hiển thị: 4.8 giây (= duration audio_002.mp3)    │
+  │  Audio: audio_002.mp3                              │
+  │  Hiệu ứng: Ken Burns (pan left)                   │
+  ├──── crossfade 0.5s ────────────────────────────────┤
+  │  ...                                               │
+  └────────────────────────────────────────────────────┘
+
+  Output: video_final_1080p.mp4 (H.264, AAC audio)
+    </div>
+
+    <h3>5.2 FFmpeg Command Generation</h3>
+    <div class="code-title">📁 xomtruyen.API/Services/VideoGenerationService.cs</div>
+    <pre><code>public class VideoGenerationService : IVideoGenerationService
+{
+    /// &lt;summary&gt;
+    /// Ghép ảnh + audio thành video MP4 bằng FFmpeg.
+    /// Mỗi ảnh hiển thị đúng thời lượng audio tương ứng.
+    /// &lt;/summary&gt;
+    public async Task&lt;string&gt; GenerateVideoAsync(VideoGenerationRequest request)
+    {
+        var outputPath = Path.Combine(request.OutputDir, "output_final.mp4");
+        
+        // 1. Tạo file input list cho FFmpeg (concat demuxer)
+        var concatFile = Path.Combine(request.OutputDir, "input.txt");
+        var lines = new List&lt;string&gt;();
+        
+        for (int i = 0; i &lt; request.Pages.Count; i++)
+        {
+            var page = request.Pages[i];
+            var duration = page.AudioDuration > 0 ? page.AudioDuration : request.DefaultDurationPerImage;
+            
+            // Tạo video segment cho mỗi ảnh (ảnh + duration)
+            var segmentPath = Path.Combine(request.OutputDir, $"segment_{i:D3}.mp4");
+            
+            // FFmpeg: ảnh → video segment với duration cụ thể + hiệu ứng
+            var segmentArgs = request.Transition switch
+            {
+                "kenburns" =&gt; $"-loop 1 -i \"{page.ImagePath}\" -i \"{page.AudioPath}\" " +
+                              $"-filter_complex \"[0:v]scale=1920:1080:force_original_aspect_ratio=decrease," +
+                              $"pad=1920:1080:(ow-iw)/2:(oh-ih)/2,zoompan=z='min(zoom+0.0015,1.1)':" +
+                              $"d={Math.Ceiling(duration * 25)}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':" +
+                              $"s=1920x1080,format=yuv420p[v]\" " +
+                              $"-map \"[v]\" -map 1:a -c:v libx264 -preset fast -c:a aac " +
+                              $"-t {duration:F2} -shortest \"{segmentPath}\"",
+                              
+                "crossfade" =&gt; $"-loop 1 -i \"{page.ImagePath}\" -i \"{page.AudioPath}\" " +
+                               $"-filter_complex \"[0:v]scale=1920:1080:force_original_aspect_ratio=decrease," +
+                               $"pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p[v]\" " +
+                               $"-map \"[v]\" -map 1:a -c:v libx264 -preset fast -c:a aac " +
+                               $"-t {duration:F2} -shortest \"{segmentPath}\"",
+                               
+                _ =&gt; $"-loop 1 -i \"{page.ImagePath}\" -i \"{page.AudioPath}\" " +
+                     $"-vf \"scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p\" " +
+                     $"-c:v libx264 -preset fast -c:a aac -t {duration:F2} -shortest \"{segmentPath}\""
+            };
+
+            await RunFFmpegAsync(segmentArgs);
+            lines.Add($"file '{segmentPath}'");
+        }
+
+        // 2. Concat tất cả segments thành 1 video
+        await File.WriteAllLinesAsync(concatFile, lines);
+        
+        var concatArgs = $"-f concat -safe 0 -i \"{concatFile}\" -c copy \"{outputPath}\"";
+        await RunFFmpegAsync(concatArgs);
+
+        // 3. Thêm subtitle nếu được yêu cầu
+        if (request.AddSubtitles && !string.IsNullOrEmpty(request.SubtitlePath))
+        {
+            var subtitledOutput = outputPath.Replace(".mp4", "_sub.mp4");
+            var subArgs = $"-i \"{outputPath}\" -vf \"subtitles='{request.SubtitlePath}'\" " +
+                         $"-c:a copy \"{subtitledOutput}\"";
+            await RunFFmpegAsync(subArgs);
+            File.Delete(outputPath);
+            File.Move(subtitledOutput, outputPath);
+        }
+
+        return outputPath;
+    }
+
+    private async Task RunFFmpegAsync(string arguments)
+    {
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo("ffmpeg", arguments)
+            {
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        await process.WaitForExitAsync();
+        
+        if (process.ExitCode != 0)
+        {
+            var error = await process.StandardError.ReadToEndAsync();
+            throw new Exception($"FFmpeg error: {error}");
+        }
+    }
+}</code></pre>
+
+    <!-- 6. API -->
+    <h2 id="api">6. API Endpoints</h2>
+
+    <table>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td><code>POST</code></td><td>/api/admin/video-convert/create</td><td>Tạo task convert mới (body: publicationId, chapterIds[], language, voice, resolution, transition)</td></tr>
+            <tr><td><code>GET</code></td><td>/api/admin/video-convert/list</td><td>Danh sách tất cả tasks (phân trang, filter status)</td></tr>
+            <tr><td><code>GET</code></td><td>/api/admin/video-convert/{taskId}/status</td><td>Kiểm tra tiến độ (%, step hiện tại)</td></tr>
+            <tr><td><code>GET</code></td><td>/api/admin/video-convert/{taskId}/download</td><td>Download file video MP4 output</td></tr>
+            <tr><td><code>DELETE</code></td><td>/api/admin/video-convert/{taskId}</td><td>Xóa task + file output</td></tr>
+            <tr><td><code>POST</code></td><td>/api/admin/video-convert/{taskId}/retry</td><td>Retry task bị lỗi</td></tr>
+            <tr><td><code>GET</code></td><td>/api/admin/video-convert/voices</td><td>Danh sách voices khả dụng theo ngôn ngữ</td></tr>
+            <tr><td><code>POST</code></td><td>/api/admin/video-convert/preview-tts</td><td>Nghe thử TTS (text ngắn + voice → trả audio)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>6.1 Request Body — Create Task</h3>
+    <pre><code>POST /api/admin/video-convert/create
+
+{
+    "publicationId": "a90dfb14-8a4e-4f18-a621-e8d98d2b9980",
+    "chapterIds": [
+        "chap-001-guid",
+        "chap-002-guid",
+        "chap-003-guid"
+    ],
+    "language": "vi-VN",
+    "voiceId": "vi-VN-HoaiMyNeural",
+    "speechRate": "+0%",
+    "resolution": "1080p",
+    "defaultDurationPerImage": 5.0,
+    "transition": "kenburns",
+    "addSubtitles": true,
+    "subtitleStyle": "embed",
+    "backgroundMusicUrl": null,
+    "backgroundMusicVolume": 0.3,
+    "narrationSource": "text_chapter"  // "text_chapter" | "manual" | "ocr"
+}</code></pre>
+
+    <!-- 7. WORKER -->
+    <h2 id="worker">7. Background Worker Pipeline</h2>
+
+    <div class="code-title">📁 xomtruyen.API/Services/Workers/VideoConvertWorker.cs</div>
+    <pre><code>public class VideoConvertWorker : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            var task = await _taskQueue.DequeueAsync(stoppingToken);
+            if (task is VideoConvertTask videoTask)
+            {
+                await ProcessVideoConvertAsync(videoTask);
+            }
+        }
+    }
+
+    private async Task ProcessVideoConvertAsync(VideoConvertTask task)
+    {
+        try
+        {
+            await UpdateStatus(task.Id, "Processing", 0, "Bắt đầu xử lý...");
+
+            // Step 1: Fetch ảnh comic pages
+            await UpdateStatus(task.Id, "Processing", 10, "Đang tải ảnh truyện...");
+            var pages = await FetchComicPages(task.ChapterIds);
+
+            // Step 2: Fetch text narration
+            await UpdateStatus(task.Id, "Processing", 20, "Đang lấy nội dung narration...");
+            var textSegments = await GetNarrationText(task);
+
+            // Step 3: Generate TTS audio cho từng segment
+            await UpdateStatus(task.Id, "Processing", 30, "Đang tạo audio TTS...");
+            var audioResults = await _ttsService.GenerateBatchAsync(
+                textSegments, task.VoiceId, task.WorkingDir, task.SpeechRate);
+
+            // Step 4: Generate video (FFmpeg)
+            await UpdateStatus(task.Id, "Processing", 60, "Đang ghép video...");
+            var videoRequest = BuildVideoRequest(pages, audioResults, task);
+            var videoPath = await _videoService.GenerateVideoAsync(videoRequest);
+
+            // Step 5: Generate subtitle file (.srt)
+            if (task.AddSubtitles)
+            {
+                await UpdateStatus(task.Id, "Processing", 80, "Đang tạo phụ đề...");
+                await GenerateSubtitleFile(textSegments, audioResults, task.WorkingDir);
+            }
+
+            // Step 6: Generate thumbnail
+            await UpdateStatus(task.Id, "Processing", 90, "Đang tạo thumbnail...");
+            var thumbnailPath = await GenerateThumbnail(videoPath);
+
+            // Step 7: Upload + Update DB
+            await UpdateStatus(task.Id, "Processing", 95, "Đang lưu file...");
+            var finalUrl = await UploadToStorage(videoPath);
+            
+            await UpdateStatus(task.Id, "Completed", 100, "Hoàn tất!", finalUrl, thumbnailPath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Video convert failed: {TaskId}", task.Id);
+            await UpdateStatus(task.Id, "Failed", 0, $"Lỗi: {ex.Message}");
+        }
+    }
+}</code></pre>
+
+    <!-- 8. DATABASE -->
+    <h2 id="database">8. Database Schema</h2>
+
+    <pre><code>-- Bảng lưu tasks convert video
+CREATE TABLE "VideoConvertTasks" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "PublicationId" UUID REFERENCES "Publications"("Id"),
+    "ChapterIds" TEXT NOT NULL,              -- JSON array of chapter GUIDs
+    "Language" VARCHAR(10) NOT NULL,          -- "vi-VN", "en-US", "zh-CN"
+    "VoiceId" VARCHAR(100) NOT NULL,          -- "vi-VN-HoaiMyNeural"
+    "SpeechRate" VARCHAR(10) DEFAULT '+0%',
+    "Resolution" VARCHAR(10) DEFAULT '1080p',
+    "Transition" VARCHAR(20) DEFAULT 'kenburns',
+    "NarrationSource" VARCHAR(20) DEFAULT 'text_chapter',
+    "AddSubtitles" BOOLEAN DEFAULT TRUE,
+    "BackgroundMusicUrl" TEXT,
+    "BackgroundMusicVolume" FLOAT DEFAULT 0.3,
+    
+    -- Status tracking
+    "Status" VARCHAR(20) DEFAULT 'Queued',    -- Queued, Processing, Completed, Failed
+    "ProgressPercent" INT DEFAULT 0,
+    "CurrentStep" TEXT,
+    "ErrorMessage" TEXT,
+    
+    -- Output
+    "OutputVideoUrl" TEXT,
+    "OutputThumbnailUrl" TEXT,
+    "OutputDurationSeconds" FLOAT,
+    "OutputFileSizeBytes" BIGINT,
+    "OutputSubtitleUrl" TEXT,
+    
+    -- Metadata
+    "CreatedBy" UUID REFERENCES "Users"("Id"),
+    "CreatedAt" TIMESTAMPTZ DEFAULT NOW(),
+    "CompletedAt" TIMESTAMPTZ,
+    "TotalPages" INT DEFAULT 0,
+    "TotalAudioSegments" INT DEFAULT 0
+);</code></pre>
+
+    <!-- 9. OUTPUT -->
+    <h2 id="output">9. Output & Phân Phối Video</h2>
+
+    <div class="section-card">
+        <h4>File output structure:</h4>
+        <pre><code>uploads/videos/{taskId}/
+├── output_final.mp4          ← Video chính (1080p, H.264)
+├── output_720p.mp4           ← Bản 720p (tùy chọn)
+├── thumbnail.jpg             ← Ảnh thumbnail (auto-generated từ frame đầu)
+├── subtitles.srt             ← File phụ đề (nếu chọn .srt riêng)
+├── segments/                 ← Folder tạm (xóa sau khi xong)
+│   ├── segment_000.mp4
+│   ├── segment_001.mp4
+│   └── ...
+└── audio/                    ← Audio TTS segments
+    ├── audio_000.mp3
+    ├── audio_001.mp3
+    └── ...</code></pre>
+    </div>
+
+    <h3>9.1 Sử dụng video output</h3>
+    <table>
+        <thead><tr><th>Mục đích</th><th>Hành động</th></tr></thead>
+        <tbody>
+            <tr><td>Download về máy</td><td>Admin click "⬇️ Download" → tải MP4</td></tr>
+            <tr><td>Xem preview trên Admin</td><td>Embed video player trong trang admin</td></tr>
+            <tr><td>Upload lên YouTube</td><td>Manual: admin tải về rồi upload. Auto: tích hợp YouTube API (tương lai)</td></tr>
+            <tr><td>Chia sẻ link xem</td><td>Tạo URL public: /watch/{taskId} (tương lai)</td></tr>
+            <tr><td>Embed trong trang đọc</td><td>Hiện nút "🎬 Xem video" bên cạnh nút "📖 Đọc truyện"</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 10. TECH -->
+    <h2 id="tech">10. Tech Stack & Thư Viện</h2>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>Backend (.NET 9)</h4>
+            <ul>
+                <li><strong>FFmpeg</strong> — Video generation, encoding, concat</li>
+                <li><strong>FFprobe</strong> — Lấy metadata audio/video duration</li>
+                <li><strong>edge-tts (Python)</strong> — TTS miễn phí, Neural quality</li>
+                <li><strong>BackgroundService</strong> — Worker queue xử lý nền</li>
+                <li><strong>System.Diagnostics.Process</strong> — Gọi CLI tools</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Frontend (Admin Portal)</h4>
+            <ul>
+                <li><strong>React + Bootstrap</strong> — Form UI cấu hình</li>
+                <li><strong>React Select</strong> — Dropdown chọn truyện/chương</li>
+                <li><strong>ProgressBar</strong> — Hiển thị tiến độ real-time</li>
+                <li><strong>Polling / SSE</strong> — Cập nhật status từ API</li>
+                <li><strong>HTML5 Video</strong> — Preview video output</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Cài đặt dependencies</h4>
+            <pre><code># FFmpeg (bắt buộc):
+choco install ffmpeg
+# hoặc tải: ffmpeg.org/download.html
+
+# Edge TTS (Python, bắt buộc):
+pip install edge-tts
+
+# Verify:
+ffmpeg -version
+edge-tts --list-voices</code></pre>
+        </div>
+        <div class="section-card">
+            <h4>Yêu cầu tài nguyên</h4>
+            <ul>
+                <li><strong>CPU:</strong> Nhiều core tốt hơn (FFmpeg tận dụng multi-thread)</li>
+                <li><strong>RAM:</strong> ~2GB cho mỗi task convert</li>
+                <li><strong>Disk:</strong> ~500MB tạm cho mỗi video (xóa sau khi xong)</li>
+                <li><strong>Thời gian:</strong> ~5-10 phút cho 1 chương 15 trang (1080p)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="warn">
+        <strong>⚠️ Lưu ý:</strong> Quá trình convert video rất tốn tài nguyên CPU. Nên giới hạn tối đa 2 tasks chạy đồng thời. Các tasks thêm vào sẽ nằm trong queue chờ.
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Convert Truyện Tranh → Video + TTS — Xóm Truyện Admin<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
