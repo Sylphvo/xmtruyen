@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Spinner, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
-import { getUsers, updateUserStatus, createUser, updateUser, deleteUser, type User, type SaveUserRequest } from '../api/userApi';
+import { faSort, faSortUp, faSortDown, faAngleDoubleLeft, faAngleLeft, faAngleRight, faAngleDoubleRight, faPlus, faPen, faTrash, faExchangeAlt, faCheckDouble, faXmark, faEye } from '@fortawesome/free-solid-svg-icons';
+import { getUsers, updateUserStatus, createUser, updateUser, type User, type SaveUserRequest } from '../api/userApi';
 import { ResizableHeader } from '../components/ResizableHeader';
 import { ExcelActionButtons } from '../components/ExcelActionButtons';
 import { FloatingBulkActionBar } from '../components/FloatingBulkActionBar';
-import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
-import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
-import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
 import toast from 'react-hot-toast';
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -19,39 +16,16 @@ interface SortConfig {
 }
 
 export const Users: React.FC = () => {
+  const [data, setData] = useState<User[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'createdAt', direction: 'asc' });
-
-  const {
-    items: data,
-    totalCount: totalItems,
-    isLoading: loading,
-    isLoadingMore,
-    hasMore,
-    loadedCount,
-    sentinelRef,
-    refresh,
-    prependItem,
-    updateItem
-  } = useInfiniteScroll<User>({
-    fetchFn: async (params) => {
-      const response = await getUsers({
-        page: params.page,
-        pageSize: params.pageSize,
-        searchKeyword: params.debouncedSearch || undefined,
-      });
-      return {
-        data: response.data || [],
-        totalCount: response.totalCount || 0,
-        page: params.page,
-        pageSize: params.pageSize
-      };
-    },
-    pageSize: 20,
-    params: { debouncedSearch }
-  });
 
   // Add User State
   const [isAddingNewUser, setIsAddingNewUser] = useState(false);
@@ -88,7 +62,7 @@ export const Users: React.FC = () => {
   // Clear selection on page or search change
   useEffect(() => {
     setSelectedUserIds([]);
-  }, [debouncedSearch]);
+  }, [currentPage, debouncedSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>, saveFunc: () => void, cancelFunc?: () => void) => {
     if (e.key === 'Enter') {
@@ -106,6 +80,26 @@ export const Users: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const fetchUsersData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await getUsers({
+        page: currentPage,
+        pageSize: itemsPerPage,
+        searchKeyword: debouncedSearch || undefined,
+      });
+      setData(response.data || []);
+      setTotalItems(response.totalCount || 0);
+    } catch (error) {
+      console.error('Lỗi load danh sách user:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, itemsPerPage, debouncedSearch]);
+
+  useEffect(() => {
+    fetchUsersData();
+  }, [fetchUsersData]);
 
   // Client-side Sort
   const sortedData = React.useMemo(() => {
@@ -146,29 +140,11 @@ export const Users: React.FC = () => {
   const handleStatusChange = async (id: string, currentStatus: boolean) => {
     try {
       await updateUserStatus(id, !currentStatus);
-      updateItem(id, (u) => ({ ...u, isActive: !currentStatus }));
+      // Update local state without reloading
+      setData(prev => prev.map(u => u.id === id ? { ...u, isActive: !currentStatus } : u));
     } catch (error) {
       console.error('Lỗi khi cập nhật trạng thái:', error);
       toast.error('Không thể cập nhật trạng thái user.');
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa ${selectedUserIds.length} user đã chọn?`)) {
-      const deletePromise = Promise.all(selectedUserIds.map(id => deleteUser(id)));
-      toast.promise(deletePromise, {
-        loading: 'Đang xóa...',
-        success: 'Xóa thành công!',
-        error: 'Có lỗi xảy ra khi xóa'
-      });
-      
-      try {
-        await deletePromise;
-        refresh();
-        setSelectedUserIds([]);
-      } catch (error) {
-        console.error('Lỗi khi xóa hàng loạt:', error);
-      }
     }
   };
 
@@ -186,9 +162,14 @@ export const Users: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const createdUser = await createUser(newUser);
+      await createUser(newUser);
       handleCloseAdd();
-      refresh();
+      // Reload list from page 1 to see new user (assuming they show up at top depending on sort)
+      if (currentPage !== 1) {
+        setCurrentPage(1);
+      } else {
+        fetchUsersData();
+      }
     } catch (error: any) {
       console.error('Lỗi khi tạo user:', error);
       toast.error(error.message || 'Không thể tạo user. Vui lòng kiểm tra lại thông tin.');
@@ -208,11 +189,15 @@ export const Users: React.FC = () => {
     });
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN').format(amount);
+  };
+
   const handleImportExcel = async (importedData: any[]) => {
     let successCount = 0;
     let errorCount = 0;
 
-    const toastId = toast.loading('Đang xử lý dữ liệu import...');
+    setLoading(true);
     for (const row of importedData) {
       const email = row.email || row.Email || row['Email'];
       const fullName = row.fullName || row.FullName || row['Họ tên'];
@@ -233,11 +218,11 @@ export const Users: React.FC = () => {
         errorCount++;
       }
     }
-    toast.dismiss(toastId);
+    setLoading(false);
 
     if (successCount > 0) {
       toast.success(`Nhập thành công ${successCount} user`);
-      refresh();
+      fetchUsersData();
     }
     if (errorCount > 0) {
       toast.error(`Lỗi khi nhập ${errorCount} user (có thể email đã tồn tại)`);
@@ -256,7 +241,8 @@ export const Users: React.FC = () => {
     }
     try {
       await updateUser(id, editFormData as SaveUserRequest);
-      updateItem(id, (u) => ({ ...u, ...editFormData, fullName: editFormData.fullName || null }));
+      // Update local state
+      setData(prev => prev.map(u => u.id === id ? { ...u, ...editFormData, fullName: editFormData.fullName || null } : u));
       setEditingUserId(null);
     } catch (error: any) {
       console.error('Lỗi khi cập nhật user:', error);
@@ -264,6 +250,8 @@ export const Users: React.FC = () => {
     }
   };
 
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
@@ -277,12 +265,117 @@ export const Users: React.FC = () => {
         <h5 className="mb-0 fw-bold" style={{ color: 'var(--jira-text)', fontSize: '16px' }}>
           Quản lý Người dùng
         </h5>
+        <div className="text-muted fw-bold" style={{ cursor: 'pointer', letterSpacing: '2px' }}>...</div>
       </div>
       {/* Custom Header for search and filters */}
       <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
         <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Quản lý User</h5>
         <div className="d-flex align-items-center gap-3">
-          
+          <ExcelActionButtons
+            dataToExport={data.map(u => ({
+              'ID': u.id,
+              'Họ tên': u.fullName,
+              'Email': u.email,
+              'Nguồn': u.provider,
+              'Xu': u.coinBalance,
+              'Trạng thái': u.isActive ? 'Hoạt động' : 'Bị khóa'
+            }))}
+            exportFileName="Users"
+            onImport={handleImportExcel}
+            isLoading={loading}
+          />
+          <Button variant="primary" size="sm" onClick={() => setIsAddingNewUser(true)} className="d-flex align-items-center gap-2 rounded-2">
+            <FontAwesomeIcon icon={faPlus} />
+            Thêm User
+          </Button>
+
+          <div className="d-flex align-items-center gap-2">
+            <span className="text-muted" style={{ fontSize: '13px' }}>Hiển thị:</span>
+            <Form.Select
+              size="sm"
+              className="bg-transparent text-body border-secondary-subtle"
+              style={{ width: '70px', height: '32px', fontSize: '13px' }}
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </Form.Select>
+          </div>
+
+          <div style={{ width: '250px' }}>
+            <Form.Control
+              size="sm"
+              type="text"
+              className="bg-transparent text-body"
+              style={{ height: '32px', fontSize: '13px', border: '1px solid #dfe1e6', borderRadius: '4px' }}
+              placeholder="Tìm kiếm Email / Tên..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Table Area */}
+      <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
+        <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1300px' }}>
+          <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+            <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+                <Form.Check
+                  type="checkbox"
+                  checked={sortedData.length > 0 && selectedUserIds.length === sortedData.length}
+                  ref={(input) => {
+                    if (input) {
+                      input.indeterminate = selectedUserIds.length > 0 && selectedUserIds.length < sortedData.length;
+                    }
+                  }}
+                  onChange={handleSelectAll}
+                />
+              </ResizableHeader>
+              <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('fullName')}>
+                <span className="fw-semibold text-nowrap">Họ tên {getSortIcon('fullName')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('email')}>
+                <span className="fw-semibold text-nowrap">Email {getSortIcon('email')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('provider')}>
+                <span className="fw-semibold text-nowrap">Nguồn {getSortIcon('provider')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('coinBalance')}>
+                <span className="fw-semibold text-nowrap">Xu {getSortIcon('coinBalance')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('currentPlanId')}>
+                <span className="fw-semibold text-nowrap">Gói Cước {getSortIcon('currentPlanId')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                <span className="fw-semibold text-nowrap">Lượt Đọc (Ngày/Tổng)</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={130} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('createdAt')}>
+                <span className="fw-semibold text-nowrap">Ngày tham gia {getSortIcon('createdAt')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('isActive')}>
+                <span className="fw-semibold text-nowrap">Status {getSortIcon('isActive')}</span>
+              </ResizableHeader>
+              <ResizableHeader initialWidth={220} style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, borderLeft: '1px solid var(--bs-border-color)' }}>
+                <span className="fw-semibold text-nowrap">Thao Tác</span>
+              </ResizableHeader>
+            </tr>
+          </thead>
+          <tbody style={{ height: '1px' }}>
+            {loading ? (
+              <tr>
+                <td colSpan={10} className="text-center py-5">
+                  <Spinner animation="border" variant="secondary" size="sm" />
                   <div className="mt-2 text-muted small">Đang tải dữ liệu...</div>
                 </td>
               </tr>
@@ -385,7 +478,7 @@ export const Users: React.FC = () => {
                                 size="sm"
                                 value={editFormData.fullName || ''}
                                 onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
-                                onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)} onBlur={() => handleSaveEdit(user.id)}
+                                onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                                 placeholder="Họ tên"
                                 className="inline-edit-input text-body w-100"
                                 autoFocus
@@ -397,7 +490,7 @@ export const Users: React.FC = () => {
                               size="sm"
                               value={editFormData.email || ''}
                               onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
-                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)} onBlur={() => handleSaveEdit(user.id)}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                               placeholder="Email"
                               className="inline-edit-input text-body w-100"
                             />
@@ -411,7 +504,7 @@ export const Users: React.FC = () => {
                               type="number"
                               value={editFormData.coinBalance ?? 0}
                               onChange={(e) => setEditFormData({ ...editFormData, coinBalance: Number(e.target.value) })}
-                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)} onBlur={() => handleSaveEdit(user.id)}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                               style={{ width: '90px' }}
                               className="inline-edit-input text-warning fw-bold"
                             />
@@ -435,7 +528,7 @@ export const Users: React.FC = () => {
                               id={`edit-status-${user.id}`}
                               checked={editFormData.isActive ?? true}
                               onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.checked })}
-                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)} onBlur={() => handleSaveEdit(user.id)}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(user.id), handleCancelEdit)}
                               className="d-inline-block"
                             />
                           </td>
@@ -464,92 +557,7 @@ export const Users: React.FC = () => {
                                 style={{ width: '36px', height: '36px', objectFit: 'cover' }}
                               />
                               <div className="fw-medium text-truncate" style={{ maxWidth: '200px' }}>{user.fullName || 'Chưa cập nhật'}</div>
-                            <ExcelActionButtons
-            dataToExport={data.map(u => ({
-              'ID': u.id,
-              'Họ tên': u.fullName,
-              'Email': u.email,
-              'Nguồn': u.provider,
-              'Xu': u.coinBalance,
-              'Trạng thái': u.isActive ? 'Hoạt động' : 'Bị khóa'
-            }))}
-            exportFileName="Users"
-            onImport={handleImportExcel}
-            isLoading={loading}
-          />
-          <Button variant="primary" size="sm" onClick={() => setIsAddingNewUser(true)} className="d-flex align-items-center gap-2 rounded-2">
-            <FontAwesomeIcon icon={faPlus} />
-            Thêm User
-          </Button>
-
-
-          <div style={{ width: '250px' }}>
-            <Form.Control
-              size="sm"
-              type="text"
-              className="bg-transparent text-body"
-              style={{ height: '32px', fontSize: '13px', border: '1px solid #dfe1e6', borderRadius: '4px' }}
-              placeholder="Tìm kiếm Email / Tên..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Table Area */}
-      <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
-        <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1300px' }}>
-          <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-            <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
-                <Form.Check
-                  type="checkbox"
-                  checked={sortedData.length > 0 && selectedUserIds.length === sortedData.length}
-                  ref={(input) => {
-                    if (input) {
-                      input.indeterminate = selectedUserIds.length > 0 && selectedUserIds.length < sortedData.length;
-                    }
-                  }}
-                  onChange={handleSelectAll}
-                />
-              </ResizableHeader>
-              <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('fullName')}>
-                <span className="fw-semibold text-nowrap">Họ tên {getSortIcon('fullName')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={220} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('email')}>
-                <span className="fw-semibold text-nowrap">Email {getSortIcon('email')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('provider')}>
-                <span className="fw-semibold text-nowrap">Nguồn {getSortIcon('provider')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={100} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('coinBalance')}>
-                <span className="fw-semibold text-nowrap">Xu {getSortIcon('coinBalance')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('currentPlanId')}>
-                <span className="fw-semibold text-nowrap">Gói Cước {getSortIcon('currentPlanId')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
-                <span className="fw-semibold text-nowrap">Lượt Đọc (Ngày/Tổng)</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={130} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }} onClick={() => handleSort('createdAt')}>
-                <span className="fw-semibold text-nowrap">Ngày tham gia {getSortIcon('createdAt')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('isActive')}>
-                <span className="fw-semibold text-nowrap">Status {getSortIcon('isActive')}</span>
-              </ResizableHeader>
-              <ResizableHeader initialWidth={220} style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, borderLeft: '1px solid var(--bs-border-color)' }}>
-                <span className="fw-semibold text-nowrap">Thao Tác</span>
-              </ResizableHeader>
-            </tr>
-          </thead>
-          <tbody style={{ height: '1px' }}>
-            {loading ? (
-              <tr>
-                <td colSpan={10} className="text-center py-5">
-                  <Spinner animation="border" variant="secondary" size="sm" /></div>
+                            </div>
                           </td>
                           <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                             <div className="text-body text-truncate" style={{ maxWidth: '200px' }}>{user.email}</div>
@@ -621,25 +629,46 @@ export const Users: React.FC = () => {
                 )}
               </>
             )}
-            {!loading && <LoadingMoreIndicator isVisible={isLoadingMore} colSpan={10} />}
           </tbody>
           
         </table>
-        {hasMore && <div ref={sentinelRef} className="scroll-sentinel" />}
       </div>
 
       {/* Bottom Controls */}
-      <InfiniteScrollFooter
-        loadedCount={loadedCount}
-        totalCount={totalItems}
-        onRefresh={refresh}
-      />
+      <div className="jira-table-footer">
+        <div style={{ visibility: 'hidden' }}>
+          {/* Placeholder to balance space for pagination centering */}
+          <Button variant="light" size="sm" className="btn-create">
+            <FontAwesomeIcon icon={faPlus} /> Create
+          </Button>
+        </div>
+
+        {totalPages > 1 && (
+          <div className="pagination-controls">
+            <span className="text-muted" style={{ fontSize: '13px' }}>
+              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
+            </span>
+            <button className="icon-btn" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+              <FontAwesomeIcon icon={faAngleDoubleLeft} />
+            </button>
+            <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>
+              <FontAwesomeIcon icon={faAngleLeft} />
+            </button>
+            <span className="text-muted px-2">{currentPage}</span>
+            <button className="icon-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
+              <FontAwesomeIcon icon={faAngleRight} />
+            </button>
+            <button className="icon-btn" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+              <FontAwesomeIcon icon={faAngleDoubleRight} />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Floating Bulk Action Bar */}
       <FloatingBulkActionBar 
         selectedCount={selectedUserIds.length} 
         onClearSelection={() => setSelectedUserIds([])} 
-        onBulkDelete={handleBulkDelete}
       />
     </div>
   );
