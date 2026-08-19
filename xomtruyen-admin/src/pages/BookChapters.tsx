@@ -181,7 +181,7 @@ export const BookChapters: React.FC = () => {
           </Button>
         </div>
       <ExcelActionButtons 
-            dataToExport={data || []}
+            dataToExport={chapters || []}
             exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Export'}
             onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
             isLoading={typeof loading !== 'undefined' ? loading : false}

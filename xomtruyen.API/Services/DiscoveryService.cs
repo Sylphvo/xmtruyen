@@ -21,6 +21,7 @@ public class DiscoveryService : IDiscoveryService
         string? categorySlug, 
         FormatType? formatType, 
         AccessLevel? accessLevel, 
+        string? displayLabel,
         int page, 
         int pageSize)
     {
@@ -52,6 +53,11 @@ public class DiscoveryService : IDiscoveryService
         if (accessLevel.HasValue)
         {
             query = query.Where(p => p.AccessLevel == accessLevel.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(displayLabel))
+        {
+            query = query.Where(p => p.DisplayLabel == displayLabel);
         }
 
         var totalCount = await query.CountAsync();

@@ -9,6 +9,7 @@ public class Publication
     public string Slug { get; set; } = null!;
     public FormatType FormatType { get; set; } = FormatType.Text;
     public AccessLevel AccessLevel { get; set; } = AccessLevel.Free;
+    public string? DisplayLabel { get; set; }
     
     // Author relation
     public Guid? AuthorId { get; set; }

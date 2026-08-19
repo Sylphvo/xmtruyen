@@ -88,10 +88,10 @@ export const BookFiles: React.FC = () => {
             <FontAwesomeIcon icon={faSync} /> Làm mới
           </Button>
         <ExcelActionButtons 
-            dataToExport={data || []}
+            dataToExport={files || []}
             exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Export'}
             onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
-            isLoading={typeof loading !== 'undefined' ? loading : false}
+            isLoading={typeof isLoading !== 'undefined' ? isLoading : false}
           /></div>
       </div>
 

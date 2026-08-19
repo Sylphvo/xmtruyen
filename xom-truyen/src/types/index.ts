@@ -15,6 +15,7 @@ export interface Book {
   slug?: string;
   formatType?: number;
   accessLevel?: number;
+  displayLabel?: string;
   description?: string;
   isMember?: boolean;
   isRecommended?: boolean;
@@ -30,6 +31,7 @@ export interface PublicationFilter {
   categorySlug?: string;
   formatType?: number;
   accessLevel?: number;
+  displayLabel?: string;
   status?: string;
   isRecommended?: boolean;
   isExclusive?: boolean;

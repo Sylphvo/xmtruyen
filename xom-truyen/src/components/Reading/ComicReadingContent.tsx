@@ -9,6 +9,8 @@ interface ComicReadingContentProps {
   onPrevPage: () => void;
   onNextPage: () => void;
   imageUrls?: string[];
+  imageFit: "width" | "height";
+  themeStyles: any;
 }
 
 export default function ComicReadingContent({
@@ -18,7 +20,9 @@ export default function ComicReadingContent({
   totalPages,
   onPrevPage,
   onNextPage,
-  imageUrls = []
+  imageUrls = [],
+  imageFit,
+  themeStyles
 }: ComicReadingContentProps) {
 
   return (
@@ -28,17 +32,17 @@ export default function ComicReadingContent({
       flexDirection: "column", 
       padding: "0 20px",
       position: "relative",
-      maxWidth: "1000px",
+      maxWidth: "100%",
       margin: "0 auto",
       width: "100%"
     }}>
       
       {/* Chapter Header */}
       <div style={{ textAlign: "center", marginBottom: "40px", marginTop: "20px" }}>
-        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a1a", margin: "0 0 8px 0" }}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 8px 0" }}>
           Chương {chapterNumber}
         </h2>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#1a1a1a", margin: 0 }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 700, margin: 0 }}>
           {chapterTitle}
         </h1>
       </div>
@@ -49,7 +53,8 @@ export default function ComicReadingContent({
         flexDirection: "column",
         alignItems: "center",
         gap: "0px", // Images usually touch each other in webtoons
-        width: "100%"
+        width: "100%",
+        backgroundColor: themeStyles.bg
       }}>
         {imageUrls.length > 0 ? (
           imageUrls.map((img, index) => (
@@ -58,16 +63,17 @@ export default function ComicReadingContent({
               src={img} 
               alt={`Page ${index + 1}`} 
               style={{ 
-                width: "100%", 
-                height: "auto", 
-                maxWidth: "800px",
+                width: imageFit === "width" ? "100%" : "auto", 
+                height: imageFit === "height" ? "100vh" : "auto", 
+                maxWidth: imageFit === "width" ? "800px" : "100%",
+                objectFit: "contain",
                 display: "block" 
               }} 
               loading="lazy"
             />
           ))
         ) : (
-          <div style={{ padding: "40px", color: "#6b7280" }}>Chưa có nội dung cho chương này</div>
+          <div style={{ padding: "40px", opacity: 0.6 }}>Chưa có nội dung cho chương này</div>
         )}
       </div>
 
@@ -78,7 +84,7 @@ export default function ComicReadingContent({
         alignItems: "center",
         padding: "40px 0",
         marginTop: "20px",
-        borderTop: "1px solid #e5e7eb"
+        borderTop: `1px solid ${themeStyles.border}`
       }}>
         <button 
           onClick={onPrevPage}
@@ -90,7 +96,7 @@ export default function ComicReadingContent({
             background: "none",
             border: "none",
             cursor: currentPage === 1 ? "not-allowed" : "pointer",
-            color: currentPage === 1 ? "#9ca3af" : "#1a1a1a",
+            color: currentPage === 1 ? themeStyles.border : themeStyles.text,
             fontSize: "16px",
             fontWeight: 600
           }}
@@ -98,7 +104,7 @@ export default function ComicReadingContent({
           <ChevronLeft size={24} /> Chương trước
         </button>
         
-        <div style={{ fontSize: "16px", fontWeight: 500, color: "#4b5563" }}>
+        <div style={{ fontSize: "16px", fontWeight: 500, opacity: 0.7 }}>
           Chương {chapterNumber}/{totalPages}
         </div>
 
@@ -112,7 +118,7 @@ export default function ComicReadingContent({
             background: "none",
             border: "none",
             cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-            color: currentPage === totalPages ? "#9ca3af" : "#1a1a1a",
+            color: currentPage === totalPages ? themeStyles.border : themeStyles.text,
             fontSize: "16px",
             fontWeight: 600
           }}

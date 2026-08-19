@@ -284,6 +284,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
         author: popupNewItem.author,
         formatType: popupNewItem.formatType || 1,
         accessLevel: popupNewItem.accessLevel || 1,
+        displayLabel: popupNewItem.displayLabel || undefined,
         categoryIds: popupNewItem.categoryIds || [],
         topicIds: popupNewItem.topicIds || [],
         description: popupNewItem.description,
@@ -319,6 +320,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
         author: newItem.author,
         formatType: newItem.formatType || 1,
         accessLevel: newItem.accessLevel || 1,
+        displayLabel: newItem.displayLabel || undefined,
         categoryIds: newItem.categoryIds || [],
         topicIds: newItem.topicIds || [],
       };
@@ -353,6 +355,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
         author: book.author,
         formatType: book.formatType,
         accessLevel: book.accessLevel,
+        displayLabel: book.displayLabel,
         categoryIds: book.categories?.map(c => c.id) || [],
         topicIds: book.topics?.map(t => t.id) || [],
       });
@@ -363,7 +366,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
   const handleCellKeyDown = (e: React.KeyboardEvent, currentField: string, book: IBook) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const fields = ['title', 'author', 'formatType', 'categories', 'topics'];
+      const fields = ['title', 'author', 'formatType', 'displayLabel', 'categories', 'topics'];
       const currentIndex = fields.indexOf(currentField);
       if (e.shiftKey) {
         if (currentIndex > 0) setActiveEditField(fields[currentIndex - 1]);
@@ -527,7 +530,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
               dataToExport={data || []}
               exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Books'}
               onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
-              isLoading={typeof loading !== 'undefined' ? loading : false}
+              isLoading={typeof isLoading !== 'undefined' ? isLoading : false}
             /></div>
         </div>
 
@@ -561,6 +564,9 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                       <span className="fw-semibold text-nowrap">Loại Sách</span>
                     </ResizableHeader>
                   )}
+                  <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
+                    <span className="fw-semibold text-nowrap">Danh mục hiển thị</span>
+                  </ResizableHeader>
                   <ResizableHeader initialWidth={180} style={{ backgroundColor: 'transparent', padding: '5px 6px', textAlign: 'center', color: 'var(--jira-text)' }}>
                     <span className="fw-semibold text-nowrap">Thể Loại</span>
                   </ResizableHeader>
@@ -617,6 +623,14 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                           </Form.Select>
                         </td>
                       )}
+                      <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                        <Form.Select size="sm" value={newItem.displayLabel || ''} onChange={(e) => setNewItem({ ...newItem, displayLabel: e.target.value })} className="inline-edit-input text-body">
+                          <option value="">Trống</option>
+                          <option value="Sách mới mỗi ngày - Free">Sách mới mỗi ngày - Free</option>
+                          <option value="Sách mới mỗi ngày - Dành cho Hội viên!">Sách mới mỗi ngày - Dành cho Hội viên!</option>
+                          <option value="Truyện Tranh">Truyện Tranh</option>
+                        </Form.Select>
+                      </td>
                       <td style={{ padding: '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                         <Select
                           isMulti
@@ -778,6 +792,32 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                               )}
                             </td>
                           )}
+
+                          <td
+                            onDoubleClick={() => handleCellDoubleClick(book, 'displayLabel')}
+                            style={{ padding: editingBookId === book.id && activeEditField === 'displayLabel' ? 0 : '5px 6px', backgroundColor: 'transparent', color: 'var(--jira-text)', textAlign: 'center' }}
+                          >
+                            {editingBookId === book.id && activeEditField === 'displayLabel' ? (
+                              <Form.Select
+                                size="sm"
+                                value={editBookData.displayLabel || ''}
+                                onChange={(e) => setEditBookData({ ...editBookData, displayLabel: e.target.value })}
+                                onKeyDown={(e) => handleCellKeyDown(e, 'displayLabel', book)} onBlur={() => handleSaveEdit(book.id)}
+                                className="cell-edit-input"
+                                style={{ border: '2px solid #0d6efd', borderRadius: '0' }}
+                                autoFocus
+                              >
+                                <option value="">Trống</option>
+                                <option value="Sách mới mỗi ngày - Free">Sách mới mỗi ngày - Free</option>
+                                <option value="Sách mới mỗi ngày - Dành cho Hội viên!">Sách mới mỗi ngày - Dành cho Hội viên!</option>
+                                <option value="Truyện Tranh">Truyện Tranh</option>
+                              </Form.Select>
+                            ) : (
+                              <span className="badge border fw-normal text-truncate" style={{ backgroundColor: 'var(--jira-hover-bg)', color: 'var(--jira-text)', maxWidth: '160px', display: 'inline-block' }}>
+                                {(editingBookId === book.id && editBookData.displayLabel !== undefined ? editBookData.displayLabel : book.displayLabel) || '-'}
+                              </span>
+                            )}
+                          </td>
 
                           <td
                             onDoubleClick={() => handleCellDoubleClick(book, 'categories')}

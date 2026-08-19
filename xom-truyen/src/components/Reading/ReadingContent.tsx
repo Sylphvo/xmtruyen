@@ -9,6 +9,10 @@ interface ReadingContentProps {
   onPrevPage: () => void;
   onNextPage: () => void;
   textContent?: string;
+  fontSize: number;
+  fontFamily: string;
+  lineHeight: number;
+  themeStyles: any;
 }
 
 export default function ReadingContent({
@@ -18,9 +22,12 @@ export default function ReadingContent({
   totalPages,
   onPrevPage,
   onNextPage,
-  textContent
+  textContent,
+  fontSize,
+  fontFamily,
+  lineHeight,
+  themeStyles
 }: ReadingContentProps) {
-  // If no textContent, use some placeholder text for now
   const contentToRender = textContent || "Đang cập nhật nội dung chương...";
   const isHtml = contentToRender.includes('<p>') || contentToRender.includes('<div>') || contentToRender.includes('<br>');
 
@@ -31,69 +38,78 @@ export default function ReadingContent({
       flexDirection: "column", 
       padding: "0 80px",
       position: "relative",
-      maxWidth: "1200px",
+      maxWidth: "1000px",
       margin: "0 auto",
-      width: "100%"
+      width: "100%",
+      fontFamily: fontFamily
     }}>
       
       {/* Navigation Arrows */}
       <button 
         onClick={onPrevPage}
         style={{
-          position: "absolute",
-          left: "0",
+          position: "fixed",
+          left: "20px",
           top: "50%",
           transform: "translateY(-50%)",
           background: "none",
           border: "none",
           cursor: "pointer",
-          color: "#1a1a1a",
+          color: themeStyles.text,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px"
+          padding: "20px",
+          opacity: 0.3,
+          transition: "opacity 0.2s"
         }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = "0.3"}
       >
-        <ChevronLeft size={32} strokeWidth={2.5} />
+        <ChevronLeft size={48} strokeWidth={2.5} />
       </button>
 
       <button 
         onClick={onNextPage}
         style={{
-          position: "absolute",
-          right: "0",
+          position: "fixed",
+          right: "20px",
           top: "50%",
           transform: "translateY(-50%)",
           background: "none",
           border: "none",
           cursor: "pointer",
-          color: "#1a1a1a",
+          color: themeStyles.text,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px"
+          padding: "20px",
+          opacity: 0.3,
+          transition: "opacity 0.2s"
         }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = "0.3"}
       >
-        <ChevronRight size={32} strokeWidth={2.5} />
+        <ChevronRight size={48} strokeWidth={2.5} />
       </button>
 
       {/* Chapter Header */}
       <div style={{ textAlign: "center", marginBottom: "40px", marginTop: "20px" }}>
-        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a1a", margin: "0 0 8px 0" }}>
+        <h2 style={{ fontSize: `${fontSize * 1.2}px`, fontWeight: 700, margin: "0 0 8px 0" }}>
           Chương {chapterNumber}
         </h2>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#1a1a1a", margin: 0 }}>
+        <h1 style={{ fontSize: `${fontSize * 1.5}px`, fontWeight: 700, margin: 0 }}>
           {chapterTitle}
         </h1>
       </div>
 
       {/* Text Content */}
       <div style={{ 
-        fontSize: "18px",
-        lineHeight: 1.8,
-        color: "#374151",
+        fontSize: `${fontSize}px`,
+        lineHeight: lineHeight,
         whiteSpace: isHtml ? "normal" : "pre-wrap",
-        minHeight: "50vh"
+        minHeight: "50vh",
+        textAlign: "justify"
       }}>
         {isHtml ? (
           <div dangerouslySetInnerHTML={{ __html: contentToRender }} />
@@ -105,10 +121,10 @@ export default function ReadingContent({
       {/* Pagination Footer */}
       <div style={{ 
         textAlign: "center", 
-        padding: "24px 0", 
+        padding: "40px 0", 
         fontSize: "14px", 
         fontWeight: 500,
-        color: "#4b5563",
+        opacity: 0.6,
         marginTop: "auto"
       }}>
         {currentPage}/{totalPages}

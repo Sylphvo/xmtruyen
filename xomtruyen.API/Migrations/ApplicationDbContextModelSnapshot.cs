@@ -22,6 +22,192 @@ namespace xomtruyen.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("XomTruyen.API.Models.AudioChapter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AudioUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("ChapterNumber")
+                        .HasColumnType("numeric");
+
+                    b.Property<int?>("CoinPrice")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ListenCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<string>("WaveformData")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId", "ChapterNumber");
+
+                    b.ToTable("AudioChapters");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.AudioJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NarratorVoiceId")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ProcessedSegments")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Settings")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceChapterIds")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetLanguage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TotalSegments")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TtsProvider")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("AudioJobs");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.AudioSegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AudioChunkUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Emotion")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PauseAfterMs")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SegmentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Speaker")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Speed")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<string>("VoiceProfileId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobId", "OrderIndex");
+
+                    b.ToTable("AudioSegments");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.AudioSfx", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AudioUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Keywords")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AudioSfxLibrary");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Author", b =>
                 {
                     b.Property<Guid>("Id")
@@ -127,6 +313,182 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("BookChapters");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.BookVideoSegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("AudioDurationSeconds")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("AudioUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SceneDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("SubtitleText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TextContent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("BookVideoSegments");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.BookVideoTask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AddIntroOutro")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AddSubtitles")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ArtStyle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("BgmEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("BgmGenre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<double>("BgmVolume")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("ChapterIds")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CompletedSegments")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CurrentStep")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("EnableMultiVoice")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageSource")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<double?>("OutputDurationSeconds")
+                        .HasColumnType("double precision");
+
+                    b.Property<long?>("OutputFileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("OutputSubtitleUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutputThumbnailUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutputVideoUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProgressPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Resolution")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("SegmentWordCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SpeechRate")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("TotalSegments")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Transition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("VoiceId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("BookVideoTasks");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.Bookmark", b =>
                 {
                     b.Property<Guid>("Id")
@@ -173,6 +535,34 @@ namespace xomtruyen.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.CharacterVoiceMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CharacterName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("VoiceProfileId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicationId");
+
+                    b.HasIndex("VoiceProfileId");
+
+                    b.ToTable("CharacterVoiceMappings");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.CoinPackage", b =>
@@ -267,6 +657,154 @@ namespace xomtruyen.API.Migrations
                     b.HasIndex("ComicChapterId");
 
                     b.ToTable("ComicPages");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.ComicVideoSegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("AudioDurationSeconds")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("AudioUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubtitleText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TextContent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("ComicVideoSegments");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.ComicVideoTask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AddSubtitles")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("BackgroundMusicUrl")
+                        .HasColumnType("text");
+
+                    b.Property<double>("BackgroundMusicVolume")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("ChapterIds")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CurrentStep")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NarrationSource")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double?>("OutputDurationSeconds")
+                        .HasColumnType("double precision");
+
+                    b.Property<long?>("OutputFileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("OutputSubtitleUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutputThumbnailUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutputVideoUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProgressPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Resolution")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SpeechRate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TotalAudioSegments")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalPages")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Transition")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("VoiceId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("ComicVideoTasks");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Course", b =>
@@ -864,6 +1402,9 @@ namespace xomtruyen.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayLabel")
                         .HasColumnType("text");
 
                     b.Property<int>("FormatType")
@@ -1677,6 +2218,119 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("UserTokens");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.VoiceProfile", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SampleAudioUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Settings")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TtsProvider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TtsVoiceId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("VoiceType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VoiceProfiles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "narrator_male",
+                            DisplayName = "Người kể (Nam)",
+                            Gender = "male",
+                            IsActive = true,
+                            TtsProvider = "edge_tts",
+                            TtsVoiceId = "vi-VN-NamMinhNeural",
+                            VoiceType = "narrator"
+                        },
+                        new
+                        {
+                            Id = "narrator_female",
+                            DisplayName = "Người kể (Nữ)",
+                            Gender = "female",
+                            IsActive = true,
+                            TtsProvider = "edge_tts",
+                            TtsVoiceId = "vi-VN-HoaiMyNeural",
+                            VoiceType = "narrator"
+                        },
+                        new
+                        {
+                            Id = "male_hero",
+                            DisplayName = "Nam chính (Trẻ)",
+                            Gender = "male",
+                            IsActive = true,
+                            TtsProvider = "edge_tts",
+                            TtsVoiceId = "vi-VN-NamMinhNeural",
+                            VoiceType = "character"
+                        },
+                        new
+                        {
+                            Id = "female_lead",
+                            DisplayName = "Nữ chính",
+                            Gender = "female",
+                            IsActive = true,
+                            TtsProvider = "edge_tts",
+                            TtsVoiceId = "vi-VN-HoaiMyNeural",
+                            VoiceType = "character"
+                        });
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.AudioChapter", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.AudioJob", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.AudioSegment", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.AudioJob", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.BookChapter", b =>
                 {
                     b.HasOne("XomTruyen.API.Models.Publication", "Publication")
@@ -1684,6 +2338,34 @@ namespace xomtruyen.API.Migrations
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.BookVideoSegment", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.BookVideoTask", "Task")
+                        .WithMany("Segments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.BookVideoTask", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
 
                     b.Navigation("Publication");
                 });
@@ -1697,6 +2379,23 @@ namespace xomtruyen.API.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.CharacterVoiceMapping", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("XomTruyen.API.Models.VoiceProfile", "VoiceProfile")
+                        .WithMany()
+                        .HasForeignKey("VoiceProfileId");
+
+                    b.Navigation("Publication");
+
+                    b.Navigation("VoiceProfile");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.ComicChapter", b =>
@@ -1718,6 +2417,34 @@ namespace xomtruyen.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("ComicChapter");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.ComicVideoSegment", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.ComicVideoTask", "Task")
+                        .WithMany("Segments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.ComicVideoTask", b =>
+                {
+                    b.HasOne("XomTruyen.API.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+
+                    b.HasOne("XomTruyen.API.Models.Publication", "Publication")
+                        .WithMany()
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Publication");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Course", b =>
@@ -2134,9 +2861,19 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("Publications");
                 });
 
+            modelBuilder.Entity("XomTruyen.API.Models.BookVideoTask", b =>
+                {
+                    b.Navigation("Segments");
+                });
+
             modelBuilder.Entity("XomTruyen.API.Models.ComicChapter", b =>
                 {
                     b.Navigation("Pages");
+                });
+
+            modelBuilder.Entity("XomTruyen.API.Models.ComicVideoTask", b =>
+                {
+                    b.Navigation("Segments");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.Course", b =>

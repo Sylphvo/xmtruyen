@@ -10,6 +10,7 @@ public class PublicationFilterRequest
     public int? CategoryId { get; set; }
     public bool? IsRecommended { get; set; }
     public bool? IsExclusive { get; set; }
+    public string? DisplayLabel { get; set; }
     
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;

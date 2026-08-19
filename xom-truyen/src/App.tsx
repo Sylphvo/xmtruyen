@@ -20,7 +20,9 @@ import { BG } from "./constants";
 import CourseListPage from "./pages/CourseListPage";
 import CourseDetailPage from "./pages/CourseDetailPage";
 import LearningPage from "./pages/LearningPage";
-
+import { AudioPlayerProvider } from "./context/AudioPlayerContext";
+import { MiniPlayer } from "./components/AudioPlayer/MiniPlayer";
+import AudioBookPage from "./pages/AudioBookPage";
 
 // ─── COMPONENT LAYOUT CHÍNH ──────────────────────────────────────────────────
 // Gom Sidebar và Header cũ thành một Layout dùng chung cho Trang chủ, Chi tiết truyện,...
@@ -90,8 +92,10 @@ import { Toaster } from "react-hot-toast";
 export default function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
-      <Routes>
+      <AudioPlayerProvider>
+        <Toaster position="top-right" />
+        <MiniPlayer />
+        <Routes>
         {/* 1. Tuyến đường trang chủ: Cần có Sidebar + Header bao quanh */}
         <Route
           path="/"
@@ -228,6 +232,16 @@ export default function App() {
           }
         />
 
+        {/* Tuyến đường Sách nói */}
+        <Route
+          path="/audiobook/:publicationId"
+          element={
+            <MainLayout>
+              <AudioBookPage />
+            </MainLayout>
+          }
+        />
+
         {/* 2. Tuyến đường Đăng nhập: Hiển thị Full-screen độc lập */}
         <Route path="/login" element={<LoginPage />} />
 
@@ -237,6 +251,7 @@ export default function App() {
         {/* 4. Tuyến đường Quên mật khẩu: Hiển thị Full-screen độc lập */}
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Routes>
+      </AudioPlayerProvider>
     </BrowserRouter>
   );
 }

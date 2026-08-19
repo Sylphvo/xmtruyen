@@ -15,4 +15,5 @@ export interface IBook {
   updatedBy?: string;
   categories?: { id: number; name: string }[];
   topics?: { id: number; name: string }[];
+  displayLabel?: string;
 }

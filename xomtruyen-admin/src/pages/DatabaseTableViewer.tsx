@@ -213,7 +213,7 @@ export const DatabaseTableViewer: React.FC = () => {
             dataToExport={data || []}
             exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Export'}
             onRefresh={typeof refresh !== 'undefined' ? refresh : undefined}
-            isLoading={typeof loading !== 'undefined' ? loading : false}
+            isLoading={typeof isLoading !== 'undefined' ? isLoading : false}
           />
 
               <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>Chi tiết bảng: {tableName}</h5>

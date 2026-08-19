@@ -21,6 +21,8 @@ public class PublicationRequest
     public FormatType FormatType { get; set; } = FormatType.Text;
     
     public AccessLevel AccessLevel { get; set; } = AccessLevel.Free;
+    
+    public string? DisplayLabel { get; set; }
 
     [Required]
     public List<int> CategoryIds { get; set; } = new List<int>();

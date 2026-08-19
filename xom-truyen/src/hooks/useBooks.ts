@@ -18,65 +18,44 @@ export function useBooks() {
     setError(null);
 
     try {
-      // 1. Lấy danh sách truyện mới nhất
-      const latestRes = await getPublications({ pageSize: 15 });
-      if (latestRes.books.length > 0) {
-        setLatestBooks(latestRes.books);
-      }
+      // 1. Sách mới mỗi ngày - Free
+      const freeRes = await getPublications({ displayLabel: 'Sách mới mỗi ngày - Free', pageSize: 15 });
+      // 2. Sách mới mỗi ngày - Dành cho Hội viên!
+      const memberRes = await getPublications({ displayLabel: 'Sách mới mỗi ngày - Dành cho Hội viên!', pageSize: 15 });
+      // 3. Truyện Tranh
+      const comicRes = await getPublications({ displayLabel: 'Truyện Tranh', pageSize: 15 });
 
-      // 2. Lấy danh sách truyện tranh
-      const comicRes = await getPublications({ formatType: 2, pageSize: 15 });
-      if (comicRes.books.length > 0) {
-        setComicBooks(comicRes.books);
-      }
-
-      // 3. Lấy danh sách truyện đề xuất
-      const recRes = await getPublications({ isRecommended: true, pageSize: 15 });
-      if (recRes.books.length > 0) {
-        setRecommendedBooks(recRes.books);
-      }
-
-      // 4. Lấy danh sách truyện độc quyền
-      const excRes = await getPublications({ isExclusive: true, pageSize: 15 });
-      if (excRes.books.length > 0) {
-        setExclusiveBooks(excRes.books);
-      }
-
-      const highRated = latestRes.books.length > 0
-        ? [...latestRes.books].sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0))
-        : RATED_BOOKS;
+      setLatestBooks(freeRes.books);
+      setRecommendedBooks(memberRes.books);
+      setComicBooks(comicRes.books);
+      
+      const allBooks = [...freeRes.books, ...memberRes.books, ...comicRes.books];
+      const highRated = allBooks.sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0)).slice(0, 15);
       setRatedBooks(highRated);
 
       // Cập nhật Sections tổng thể
       setSections([
         {
-          id: "new",
-          title: "Mới Nhất",
-          subtitle: "(Sách Mới)",
-          books: latestRes.books.length > 0 ? latestRes.books : NEW_BOOKS,
+          id: "free",
+          title: "Sách mới mỗi ngày - Free",
+          subtitle: "(Miễn phí)",
+          books: freeRes.books,
           size: "large",
         },
         {
-          id: "recommend",
-          title: "Sách Được Đề Xuất",
-          subtitle: "(Xem Thêm)",
-          books: recRes.books.length > 0 ? recRes.books : RECOMMENDED_BOOKS,
+          id: "member",
+          title: "Sách mới mỗi ngày - Dành cho Hội viên!",
+          subtitle: "(Dành cho Hội viên)",
+          books: memberRes.books,
           size: "large",
         },
         {
-          id: "exclusive",
-          title: "Sách Độc Quyền",
-          subtitle: "(Đọc Thêm)",
-          books: excRes.books.length > 0 ? excRes.books : EXCLUSIVE_BOOKS,
+          id: "comic",
+          title: "Truyện Tranh",
+          subtitle: "(Hấp dẫn)",
+          books: comicRes.books,
           size: "large",
-        },
-        {
-          id: "rated",
-          title: "Sách Được Đánh Giá Cao",
-          subtitle: "(Phổ Biến)",
-          books: highRated,
-          size: "large",
-        },
+        }
       ]);
     } catch (err: any) {
       setError(err.message || "Lỗi tải danh sách truyện");

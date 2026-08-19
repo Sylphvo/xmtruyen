@@ -141,6 +141,12 @@ public class PublicationRepository : IPublicationRepository
             parameters.Add("IsExclusive", filter.IsExclusive.Value);
         }
 
+        if (!string.IsNullOrWhiteSpace(filter.DisplayLabel))
+        {
+            whereClause += " AND b.\"DisplayLabel\" = @DisplayLabel";
+            parameters.Add("DisplayLabel", filter.DisplayLabel);
+        }
+
         if (filter.CategoryId.HasValue)
         {
             whereClause += " AND b.\"Id\" IN (SELECT \"PublicationId\" FROM \"PublicationCategories\" WHERE \"CategoryId\" = @CategoryId)";
@@ -178,7 +184,7 @@ public class PublicationRepository : IPublicationRepository
         var dataSql = $@"
             SELECT 
                 b.""Id"", b.""Title"", b.""Slug"", b.""AuthorName"", b.""Description"", b.""CoverImageUrl"",
-                b.""FormatType"", b.""AccessLevel"", b.""Status"", b.""ViewCount"", b.""AverageRating"",
+                b.""FormatType"", b.""AccessLevel"", b.""DisplayLabel"", b.""Status"", b.""ViewCount"", b.""AverageRating"",
                 b.""IsRecommended"", b.""IsExclusive"", b.""CreatedAt"", b.""UpdatedAt"", b.""CreatedBy"", b.""UpdatedBy"",
                 (
                     SELECT COALESCE(json_agg(json_build_object('Id', c.""Id"", 'Name', c.""Name"")), '[]'::json)
@@ -212,6 +218,7 @@ public class PublicationRepository : IPublicationRepository
             CoverImageUrl = b.CoverImageUrl,
             FormatType = (FormatType)b.FormatType,
             AccessLevel = (AccessLevel)b.AccessLevel,
+            DisplayLabel = b.DisplayLabel,
             Status = b.Status,
             ViewCount = b.ViewCount,
             AverageRating = b.AverageRating,

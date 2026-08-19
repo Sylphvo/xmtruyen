@@ -1,12 +1,14 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import BookInfo from "../components/BookDetail/BookInfo";
-import BookComments from "../components/BookDetail/BookComments";
+import AnimatedBookComments from "../components/BookDetail/AnimatedBookComments";
+import { AnimatedChapterList } from "../components/BookDetail/AnimatedChapterList";
 import BookCover from "../components/Book/BookCover";
 import Footer from "../components/Layout/Footer";
 import { useBookDetail } from "../hooks/useBooks";
-import { getSimilarBooks } from "../services/bookService";
+import { getSimilarBooks, getComicChapters, getTextChapters } from "../services/bookService";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 import type { Book } from "../types";
 
 export default function BookDetailPage() {
@@ -14,13 +16,27 @@ export default function BookDetailPage() {
   const { id } = useParams();
   const { book, loading } = useBookDetail(id);
   const [similarBooks, setSimilarBooks] = useState<Book[]>([]);
+  const [chapters, setChapters] = useState<any[]>([]);
 
-  // Fetch similar books
+  // Reveal hooks
+  const infoReveal = useScrollReveal({ delay: 0 });
+  const chaptersReveal = useScrollReveal({ delay: 100 });
+  const similarReveal = useScrollReveal({ delay: 200 });
+  const commentsReveal = useScrollReveal({ delay: 300 });
+
+  // Fetch similar books and chapters
   useEffect(() => {
     if (id) {
       getSimilarBooks(id, 6).then(books => setSimilarBooks(books));
     }
   }, [id]);
+
+  useEffect(() => {
+    if (id && book) {
+      const fetcher = (book.formatType === 2 || book.genres?.includes("Truyện tranh")) ? getComicChapters : getTextChapters;
+      fetcher(id).then(data => setChapters(data));
+    }
+  }, [id, book]);
 
   // Update SEO meta tags
   useEffect(() => {
@@ -62,6 +78,7 @@ export default function BookDetailPage() {
         {/* Back Button */}
         <button 
           onClick={() => navigate(-1)}
+          className="hover-lift"
           style={{
             display: "flex",
             alignItems: "center",
@@ -80,17 +97,29 @@ export default function BookDetailPage() {
         </button>
 
         {/* Book Details */}
-        <BookInfo book={displayBook} isLoading={loading} />
+        <div ref={infoReveal.ref} style={infoReveal.style}>
+          <BookInfo book={displayBook} isLoading={loading} />
+        </div>
+
+        {/* Chapter List */}
+        {chapters.length > 0 && (
+          <div ref={chaptersReveal.ref} style={{ ...chaptersReveal.style, marginTop: "40px" }}>
+             <AnimatedChapterList 
+                chapters={chapters.map((ch, idx) => ({ ...ch, publicationId: id }))} 
+                isComic={book?.formatType === 2 || book?.genres?.includes("Truyện tranh")}
+             />
+          </div>
+        )}
 
         {/* Similar Books Section */}
         {similarBooks.length > 0 && (
-          <div style={{ marginTop: "40px", marginBottom: "40px" }}>
+          <div ref={similarReveal.ref} style={{ ...similarReveal.style, marginTop: "40px", marginBottom: "40px" }}>
             <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "var(--text-h, #e0e0e0)", marginBottom: "20px" }}>
               Sách Tương Tự
             </h3>
             <div style={{ display: "flex", gap: "20px", overflowX: "auto", paddingBottom: "10px" }}>
               {similarBooks.map(simBook => (
-                <div key={simBook.id} style={{ minWidth: "150px", maxWidth: "150px" }}>
+                <div key={simBook.id} style={{ minWidth: "150px", maxWidth: "150px" }} className="hover-lift">
                   <Link to={`/book/${simBook.id}`} style={{ textDecoration: 'none' }}>
                     <BookCover book={simBook} width="100%" height="220px" />
                     <div style={{ marginTop: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-h, #e0e0e0)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -104,7 +133,9 @@ export default function BookDetailPage() {
         )}
 
         {/* Comments */}
-        <BookComments publicationId={displayBook.id.toString()} />
+        <div ref={commentsReveal.ref} style={commentsReveal.style}>
+          <AnimatedBookComments publicationId={displayBook.id.toString()} />
+        </div>
       </div>
       
       <Footer />

@@ -11,6 +11,7 @@ using XomTruyen.API.Services.Interfaces;
 using XomTruyen.API.Services.Implementations;
 using XomTruyen.API.Services.Background;
 using XomTruyen.API.Services;
+using XomTruyen.API.Services.VideoConvert;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,14 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<XomTruyen.API.Services.IPaymentService, XomTruyen.API.Services.PaymentService>();
 builder.Services.AddScoped<IEngagementService, EngagementService>();
 builder.Services.AddScoped<IDiscoveryService, DiscoveryService>();
+
+// Register Audiobook Services
+builder.Services.AddSingleton<AudioJobQueue>();
+builder.Services.AddHostedService<AudioBackgroundWorker>();
+builder.Services.AddHttpClient("PythonWorker", client =>
+{
+    client.BaseAddress = new Uri("http://127.0.0.1:8000");
+});
 
 // Register Publication Processing Services
 builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx => new BackgroundTaskQueue(100));
@@ -140,6 +149,16 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
+
+// Book to Video Services
+builder.Services.AddSingleton<XomTruyen.API.Services.BookVideo.IBookVideoJobQueue, XomTruyen.API.Services.BookVideo.BookVideoJobQueue>();
+builder.Services.AddHostedService<XomTruyen.API.Services.BookVideo.BookVideoBackgroundWorker>();
+builder.Services.AddScoped<XomTruyen.API.Services.BookVideo.SceneDescriptionService>();
+builder.Services.AddScoped<XomTruyen.API.Services.BookVideo.IImageGenerationService, XomTruyen.API.Services.BookVideo.ImageGenerationService>();
+builder.Services.AddScoped<XomTruyen.API.Services.BookVideo.BookVideoComposeService>();
+
+builder.Services.AddSingleton<IVideoConvertJobQueue, VideoConvertJobQueue>();
+builder.Services.AddHostedService<VideoConvertBackgroundWorker>();
 
 var app = builder.Build();
 

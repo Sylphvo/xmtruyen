@@ -6,6 +6,7 @@ export interface GetBooksParams {
   categoryId?: string;
   formatType?: number;
   accessLevel?: number;
+  displayLabel?: string;
   page?: number;
   pageSize?: number;
 }
@@ -18,6 +19,7 @@ export interface SaveBookRequest {
   author: string;
   description?: string;
   coverImageUrl?: string;
+  displayLabel?: string;
   categoryIds?: number[];
   topicIds?: number[];
 }

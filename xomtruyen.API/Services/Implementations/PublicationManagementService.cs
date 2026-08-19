@@ -38,6 +38,7 @@ public class PublicationManagementService : IPublicationManagementService
             CoverImageUrl = request.CoverImageUrl,
             FormatType = request.FormatType,
             AccessLevel = request.AccessLevel,
+            DisplayLabel = request.DisplayLabel,
             CreatedAt = DateTime.UtcNow,
             ViewCount = 0,
             AverageRating = 0
@@ -64,6 +65,7 @@ public class PublicationManagementService : IPublicationManagementService
         Publication.CoverImageUrl = request.CoverImageUrl;
         Publication.FormatType = request.FormatType;
         Publication.AccessLevel = request.AccessLevel;
+        Publication.DisplayLabel = request.DisplayLabel;
 
         await _publicationRepository.UpdateAsync(Publication, request.CategoryIds, request.TopicIds);
     }

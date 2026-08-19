@@ -22,10 +22,11 @@ public class DiscoveryController : BaseApiController
         [FromQuery] string? categorySlug,
         [FromQuery] FormatType? formatType,
         [FromQuery] AccessLevel? accessLevel,
+        [FromQuery] string? displayLabel,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
-        var (publications, totalCount) = await _discoveryService.SearchPublicationsAsync(q, categorySlug, formatType, accessLevel, page, pageSize);
+        var (publications, totalCount) = await _discoveryService.SearchPublicationsAsync(q, categorySlug, formatType, accessLevel, displayLabel, page, pageSize);
         return Ok(new
         {
             Data = publications,

@@ -54,6 +54,22 @@ public class ApplicationDbContext : DbContext
     public DbSet<EmailTemplate> EmailTemplates { get; set; }
     public DbSet<HelpArticle> HelpArticles { get; set; }
 
+    // Audiobook Pipeline
+    public DbSet<AudioChapter> AudioChapters { get; set; }
+    public DbSet<AudioJob> AudioJobs { get; set; }
+    public DbSet<AudioSegment> AudioSegments { get; set; }
+    public DbSet<VoiceProfile> VoiceProfiles { get; set; }
+    public DbSet<CharacterVoiceMapping> CharacterVoiceMappings { get; set; }
+    public DbSet<AudioSfx> AudioSfxLibrary { get; set; }
+
+    // Book to Video Pipeline
+    public DbSet<BookVideoTask> BookVideoTasks { get; set; }
+    public DbSet<BookVideoSegment> BookVideoSegments { get; set; }
+
+    // Comic to Video Pipeline
+    public DbSet<ComicVideoTask> ComicVideoTasks { get; set; }
+    public DbSet<ComicVideoSegment> ComicVideoSegments { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -332,6 +348,48 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Slug).IsUnique();
+        });
+
+        // Audiobook Pipeline
+        modelBuilder.Entity<AudioChapter>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.PublicationId, e.ChapterNumber });
+        });
+
+        modelBuilder.Entity<AudioJob>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.PublicationId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<AudioSegment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.JobId, e.OrderIndex });
+        });
+
+        modelBuilder.Entity<VoiceProfile>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasData(
+                new VoiceProfile { Id = "narrator_male", DisplayName = "Người kể (Nam)", VoiceType = "narrator", Gender = "male", TtsProvider = "edge_tts", TtsVoiceId = "vi-VN-NamMinhNeural", IsActive = true },
+                new VoiceProfile { Id = "narrator_female", DisplayName = "Người kể (Nữ)", VoiceType = "narrator", Gender = "female", TtsProvider = "edge_tts", TtsVoiceId = "vi-VN-HoaiMyNeural", IsActive = true },
+                new VoiceProfile { Id = "male_hero", DisplayName = "Nam chính (Trẻ)", VoiceType = "character", Gender = "male", TtsProvider = "edge_tts", TtsVoiceId = "vi-VN-NamMinhNeural", IsActive = true },
+                new VoiceProfile { Id = "female_lead", DisplayName = "Nữ chính", VoiceType = "character", Gender = "female", TtsProvider = "edge_tts", TtsVoiceId = "vi-VN-HoaiMyNeural", IsActive = true }
+            );
+        });
+
+        modelBuilder.Entity<CharacterVoiceMapping>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        modelBuilder.Entity<AudioSfx>(entity =>
+        {
+            entity.HasKey(e => e.Id);
         });
     }
 }

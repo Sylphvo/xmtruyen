@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HistoryItem from "../components/History/HistoryItem";
 import type { HistoryRecord } from "../components/History/HistoryItem";
+import { HistoryList } from "../components/History/HistoryList";
 import Footer from "../components/Layout/Footer";
 import { getHistory, deleteHistory } from "../services/engagementService";
 
@@ -68,13 +69,10 @@ export default function HistoryPage() {
               Đang tải lịch sử...
             </div>
           ) : historyList.length > 0 ? (
-            historyList.map(record => (
-              <HistoryItem 
-                key={record.id} 
-                record={record} 
-                onRemove={handleRemove} 
-              />
-            ))
+            <HistoryList 
+                items={historyList} 
+                onRemoveItem={handleRemove} 
+            />
           ) : (
             <div style={{ textAlign: "center", padding: "40px", color: "#6b7280" }}>
               Chưa có lịch sử đọc truyện.

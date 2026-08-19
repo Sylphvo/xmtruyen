@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings, Headphones } from 'lucide-react';
 import { getTables } from '../../api/managerDbApi';
 import { getTableInfo } from '../../constants/databaseDictionary';
 
@@ -76,6 +76,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
       setActiveMenu('marketing');
     } else if (path.startsWith('/crawlers') || path.startsWith('/translation')) {
       setActiveMenu('automation');
+    } else if (path.startsWith('/audio') || path.startsWith('/book-video') || path.startsWith('/comic-video')) {
+      setActiveMenu('audio');
     } else {
       setActiveMenu('dashboard');
     }
@@ -161,6 +163,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
         >
           <Bot />
         </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'audio' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('audio')}
+          style={{ cursor: 'pointer' }}
+          title="Audio & Video"
+        >
+          <Headphones />
+        </div>
       </aside>
 
       {/* Menu Sidebar */}
@@ -227,6 +237,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
               <NavLink to="/users" className="menu-link">
                 <Users />
                 <span>User <span className="text-secondary small" style={{ fontSize: '12px' }}>(Người dùng)</span></span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'audio' && (
+            <>
+              <div className="menu-heading">🎧 Sách nói (Audiobooks)</div>
+              <NavLink to="/audio" className="menu-link" end>
+                <LayoutDashboard />
+                <span>Tổng quan Audio</span>
+              </NavLink>
+              <NavLink to="/audio/voices" className="menu-link" end>
+                <Users />
+                <span>Quản lý Giọng đọc</span>
+              </NavLink>
+              
+              <div className="menu-heading mt-3">🎬 Video (Storytelling)</div>
+              <NavLink to="/book-video" className="menu-link" end>
+                <LayoutDashboard />
+                <span>Video Truyện Chữ</span>
+              </NavLink>
+              <NavLink to="/comic-video" className="menu-link" end>
+                <LayoutDashboard />
+                <span>Video Truyện Tranh</span>
               </NavLink>
             </>
           )}

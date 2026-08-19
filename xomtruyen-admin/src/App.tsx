@@ -34,6 +34,18 @@ import { ReadingAnalytics } from './pages/ReadingAnalytics';
 import { EmailTemplates } from './pages/EmailTemplates';
 import { HelpArticles } from './pages/HelpArticles';
 import { BookChapters } from './pages/BookChapters';
+import { AudioDashboard } from './pages/AudioDashboard';
+import { AudioCreate } from './pages/AudioCreate';
+import { AudioJobDetail } from './pages/AudioJobDetail';
+import { AudioVoices } from './pages/AudioVoices';
+import { AudioCharacters } from './pages/AudioCharacters';
+import { BookVideoDashboard } from './pages/BookVideoDashboard';
+import { BookVideoCreate } from './pages/BookVideoCreate';
+import { BookVideoJobDetail } from './pages/BookVideoJobDetail';
+import { ComicVideoDashboard } from './pages/ComicVideoDashboard';
+import { ComicVideoCreate } from './pages/ComicVideoCreate';
+import { ComicVideoJobDetail } from './pages/ComicVideoJobDetail';
+
 function App() {
   return (
     <AuthProvider>
@@ -74,6 +86,20 @@ function App() {
           <Route path="/email-templates" element={<EmailTemplates />} />
           <Route path="/help-articles" element={<HelpArticles />} />
           <Route path="/book-chapters" element={<BookChapters />} />
+          
+          <Route path="/audio" element={<AudioDashboard />} />
+          <Route path="/audio/create" element={<AudioCreate />} />
+          <Route path="/audio/jobs/:id" element={<AudioJobDetail />} />
+          <Route path="/audio/voices" element={<AudioVoices />} />
+          <Route path="/audio/characters/:publicationId" element={<AudioCharacters />} />
+          
+          <Route path="/book-video" element={<BookVideoDashboard />} />
+          <Route path="/book-video/create" element={<BookVideoCreate />} />
+          <Route path="/book-video/:id" element={<BookVideoJobDetail />} />
+          
+          <Route path="/comic-video" element={<ComicVideoDashboard />} />
+          <Route path="/comic-video/create" element={<ComicVideoCreate />} />
+          <Route path="/comic-video/:id" element={<ComicVideoJobDetail />} />
             </Route>
           </Route>
         </Routes>

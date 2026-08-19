@@ -14,9 +14,14 @@ export default function BookSection({
     <section key={id} style={{ marginBottom: 30 }}>
       <SectionHeader title={title} subtitle={subtitle} />
 
-      {/* Sử dụng component BookSlider thay cho div overflow-x thông thường */}
       <div style={{ marginTop: "16px" }}>
-        <BookSlider books={books} size={size} isLoading={isLoading} />
+        {books.length > 0 ? (
+          <BookSlider books={books} size={size} isLoading={isLoading} />
+        ) : (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontStyle: 'italic' }}>
+            hiện tại chưa có sách nào
+          </div>
+        )}
       </div>
     </section>
   );

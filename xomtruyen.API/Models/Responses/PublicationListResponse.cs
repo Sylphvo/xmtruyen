@@ -11,6 +11,7 @@ public class PublicationListResponse
     public string? CoverImageUrl { get; set; }
     public FormatType FormatType { get; set; }
     public AccessLevel AccessLevel { get; set; }
+    public string? DisplayLabel { get; set; }
     public string Status { get; set; } = null!;
     public int? ViewCount { get; set; }
     public decimal? AverageRating { get; set; }

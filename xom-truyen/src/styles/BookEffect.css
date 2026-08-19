@@ -1,0 +1,68 @@
+/* Book Effect — 2 trang spread, spine giữa */
+
+.book-flip-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    perspective: 2500px;
+    perspective-origin: center;
+}
+
+.book-spread {
+    display: flex;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border-radius: 0 6px 6px 0;
+}
+
+/* Spine shadow (giữa 2 trang) */
+.book-spread::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(90deg,
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.05) 30%,
+        rgba(0,0,0,0) 50%,
+        rgba(0,0,0,0.05) 70%,
+        rgba(0,0,0,0.15) 100%
+    );
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Page texture */
+.book-page {
+    background-color: #fdfbf7;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Corner curl hint (góc dưới phải) */
+.book-page.right-page::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.03) 50%);
+    cursor: pointer;
+    transition: all 300ms ease;
+}
+
+.book-page.right-page:hover::after {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.08) 50%);
+}
+
+/* Page thickness illusion (cạnh phải mỗi trang) */
+.book-page.left-page {
+    border-right: 1px solid rgba(0,0,0,0.08);
+}

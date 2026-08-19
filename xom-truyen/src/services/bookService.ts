@@ -53,6 +53,7 @@ export function mapPublicationToBook(item: any, index: number = 0): Book {
     isMember: (item.accessLevel ?? item.AccessLevel) === 2 || item.isMember === true,
     isRecommended: item.isRecommended ?? item.IsRecommended ?? false,
     isExclusive: item.isExclusive ?? item.IsExclusive ?? false,
+    displayLabel: item.displayLabel ?? item.DisplayLabel ?? undefined,
     status: item.status || item.Status || "Published",
     description:
       item.description ||
@@ -83,6 +84,7 @@ export async function getPublications(filter?: PublicationFilter): Promise<{ boo
   if (filter?.categoryId || filter?.categorySlug) params.categorySlug = filter.categorySlug || filter.categoryId;
   if (filter?.formatType !== undefined) params.formatType = filter.formatType;
   if (filter?.accessLevel !== undefined) params.accessLevel = filter.accessLevel;
+  if (filter?.displayLabel) params.displayLabel = filter.displayLabel;
 
   for (const endpoint of endpoints) {
     try {

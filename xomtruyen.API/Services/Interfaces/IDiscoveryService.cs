@@ -10,6 +10,7 @@ public interface IDiscoveryService
         string? categorySlug, 
         FormatType? formatType, 
         AccessLevel? accessLevel, 
+        string? displayLabel,
         int page, 
         int pageSize);
         
