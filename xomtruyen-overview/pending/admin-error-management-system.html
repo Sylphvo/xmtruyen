@@ -64,6 +64,7 @@
         <a href="#notification">9. Error Notification & Alert</a>
         <a href="#database">10. Database Schema (Error Logs)</a>
         <a href="#implementation">11. Tổng Hợp Files & Triển Khai</a>
+        <a href="#resolution">12. Module Giải Pháp Khắc Phục Lỗi (Knowledge Base + Auto-Suggest)</a>
     </div>
 
     <!-- 1. HIỆN TRẠNG -->
@@ -927,6 +928,471 @@ CREATE INDEX idx_health_checks ON "HealthCheckLogs"("ServiceName", "CheckedAt" D
             <li><strong>Sau:</strong> Retry mechanism + notification badge + export CSV</li>
         </ol>
     </div>
+
+    <!-- 12. MODULE GIẢI PHÁP KHẮC PHỤC LỖI -->
+    <h2 id="resolution">12. Module Giải Pháp Khắc Phục Lỗi (Error Resolution System)</h2>
+
+    <div class="note">
+        <strong>💡 Ý tưởng:</strong> Không chỉ ghi log lỗi — mà còn đề xuất giải pháp fix, lưu lại knowledge base các lỗi đã fix trước đó, và tự động áp dụng fix cho lỗi tái diễn.
+    </div>
+
+    <h3>12.1 Kiến trúc Resolution System</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│           ERROR RESOLUTION SYSTEM — LUỒNG KHẮC PHỤC                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Lỗi mới xuất hiện
+       │
+       ▼
+  ┌──────────────────────────────────┐
+  │  1. PATTERN MATCHING             │
+  │  So sánh lỗi mới với Knowledge  │
+  │  Base → tìm lỗi tương tự đã fix│
+  └──────────────┬───────────────────┘
+                 │
+       ┌─────────┼──────────┐
+       │ FOUND   │          │ NOT FOUND
+       ▼         │          ▼
+  ┌────────────┐ │  ┌──────────────────────────┐
+  │ Đề xuất    │ │  │ AI Suggest Fix           │
+  │ giải pháp  │ │  │ (GPT / rule-based)       │
+  │ từ KB      │ │  │ → Phân tích message,     │
+  │            │ │  │   stack trace, endpoint   │
+  └─────┬──────┘ │  │ → Đề xuất giải pháp      │
+        │        │  └──────────────┬────────────┘
+        │        │                 │
+        └────────┼─────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  2. HIỂN THỊ ĐỀ XUẤT CHO ADMIN │
+  │                                  │
+  │  • Giải pháp đề xuất (1-3 cách) │
+  │  • Code snippet gợi ý           │
+  │  • File cần sửa                  │
+  │  • Link tài liệu liên quan      │
+  │  • Lỗi tương tự đã fix trước    │
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  3. ADMIN HÀNH ĐỘNG              │
+  │                                  │
+  │  [✅ Áp dụng giải pháp]          │
+  │  [✏️ Ghi note giải pháp custom]  │
+  │  [🔄 Auto-fix (nếu có script)]  │
+  │  [❌ Bỏ qua]                     │
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  4. CẬP NHẬT KNOWLEDGE BASE     │
+  │                                  │
+  │  Lưu: lỗi + giải pháp đã áp    │
+  │  dụng → lần sau tự đề xuất      │
+  └──────────────────────────────────┘
+    </div>
+
+    <h3>12.2 Knowledge Base — Bảng lưu giải pháp đã biết</h3>
+    <div class="code-title">📁 Database Schema</div>
+    <pre><code>-- Knowledge Base: lưu các lỗi + giải pháp đã fix
+CREATE TABLE "ErrorResolutions" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Pattern matching (dùng để tìm lỗi tương tự)
+    "ErrorPattern" TEXT NOT NULL,             -- Regex hoặc substring match message
+    "CategoryMatch" VARCHAR(30),             -- Khớp category (API_ERROR, NETWORK...)
+    "EndpointMatch" VARCHAR(200),            -- Endpoint pattern (/api/Publications/*)
+    "StatusCodeMatch" INT,                   -- HTTP status code (500, 403...)
+    
+    -- Giải pháp
+    "Title" VARCHAR(200) NOT NULL,           -- "Fix CORS error khi gọi từ localhost"
+    "Description" TEXT NOT NULL,             -- Mô tả chi tiết cách fix
+    "Solution" TEXT NOT NULL,                -- Hướng dẫn từng bước
+    "CodeSnippet" TEXT,                      -- Code mẫu cần sửa
+    "AffectedFile" VARCHAR(300),             -- File cần sửa (Controllers/AuthController.cs:25)
+    "DocumentationUrl" TEXT,                 -- Link docs tham khảo
+    "Tags" TEXT[],                           -- ["cors", "api", "authentication"]
+    
+    -- Auto-fix (nếu có)
+    "AutoFixCommand" TEXT,                   -- Command tự động: "dotnet ef database update"
+    "AutoFixType" VARCHAR(20),              -- 'command' | 'api_call' | 'config_change' | null
+    "AutoFixPayload" JSONB,                 -- Payload cho auto-fix
+    
+    -- Stats
+    "TimesApplied" INT DEFAULT 0,            -- Số lần đã áp dụng thành công
+    "SuccessRate" FLOAT DEFAULT 0,           -- % fix thành công
+    "LastAppliedAt" TIMESTAMPTZ,
+    
+    -- Metadata
+    "CreatedBy" UUID REFERENCES "Users"("Id"),
+    "CreatedAt" TIMESTAMPTZ DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMPTZ DEFAULT NOW(),
+    "IsActive" BOOLEAN DEFAULT TRUE
+);
+
+CREATE INDEX idx_error_resolutions_pattern ON "ErrorResolutions" USING GIN (to_tsvector('simple', "ErrorPattern"));
+CREATE INDEX idx_error_resolutions_category ON "ErrorResolutions"("CategoryMatch");
+
+-- Liên kết: Error Log nào đã được fix bằng Resolution nào
+CREATE TABLE "ErrorLogResolutions" (
+    "ErrorLogId" UUID REFERENCES "ErrorLogs"("Id") ON DELETE CASCADE,
+    "ResolutionId" UUID REFERENCES "ErrorResolutions"("Id"),
+    "AppliedBy" UUID REFERENCES "Users"("Id"),
+    "AppliedAt" TIMESTAMPTZ DEFAULT NOW(),
+    "WasSuccessful" BOOLEAN DEFAULT TRUE,
+    "Notes" TEXT,
+    PRIMARY KEY ("ErrorLogId", "ResolutionId")
+);</code></pre>
+
+    <h3>12.3 Resolution Service (Backend)</h3>
+    <div class="code-title">📁 xomtruyen.API/Services/ErrorResolutionService.cs</div>
+    <pre><code>/// &lt;summary&gt;
+/// Service tìm giải pháp khắc phục cho lỗi dựa trên Knowledge Base.
+/// Pattern matching: message, category, endpoint, status code.
+/// &lt;/summary&gt;
+public class ErrorResolutionService
+{
+    private readonly ApplicationDbContext _db;
+
+    /// &lt;summary&gt;
+    /// Tìm giải pháp đề xuất cho 1 error log
+    /// &lt;/summary&gt;
+    public async Task&lt;List&lt;ResolutionSuggestion&gt;&gt; GetSuggestionsAsync(ErrorLog error)
+    {
+        var suggestions = new List&lt;ResolutionSuggestion&gt;();
+
+        // 1. Exact match: cùng endpoint + status code
+        var exactMatches = await _db.ErrorResolutions
+            .Where(r => r.IsActive)
+            .Where(r => r.EndpointMatch != null && error.Endpoint != null 
+                        && error.Endpoint.Contains(r.EndpointMatch))
+            .Where(r => r.StatusCodeMatch == null || r.StatusCodeMatch == error.StatusCode)
+            .OrderByDescending(r => r.TimesApplied)
+            .Take(3)
+            .ToListAsync();
+
+        foreach (var match in exactMatches)
+        {
+            suggestions.Add(new ResolutionSuggestion
+            {
+                Resolution = match,
+                MatchType = "exact",
+                Confidence = 0.9
+            });
+        }
+
+        // 2. Pattern match: message contains pattern
+        if (suggestions.Count &lt; 3)
+        {
+            var patternMatches = await _db.ErrorResolutions
+                .Where(r => r.IsActive)
+                .Where(r => r.CategoryMatch == error.Category || r.CategoryMatch == null)
+                .Where(r => EF.Functions.ILike(error.Message, "%" + r.ErrorPattern + "%"))
+                .OrderByDescending(r => r.SuccessRate)
+                .Take(3 - suggestions.Count)
+                .ToListAsync();
+
+            foreach (var match in patternMatches)
+            {
+                suggestions.Add(new ResolutionSuggestion
+                {
+                    Resolution = match,
+                    MatchType = "pattern",
+                    Confidence = 0.7
+                });
+            }
+        }
+
+        // 3. Fallback: dựa trên category + severity (generic suggestions)
+        if (suggestions.Count == 0)
+        {
+            suggestions.AddRange(GetGenericSuggestions(error));
+        }
+
+        return suggestions;
+    }
+
+    /// &lt;summary&gt;
+    /// Gợi ý chung khi không tìm thấy match trong KB
+    /// &lt;/summary&gt;
+    private List&lt;ResolutionSuggestion&gt; GetGenericSuggestions(ErrorLog error)
+    {
+        return error.Category switch
+        {
+            "NETWORK" => new List&lt;ResolutionSuggestion&gt;
+            {
+                new() { GenericTitle = "Kiểm tra kết nối mạng", 
+                         GenericDescription = "• Kiểm tra server API có đang chạy\n• Kiểm tra firewall không chặn port\n• Thử ping server: curl http://localhost:5000/api/system/health",
+                         MatchType = "generic", Confidence = 0.3 }
+            },
+            "AUTH" => new List&lt;ResolutionSuggestion&gt;
+            {
+                new() { GenericTitle = "Lỗi xác thực / phân quyền",
+                         GenericDescription = "• Token có thể đã hết hạn → đăng nhập lại\n• Kiểm tra role user có đủ quyền truy cập endpoint\n• Kiểm tra JWT Secret trong appsettings.json",
+                         MatchType = "generic", Confidence = 0.3 }
+            },
+            "API_ERROR" when error.StatusCode == 500 => new List&lt;ResolutionSuggestion&gt;
+            {
+                new() { GenericTitle = "Lỗi server 500 — Internal Server Error",
+                         GenericDescription = "• Kiểm tra log backend (.NET): dotnet run → xem console\n• Kiểm tra connection string DB\n• Kiểm tra EF migration đã update chưa: dotnet ef database update\n• Xem chi tiết exception trong ErrorLogs table",
+                         MatchType = "generic", Confidence = 0.4 }
+            },
+            "VALIDATION" => new List&lt;ResolutionSuggestion&gt;
+            {
+                new() { GenericTitle = "Lỗi validation dữ liệu",
+                         GenericDescription = "• Kiểm tra các trường bắt buộc đã điền đủ chưa\n• Kiểm tra format dữ liệu (email, số, ngày tháng)\n• Xem response body chi tiết để biết trường nào lỗi",
+                         MatchType = "generic", Confidence = 0.5 }
+            },
+            _ => new List&lt;ResolutionSuggestion&gt;
+            {
+                new() { GenericTitle = "Lỗi chưa xác định",
+                         GenericDescription = "• Kiểm tra console browser (F12) để xem chi tiết\n• Kiểm tra network tab xem request/response\n• Thử refresh trang và thao tác lại\n• Nếu lặp lại → ghi chú lại steps to reproduce",
+                         MatchType = "generic", Confidence = 0.2 }
+            }
+        };
+    }
+
+    /// &lt;summary&gt;
+    /// Áp dụng giải pháp: cập nhật stats + liên kết error↔resolution
+    /// &lt;/summary&gt;
+    public async Task ApplyResolutionAsync(Guid errorLogId, Guid resolutionId, Guid adminId, bool wasSuccessful, string? notes)
+    {
+        // Liên kết
+        _db.Set&lt;ErrorLogResolution&gt;().Add(new ErrorLogResolution
+        {
+            ErrorLogId = errorLogId,
+            ResolutionId = resolutionId,
+            AppliedBy = adminId,
+            WasSuccessful = wasSuccessful,
+            Notes = notes
+        });
+
+        // Cập nhật stats resolution
+        var resolution = await _db.ErrorResolutions.FindAsync(resolutionId);
+        if (resolution != null)
+        {
+            resolution.TimesApplied++;
+            resolution.LastAppliedAt = DateTime.UtcNow;
+            // Tính success rate
+            var total = await _db.Set&lt;ErrorLogResolution&gt;().CountAsync(r => r.ResolutionId == resolutionId);
+            var success = await _db.Set&lt;ErrorLogResolution&gt;().CountAsync(r => r.ResolutionId == resolutionId && r.WasSuccessful);
+            resolution.SuccessRate = total > 0 ? (double)success / total : 0;
+        }
+
+        // Mark error là resolved
+        var errorLog = await _db.ErrorLogs.FindAsync(errorLogId);
+        if (errorLog != null)
+        {
+            errorLog.IsResolved = true;
+            errorLog.ResolvedBy = adminId;
+            errorLog.ResolvedAt = DateTime.UtcNow;
+            errorLog.ResolvedNote = notes;
+        }
+
+        await _db.SaveChangesAsync();
+    }
+}</code></pre>
+
+    <h3>12.4 UI — Resolution Panel trong Error Detail</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ERROR DETAIL MODAL — TAB: GIẢI PHÁP KHẮC PHỤC                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌── TABS ───────────────────────────────────────────────────────────────┐
+  │  [📋 Chi tiết lỗi]  [💡 Giải pháp đề xuất]  [📜 Lịch sử fix]       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+  ┌── TAB: GIẢI PHÁP ĐỀ XUẤT ────────────────────────────────────────────┐
+  │                                                                        │
+  │  🤖 Hệ thống tìm thấy 2 giải pháp phù hợp:                          │
+  │                                                                        │
+  │  ┌─── Giải pháp #1 (Confidence: 90%) ─── ⭐ Khuyến nghị ───────────┐ │
+  │  │                                                                    │ │
+  │  │  📌 Fix CORS error — thêm origin vào AllowedOrigins               │ │
+  │  │                                                                    │ │
+  │  │  Mô tả:                                                           │ │
+  │  │  API từ chối request vì origin (localhost:5174) chưa được         │ │
+  │  │  khai báo trong CORS policy.                                      │ │
+  │  │                                                                    │ │
+  │  │  Cách fix:                                                         │ │
+  │  │  1. Mở file: xomtruyen.API/Program.cs                            │ │
+  │  │  2. Tìm section AddCors → thêm origin mới                        │ │
+  │  │  3. Restart API                                                    │ │
+  │  │                                                                    │ │
+  │  │  Code:                                                             │ │
+  │  │  ┌──────────────────────────────────────────────────────────────┐ │ │
+  │  │  │ policy.WithOrigins(                                          │ │ │
+  │  │  │     "http://localhost:5173",                                 │ │ │
+  │  │  │     "http://localhost:5174"  // ← THÊM DÒNG NÀY            │ │ │
+  │  │  │ )                                                            │ │ │
+  │  │  └──────────────────────────────────────────────────────────────┘ │ │
+  │  │                                                                    │ │
+  │  │  📁 File: Program.cs:42                                           │ │
+  │  │  📊 Đã áp dụng thành công: 5 lần (100% success)                  │ │
+  │  │                                                                    │ │
+  │  │  [✅ Áp dụng giải pháp này]  [📋 Copy code]                       │ │
+  │  └────────────────────────────────────────────────────────────────────┘ │
+  │                                                                        │
+  │  ┌─── Giải pháp #2 (Confidence: 70%) ────────────────────────────────┐│
+  │  │  📌 Restart API service — clear cache kết nối                      ││
+  │  │  ...                                                               ││
+  │  │  [✅ Áp dụng]                                                      ││
+  │  └────────────────────────────────────────────────────────────────────┘│
+  │                                                                        │
+  │  ─────────── Hoặc ──────────────                                      │
+  │                                                                        │
+  │  ┌─── Thêm giải pháp mới (Knowledge Base) ──────────────────────────┐│
+  │  │  Tiêu đề: [_________________________________]                     ││
+  │  │  Mô tả:   [_________________________________]                     ││
+  │  │  Code:    [_________________________________]                     ││
+  │  │  File:    [_________________________________]                     ││
+  │  │  Tags:    [_________________________________]                     ││
+  │  │                                                                    ││
+  │  │  [💾 Lưu vào Knowledge Base]                                       ││
+  │  └────────────────────────────────────────────────────────────────────┘│
+  └────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>12.5 Trang Knowledge Base (Quản lý giải pháp)</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ADMIN — /admin/error-resolutions (Knowledge Base)                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  📚 Knowledge Base — Giải Pháp Khắc Phục Lỗi      [+ Thêm Giải Pháp]   │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                          │
+  │  🔍 Tìm kiếm: [________________]   Tags: [CORS ▼] [API ▼] [DB ▼]     │
+  │                                                                          │
+  │  ┌──────────────────────────────────────────────────────────────────────┐│
+  │  │ #  │ Tiêu đề              │ Category  │ Áp dụng │ Success │ Actions  ││
+  │  │────┼──────────────────────┼───────────┼─────────┼─────────┼──────── ││
+  │  │ 1  │ Fix CORS error       │ NETWORK   │ 12 lần  │ 100%    │ [✏️][🗑️]││
+  │  │ 2  │ Fix DB connection    │ API_ERROR │ 8 lần   │ 87%     │ [✏️][🗑️]││
+  │  │ 3  │ Fix JWT expired      │ AUTH      │ 15 lần  │ 100%    │ [✏️][🗑️]││
+  │  │ 4  │ Fix 413 Payload      │ API_ERROR │ 5 lần   │ 100%    │ [✏️][🗑️]││
+  │  │ 5  │ Fix upload timeout   │ NETWORK   │ 3 lần   │ 67%     │ [✏️][🗑️]││
+  │  │ ...│                      │           │         │         │          ││
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  Tổng: 24 giải pháp │ Đã áp dụng: 156 lần │ Success rate trung bình: 91% │
+  └─────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>12.6 Seed Data — Giải pháp có sẵn (Common Fixes)</h3>
+    <pre><code>-- Seed các giải pháp phổ biến nhất vào Knowledge Base
+INSERT INTO "ErrorResolutions" ("Id", "ErrorPattern", "CategoryMatch", "StatusCodeMatch", "Title", "Description", "Solution", "CodeSnippet", "AffectedFile", "Tags") VALUES
+
+-- 1. CORS Error
+(gen_random_uuid(), 'CORS', 'NETWORK', NULL,
+ 'Fix CORS error — Origin không được phép',
+ 'Browser chặn request do origin chưa khai báo trong CORS policy.',
+ '1. Mở file Program.cs\n2. Tìm section builder.Services.AddCors\n3. Thêm origin mới vào WithOrigins()\n4. Restart API',
+ 'policy.WithOrigins(\n    "http://localhost:5173",\n    "http://localhost:5174",\n    "http://192.168.1.100"\n)',
+ 'xomtruyen.API/Program.cs',
+ ARRAY['cors', 'network', 'browser']),
+
+-- 2. DB Connection Refused
+(gen_random_uuid(), 'connection refused', 'API_ERROR', 500,
+ 'Fix lỗi kết nối PostgreSQL (Connection Refused)',
+ 'API không kết nối được database. PostgreSQL chưa chạy hoặc connection string sai.',
+ '1. Kiểm tra PostgreSQL service: net start postgresql-x64-16\n2. Kiểm tra connection string trong appsettings.json\n3. Kiểm tra pg_hba.conf cho phép kết nối\n4. Test: psql -U postgres -d xomtruyen_db',
+ '"ConnectionStrings": {\n    "DefaultConnection": "Host=localhost;Port=5432;Database=xomtruyen_db;Username=postgres;Password=YourPassword"\n}',
+ 'xomtruyen.API/appsettings.json',
+ ARRAY['database', 'postgresql', 'connection']),
+
+-- 3. JWT Token Expired
+(gen_random_uuid(), '401', 'AUTH', 401,
+ 'Fix lỗi 401 Unauthorized — Token hết hạn',
+ 'JWT token đã hết hạn hoặc không hợp lệ. User cần đăng nhập lại.',
+ '1. Frontend: xóa token trong sessionStorage\n2. Redirect về /login\n3. Nếu lỗi liên tục: kiểm tra JWT:Key trong appsettings.json có khớp không\n4. Kiểm tra ExpireMinutes trong TokenService',
+ 'sessionStorage.removeItem("accessToken");\nwindow.location.href = "/login";',
+ 'xomtruyen-admin/src/api/userApi.ts',
+ ARRAY['auth', 'jwt', 'token', '401']),
+
+-- 4. 413 Payload Too Large
+(gen_random_uuid(), '413', 'API_ERROR', 413,
+ 'Fix lỗi 413 — File upload quá giới hạn dung lượng',
+ 'File upload vượt quá giới hạn Kestrel/Nginx. Cần tăng limit.',
+ '1. Backend: Kiểm tra [RequestSizeLimit(524288000)] trên Controller\n2. Program.cs: builder.WebHost.ConfigureKestrel → MaxRequestBodySize = 524288000\n3. Nginx: client_max_body_size 500M;\n4. Restart cả API + Nginx',
+ '// Program.cs\nbuilder.WebHost.ConfigureKestrel(options => {\n    options.Limits.MaxRequestBodySize = 524288000; // 500MB\n});\n\n// nginx.conf\nclient_max_body_size 500M;',
+ 'xomtruyen.API/Program.cs + nginx.conf',
+ ARRAY['upload', '413', 'file', 'nginx', 'kestrel']),
+
+-- 5. Cannot read properties of null
+(gen_random_uuid(), 'Cannot read properties of null', 'REACT_CRASH', NULL,
+ 'Fix React crash — Truy cập property của null/undefined',
+ 'Component đang truy cập .map() hoặc .property trên giá trị null. Data chưa load xong hoặc API trả rỗng.',
+ '1. Thêm optional chaining: data?.items?.map(...)\n2. Thêm null check: if (!data) return <Loading />\n3. Set default value: useState<Item[]>([])\n4. Kiểm tra API response có trả đúng format không',
+ '// Trước (crash):\ndata.items.map(item => ...)\n\n// Sau (safe):\ndata?.items?.map(item => ...) || []',
+ NULL,
+ ARRAY['react', 'null', 'crash', 'undefined']),
+
+-- 6. Network timeout
+(gen_random_uuid(), 'timeout', 'NETWORK', NULL,
+ 'Fix lỗi Network Timeout — Request quá lâu',
+ 'API mất quá lâu để response (>30s). Có thể do query nặng, DB lock, hoặc file upload lớn.',
+ '1. Kiểm tra API có đang chạy: curl http://localhost:5000/api/system/health\n2. Nếu upload file: tăng timeout axios: { timeout: 300000 }\n3. Nếu query nặng: kiểm tra DB index, optimize query\n4. Kiểm tra BackgroundWorker có bị block thread không',
+ '// Axios config:\naxios.create({\n    baseURL: "http://localhost:5172/api",\n    timeout: 60000, // 60 giây\n})',
+ 'xomtruyen-admin/src/api/userApi.ts',
+ ARRAY['timeout', 'network', 'slow', 'performance']),
+
+-- 7. EF Migration pending
+(gen_random_uuid(), 'relation.*does not exist', 'API_ERROR', 500,
+ 'Fix lỗi DB table không tồn tại — Chưa chạy Migration',
+ 'Bảng DB chưa được tạo do chưa chạy EF migration sau khi thêm entity mới.',
+ '1. cd xomtruyen.API\n2. dotnet ef migrations add <TenMigration>\n3. dotnet ef database update\n4. Restart API',
+ '# Trong terminal:\ncd xomtruyen.API\ndotnet ef database update\n\n# Nếu cần tạo migration mới:\ndotnet ef migrations add AddNewTable',
+ 'xomtruyen.API/',
+ ARRAY['database', 'migration', 'table', 'entity-framework']);
+</code></pre>
+
+    <h3>12.7 Auto-Fix Actions (tùy chọn nâng cao)</h3>
+    <div class="section-card">
+        <h4>Một số lỗi có thể auto-fix mà không cần admin can thiệp thủ công:</h4>
+        <table>
+            <thead><tr><th>Lỗi</th><th>Auto-Fix Action</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr><td>Token expired (401)</td><td>Auto-refresh token hoặc redirect login</td><td>Frontend script</td></tr>
+                <tr><td>DB connection lost</td><td>Retry connection 3 lần → restart service nếu vẫn fail</td><td>Backend retry</td></tr>
+                <tr><td>Worker queue stuck</td><td>Clear stuck tasks + restart worker</td><td>API call</td></tr>
+                <tr><td>Disk space low</td><td>Auto-cleanup temp files older than 7 days</td><td>Command</td></tr>
+                <tr><td>CDN timeout</td><td>Switch to backup CDN URL</td><td>Config change</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>12.8 API Endpoints — Resolution Module</h3>
+    <table>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td>GET</td><td>/api/admin/error-resolutions</td><td>Danh sách Knowledge Base (filter category, tags, search)</td></tr>
+            <tr><td>GET</td><td>/api/admin/error-resolutions/{id}</td><td>Chi tiết 1 giải pháp</td></tr>
+            <tr><td>POST</td><td>/api/admin/error-resolutions</td><td>Thêm giải pháp mới vào KB</td></tr>
+            <tr><td>PUT</td><td>/api/admin/error-resolutions/{id}</td><td>Cập nhật giải pháp</td></tr>
+            <tr><td>DELETE</td><td>/api/admin/error-resolutions/{id}</td><td>Xóa giải pháp</td></tr>
+            <tr><td>GET</td><td>/api/admin/error-logs/{errorId}/suggestions</td><td>Lấy đề xuất giải pháp cho 1 lỗi cụ thể</td></tr>
+            <tr><td>POST</td><td>/api/admin/error-logs/{errorId}/apply-resolution</td><td>Áp dụng giải pháp + mark resolved</td></tr>
+            <tr><td>POST</td><td>/api/admin/error-resolutions/{id}/auto-fix</td><td>Trigger auto-fix (nếu có)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>12.9 Files cần tạo thêm (Resolution Module)</h3>
+    <table>
+        <thead><tr><th>File</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td><code>src/pages/ErrorResolutions.tsx</code></td><td>Trang Knowledge Base CRUD</td></tr>
+            <tr><td><code>src/components/ResolutionPanel.tsx</code></td><td>Panel đề xuất giải pháp trong Error Detail modal</td></tr>
+            <tr><td><code>src/components/AddResolutionForm.tsx</code></td><td>Form thêm giải pháp mới</td></tr>
+            <tr><td><code>src/api/errorResolutionApi.ts</code></td><td>API module cho resolution CRUD</td></tr>
+            <tr><td><code>Controllers/ErrorResolutionController.cs</code></td><td>Backend CRUD + suggestion logic</td></tr>
+            <tr><td><code>Services/ErrorResolutionService.cs</code></td><td>Pattern matching + suggestion engine</td></tr>
+        </tbody>
+    </table>
 
     <hr style="border-color: #333; margin: 50px 0;">
     <p style="color: #666; text-align: center; font-size: 0.85em;">
