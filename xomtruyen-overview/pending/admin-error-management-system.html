@@ -65,6 +65,7 @@
         <a href="#database">10. Database Schema (Error Logs)</a>
         <a href="#implementation">11. Tổng Hợp Files & Triển Khai</a>
         <a href="#resolution">12. Module Giải Pháp Khắc Phục Lỗi (Knowledge Base + Auto-Suggest)</a>
+        <a href="#prevention">13. Kỹ Năng & Quy Tắc Phát Triển Phòng Tránh Lỗi (Prevention Skills)</a>
     </div>
 
     <!-- 1. HIỆN TRẠNG -->
@@ -1395,8 +1396,402 @@ INSERT INTO "ErrorResolutions" ("Id", "ErrorPattern", "CategoryMatch", "StatusCo
     </table>
 
     <hr style="border-color: #333; margin: 50px 0;">
+
+    <!-- 13. PREVENTION SKILLS -->
+    <h2 id="prevention">13. Kỹ Năng & Quy Tắc Phát Triển Phòng Tránh Lỗi (Prevention Skills)</h2>
+
+    <div class="note">
+        <strong>💡 Nguyên tắc:</strong> "Fix bug tốn gấp 10 lần so với phòng ngừa." Module này định nghĩa các kỹ năng, coding conventions, và checklist mà developer phải tuân thủ để <strong>ngăn lỗi từ gốc</strong> thay vì chữa lỗi khi đã xảy ra.
+    </div>
+
+    <h3>13.1 Defensive Coding — Viết code phòng thủ</h3>
+
+    <table>
+        <thead><tr><th>Skill</th><th>Mô tả</th><th>Code Ví Dụ (Sai → Đúng)</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Null-safe access</strong></td>
+                <td>LUÔN dùng optional chaining (?.) khi truy cập nested object từ API response</td>
+                <td><code>❌ data.items.map()</code><br><code>✅ data?.items?.map() ?? []</code></td>
+            </tr>
+            <tr>
+                <td><strong>Default values</strong></td>
+                <td>State luôn có giá trị mặc định hợp lệ (không để undefined)</td>
+                <td><code>❌ const [data, setData] = useState()</code><br><code>✅ const [data, setData] = useState&lt;IBook[]&gt;([])</code></td>
+            </tr>
+            <tr>
+                <td><strong>Type guards</strong></td>
+                <td>Kiểm tra type trước khi thao tác — đặc biệt với data từ API</td>
+                <td><code>❌ items.length</code><br><code>✅ Array.isArray(items) ? items.length : 0</code></td>
+            </tr>
+            <tr>
+                <td><strong>Error boundaries per route</strong></td>
+                <td>Bọc ErrorBoundary cho từng route, không chỉ toàn app — 1 page crash không ảnh hưởng page khác</td>
+                <td><code>✅ &lt;Route path="/books" element={&lt;ErrorBoundary&gt;&lt;Books/&gt;&lt;/ErrorBoundary&gt;} /&gt;</code></td>
+            </tr>
+            <tr>
+                <td><strong>API response validation</strong></td>
+                <td>Luôn kiểm tra response trước khi dùng — không assume API luôn trả đúng format</td>
+                <td><code>❌ setData(res.data)</code><br><code>✅ setData(res?.data ?? []) // + check totalCount</code></td>
+            </tr>
+            <tr>
+                <td><strong>Graceful degradation</strong></td>
+                <td>Nếu 1 phần fail → phần còn lại vẫn hoạt động. Không để toàn trang chết.</td>
+                <td><code>✅ {chart error? &lt;ChartFallback/&gt; : &lt;RealChart/&gt;}</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>13.2 API Integration — Quy tắc gọi API an toàn</h3>
+
+    <div class="section-card">
+        <h4>Checklist cho MỖI API call trong admin:</h4>
+        <ol>
+            <li><strong>Wrap trong try/catch</strong> — KHÔNG BAO GIỜ để promise unhandled</li>
+            <li><strong>Loading state</strong> — Hiện skeleton/spinner khi đang fetch, disable buttons khi đang submit</li>
+            <li><strong>Error state</strong> — Hiện message rõ ràng khi API fail (toast + log vào errorService)</li>
+            <li><strong>Empty state</strong> — Hiện UI "Không có dữ liệu" khi API trả mảng rỗng (không blank trắng)</li>
+            <li><strong>Timeout handling</strong> — Set timeout cho mọi request (60s default, 300s cho upload)</li>
+            <li><strong>Cancel on unmount</strong> — Dùng AbortController để cancel request khi user navigate away</li>
+            <li><strong>Optimistic rollback</strong> — Nếu optimistic update fail → rollback state về trước</li>
+        </ol>
+    </div>
+
+    <div class="code-title">� Pattern mẫu cho API call an toàn</div>
+    <pre><code>// ✅ PATTERN CHUẨN — Mọi page nên theo pattern này:
+
+const [data, setData] = useState&lt;IBook[]&gt;([]);       // Default rỗng, KHÔNG undefined
+const [isLoading, setIsLoading] = useState(true);      // Loading ngay từ đầu
+const [error, setError] = useState&lt;string | null&gt;(null);
+
+useEffect(() => {
+    const controller = new AbortController();           // Cancel on unmount
+    
+    const fetchData = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const res = await getBooks({ page: 1 }, { signal: controller.signal });
+            setData(res?.data ?? []);                   // Null-safe + default
+        } catch (err: any) {
+            if (err.name === 'CanceledError') return;  // Bỏ qua nếu canceled
+            setError(err.message || 'Có lỗi xảy ra');
+            errorService.captureApiError(err);         // Ghi log tập trung
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    fetchData();
+    return () => controller.abort();                    // Cleanup
+}, []);
+
+// Trong JSX:
+{isLoading ? &lt;TableSkeleton /&gt; :
+ error ? &lt;ErrorMessage message={error} onRetry={refetch} /&gt; :
+ data.length === 0 ? &lt;EmptyState /&gt; :
+ &lt;DataTable data={data} /&gt;}</code></pre>
+
+    <h3>13.3 Form Validation — Ngăn lỗi từ input</h3>
+
+    <table>
+        <thead><tr><th>Quy tắc</th><th>Mô tả</th><th>Ví dụ</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Client-side validate trước</strong></td>
+                <td>Validate ở frontend TRƯỚC khi gửi API → giảm request thừa, UX nhanh hơn</td>
+                <td>Email format, required fields, min/max length, number range</td>
+            </tr>
+            <tr>
+                <td><strong>Server-side validate LẠI</strong></td>
+                <td>KHÔNG BAO GIỜ tin client → backend phải validate lại 100%</td>
+                <td>[Required], [MaxLength], [Range] attributes trên DTO</td>
+            </tr>
+            <tr>
+                <td><strong>Disable submit khi invalid</strong></td>
+                <td>Button submit disable khi form chưa valid → ngăn double submit</td>
+                <td><code>disabled={!isValid || isSubmitting}</code></td>
+            </tr>
+            <tr>
+                <td><strong>Trim input</strong></td>
+                <td>Trim whitespace trước khi gửi — tránh " email@test.com " lỗi</td>
+                <td><code>email.trim()</code> trước khi POST</td>
+            </tr>
+            <tr>
+                <td><strong>Hiện lỗi cạnh field</strong></td>
+                <td>Error message hiện ngay dưới field lỗi (không chỉ toast chung chung)</td>
+                <td>Inline error: "Email đã tồn tại" dưới ô email</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>13.4 State Management — Tránh lỗi race condition</h3>
+
+    <div class="section-card">
+        <h4>Các lỗi phổ biến và cách phòng ngừa:</h4>
+        <table>
+            <thead><tr><th>Lỗi</th><th>Nguyên nhân</th><th>Skill phòng tránh</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>Stale closure</td>
+                    <td>useEffect/callback đọc state cũ</td>
+                    <td>Dùng <code>useRef</code> cho giá trị cần fresh, hoặc dependency array đúng</td>
+                </tr>
+                <tr>
+                    <td>Race condition</td>
+                    <td>2 API calls đồng thời, response cũ đè response mới</td>
+                    <td>AbortController cancel request cũ khi có request mới, hoặc dùng request ID check</td>
+                </tr>
+                <tr>
+                    <td>Memory leak</td>
+                    <td>setState sau khi component unmounted</td>
+                    <td>Cleanup trong useEffect return, AbortController, mounted ref check</td>
+                </tr>
+                <tr>
+                    <td>Infinite re-render</td>
+                    <td>useEffect dependency là object/array mới mỗi render</td>
+                    <td>useMemo/useCallback cho complex objects, primitive deps, JSON.stringify compare</td>
+                </tr>
+                <tr>
+                    <td>Double submit</td>
+                    <td>User click nút 2 lần nhanh → 2 request</td>
+                    <td><code>isSubmitting</code> state + disable button + debounce</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>13.5 TypeScript — Tận dụng type system ngăn lỗi compile-time</h3>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>❌ Sai (loose types)</h4>
+            <pre><code>// Không có type → runtime crash
+const [data, setData] = useState(null);
+const book: any = response.data;
+book.nonExistentProp.crash;
+
+// Không check union type
+function handle(status: string) {
+  // "Active" hay "active"? Typo → bug
+}</code></pre>
+        </div>
+        <div class="section-card">
+            <h4>✅ Đúng (strict types)</h4>
+            <pre><code>// Type rõ ràng → IDE cảnh báo ngay
+const [data, setData] = useState&lt;IBook[]&gt;([]);
+const book: IBook = response.data;
+// book.xyz → TS error ngay!
+
+// Enum / union literal
+type BookStatus = 'Active' | 'On Hold' | 'Archived';
+function handle(status: BookStatus) {
+  // Typo → compile error
+}</code></pre>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h4>tsconfig.json — Bật strict mode (phát hiện lỗi sớm)</h4>
+        <pre><code>{
+  "compilerOptions": {
+    "strict": true,                    // Bật TẤT CẢ strict checks
+    "noUncheckedIndexedAccess": true,  // array[0] có thể undefined
+    "noImplicitAny": true,             // Cấm dùng any ngầm
+    "strictNullChecks": true,          // null/undefined phải check
+    "noUnusedLocals": true,            // Cấm biến thừa
+    "noUnusedParameters": true         // Cấm param thừa
+  }
+}</code></pre>
+    </div>
+
+    <h3>13.6 Git & Code Review — Ngăn lỗi trước khi merge</h3>
+
+    <table>
+        <thead><tr><th>Skill</th><th>Mô tả</th><th>Tool/Command</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Pre-commit lint</strong></td>
+                <td>ESLint chạy tự động trước mỗi commit → block commit nếu có error</td>
+                <td><code>husky</code> + <code>lint-staged</code></td>
+            </tr>
+            <tr>
+                <td><strong>Type check CI</strong></td>
+                <td>TypeScript compile check trong CI → block merge nếu type error</td>
+                <td><code>tsc --noEmit</code> trong pipeline</td>
+            </tr>
+            <tr>
+                <td><strong>Build trước deploy</strong></td>
+                <td>LUÔN chạy <code>npm run build</code> trước deploy — build sẽ bắt nhiều lỗi runtime</td>
+                <td><code>vite build</code> (fail = có error)</td>
+            </tr>
+            <tr>
+                <td><strong>Small PRs</strong></td>
+                <td>PR nhỏ (< 300 dòng) dễ review, dễ phát hiện bug, dễ rollback</td>
+                <td>Chia task thành nhiều PR nhỏ</td>
+            </tr>
+            <tr>
+                <td><strong>Test sau mỗi feature</strong></td>
+                <td>Manual test tất cả happy path + edge cases trước khi commit</td>
+                <td>Checklist test (file testing-api-client-guide.html)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>13.7 Backend — Ngăn lỗi từ API layer</h3>
+
+    <div class="section-card">
+        <h4>Checklist cho mỗi API endpoint (.NET):</h4>
+        <ol>
+            <li><strong>Input validation</strong> — [Required], [MaxLength], [Range] trên mọi DTO property</li>
+            <li><strong>ModelState check</strong> — <code>if (!ModelState.IsValid) return BadRequest(ModelState)</code></li>
+            <li><strong>Null check entity</strong> — <code>var book = await _db.Books.FindAsync(id); if (book == null) return NotFound();</code></li>
+            <li><strong>Try-catch cho external calls</strong> — DB, file system, external API → wrap trong try-catch</li>
+            <li><strong>Trả response chuẩn</strong> — Luôn return <code>ApiResponse&lt;T&gt;</code> với success/message/data — KHÔNG throw raw exception ra client</li>
+            <li><strong>Log meaningful info</strong> — Log đủ context: userId, endpoint, params, error. KHÔNG log sensitive data (password, token)</li>
+            <li><strong>Idempotent operations</strong> — PUT/DELETE phải idempotent (gọi nhiều lần = kết quả như gọi 1 lần)</li>
+            <li><strong>Pagination protection</strong> — Giới hạn pageSize tối đa (≤100) — ngăn client request 1 triệu rows</li>
+        </ol>
+    </div>
+
+    <pre><code>// ✅ Controller endpoint chuẩn (phòng lỗi tối đa):
+
+[HttpPut("{id}")]
+[Authorize(Roles = "Admin,Editor")]
+public async Task&lt;IActionResult&gt; UpdateBook(Guid id, [FromBody] UpdateBookRequest request)
+{
+    // 1. Validate input
+    if (!ModelState.IsValid)
+        return BadRequest(ApiResponse.Error(ModelState.GetErrors()));
+
+    // 2. Check entity exists
+    var book = await _db.Publications.FindAsync(id);
+    if (book == null)
+        return NotFound(ApiResponse.Error($"Sách với ID {id} không tồn tại"));
+
+    // 3. Business logic (wrapped)
+    try
+    {
+        book.Title = request.Title.Trim();      // Trim input
+        book.Author = request.Author.Trim();
+        book.UpdatedAt = DateTime.UtcNow;
+        book.UpdatedBy = GetCurrentUserId();
+        
+        await _db.SaveChangesAsync();
+        
+        _logger.LogInformation("Book {BookId} updated by {UserId}", id, GetCurrentUserId());
+        return Ok(ApiResponse.Ok("Cập nhật thành công"));
+    }
+    catch (DbUpdateException ex)
+    {
+        _logger.LogError(ex, "DB error updating book {BookId}", id);
+        return StatusCode(500, ApiResponse.Error("Lỗi cập nhật database"));
+    }
+}</code></pre>
+
+    <h3>13.8 Monitoring & Alerting — Phát hiện sớm trước khi thành disaster</h3>
+
+    <div class="section-card">
+        <h4>Các metric cần theo dõi liên tục:</h4>
+        <table>
+            <thead><tr><th>Metric</th><th>Ngưỡng Warning</th><th>Ngưỡng Critical</th><th>Hành động</th></tr></thead>
+            <tbody>
+                <tr><td>API response time (avg)</td><td>> 500ms</td><td>> 2000ms</td><td>Check DB query, optimize indexes</td></tr>
+                <tr><td>Error rate (5xx/total)</td><td>> 1%</td><td>> 5%</td><td>Check logs, rollback nếu cần</td></tr>
+                <tr><td>Disk usage</td><td>> 80%</td><td>> 95%</td><td>Cleanup temp files, archive old uploads</td></tr>
+                <tr><td>Memory usage (.NET process)</td><td>> 1GB</td><td>> 2GB</td><td>Check memory leak, restart service</td></tr>
+                <tr><td>DB connection pool</td><td>> 80% used</td><td>Pool exhausted</td><td>Close idle connections, increase pool size</td></tr>
+                <tr><td>Background queue size</td><td>> 50 tasks</td><td>> 200 tasks</td><td>Scale worker, check stuck tasks</td></tr>
+                <tr><td>Failed login attempts</td><td>> 10/phút from 1 IP</td><td>> 50/phút</td><td>Rate limit, block IP</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>13.9 Checklist Trước Khi Deploy (Pre-deployment)</h3>
+
+    <div class="section-card">
+        <pre><code>╔════════════════════════════════════════════════════════════════╗
+║  PRE-DEPLOYMENT CHECKLIST — Chạy trước MỖI lần deploy        ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  FRONTEND:                                                     ║
+║  ☐ npm run build thành công (0 errors)                        ║
+║  ☐ Không có console.error/warning trong build output          ║
+║  ☐ .env.production đúng API URL                               ║
+║  ☐ Test manual: đăng nhập, CRUD 1 entity, upload file        ║
+║  ☐ Check responsive (mobile 375px)                            ║
+║  ☐ Check dark mode (nếu có)                                   ║
+║                                                                ║
+║  BACKEND:                                                      ║
+║  ☐ dotnet build thành công (0 errors, 0 warnings)            ║
+║  ☐ EF migrations up to date (dotnet ef database update)       ║
+║  ☐ appsettings.Production.json đúng connection string         ║
+║  ☐ CORS allowed origins đúng domain production                ║
+║  ☐ JWT secret ≥ 32 ký tự, khác với dev                       ║
+║  ☐ Health check endpoint accessible: /api/admin/health        ║
+║                                                                ║
+║  INFRASTRUCTURE:                                               ║
+║  ☐ PostgreSQL service running                                  ║
+║  ☐ Nginx config syntax OK (nginx -t)                          ║
+║  ☐ Firewall ports mở (80, 443, 5000)                          ║
+║  ☐ SSL cert valid (nếu có HTTPS)                              ║
+║  ☐ Disk space > 20% free                                      ║
+║  ☐ Backup DB trước khi deploy                                 ║
+║                                                                ║
+║  POST-DEPLOY:                                                  ║
+║  ☐ Truy cập web client → load trang chủ OK                   ║
+║  ☐ Truy cập admin → login OK                                  ║
+║  ☐ API health check → tất cả services UP                     ║
+║  ☐ Error log dashboard → không có critical error mới          ║
+║  ☐ Monitor 15 phút → error rate < 1%                         ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝</code></pre>
+    </div>
+
+    <h3>13.10 Tóm tắt — Skills phòng tránh lỗi theo layer</h3>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PREVENTION SKILLS BY LAYER                                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── LAYER 1: CODING (Developer) ─────────────────────────────────────────┐
+  │  • Null-safe access (?.)                                                  │
+  │  • TypeScript strict mode                                                 │
+  │  • Default values cho state                                               │
+  │  • Try-catch mọi async operation                                          │
+  │  • Input validation (client + server)                                     │
+  │  • Cancel request on unmount                                              │
+  └───────────────────────────────────────────────────────────────────────────┘
+                          │
+  ┌─── LAYER 2: BUILD (CI/CD) ──────────────────────────────────────────────┐
+  │  • ESLint + TypeScript check trước commit                                 │
+  │  • Build thành công trước deploy                                          │
+  │  • Small PRs, code review                                                 │
+  │  • Pre-deployment checklist                                               │
+  └───────────────────────────────────────────────────────────────────────────┘
+                          │
+  ┌─── LAYER 3: RUNTIME (Production) ──────────────────────────────────────┐
+  │  • Error Boundary (catch crash)                                           │
+  │  • Centralized error logging                                              │
+  │  • Auto-retry transient failures                                          │
+  │  • Health check monitoring                                                │
+  │  • Alert thresholds (response time, error rate)                          │
+  └───────────────────────────────────────────────────────────────────────────┘
+                          │
+  ┌─── LAYER 4: RECOVERY (Post-incident) ──────────────────────────────────┐
+  │  • Knowledge Base (giải pháp đã biết)                                     │
+  │  • Auto-suggest fix                                                       │
+  │  • Auto-fix scripts                                                       │
+  │  • Post-mortem → cập nhật prevention rules                               │
+  └───────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+
+    <hr style="border-color: #333; margin: 50px 0;">
     <p style="color: #666; text-align: center; font-size: 0.85em;">
         📄 Tài liệu Module Quản Lý Lỗi (Error Management System) — Xóm Truyện Admin<br>
+        Bao gồm: Error Boundary, Error Log, Health Check, Knowledge Base, Prevention Skills<br>
         Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
         Cập nhật: Tháng 8/2026
     </p>
