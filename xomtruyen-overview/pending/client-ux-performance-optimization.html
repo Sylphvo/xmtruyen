@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen Client — Tối Ưu UX & Performance (Dễ Dùng, Không Giật, Không Rối)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.8; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px; border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-ux { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-perf { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.88em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px; padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff; padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d; padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>⚡ Tối Ưu UX & Performance — Dễ Dùng, Không Giật, Không Rối</h1>
+    <p class="subtitle">
+        <span class="badge badge-ux">UX Optimization</span>
+        <span class="badge badge-perf">Performance</span>
+        Tổng hợp tất cả kỹ thuật tối ưu trải nghiệm người dùng + hiệu năng cho trang Web Client Xóm Truyện
+    </p>
+
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#principles">1. Nguyên Tắc UX: Dễ Dùng, Không Rối</a>
+        <a href="#layout">2. Tối Ưu Layout & Visual Hierarchy</a>
+        <a href="#loading">3. Perceived Performance — Cảm Giác Nhanh</a>
+        <a href="#images">4. Tối Ưu Ảnh (Lazy Load, WebP, CDN)</a>
+        <a href="#bundle">5. Code Splitting & Bundle Optimization</a>
+        <a href="#rendering">6. Tối Ưu React Rendering (Không Giật)</a>
+        <a href="#network">7. Network & Caching Strategy</a>
+        <a href="#interaction">8. Smooth Interactions & Animations</a>
+        <a href="#mobile">9. Mobile Performance & Touch UX</a>
+        <a href="#detail-page">10. Trang Chi Tiết Sách — Layout Chuẩn (Waka-style)</a>
+        <a href="#reading-page">11. Trang Đọc Sách — UX Mượt Mà</a>
+        <a href="#metrics">12. Core Web Vitals & Đo Lường</a>
+        <a href="#checklist">13. Checklist Tối Ưu Toàn Diện</a>
+    </div>
+
+    <!-- 1. NGUYÊN TẮC -->
+    <h2 id="principles">1. Nguyên Tắc UX: Dễ Dùng, Không Rối</h2>
+
+    <div class="grid-3">
+        <div class="section-card" style="text-align:center;">
+            <div style="font-size:2.5em; margin-bottom:8px;">👁️</div>
+            <h4>Nhìn Không Rối</h4>
+            <p style="font-size:0.85em;">Visual hierarchy rõ ràng. Mỗi trang chỉ có 1 action chính. Whitespace đủ rộng.</p>
+        </div>
+        <div class="section-card" style="text-align:center;">
+            <div style="font-size:2.5em; margin-bottom:8px;">🖱️</div>
+            <h4>Dùng Dễ Dàng</h4>
+            <p style="font-size:0.85em;">Tối đa 3 click để đến content. Nút bấm đủ lớn. Label rõ ràng. Không cần hướng dẫn.</p>
+        </div>
+        <div class="section-card" style="text-align:center;">
+            <div style="font-size:2.5em; margin-bottom:8px;">⚡</div>
+            <h4>Không Giật Lag</h4>
+            <p style="font-size:0.85em;">Response < 100ms. Scroll 60fps. Ảnh load mượt. Page transition không blank.</p>
+        </div>
+    </div>
+
+    <h3>1.1 Quy tắc "3 giây" — First Meaningful Paint</h3>
+    <div class="section-card">
+        <ul>
+            <li><strong>< 1 giây:</strong> User cảm thấy "tức thì" → phản hồi ngay (skeleton, optimistic UI)</li>
+            <li><strong>1-3 giây:</strong> User chờ được nhưng cần feedback → loading indicator, progress bar</li>
+            <li><strong>> 3 giây:</strong> User bắt đầu bực → KHÔNG BAO GIỜ cho phép trang load > 3 giây mà không có feedback</li>
+        </ul>
+    </div>
+
+    <h3>1.2 Quy tắc "Ít hơn là Nhiều hơn"</h3>
+    <table>
+        <thead><tr><th>Nguyên tắc</th><th>Áp dụng</th><th>Ví dụ Xóm Truyện</th></tr></thead>
+        <tbody>
+            <tr><td>Ẩn bớt, hiện khi cần</td><td>Không hiện 20 nút cùng lúc — ẩn vào menu/dropdown</td><td>Trang đọc: chỉ hiện nội dung + ẩn toolbar → tap/hover để hiện</td></tr>
+            <tr><td>Progressive disclosure</td><td>Hiện thông tin quan trọng trước, chi tiết sau</td><td>Trang detail: tên + cover + nút đọc → cuộn thêm = mô tả + chương + review</td></tr>
+            <tr><td>Consistent patterns</td><td>Cùng 1 hành động → cùng 1 cách thao tác ở mọi nơi</td><td>Nút "Đọc" luôn cùng vị trí, cùng màu ở mọi trang</td></tr>
+            <tr><td>Clear feedback</td><td>Mọi action phải có response rõ ràng</td><td>Click bookmark → icon đổi màu + toast "Đã lưu" (không im lặng)</td></tr>
+            <tr><td>Forgiving UI</td><td>Dễ undo, dễ quay lại, không sợ bấm nhầm</td><td>Confirm trước khi xóa. Back button luôn accessible.</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 2. LAYOUT -->
+    <h2 id="layout">2. Tối Ưu Layout & Visual Hierarchy</h2>
+
+    <h3>2.1 Trang chủ — Layout Grid rõ ràng</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TRANG CHỦ — VISUAL HIERARCHY (từ trên → dưới)                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── HEADER (sticky, 60px) ──────────────────────────────────────────────┐
+  │  Logo   [Search bar ___________]   [🔔] [Avatar]                       │
+  │  ← Compact, không chiếm nhiều space, search luôn accessible           │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── HERO SECTION (optional, có thể ẩn) ─────────────────────────────────┐
+  │  Banner đề xuất / Truyện hot / Event (auto-slide, max 3 slides)        │
+  │  ← Max 250px height, không quá to chiếm viewport                      │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── SECTION: Sách Mới ──────────────────────────────────────────────────┐
+  │  Title: "Sách Mới Cập Nhật"                          [Xem tất cả →]   │
+  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐                          │
+  │  │book│ │book│ │book│ │book│ │book│ │book│  ← Horizontal scroll      │
+  │  │card│ │card│ │card│ │card│ │card│ │card│    hoặc Grid responsive    │
+  │  └────┘ └────┘ └────┘ └────┘ └────┘ └────┘                          │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── SECTION: Truyện Tranh ──────────────────────────────────────────────┐
+  │  Title: "Truyện Tranh"                               [Xem tất cả →]   │
+  │  ← Layout giống section trên → CONSISTENCY                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ← Whitespace giữa sections: 32-48px (đủ thoáng, không dính nhau)
+  ← Max 4-5 sections trên trang chủ (không quá nhiều → overload)
+  ← Footer ở cuối cùng
+    </div>
+
+    <h3>2.2 Quy tắc spacing & typography</h3>
+    <table>
+        <thead><tr><th>Element</th><th>Size / Spacing</th><th>Lý do</th></tr></thead>
+        <tbody>
+            <tr><td>Heading section</td><td>20-24px, bold 700</td><td>Dễ scan, phân biệt với content</td></tr>
+            <tr><td>Body text (đọc sách)</td><td>16-18px, line-height 1.6-1.8</td><td>Đọc lâu không mỏi mắt</td></tr>
+            <tr><td>Card title</td><td>14-15px, semibold 600</td><td>Compact nhưng đọc được</td></tr>
+            <tr><td>Meta text (author, date)</td><td>12-13px, color muted</td><td>Không tranh chấp với title</td></tr>
+            <tr><td>Spacing giữa sections</td><td>40-48px</td><td>Thoáng, rõ phân cách</td></tr>
+            <tr><td>Spacing trong card</td><td>12-16px padding</td><td>Content không bị dồn</td></tr>
+            <tr><td>Border radius</td><td>8-12px</td><td>Mềm mại, hiện đại</td></tr>
+            <tr><td>Max content width</td><td>1200px centered</td><td>Không bị dãn quá rộng trên 4K</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 3. PERCEIVED PERFORMANCE -->
+    <h2 id="loading">3. Perceived Performance — Cảm Giác Nhanh</h2>
+
+    <div class="note">
+        <strong>Nguyên tắc:</strong> User không cần app THẬT SỰ nhanh — chỉ cần CẢM THẤY nhanh. Các kỹ thuật dưới đây tạo cảm giác tức thì dù data chưa load xong.
+    </div>
+
+    <table>
+        <thead><tr><th>Kỹ thuật</th><th>Mô tả</th><th>Khi nào dùng</th><th>Impact</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Skeleton Screen</strong></td>
+                <td>Hiện khung xám shimmer thay vì blank/spinner</td>
+                <td>Mọi trang load data lần đầu</td>
+                <td>User biết content sắp đến → ít bực</td>
+            </tr>
+            <tr>
+                <td><strong>Optimistic UI</strong></td>
+                <td>UI cập nhật ngay trước khi API confirm</td>
+                <td>Bookmark, Like, Vote — action nhẹ</td>
+                <td>Cảm giác tức thì (0ms delay)</td>
+            </tr>
+            <tr>
+                <td><strong>Prefetch data</strong></td>
+                <td>Fetch data trang tiếp trước khi user click</td>
+                <td>Hover link > 200ms → prefetch</td>
+                <td>Chuyển trang không loading</td>
+            </tr>
+            <tr>
+                <td><strong>Instant page transition</strong></td>
+                <td>Content cũ fade out → content mới fade in (không blank giữa)</td>
+                <td>Mọi navigation</td>
+                <td>Không bao giờ thấy trang trắng</td>
+            </tr>
+            <tr>
+                <td><strong>Progressive image</strong></td>
+                <td>Ảnh hiện blur → sắc nét (BlurHash/LQIP)</td>
+                <td>Ảnh bìa sách, ảnh truyện tranh</td>
+                <td>Ảnh "có mặt" ngay, chi tiết tải sau</td>
+            </tr>
+            <tr>
+                <td><strong>Above-the-fold priority</strong></td>
+                <td>Load content trên màn hình trước, dưới fold load sau</td>
+                <td>Trang chủ, detail page</td>
+                <td>Meaningful content hiện trong < 1s</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3.1 Code: Optimistic Bookmark</h3>
+    <div class="code-title">📁 Pattern — Click bookmark → UI đổi ngay, API chạy background</div>
+    <pre><code>const handleBookmark = async () => {
+    // 1. Optimistic: đổi UI ngay lập tức (0ms)
+    setIsBookmarked(prev => !prev);
+    toast.success(isBookmarked ? "Đã bỏ đánh dấu" : "Đã đánh dấu");
+
+    try {
+        // 2. API gọi background
+        await toggleBookmark(chapterId);
+    } catch (err) {
+        // 3. Rollback nếu fail
+        setIsBookmarked(prev => !prev);
+        toast.error("Lỗi — đã hoàn tác");
+    }
+};</code></pre>
+
+    <!-- 4. IMAGES -->
+    <h2 id="images">4. Tối Ưu Ảnh (Lazy Load, WebP, CDN)</h2>
+
+    <div class="section-card">
+        <h4>Ảnh là bottleneck #1 của performance trên trang đọc truyện. Áp dụng:</h4>
+        <ol>
+            <li><strong>Lazy loading (native):</strong> <code>&lt;img loading="lazy" /&gt;</code> — chỉ load ảnh khi gần viewport</li>
+            <li><strong>WebP format:</strong> Convert tất cả ảnh sang WebP (giảm 25-34% so với JPEG)</li>
+            <li><strong>Responsive sizes:</strong> Serve ảnh đúng size theo device (<code>srcset</code> + <code>sizes</code>)</li>
+            <li><strong>CDN caching:</strong> Ảnh serve từ CDN edge (Cloudflare) → latency < 50ms</li>
+            <li><strong>BlurHash placeholder:</strong> Inline tiny blur ảnh (20 bytes) → hiện ngay, ảnh thật load sau</li>
+            <li><strong>Preload critical images:</strong> Cover sách trên detail page → <code>&lt;link rel="preload" as="image"&gt;</code></li>
+        </ol>
+    </div>
+
+    <pre><code>// Component ảnh tối ưu:
+&lt;img
+    src={getImageUrl(book.coverImageUrl, 'medium')}   // 720px cho mobile
+    srcSet={`
+        ${getImageUrl(book.coverImageUrl, 'thumb')} 200w,
+        ${getImageUrl(book.coverImageUrl, 'medium')} 720w,
+        ${getImageUrl(book.coverImageUrl, 'full')} 1200w
+    `}
+    sizes="(max-width: 768px) 200px, 300px"
+    loading="lazy"                                     // Native lazy load
+    decoding="async"                                   // Non-blocking decode
+    alt={book.title}
+    style={{ 
+        aspectRatio: '3/4',                           // Prevent layout shift
+        objectFit: 'cover',
+        backgroundColor: '#e5e7eb'                    // Placeholder color
+    }}
+/&gt;</code></pre>
+
+    <!-- 5. CODE SPLITTING -->
+    <h2 id="bundle">5. Code Splitting & Bundle Optimization</h2>
+
+    <h3>5.1 Route-based code splitting</h3>
+    <pre><code>// App.tsx — Lazy load mỗi page (chỉ load JS khi navigate đến)
+import { lazy, Suspense } from 'react';
+
+const HomePage = lazy(() => import('./pages/index'));
+const BookDetailPage = lazy(() => import('./pages/BookDetailPage'));
+const ReadingPage = lazy(() => import('./pages/ReadingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+
+// Wrap với Suspense + Skeleton fallback:
+&lt;Suspense fallback={&lt;PageSkeleton /&gt;}&gt;
+    &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;HomePage /&gt;} /&gt;
+        &lt;Route path="/book/:id" element={&lt;BookDetailPage /&gt;} /&gt;
+        &lt;Route path="/book/:id/read" element={&lt;ReadingPage /&gt;} /&gt;
+    &lt;/Routes&gt;
+&lt;/Suspense&gt;</code></pre>
+
+    <h3>5.2 Component-level splitting (heavy libraries)</h3>
+    <pre><code>// Chỉ load react-pageflip khi user chọn Magazine effect
+const MagazineFlip = lazy(() => import('./Effects/MagazineFlip'));
+
+// Chỉ load Swiper khi user dùng Slider/Coverflow
+const SliderView = lazy(() => import('./Effects/SliderView'));</code></pre>
+
+    <h3>5.3 Bundle analysis — Loại bỏ bloat</h3>
+    <table>
+        <thead><tr><th>Vấn đề</th><th>Giải pháp</th><th>Giảm size</th></tr></thead>
+        <tbody>
+            <tr><td>Toàn bộ lucide-react icons import</td><td>Tree-shaking: <code>import { Heart } from 'lucide-react'</code> (đã OK)</td><td>~50KB</td></tr>
+            <tr><td>Moment.js (nếu có)</td><td>Thay bằng <code>date-fns</code> hoặc native <code>Intl.DateTimeFormat</code></td><td>~70KB</td></tr>
+            <tr><td>Unused dependencies</td><td>Audit: <code>npx depcheck</code> → remove unused</td><td>Varies</td></tr>
+            <tr><td>Source maps in production</td><td><code>build.sourcemap: false</code> trong vite.config</td><td>Không ảnh hưởng bundle, nhưng giảm deploy size</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 6. REACT RENDERING -->
+    <h2 id="rendering">6. Tối Ưu React Rendering (Không Giật)</h2>
+
+    <h3>6.1 Nguyên tắc: Render ít nhất có thể</h3>
+    <table>
+        <thead><tr><th>Kỹ thuật</th><th>Khi nào dùng</th><th>Code</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><code>React.memo()</code></td>
+                <td>Component nhận props không đổi nhưng parent re-render</td>
+                <td><code>export default React.memo(BookCard)</code></td>
+            </tr>
+            <tr>
+                <td><code>useMemo()</code></td>
+                <td>Tính toán nặng (sort, filter) không đổi giữa renders</td>
+                <td><code>const sorted = useMemo(() =&gt; data.sort(...), [data])</code></td>
+            </tr>
+            <tr>
+                <td><code>useCallback()</code></td>
+                <td>Function truyền xuống child memo'd component</td>
+                <td><code>const handleClick = useCallback(() =&gt; {...}, [deps])</code></td>
+            </tr>
+            <tr>
+                <td>Virtualization</td>
+                <td>List > 100 items (chỉ render items trong viewport)</td>
+                <td>Dùng <code>react-window</code> hoặc IntersectionObserver</td>
+            </tr>
+            <tr>
+                <td><code>startTransition()</code></td>
+                <td>Update không urgent (search filter) → không block UI</td>
+                <td><code>startTransition(() =&gt; setFilteredData(...))</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>6.2 Anti-pattern: Tránh re-render không cần thiết</h3>
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>❌ Gây re-render thừa</h4>
+            <pre><code>// Object mới mỗi render → child re-render
+&lt;BookCard style={{ margin: 10 }} /&gt;
+
+// Function mới mỗi render
+&lt;Button onClick={() => doSomething(id)} /&gt;
+
+// Spread toàn bộ state
+&lt;Component {...state} /&gt;</code></pre>
+        </div>
+        <div class="section-card">
+            <h4>✅ Tối ưu</h4>
+            <pre><code>// Constant style object
+const cardStyle = { margin: 10 };
+&lt;BookCard style={cardStyle} /&gt;
+
+// useCallback
+const handleClick = useCallback(() =&gt; 
+    doSomething(id), [id]);
+
+// Chỉ pass props cần thiết
+&lt;Component title={state.title} /&gt;</code></pre>
+        </div>
+    </div>
+
+    <!-- 7. NETWORK & CACHING -->
+    <h2 id="network">7. Network & Caching Strategy</h2>
+
+    <table>
+        <thead><tr><th>Loại data</th><th>Cache strategy</th><th>Duration</th><th>Invalidation</th></tr></thead>
+        <tbody>
+            <tr><td>Ảnh bìa sách</td><td>CDN + browser cache</td><td>30 ngày</td><td>URL mới khi thay ảnh</td></tr>
+            <tr><td>Ảnh truyện tranh (comic pages)</td><td>CDN + immutable cache</td><td>1 năm</td><td>Ảnh không bao giờ thay đổi</td></tr>
+            <tr><td>API: danh sách sách</td><td>SWR (stale-while-revalidate)</td><td>5 phút</td><td>Revalidate on focus/navigate</td></tr>
+            <tr><td>API: nội dung chương</td><td>Memory cache (React state)</td><td>Session</td><td>Không cache cross-session</td></tr>
+            <tr><td>API: user profile</td><td>Memory + sessionStorage</td><td>Session</td><td>Khi logout</td></tr>
+            <tr><td>Reading settings</td><td>localStorage</td><td>Vĩnh viễn</td><td>User reset manual</td></tr>
+            <tr><td>Static assets (JS, CSS)</td><td>Immutable (content hash)</td><td>1 năm</td><td>Build mới = hash mới</td></tr>
+        </tbody>
+    </table>
+
+    <h3>7.1 SWR Pattern cho data fetch</h3>
+    <pre><code>// Pattern: Hiện data cũ ngay lập tức → fetch mới ở background → update khi xong
+// Thay vì: Loading... → 2 giây → data hiện
+
+const useBookCache = (bookId: string) => {
+    const cacheKey = `book_${bookId}`;
+    const [data, setData] = useState(() => {
+        // 1. Trả ngay data từ cache (cũ nhưng có ngay)
+        const cached = sessionStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : null;
+    });
+
+    useEffect(() => {
+        // 2. Fetch data mới ở background
+        getBookDetail(bookId).then(fresh => {
+            setData(fresh);
+            sessionStorage.setItem(cacheKey, JSON.stringify(fresh));
+        });
+    }, [bookId]);
+
+    return data; // User thấy data ngay (cũ) → update seamless khi có data mới
+};</code></pre>
+
+    <!-- 8. INTERACTIONS -->
+    <h2 id="interaction">8. Smooth Interactions & Animations</h2>
+
+    <div class="section-card">
+        <h4>Quy tắc animation cho UX mượt:</h4>
+        <table>
+            <thead><tr><th>Quy tắc</th><th>Giải thích</th></tr></thead>
+            <tbody>
+                <tr><td>Chỉ animate <code>transform</code> + <code>opacity</code></td><td>2 property này GPU-accelerated, không trigger layout/paint</td></tr>
+                <tr><td>Duration 200-400ms</td><td>Ngắn hơn = giật. Dài hơn = chậm chạp.</td></tr>
+                <tr><td>Ease-out cho entrance, ease-in cho exit</td><td>Tự nhiên: vào nhanh → chậm dần. Ra nhanh dần.</td></tr>
+                <tr><td>Không animate khi <code>prefers-reduced-motion</code></td><td>Accessibility: một số user nhạy với motion</td></tr>
+                <tr><td>Animation có MỤC ĐÍCH</td><td>Mọi animation phải giúp user hiểu context (không chỉ đẹp)</td></tr>
+                <tr><td>60fps minimum</td><td>< 60fps = user thấy giật. Test bằng Chrome DevTools Performance.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 9. MOBILE -->
+    <h2 id="mobile">9. Mobile Performance & Touch UX</h2>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>📱 Touch targets</h4>
+            <ul>
+                <li>Nút bấm tối thiểu <strong>44×44px</strong> (Apple HIG)</li>
+                <li>Spacing giữa buttons ≥ 8px</li>
+                <li>Swipe areas đủ rộng (không bị tap nhầm)</li>
+                <li>Bottom navigation: nút quan trọng nhất ở giữa (thumb zone)</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>⚡ Mobile performance</h4>
+            <ul>
+                <li>Initial JS bundle < 200KB gzipped</li>
+                <li>Ảnh mobile: serve 720px max (không 1080p)</li>
+                <li><code>font-display: swap</code> → text hiện trước, font load sau</li>
+                <li>Giảm DOM nodes (< 1500 per page)</li>
+                <li>Passive scroll listeners: <code>{ passive: true }</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 10. DETAIL PAGE -->
+    <h2 id="detail-page">10. Trang Chi Tiết Sách — Layout Chuẩn (Waka-style)</h2>
+
+    <div class="note">
+        <strong>Tham khảo:</strong> Layout của Waka.vn / Kindle / Google Play Books. Tổ chức thông tin theo thứ tự ưu tiên: Cover + CTA → Tabs (Giới thiệu / Mục lục / Đánh giá) → Sách tương tự.
+    </div>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TRANG CHI TIẾT SÁCH — LAYOUT TỐI ƯU (Waka-style)                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── ABOVE THE FOLD (thấy ngay, không cần cuộn) ────────────────────────┐
+  │                                                                         │
+  │  [← Back]                                                               │
+  │                                                                         │
+  │  ┌─────────┐   📖 Tên Sách                                            │
+  │  │         │   ✍️ Tác giả                                              │
+  │  │  COVER  │   ⭐ 4.5/5 (128 đánh giá)                                │
+  │  │  IMAGE  │                                                            │
+  │  │ (200px) │   🏷️ [Miễn phí] hoặc [VIP 💎] hoặc [Hội viên]           │
+  │  │         │   📂 Thể loại: Tiên Hiệp, Huyền Huyễn                    │
+  │  │         │   📄 120 chương • 2.5M lượt đọc                          │
+  │  └─────────┘                                                            │
+  │                                                                         │
+  │  ┌────────────────────────────────────────────────────────────────────┐│
+  │  │ [📖 Đọc Sách]  [🎧 Nghe Sách]  [❤️]  [🔖]  [📤 Chia sẻ]        ││
+  │  └────────────────────────────────────────────────────────────────────┘│
+  │                                                                         │
+  │  ← Nút "Đọc Sách" = primary CTA, lớn nhất, nổi bật nhất              │
+  │  ← Nếu đang đọc dở: hiện progress "Tiếp tục chương 12 (42%)"        │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── TABS (sticky khi cuộn qua) ─────────────────────────────────────────┐
+  │  [📝 Giới thiệu]  [📋 Mục lục (120)]  [⭐ Đánh giá (128)]            │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── TAB: GIỚI THIỆU ────────────────────────────────────────────────────┐
+  │  Mô tả ngắn (max 4 dòng) + [Xem thêm ▼]                              │
+  │  ─────────────────────                                                  │
+  │  Thông tin chi tiết:                                                    │
+  │  • Ngôn ngữ: Tiếng Việt                                                │
+  │  • Năm xuất bản: 2024                                                   │
+  │  • NXB: Đang cập nhật                                                   │
+  │  • Trạng thái: Đang cập nhật (25/50 chương)                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── TAB: MỤC LỤC ──────────────────────────────────────────────────────┐
+  │  Chương 1: Khởi Đầu                    ✅ Đã đọc                       │
+  │  Chương 2: Gặp Gỡ                      ✅ Đã đọc                       │
+  │  Chương 3: Thử Thách                   ← Đang đọc (highlight)         │
+  │  Chương 4: Biến Cố                     🔒 VIP                          │
+  │  ...                                                                    │
+  │  [Xem tất cả 120 chương ▼]                                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── TAB: ĐÁNH GIÁ ──────────────────────────────────────────────────────┐
+  │  ⭐⭐⭐⭐☆ 4.5/5 (128 đánh giá)                                       │
+  │  [Viết đánh giá ✏️]                                                    │
+  │  ────────────                                                           │
+  │  UserA: ⭐⭐⭐⭐⭐ "Hay lắm!" — 2 giờ trước                          │
+  │  UserB: ⭐⭐⭐⭐☆ "OK nhưng hơi dài" — 5 giờ trước                    │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─── SÁCH TƯƠNG TỰ (horizontal scroll) ──────────────────────────────────┐
+  │  "Có thể bạn thích"                                                    │
+  │  [card] [card] [card] [card] →                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>10.1 Mapping data từ DB/API → UI</h3>
+    <table>
+        <thead><tr><th>UI Element</th><th>Data Source (API field)</th><th>Ghi chú</th></tr></thead>
+        <tbody>
+            <tr><td>Cover image</td><td><code>book.coverImageUrl</code></td><td>Fallback default nếu null</td></tr>
+            <tr><td>Tên sách</td><td><code>book.title</code></td><td>—</td></tr>
+            <tr><td>Tác giả</td><td><code>book.author</code></td><td>—</td></tr>
+            <tr><td>Rating</td><td><code>book.averageRating</code></td><td>Hiện sao + số review</td></tr>
+            <tr><td>Badge Miễn phí/VIP</td><td><code>book.accessLevel</code></td><td>1 = Miễn phí, 2 = VIP</td></tr>
+            <tr><td>Badge Hội viên</td><td><code>book.isMember</code></td><td>true = chỉ hội viên đọc được</td></tr>
+            <tr><td>Thể loại</td><td><code>book.genres[]</code></td><td>Array tags</td></tr>
+            <tr><td>Số chương</td><td><code>chapters.length</code> (fetch API)</td><td>Hiện: "120 chương"</td></tr>
+            <tr><td>Lượt đọc</td><td><code>book.viewCount</code></td><td>Format: 2.5M, 15K</td></tr>
+            <tr><td>Mô tả</td><td><code>book.description</code></td><td>Truncate 4 dòng + "Xem thêm"</td></tr>
+            <tr><td>Loại hiển thị nút</td><td><code>book.formatType</code></td><td>1 = "Đọc sách", 2 = "Đọc truyện tranh"</td></tr>
+            <tr><td>Nút Nghe</td><td>Có audio chapters?</td><td>Hiện nếu có audiobook version</td></tr>
+            <tr><td>Progress "Tiếp tục"</td><td>API: <code>/api/reading/progress</code></td><td>Hiện nếu user đang đọc dở</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 11. READING PAGE -->
+    <h2 id="reading-page">11. Trang Đọc Sách — UX Mượt Mà</h2>
+
+    <div class="section-card">
+        <h4>Checklist UX mượt cho Reading Page:</h4>
+        <ol>
+            <li><strong>Không layout shift:</strong> Content area có chiều cao cố định hoặc aspect-ratio — không nhảy khi ảnh load</li>
+            <li><strong>Preload chương tiếp:</strong> Khi đọc > 80% chương → fetch chương tiếp ở background</li>
+            <li><strong>Seamless chapter transition:</strong> Cuộn hết chương → auto load chương tiếp (không reload page)</li>
+            <li><strong>Instant mode switch:</strong> Đổi theme/font/size → transition smooth 200ms (không flash trắng)</li>
+            <li><strong>Keep screen on:</strong> <code>navigator.wakeLock.request('screen')</code> — màn hình không tắt khi đọc</li>
+            <li><strong>Auto-save position:</strong> Mỗi 10 giây → lưu % đọc → resume khi quay lại</li>
+            <li><strong>Toolbar ẩn/hiện:</strong> Khi đọc → toolbar biến mất (full immersion). Tap/cuộn lên → hiện lại.</li>
+            <li><strong>Keyboard/gesture responsive:</strong> Phím tắt + swipe phản hồi < 100ms</li>
+            <li><strong>Offline ready:</strong> Chương đã load cache trong memory → đọc lại không cần fetch</li>
+            <li><strong>Error graceful:</strong> Ảnh 404 → placeholder "Ảnh lỗi — tap thử lại" (không ảnh broken icon xấu)</li>
+        </ol>
+    </div>
+
+    <!-- 12. METRICS -->
+    <h2 id="metrics">12. Core Web Vitals & Đo Lường</h2>
+
+    <table>
+        <thead><tr><th>Metric</th><th>Mục tiêu</th><th>Ý nghĩa</th><th>Cách đo</th></tr></thead>
+        <tbody>
+            <tr><td><strong>LCP</strong> (Largest Contentful Paint)</td><td>< 2.5 giây</td><td>Thời gian hiện content lớn nhất (cover image/text block)</td><td>Chrome DevTools → Performance / Lighthouse</td></tr>
+            <tr><td><strong>FID</strong> (First Input Delay)</td><td>< 100ms</td><td>Thời gian từ click → response (JS block)</td><td>Lighthouse / Web Vitals library</td></tr>
+            <tr><td><strong>CLS</strong> (Cumulative Layout Shift)</td><td>< 0.1</td><td>Trang nhảy/giật bao nhiêu khi loading</td><td>Lighthouse / DevTools Performance</td></tr>
+            <tr><td><strong>TTFB</strong> (Time to First Byte)</td><td>< 600ms</td><td>Thời gian server response</td><td>Network tab / curl timing</td></tr>
+            <tr><td><strong>TTI</strong> (Time to Interactive)</td><td>< 3.8 giây</td><td>Thời gian trang sẵn sàng tương tác</td><td>Lighthouse</td></tr>
+            <tr><td><strong>Bundle Size</strong> (Initial)</td><td>< 200KB gzip</td><td>Lượng JS load lần đầu</td><td><code>vite build --report</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>12.1 Tool đo lường</h3>
+    <pre><code># 1. Lighthouse (built-in Chrome DevTools)
+# F12 → Lighthouse tab → Generate report
+
+# 2. Vite bundle analyzer:
+npm install -D rollup-plugin-visualizer
+# vite.config.ts: plugins: [visualizer()]
+# → Build → mở stats.html xem chart bundle
+
+# 3. Core Web Vitals trong code:
+import { onLCP, onFID, onCLS } from 'web-vitals';
+onLCP(console.log);  // Log metrics to analytics</code></pre>
+
+    <!-- 13. CHECKLIST -->
+    <h2 id="checklist">13. Checklist Tối Ưu Toàn Diện</h2>
+
+    <div class="section-card">
+        <pre><code>╔════════════════════════════════════════════════════════════════════════╗
+║  CHECKLIST TỐI ƯU UX & PERFORMANCE — XÓM TRUYỆN CLIENT               ║
+╠════════════════════════════════════════════════════════════════════════╣
+║                                                                        ║
+║  🎨 UX — KHÔNG RỐI:                                                    ║
+║  ☐ Mỗi trang có 1 CTA chính rõ ràng (nút lớn, màu nổi)              ║
+║  ☐ Visual hierarchy: heading > body > meta (font size + weight)       ║
+║  ☐ Whitespace đủ (padding 16-24px, section gap 40-48px)              ║
+║  ☐ Max 4-5 sections trên trang chủ (không overload)                   ║
+║  ☐ Book card: chỉ hiện cover + title + author (không quá nhiều info) ║
+║  ☐ Detail page: tabs (Giới thiệu / Mục lục / Đánh giá)             ║
+║  ☐ Consistent button styles + positions toàn app                      ║
+║  ☐ Empty states cho mọi trang (không blank trắng)                    ║
+║  ☐ Error messages rõ ràng + có action (retry/back)                    ║
+║                                                                        ║
+║  ⚡ PERFORMANCE — KHÔNG GIẬT:                                           ║
+║  ☐ Skeleton screen thay thế spinner/blank                              ║
+║  ☐ Ảnh lazy loading (loading="lazy" + IntersectionObserver)           ║
+║  ☐ Ảnh WebP + srcset responsive                                       ║
+║  ☐ Code splitting (React.lazy) cho mỗi route                         ║
+║  ☐ React.memo cho BookCard, BookSection (list items)                  ║
+║  ☐ useMemo cho sorted/filtered data                                    ║
+║  ☐ Preload chương tiếp khi đọc > 80%                                  ║
+║  ☐ font-display: swap (text hiện ngay)                                ║
+║  ☐ CDN cho static assets (ảnh, JS, CSS)                               ║
+║  ☐ Cache headers đúng (immutable cho ảnh, SWR cho API)               ║
+║                                                                        ║
+║  📱 MOBILE:                                                             ║
+║  ☐ Touch targets ≥ 44×44px                                            ║
+║  ☐ Responsive layout (test 375px, 768px, 1024px)                     ║
+║  ☐ Ảnh mobile serve 720px max (không 1080p)                           ║
+║  ☐ Swipe gestures cho chuyển trang/chương                             ║
+║  ☐ Bottom navigation (nếu có) trong thumb zone                        ║
+║                                                                        ║
+║  🔄 SMOOTH TRANSITIONS:                                                 ║
+║  ☐ Page transitions (fade/slide, không blank)                          ║
+║  ☐ Theme switch: color transition 400ms (không flash)                 ║
+║  ☐ Toolbar auto-hide khi đọc (slide up 300ms)                         ║
+║  ☐ Bookmark/Like: optimistic UI (update ngay, API background)         ║
+║  ☐ Animations chỉ dùng transform + opacity                            ║
+║  ☐ prefers-reduced-motion: tắt animations                             ║
+║                                                                        ║
+║  📊 METRICS MỤC TIÊU:                                                   ║
+║  ☐ LCP < 2.5s (ảnh bìa + text hiện nhanh)                            ║
+║  ☐ CLS < 0.1 (không layout shift)                                     ║
+║  ☐ FID < 100ms (click responsive ngay)                                 ║
+║  ☐ Initial bundle < 200KB gzip                                         ║
+║  ☐ Lighthouse score ≥ 90 (Performance)                                ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝</code></pre>
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Tối Ưu UX & Performance — Xóm Truyện Web Client<br>
+        Mục tiêu: Dễ dùng, không rối, không giật, không lag<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
