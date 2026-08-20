@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XomTruyen Admin — Module Quản Lý Lỗi (Error Management System)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.8; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px; border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-new { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-critical { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.88em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px; padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff; padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d; padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .severity-critical { color: #ef4444; font-weight: 700; }
+        .severity-high { color: #f97316; font-weight: 700; }
+        .severity-medium { color: #f59e0b; font-weight: 700; }
+        .severity-low { color: #22c55e; font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🛡️ Module Quản Lý Lỗi (Error Management System)</h1>
+    <p class="subtitle">
+        <span class="badge badge-new">Tính Năng Mới</span>
+        <span class="badge badge-critical">Ưu Tiên Cao</span>
+        Hệ thống ghi log, phân loại, theo dõi và xử lý lỗi tập trung cho toàn Admin Portal — Error Boundary, Error Log, Health Check
+    </p>
+
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#current">1. Hiện Trạng & Vấn Đề (Gap Analysis)</a>
+        <a href="#architecture">2. Kiến Trúc Error Management System</a>
+        <a href="#error-boundary">3. React Error Boundary (Frontend Crash Handler)</a>
+        <a href="#error-service">4. Centralized Error Service (Thu thập & Phân loại)</a>
+        <a href="#error-log-page">5. Error Log Dashboard (Trang Quản Lý Lỗi)</a>
+        <a href="#health-check">6. API Health Check Dashboard</a>
+        <a href="#api-error-handler">7. Backend — Global Exception Handler</a>
+        <a href="#retry">8. Auto-Retry & Circuit Breaker (Frontend)</a>
+        <a href="#notification">9. Error Notification & Alert</a>
+        <a href="#database">10. Database Schema (Error Logs)</a>
+        <a href="#implementation">11. Tổng Hợp Files & Triển Khai</a>
+    </div>
+
+    <!-- 1. HIỆN TRẠNG -->
+    <h2 id="current">1. Hiện Trạng & Vấn Đề (Gap Analysis)</h2>
+
+    <div class="warn">
+        <strong>⚠️ Kết quả kiểm tra source code admin hiện tại:</strong>
+    </div>
+
+    <table>
+        <thead><tr><th>Thành phần</th><th>Hiện trạng</th><th>Vấn đề</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>Error handling trong pages</td>
+                <td>Chỉ có <code>try/catch → toast.error()</code></td>
+                <td>Toast biến mất sau 3 giây → mất thông tin lỗi. Không lưu lại.</td>
+            </tr>
+            <tr>
+                <td>Console.error</td>
+                <td>Một số nơi có <code>console.error(err)</code></td>
+                <td>Chỉ hiện trên DevTools → mất khi đóng tab. Không track được production.</td>
+            </tr>
+            <tr>
+                <td>Error Boundary</td>
+                <td><span class="severity-critical">KHÔNG CÓ</span></td>
+                <td>Nếu component crash → toàn app trắng xóa, user không thấy gì.</td>
+            </tr>
+            <tr>
+                <td>API error interceptor</td>
+                <td>Chỉ xử lý 401 (auto logout)</td>
+                <td>Lỗi 403, 500, timeout, network error không có xử lý chung.</td>
+            </tr>
+            <tr>
+                <td>Error Log tập trung</td>
+                <td><span class="severity-critical">KHÔNG CÓ</span></td>
+                <td>Không có nơi nào admin xem lại tất cả lỗi đã xảy ra.</td>
+            </tr>
+            <tr>
+                <td>Health Check</td>
+                <td><span class="severity-critical">KHÔNG CÓ</span></td>
+                <td>Không biết API, DB, Worker có đang chạy tốt không.</td>
+            </tr>
+            <tr>
+                <td>Retry mechanism</td>
+                <td><span class="severity-high">KHÔNG CÓ</span></td>
+                <td>API lỗi tạm (network blip) → user phải refresh tay.</td>
+            </tr>
+            <tr>
+                <td>Error categorization</td>
+                <td><span class="severity-high">KHÔNG CÓ</span></td>
+                <td>Không phân biệt lỗi mạng / auth / validation / server crash.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 2. KIẾN TRÚC -->
+    <h2 id="architecture">2. Kiến Trúc Error Management System</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              ERROR MANAGEMENT SYSTEM — KIẾN TRÚC TỔNG THỂ                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                    ┌─────────────────────────┐
+                    │   ERROR SOURCES          │
+                    │                          │
+                    │  • React component crash │
+                    │  • API response errors   │
+                    │  • Network failures      │
+                    │  • Unhandled promises    │
+                    │  • Console errors        │
+                    └────────────┬─────────────┘
+                                 │
+                                 ▼
+              ┌──────────────────────────────────────┐
+              │   CENTRALIZED ERROR SERVICE          │
+              │   (errorService.ts)                  │
+              │                                      │
+              │   • Phân loại (category + severity)  │
+              │   • Format (timestamp, context, stack)│
+              │   • Lưu vào memory queue             │
+              │   • Gửi lên backend API              │
+              │   • Trigger notification              │
+              └───────┬──────────────┬───────────────┘
+                      │              │
+           ┌──────────▼──────┐  ┌───▼──────────────┐
+           │ LOCAL STORAGE   │  │ BACKEND API      │
+           │ (offline cache) │  │ POST /api/errors │
+           │ Max 100 entries │  │ → PostgreSQL     │
+           └─────────────────┘  └──────────────────┘
+                                         │
+                                         ▼
+              ┌──────────────────────────────────────┐
+              │   ADMIN UI — ERROR DASHBOARD         │
+              │                                      │
+              │   • Error Log Table (filter, search) │
+              │   • Error Detail Modal               │
+              │   • Health Check Status              │
+              │   • Error Trends Chart               │
+              │   • Realtime Notifications           │
+              └──────────────────────────────────────┘
+    </div>
+
+    <!-- 3. ERROR BOUNDARY -->
+    <h2 id="error-boundary">3. React Error Boundary (Frontend Crash Handler)</h2>
+
+    <div class="note">
+        <strong>Vấn đề:</strong> Nếu bất kỳ component nào throw error trong render → toàn bộ React app crash → trang trắng. Error Boundary bắt crash và hiển thị fallback UI thân thiện.
+    </div>
+
+    <div class="code-title">📁 xomtruyen-admin/src/components/ErrorBoundary.tsx</div>
+    <pre><code>import React from 'react';
+import { errorService } from '../services/errorService';
+
+interface State {
+    hasError: boolean;
+    error: Error | null;
+    errorInfo: React.ErrorInfo | null;
+}
+
+/**
+ * Global Error Boundary — bọc toàn bộ App.
+ * Bắt mọi unhandled error trong component tree → hiện fallback UI.
+ * Ghi log lỗi vào errorService.
+ */
+export class ErrorBoundary extends React.Component&lt;{ children: React.ReactNode }, State&gt; {
+    state: State = { hasError: false, error: null, errorInfo: null };
+
+    static getDerivedStateFromError(error: Error): Partial&lt;State&gt; {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        // Ghi log vào hệ thống Error Management
+        errorService.captureError({
+            type: 'REACT_CRASH',
+            severity: 'critical',
+            message: error.message,
+            stack: error.stack || '',
+            componentStack: errorInfo.componentStack || '',
+            url: window.location.href,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+        });
+
+        this.setState({ errorInfo });
+    }
+
+    handleReset = () => {
+        this.setState({ hasError: false, error: null, errorInfo: null });
+    };
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                &lt;div style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', minHeight: '100vh', padding: '40px',
+                    backgroundColor: '#f8fafc', textAlign: 'center'
+                }}&gt;
+                    &lt;div style={{ fontSize: '48px', marginBottom: '16px' }}&gt;💥&lt;/div&gt;
+                    &lt;h2 style={{ color: '#1f2937', marginBottom: '8px' }}&gt;Ứng dụng gặp sự cố&lt;/h2&gt;
+                    &lt;p style={{ color: '#6b7280', marginBottom: '24px', maxWidth: '400px' }}&gt;
+                        Đã xảy ra lỗi không mong muốn. Lỗi đã được ghi nhận và đội ngũ kỹ thuật sẽ khắc phục sớm nhất.
+                    &lt;/p&gt;
+
+                    {/* Error details (dev mode) */}
+                    {process.env.NODE_ENV === 'development' && this.state.error && (
+                        &lt;details style={{ marginBottom: '20px', textAlign: 'left', maxWidth: '600px' }}&gt;
+                            &lt;summary style={{ cursor: 'pointer', color: '#ef4444' }}&gt;Chi tiết lỗi (Dev)&lt;/summary&gt;
+                            &lt;pre style={{ fontSize: '12px', overflow: 'auto', padding: '12px', background: '#1f2937', color: '#f87171', borderRadius: '8px', marginTop: '8px' }}&gt;
+                                {this.state.error.message}\n\n{this.state.error.stack}
+                            &lt;/pre&gt;
+                        &lt;/details&gt;
+                    )}
+
+                    &lt;div style={{ display: 'flex', gap: '12px' }}&gt;
+                        &lt;button onClick={this.handleReset} style={{
+                            padding: '10px 24px', backgroundColor: '#2196f3', color: '#fff',
+                            border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'
+                        }}&gt;
+                            Thử lại
+                        &lt;/button&gt;
+                        &lt;button onClick={() => window.location.href = '/'} style={{
+                            padding: '10px 24px', backgroundColor: '#e5e7eb', color: '#374151',
+                            border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'
+                        }}&gt;
+                            Về trang chủ
+                        &lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            );
+        }
+        return this.props.children;
+    }
+}
+
+// Sử dụng trong App.tsx:
+// &lt;ErrorBoundary&gt;
+//     &lt;BrowserRouter&gt;...&lt;/BrowserRouter&gt;
+// &lt;/ErrorBoundary&gt;</code></pre>
+
+    <!-- 4. ERROR SERVICE -->
+    <h2 id="error-service">4. Centralized Error Service (Thu thập & Phân loại)</h2>
+
+    <div class="code-title">📁 xomtruyen-admin/src/services/errorService.ts</div>
+    <pre><code>/**
+ * Centralized Error Service — Thu thập, phân loại và gửi lỗi lên server.
+ * Thay thế console.error + toast rời rạc bằng 1 hệ thống tập trung.
+ */
+
+export type ErrorSeverity = 'critical' | 'high' | 'medium' | 'low';
+export type ErrorCategory = 'REACT_CRASH' | 'API_ERROR' | 'NETWORK' | 'AUTH' | 'VALIDATION' | 'UNKNOWN';
+
+export interface AppError {
+    id?: string;
+    type: ErrorCategory;
+    severity: ErrorSeverity;
+    message: string;
+    stack?: string;
+    componentStack?: string;
+    url: string;
+    endpoint?: string;
+    statusCode?: number;
+    requestBody?: string;
+    responseBody?: string;
+    timestamp: string;
+    userAgent: string;
+    userId?: string;
+    metadata?: Record&lt;string, any&gt;;
+}
+
+class ErrorService {
+    private queue: AppError[] = [];
+    private maxQueueSize = 100;
+    private flushInterval: number;
+    private listeners: ((error: AppError) => void)[] = [];
+
+    constructor() {
+        // Flush queue mỗi 30 giây
+        this.flushInterval = window.setInterval(() => this.flush(), 30000);
+
+        // Bắt unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            this.captureError({
+                type: 'UNKNOWN',
+                severity: 'high',
+                message: `Unhandled Promise Rejection: ${event.reason?.message || event.reason}`,
+                stack: event.reason?.stack || '',
+                url: window.location.href,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            });
+        });
+
+        // Bắt global JS errors
+        window.addEventListener('error', (event) => {
+            this.captureError({
+                type: 'UNKNOWN',
+                severity: 'high',
+                message: event.message,
+                stack: event.error?.stack || `${event.filename}:${event.lineno}:${event.colno}`,
+                url: window.location.href,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            });
+        });
+    }
+
+    /**
+     * Ghi nhận 1 lỗi — phân loại + lưu queue + notify listeners
+     */
+    captureError(error: AppError) {
+        // Assign ID
+        error.id = `err_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+
+        // Thêm userId nếu đã login
+        const token = sessionStorage.getItem('accessToken');
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                error.userId = payload.sub || payload.nameid;
+            } catch (e) { /* ignore */ }
+        }
+
+        // Auto-detect severity nếu chưa set
+        if (!error.severity) {
+            error.severity = this.detectSeverity(error);
+        }
+
+        // Thêm vào queue
+        this.queue.push(error);
+        if (this.queue.length > this.maxQueueSize) {
+            this.queue.shift(); // Bỏ cũ nhất
+        }
+
+        // Lưu localStorage (offline backup)
+        this.saveToLocalStorage(error);
+
+        // Notify listeners (UI updates)
+        this.listeners.forEach(fn => fn(error));
+
+        // Nếu critical → flush ngay
+        if (error.severity === 'critical') {
+            this.flush();
+        }
+
+        // Dev mode: vẫn console.error
+        if (process.env.NODE_ENV === 'development') {
+            console.error(`[ErrorService] [${error.severity}] ${error.type}:`, error.message);
+        }
+    }
+
+    /**
+     * Tạo error từ Axios response
+     */
+    captureApiError(axiosError: any, endpoint?: string) {
+        const status = axiosError.response?.status;
+        const category: ErrorCategory = 
+            !axiosError.response ? 'NETWORK' :
+            status === 401 || status === 403 ? 'AUTH' :
+            status === 400 || status === 422 ? 'VALIDATION' :
+            'API_ERROR';
+
+        this.captureError({
+            type: category,
+            severity: status >= 500 ? 'high' : status === 401 ? 'medium' : 'low',
+            message: axiosError.response?.data?.message || axiosError.message || 'API Error',
+            endpoint: endpoint || axiosError.config?.url,
+            statusCode: status,
+            requestBody: JSON.stringify(axiosError.config?.data)?.substring(0, 500),
+            responseBody: JSON.stringify(axiosError.response?.data)?.substring(0, 500),
+            url: window.location.href,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+        });
+    }
+
+    /**
+     * Gửi queue lên backend
+     */
+    private async flush() {
+        if (this.queue.length === 0) return;
+
+        const errors = [...this.queue];
+        this.queue = [];
+
+        try {
+            await fetch('/api/admin/error-logs/batch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken') || ''}`
+                },
+                body: JSON.stringify({ errors }),
+                keepalive: true
+            });
+        } catch (e) {
+            // Nếu gửi thất bại → đưa lại vào queue
+            this.queue.unshift(...errors);
+        }
+    }
+
+    private saveToLocalStorage(error: AppError) {
+        try {
+            const existing = JSON.parse(localStorage.getItem('xomtruyen_error_log') || '[]');
+            existing.push(error);
+            if (existing.length > 50) existing.splice(0, existing.length - 50);
+            localStorage.setItem('xomtruyen_error_log', JSON.stringify(existing));
+        } catch (e) { /* quota exceeded — ignore */ }
+    }
+
+    private detectSeverity(error: AppError): ErrorSeverity {
+        if (error.type === 'REACT_CRASH') return 'critical';
+        if (error.statusCode && error.statusCode >= 500) return 'high';
+        if (error.type === 'NETWORK') return 'medium';
+        return 'low';
+    }
+
+    /** Subscribe to new errors (for UI notification badge) */
+    onError(listener: (error: AppError) => void) {
+        this.listeners.push(listener);
+        return () => { this.listeners = this.listeners.filter(l => l !== listener); };
+    }
+
+    /** Get recent errors from localStorage (for offline view) */
+    getRecentErrors(): AppError[] {
+        try {
+            return JSON.parse(localStorage.getItem('xomtruyen_error_log') || '[]');
+        } catch { return []; }
+    }
+
+    /** Clear local cache */
+    clearLocalErrors() {
+        localStorage.removeItem('xomtruyen_error_log');
+    }
+
+    destroy() {
+        clearInterval(this.flushInterval);
+    }
+}
+
+export const errorService = new ErrorService();</code></pre>
+
+    <h3>4.1 Tích hợp vào Axios Interceptor</h3>
+    <div class="code-title">📁 xomtruyen-admin/src/api/userApi.ts — Sửa interceptor</div>
+    <pre><code>import { errorService } from '../services/errorService';
+
+apiClient.interceptors.response.use(
+    (response) => response.data,
+    (error) => {
+        // Ghi log mọi API error vào Error Management System
+        errorService.captureApiError(error, error.config?.url);
+
+        // Xử lý 401 (giữ nguyên)
+        if (error.response?.status === 401) {
+            sessionStorage.removeItem('accessToken');
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);</code></pre>
+
+    <!-- 5. ERROR LOG PAGE -->
+    <h2 id="error-log-page">5. Error Log Dashboard (Trang Quản Lý Lỗi)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ADMIN — /admin/error-logs                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  🛡️ Error Log Dashboard                              [🔄 Refresh] [📥 Export] │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                          │
+  │  ┌─── STAT CARDS ──────────────────────────────────────────────────────┐│
+  │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐ ││
+  │  │  │ 🔴 12   │  │ 🟠 34   │  │ 🟡 56   │  │ 🟢 89   │  │ 📊 191  │ ││
+  │  │  │Critical │  │  High   │  │ Medium  │  │  Low    │  │  Total  │ ││
+  │  │  │ Hôm nay │  │ Hôm nay │  │ Hôm nay │  │ Hôm nay │  │ 7 ngày  │ ││
+  │  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘ ││
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  ┌─── FILTER BAR ─────────────────────────────────────────────────────┐ │
+  │  │  Severity: [All ▼]  Category: [All ▼]  Thời gian: [Hôm nay ▼]   │ │
+  │  │  Search: [___________________]  [Apply]  [Reset]                   │ │
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  ┌─── ERROR TABLE ────────────────────────────────────────────────────┐ │
+  │  │  Thời gian       │ Severity │ Category  │ Message          │ Endpoint  ││
+  │  │  ────────────────┼──────────┼───────────┼──────────────────┼────────── ││
+  │  │  14:32:05 Hôm nay│ 🔴 CRIT  │ REACT     │ Cannot read null │ /books    ││
+  │  │  14:28:12 Hôm nay│ 🟠 HIGH  │ API_ERROR │ 500 Internal Err │ /api/pub  ││
+  │  │  14:15:00 Hôm nay│ 🟡 MED   │ NETWORK   │ timeout 30s      │ /api/user ││
+  │  │  13:55:22 Hôm nay│ 🟢 LOW   │ VALIDATION│ Email required   │ /api/auth ││
+  │  │  ...             │          │           │                  │           ││
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  [50 of 191]  ⟳                                                          │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ═══ Click vào 1 row → mở Error Detail Modal ═══
+
+  ┌── ERROR DETAIL MODAL ──────────────────────────────────────────────────┐
+  │  🔴 CRITICAL — REACT_CRASH                                              │
+  │  ──────────────────────────────────────────────────────────────────────│
+  │  Message: Cannot read properties of null (reading 'map')                │
+  │  Timestamp: 2026-08-17 14:32:05                                         │
+  │  URL: http://localhost:5174/books                                       │
+  │  User: admin@xomtruyen.com                                              │
+  │  Browser: Chrome 128 / Windows 11                                       │
+  │                                                                          │
+  │  Stack Trace:                                                            │
+  │  ┌────────────────────────────────────────────────────────────────────┐ │
+  │  │ TypeError: Cannot read properties of null (reading 'map')          │ │
+  │  │   at Books.tsx:245:18                                               │ │
+  │  │   at renderWithHooks (react-dom.js:14985:18)                       │ │
+  │  │   at mountIndeterminateComponent (react-dom.js:17811:13)           │ │
+  │  └────────────────────────────────────────────────────────────────────┘ │
+  │                                                                          │
+  │  Component Stack:                                                        │
+  │  ┌────────────────────────────────────────────────────────────────────┐ │
+  │  │ at Books (src/pages/Books.tsx:245)                                  │ │
+  │  │ at Route (react-router-dom)                                         │ │
+  │  │ at App (src/App.tsx:12)                                             │ │
+  │  └────────────────────────────────────────────────────────────────────┘ │
+  │                                                                          │
+  │  Actions:                                                                │
+  │  [🗑️ Dismiss] [📋 Copy Stack] [🔗 Open File] [✅ Mark Resolved]        │
+  └──────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <!-- 6. HEALTH CHECK -->
+    <h2 id="health-check">6. API Health Check Dashboard</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  HEALTH CHECK DASHBOARD — /admin/health                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  💚 Hệ Thống Đang Hoạt Động Bình Thường          Cập nhật: 30 giây trước│
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                          │
+  │  ┌─── SERVICE STATUS ──────────────────────────────────────────────────┐│
+  │  │                                                                      ││
+  │  │  🟢 API Server (.NET)          UP    Response: 45ms    Port 5000    ││
+  │  │  🟢 PostgreSQL Database        UP    Response: 12ms    Port 5432    ││
+  │  │  🟢 Background Worker          UP    Queue: 2 tasks    Active       ││
+  │  │  🟢 File Storage               UP    Disk: 65% used    120GB free   ││
+  │  │  🟡 CDN (Cloudflare)           SLOW  Response: 320ms   Degraded     ││
+  │  │  🔴 Email Service (SMTP)       DOWN  Timeout            Not reachable││
+  │  │                                                                      ││
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  ┌─── UPTIME (7 ngày qua) ────────────────────────────────────────────┐│
+  │  │                                                                      ││
+  │  │  API:  ████████████████████████████████████████████  99.8%          ││
+  │  │  DB:   █████████████████████████████████████████████ 100%           ││
+  │  │  CDN:  ██████████████████████████████████████░░░░░░  92.3%          ││
+  │  │  SMTP: ████████████████████░░░░░░░░░░░░░░░░░░░░░░░  45.1%          ││
+  │  │                                                                      ││
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  ┌─── RESPONSE TIME CHART (24h) ──────────────────────────────────────┐ │
+  │  │  ms                                                                  │ │
+  │  │  200 ┤                          ╱╲                                   │ │
+  │  │  150 ┤                    ╱╲╱╲╱  ╲                                  │ │
+  │  │  100 ┤       ╱╲    ╱╲╱╲╱        ╲╱╲                                │ │
+  │  │   50 ┤ ╱╲╱╲╱  ╲╱╲╱                ╲╱╲──                            │ │
+  │  │    0 ┼──────────────────────────────────                             │ │
+  │  │       00:00  04:00  08:00  12:00  16:00  20:00                      │ │
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  │                                                                          │
+  │  Auto-refresh: [● 30s] [1m] [5m] [Off]                                  │
+  └─────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>6.1 Backend Health Check Endpoint</h3>
+    <div class="code-title">📁 xomtruyen.API/Controllers/HealthCheckController.cs</div>
+    <pre><code>[Route("api/admin/health")]
+[ApiController]
+[Authorize(Roles = "Admin")]
+public class HealthCheckController : ControllerBase
+{
+    private readonly ApplicationDbContext _db;
+    private readonly IBackgroundTaskQueue _taskQueue;
+
+    [HttpGet]
+    public async Task&lt;IActionResult&gt; GetHealthStatus()
+    {
+        var result = new HealthCheckResult
+        {
+            Timestamp = DateTime.UtcNow,
+            Services = new List&lt;ServiceStatus&gt;()
+        };
+
+        // 1. Check Database
+        try {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            await _db.Database.ExecuteSqlRawAsync("SELECT 1");
+            sw.Stop();
+            result.Services.Add(new ServiceStatus("PostgreSQL", "UP", sw.ElapsedMilliseconds));
+        } catch (Exception ex) {
+            result.Services.Add(new ServiceStatus("PostgreSQL", "DOWN", 0, ex.Message));
+        }
+
+        // 2. Check Background Worker
+        result.Services.Add(new ServiceStatus("BackgroundWorker", "UP",
+            metadata: new { queueSize = _taskQueue.Count }));
+
+        // 3. Check Disk Space
+        var drive = new DriveInfo(Path.GetPathRoot(Directory.GetCurrentDirectory())!);
+        var freeGb = drive.AvailableFreeSpace / (1024 * 1024 * 1024);
+        result.Services.Add(new ServiceStatus("FileStorage",
+            freeGb > 5 ? "UP" : "WARNING",
+            metadata: new { freeGb, usedPercent = 100 - (int)(drive.AvailableFreeSpace * 100 / drive.TotalSize) }));
+
+        // 4. Check External Services (CDN, SMTP)
+        // ... ping external endpoints ...
+
+        result.OverallStatus = result.Services.All(s => s.Status == "UP") ? "HEALTHY" :
+                              result.Services.Any(s => s.Status == "DOWN") ? "UNHEALTHY" : "DEGRADED";
+
+        return Ok(result);
+    }
+}</code></pre>
+
+    <!-- 7. BACKEND ERROR HANDLER -->
+    <h2 id="api-error-handler">7. Backend — Global Exception Handler</h2>
+
+    <div class="code-title">📁 xomtruyen.API/Middleware/GlobalExceptionMiddleware.cs</div>
+    <pre><code>/// &lt;summary&gt;
+/// Middleware bắt MỌI exception không xử lý trong pipeline ASP.NET.
+/// Ghi log vào DB + trả response chuẩn cho client.
+/// &lt;/summary&gt;
+public class GlobalExceptionMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger&lt;GlobalExceptionMiddleware&gt; _logger;
+
+    public async Task InvokeAsync(HttpContext context, ApplicationDbContext db)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unhandled exception: {Path}", context.Request.Path);
+
+            // Ghi vào DB
+            var errorLog = new ErrorLog
+            {
+                Id = Guid.NewGuid(),
+                Severity = "high",
+                Category = "SERVER_EXCEPTION",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace ?? "",
+                Endpoint = $"{context.Request.Method} {context.Request.Path}",
+                StatusCode = 500,
+                UserId = context.User?.FindFirst("sub")?.Value,
+                IpAddress = context.Connection.RemoteIpAddress?.ToString(),
+                UserAgent = context.Request.Headers["User-Agent"].ToString(),
+                CreatedAt = DateTime.UtcNow
+            };
+            db.ErrorLogs.Add(errorLog);
+            await db.SaveChangesAsync();
+
+            // Trả response chuẩn (KHÔNG lộ stack trace ra production)
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new
+            {
+                success = false,
+                message = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.",
+                errorId = errorLog.Id, // Để user report kèm ID
+                timestamp = errorLog.CreatedAt
+            });
+        }
+    }
+}
+
+// Đăng ký trong Program.cs:
+// app.UseMiddleware&lt;GlobalExceptionMiddleware&gt;();</code></pre>
+
+    <!-- 8. RETRY -->
+    <h2 id="retry">8. Auto-Retry & Circuit Breaker (Frontend)</h2>
+
+    <div class="code-title">📁 xomtruyen-admin/src/utils/retryFetch.ts</div>
+    <pre><code>import { errorService } from '../services/errorService';
+
+interface RetryOptions {
+    maxRetries?: number;       // Số lần retry tối đa (default: 3)
+    retryDelay?: number;       // Delay giữa các lần retry (ms, default: 1000)
+    retryOn?: number[];        // Status codes nào sẽ retry (default: [408, 500, 502, 503, 504])
+    onRetry?: (attempt: number, error: any) => void;
+}
+
+/**
+ * Wrapper retry logic cho API calls.
+ * Tự động retry khi gặp lỗi tạm thời (network, 5xx).
+ * Không retry cho lỗi client (4xx) vì retry cũng không fix được.
+ */
+export async function withRetry&lt;T&gt;(
+    fn: () => Promise&lt;T&gt;,
+    options: RetryOptions = {}
+): Promise&lt;T&gt; {
+    const { maxRetries = 3, retryDelay = 1000, retryOn = [408, 500, 502, 503, 504], onRetry } = options;
+
+    let lastError: any;
+
+    for (let attempt = 1; attempt &lt;= maxRetries + 1; attempt++) {
+        try {
+            return await fn();
+        } catch (error: any) {
+            lastError = error;
+            const status = error.response?.status;
+
+            // Không retry nếu là lỗi client (4xx) trừ 408 timeout
+            if (status && status &gt;= 400 && status &lt; 500 && !retryOn.includes(status)) {
+                throw error;
+            }
+
+            // Đã hết lượt retry
+            if (attempt > maxRetries) {
+                errorService.captureApiError(error);
+                throw error;
+            }
+
+            // Callback thông báo đang retry
+            onRetry?.(attempt, error);
+
+            // Exponential backoff: 1s, 2s, 4s...
+            const delay = retryDelay * Math.pow(2, attempt - 1);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+
+    throw lastError;
+}
+
+// Sử dụng:
+// const data = await withRetry(() => getBooks({ page: 1 }), { maxRetries: 2 });
+// → Nếu API lỗi 500 → retry 2 lần (sau 1s và 2s) → nếu vẫn lỗi → throw + log error</code></pre>
+
+    <!-- 9. NOTIFICATION -->
+    <h2 id="notification">9. Error Notification & Alert</h2>
+
+    <div class="section-card">
+        <h4>Hệ thống thông báo lỗi theo severity:</h4>
+        <table>
+            <thead><tr><th>Severity</th><th>UI Notification</th><th>Hành động</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="severity-critical">Critical</span></td>
+                    <td>Full-screen Error Boundary + toast persistent (không tự biến mất)</td>
+                    <td>Ghi log ngay + alert admin (email/Telegram nếu có)</td>
+                </tr>
+                <tr>
+                    <td><span class="severity-high">High</span></td>
+                    <td>Toast error (5 giây) + badge đỏ trên icon 🛡️ sidebar</td>
+                    <td>Ghi log + hiện trong Error Log dashboard</td>
+                </tr>
+                <tr>
+                    <td><span class="severity-medium">Medium</span></td>
+                    <td>Toast warning (3 giây)</td>
+                    <td>Ghi log silently</td>
+                </tr>
+                <tr>
+                    <td><span class="severity-low">Low</span></td>
+                    <td>Không hiện UI (silent)</td>
+                    <td>Ghi log silently, chỉ hiện khi filter ở dashboard</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>9.1 Sidebar Badge (số lỗi chưa xem)</h3>
+    <div class="code-title">📁 Sidebar.tsx — thêm badge lỗi</div>
+    <pre><code>// Trong Sidebar navigation, thêm menu item:
+{
+    icon: "🛡️",
+    label: "Error Logs",
+    path: "/error-logs",
+    badge: unreadErrorCount > 0 ? unreadErrorCount : null,  // Badge đỏ
+    badgeVariant: "danger"
+}
+
+// unreadErrorCount lấy từ errorService.onError listener:
+useEffect(() => {
+    const unsub = errorService.onError((error) => {
+        if (error.severity === 'critical' || error.severity === 'high') {
+            setUnreadErrorCount(prev => prev + 1);
+        }
+    });
+    return unsub;
+}, []);</code></pre>
+
+    <!-- 10. DATABASE -->
+    <h2 id="database">10. Database Schema (Error Logs)</h2>
+
+    <pre><code>-- Bảng lưu error logs (backend + frontend gửi lên)
+CREATE TABLE "ErrorLogs" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Source" VARCHAR(20) NOT NULL DEFAULT 'frontend',  -- 'frontend' | 'backend'
+    "Severity" VARCHAR(10) NOT NULL,                    -- 'critical','high','medium','low'
+    "Category" VARCHAR(30) NOT NULL,                    -- 'REACT_CRASH','API_ERROR','NETWORK','AUTH','VALIDATION','SERVER_EXCEPTION'
+    "Message" TEXT NOT NULL,
+    "StackTrace" TEXT,
+    "ComponentStack" TEXT,                               -- React component tree (frontend only)
+    "Endpoint" VARCHAR(500),                             -- API endpoint gây lỗi
+    "StatusCode" INT,                                   -- HTTP status code
+    "RequestBody" TEXT,                                  -- Request body (truncated 500 chars)
+    "ResponseBody" TEXT,                                 -- Response body (truncated 500 chars)
+    "Url" VARCHAR(500),                                 -- Page URL khi lỗi xảy ra
+    "UserId" UUID,                                      -- User đang thao tác
+    "IpAddress" VARCHAR(50),
+    "UserAgent" VARCHAR(500),
+    "Metadata" JSONB,                                   -- Extra info (browser, OS, etc.)
+    "IsResolved" BOOLEAN DEFAULT FALSE,                 -- Admin đã xem/fix chưa
+    "ResolvedBy" UUID,
+    "ResolvedAt" TIMESTAMPTZ,
+    "ResolvedNote" TEXT,                                 -- Ghi chú cách fix
+    "CreatedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_error_logs_severity ON "ErrorLogs"("Severity", "CreatedAt" DESC);
+CREATE INDEX idx_error_logs_category ON "ErrorLogs"("Category", "CreatedAt" DESC);
+CREATE INDEX idx_error_logs_created ON "ErrorLogs"("CreatedAt" DESC);
+CREATE INDEX idx_error_logs_unresolved ON "ErrorLogs"("IsResolved") WHERE "IsResolved" = FALSE;
+
+-- Health Check Logs (ping history)
+CREATE TABLE "HealthCheckLogs" (
+    "Id" SERIAL PRIMARY KEY,
+    "ServiceName" VARCHAR(50) NOT NULL,
+    "Status" VARCHAR(10) NOT NULL,            -- 'UP', 'DOWN', 'SLOW'
+    "ResponseTimeMs" INT,
+    "Metadata" JSONB,
+    "CheckedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_health_checks ON "HealthCheckLogs"("ServiceName", "CheckedAt" DESC);</code></pre>
+
+    <!-- 11. IMPLEMENTATION -->
+    <h2 id="implementation">11. Tổng Hợp Files & Triển Khai</h2>
+
+    <table>
+        <thead><tr><th>File</th><th>App</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td><code>src/components/ErrorBoundary.tsx</code></td><td>Admin + Client</td><td>React Error Boundary (bọc App)</td></tr>
+            <tr><td><code>src/services/errorService.ts</code></td><td>Admin + Client</td><td>Centralized error capture + classify + flush</td></tr>
+            <tr><td><code>src/utils/retryFetch.ts</code></td><td>Admin + Client</td><td>Auto-retry wrapper cho API calls</td></tr>
+            <tr><td><code>src/pages/ErrorLogs.tsx</code></td><td>Admin</td><td>Error Log Dashboard (table + filter + detail modal)</td></tr>
+            <tr><td><code>src/pages/HealthCheck.tsx</code></td><td>Admin</td><td>Health Check Dashboard (service status + uptime + chart)</td></tr>
+            <tr><td><code>src/api/errorLogApi.ts</code></td><td>Admin</td><td>API module cho error logs CRUD</td></tr>
+            <tr><td><code>src/api/healthCheckApi.ts</code></td><td>Admin</td><td>API module cho health check</td></tr>
+            <tr><td><code>src/hooks/useErrorNotification.ts</code></td><td>Admin</td><td>Hook lắng nghe lỗi mới → badge sidebar</td></tr>
+            <tr><td><code>Controllers/ErrorLogController.cs</code></td><td>Backend</td><td>CRUD error logs (GET list, POST batch, PATCH resolve)</td></tr>
+            <tr><td><code>Controllers/HealthCheckController.cs</code></td><td>Backend</td><td>Health check endpoint (DB, Worker, Disk, External)</td></tr>
+            <tr><td><code>Middleware/GlobalExceptionMiddleware.cs</code></td><td>Backend</td><td>Bắt mọi unhandled exception → log + response chuẩn</td></tr>
+            <tr><td><code>src/api/userApi.ts</code></td><td>Admin</td><td>✏️ Sửa interceptor → gọi errorService</td></tr>
+            <tr><td><code>src/App.tsx</code></td><td>Admin + Client</td><td>✏️ Bọc &lt;ErrorBoundary&gt; ngoài App</td></tr>
+        </tbody>
+    </table>
+
+    <h3>11.1 Sidebar Navigation — Thêm menu mới</h3>
+    <div class="section-card">
+        <p>Thêm vào nhóm "Hệ Thống" trong Sidebar:</p>
+        <pre><code>// Sidebar menu items mới:
+{ icon: "🛡️", label: "Error Logs",    path: "/error-logs",   badge: errorCount }
+{ icon: "💚", label: "Health Check",  path: "/health-check"  }</code></pre>
+    </div>
+
+    <h3>11.2 API Endpoints mới</h3>
+    <table>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td>POST</td><td>/api/admin/error-logs/batch</td><td>Frontend gửi batch errors lên server</td></tr>
+            <tr><td>GET</td><td>/api/admin/error-logs</td><td>Danh sách errors (filter severity, category, date range)</td></tr>
+            <tr><td>GET</td><td>/api/admin/error-logs/{id}</td><td>Chi tiết 1 error</td></tr>
+            <tr><td>PATCH</td><td>/api/admin/error-logs/{id}/resolve</td><td>Mark resolved + ghi note cách fix</td></tr>
+            <tr><td>DELETE</td><td>/api/admin/error-logs/clear</td><td>Xóa tất cả resolved errors (cleanup)</td></tr>
+            <tr><td>GET</td><td>/api/admin/error-logs/stats</td><td>Thống kê: count by severity, by day, trends</td></tr>
+            <tr><td>GET</td><td>/api/admin/health</td><td>Health check tất cả services</td></tr>
+            <tr><td>GET</td><td>/api/admin/health/history</td><td>Lịch sử uptime 7 ngày</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn">
+        <strong>⚠️ Ưu tiên triển khai:</strong>
+        <ol>
+            <li><strong>Ngay lập tức:</strong> ErrorBoundary + errorService + sửa interceptor (30 phút)</li>
+            <li><strong>Ngày 1:</strong> GlobalExceptionMiddleware backend + DB table (1 giờ)</li>
+            <li><strong>Ngày 2:</strong> Error Log Dashboard page (2-3 giờ)</li>
+            <li><strong>Ngày 3:</strong> Health Check Dashboard + auto-refresh (2-3 giờ)</li>
+            <li><strong>Sau:</strong> Retry mechanism + notification badge + export CSV</li>
+        </ol>
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Module Quản Lý Lỗi (Error Management System) — Xóm Truyện Admin<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
