@@ -24,6 +24,9 @@ export default function BookInfo({ book, isLoading }: BookInfoProps) {
   }, [book.id]);
 
   const handleToggleFavorite = async () => {
+    const prevStatus = isFavorite;
+    setIsFavorite(!prevStatus); // Optimistic Update
+
     try {
       const res = await toggleFavorite(book.id.toString());
       if (res.message === "Added to favorites") {
@@ -32,6 +35,7 @@ export default function BookInfo({ book, isLoading }: BookInfoProps) {
         setIsFavorite(false);
       }
     } catch (err) {
+      setIsFavorite(prevStatus); // Rollback
       alert("Vui lòng đăng nhập để thêm vào yêu thích!");
     }
   };

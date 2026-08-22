@@ -53,6 +53,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ReadingAnalytic> ReadingAnalytics { get; set; }
     public DbSet<EmailTemplate> EmailTemplates { get; set; }
     public DbSet<HelpArticle> HelpArticles { get; set; }
+    public DbSet<ErrorLog> ErrorLogs { get; set; }
 
     // Audiobook Pipeline
     public DbSet<AudioChapter> AudioChapters { get; set; }

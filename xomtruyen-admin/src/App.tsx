@@ -45,67 +45,76 @@ import { BookVideoJobDetail } from './pages/BookVideoJobDetail';
 import { ComicVideoDashboard } from './pages/ComicVideoDashboard';
 import { ComicVideoCreate } from './pages/ComicVideoCreate';
 import { ComicVideoJobDetail } from './pages/ComicVideoJobDetail';
+import { ErrorLogPage } from './pages/ErrorLogPage';
+import { HealthCheckPage } from './pages/HealthCheckPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/all-books" element={<Books key="all" />} />
-              <Route path="/books" element={<Books key="books" formatType={1} />} />
-              <Route path="/comics" element={<Books key="comics" formatType={2} />} />
-              <Route path="/books/:id" element={<BookDetails />} />
-              <Route path="/topics" element={<Topics />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/database" element={<Database />} />
-              <Route path="/database/:tableName" element={<DatabaseTableViewer />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/book-files" element={<BookFiles />} />
-              <Route path="/plans" element={<SubscriptionPlans />} />
-              <Route path="/coin-packages" element={<CoinPackages />} />
-              <Route path="/notifications" element={<Notifications />} />
-          <Route path="/promotions" element={<Promotions />} />
-          <Route path="/banners" element={<Banners />} />
-          <Route path="/home-sections" element={<HomeSections />} />
-          <Route path="/crawlers" element={<Crawlers />} />
-          <Route path="/translation" element={<Translation />} />
-          <Route path="/translation/upload" element={<TranslationUpload />} />
-          <Route path="/translation/jobs/:id" element={<TranslationJobDetail />} />
-          <Route path="/translation/review/:chapterId" element={<TranslationReview />} />
-          <Route path="/translation/glossary" element={<TranslationGlossary />} />
-          <Route path="/authors" element={<Authors />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/system-configs" element={<SystemConfigs />} />
-          <Route path="/reading-analytics" element={<ReadingAnalytics />} />
-          <Route path="/email-templates" element={<EmailTemplates />} />
-          <Route path="/help-articles" element={<HelpArticles />} />
-          <Route path="/book-chapters" element={<BookChapters />} />
-          
-          <Route path="/audio" element={<AudioDashboard />} />
-          <Route path="/audio/create" element={<AudioCreate />} />
-          <Route path="/audio/jobs/:id" element={<AudioJobDetail />} />
-          <Route path="/audio/voices" element={<AudioVoices />} />
-          <Route path="/audio/characters/:publicationId" element={<AudioCharacters />} />
-          
-          <Route path="/book-video" element={<BookVideoDashboard />} />
-          <Route path="/book-video/create" element={<BookVideoCreate />} />
-          <Route path="/book-video/:id" element={<BookVideoJobDetail />} />
-          
-          <Route path="/comic-video" element={<ComicVideoDashboard />} />
-          <Route path="/comic-video/create" element={<ComicVideoCreate />} />
-          <Route path="/comic-video/:id" element={<ComicVideoJobDetail />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/all-books" element={<Books key="all" />} />
+                <Route path="/books" element={<Books key="books" formatType={1} />} />
+                <Route path="/comics" element={<Books key="comics" formatType={2} />} />
+                <Route path="/books/:id" element={<BookDetails />} />
+                <Route path="/topics" element={<Topics />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/database" element={<Database />} />
+                <Route path="/database/:tableName" element={<DatabaseTableViewer />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/book-files" element={<BookFiles />} />
+                <Route path="/plans" element={<SubscriptionPlans />} />
+                <Route path="/coin-packages" element={<CoinPackages />} />
+                <Route path="/notifications" element={<Notifications />} />
+            <Route path="/promotions" element={<Promotions />} />
+            <Route path="/banners" element={<Banners />} />
+            <Route path="/home-sections" element={<HomeSections />} />
+            <Route path="/crawlers" element={<Crawlers />} />
+            <Route path="/translation" element={<Translation />} />
+            <Route path="/translation/upload" element={<TranslationUpload />} />
+            <Route path="/translation/jobs/:id" element={<TranslationJobDetail />} />
+            <Route path="/translation/review/:chapterId" element={<TranslationReview />} />
+            <Route path="/translation/glossary" element={<TranslationGlossary />} />
+            <Route path="/authors" element={<Authors />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/system-configs" element={<SystemConfigs />} />
+            <Route path="/reading-analytics" element={<ReadingAnalytics />} />
+            <Route path="/email-templates" element={<EmailTemplates />} />
+            <Route path="/help-articles" element={<HelpArticles />} />
+            <Route path="/book-chapters" element={<BookChapters />} />
+            
+            <Route path="/audio" element={<AudioDashboard />} />
+            <Route path="/audio/create" element={<AudioCreate />} />
+            <Route path="/audio/jobs/:id" element={<AudioJobDetail />} />
+            <Route path="/audio/voices" element={<AudioVoices />} />
+            <Route path="/audio/characters/:publicationId" element={<AudioCharacters />} />
+            
+            <Route path="/book-video" element={<BookVideoDashboard />} />
+            <Route path="/book-video/create" element={<BookVideoCreate />} />
+            <Route path="/book-video/:id" element={<BookVideoJobDetail />} />
+            
+            <Route path="/comic-video" element={<ComicVideoDashboard />} />
+            <Route path="/comic-video/create" element={<ComicVideoCreate />} />
+            <Route path="/comic-video/:id" element={<ComicVideoJobDetail />} />
+
+            {/* Error Management Routes */}
+            <Route path="/error-logs" element={<ErrorLogPage />} />
+            <Route path="/health" element={<HealthCheckPage />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-        <Toaster position="top-right" />
-      </Router>
-    </AuthProvider>
+          </Routes>
+          <Toaster position="top-right" />
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -2,27 +2,29 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
 // import Footer from "./components/Layout/Footer";
-import HomePage from "./pages";
-import LibraryPage from "./pages/LibraryPage";
-import ComicPage from "./pages/ComicPage";
-import { SearchPage } from "./pages/SearchPage";
-import LoginPage from "./pages/LoginPage"; // <-- Nhớ import trang Login vào đây
-import RegisterPage from "./pages/RegisterPage"; // <-- Import thêm trang Register (nếu có)
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import BookDetailPage from "./pages/BookDetailPage";
-import ReadingPage from "./pages/ReadingPage";
-import HistoryPage from "./pages/HistoryPage";
-import BookmarkPage from "./pages/BookmarkPage";
-import ProfilePage from "./pages/ProfilePage";
-import WalletPage from "./pages/WalletPage";
-import SubscriptionPage from "./pages/SubscriptionPage";
+import { lazy, Suspense } from 'react';
+
+const HomePage = lazy(() => import("./pages"));
+const LibraryPage = lazy(() => import("./pages/LibraryPage"));
+const ComicPage = lazy(() => import("./pages/ComicPage"));
+const SearchPage = lazy(() => import("./pages/SearchPage").then(module => ({ default: module.SearchPage })));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const BookDetailPage = lazy(() => import("./pages/BookDetailPage"));
+const ReadingPage = lazy(() => import("./pages/ReadingPage"));
+const HistoryPage = lazy(() => import("./pages/HistoryPage"));
+const BookmarkPage = lazy(() => import("./pages/BookmarkPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const WalletPage = lazy(() => import("./pages/WalletPage"));
+const SubscriptionPage = lazy(() => import("./pages/SubscriptionPage"));
+const CourseListPage = lazy(() => import("./pages/CourseListPage"));
+const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
+const LearningPage = lazy(() => import("./pages/LearningPage"));
+const AudioBookPage = lazy(() => import("./pages/AudioBookPage"));
 import { BG } from "./constants";
-import CourseListPage from "./pages/CourseListPage";
-import CourseDetailPage from "./pages/CourseDetailPage";
-import LearningPage from "./pages/LearningPage";
 import { AudioPlayerProvider } from "./context/AudioPlayerContext";
 import { MiniPlayer } from "./components/AudioPlayer/MiniPlayer";
-import AudioBookPage from "./pages/AudioBookPage";
 
 // ─── COMPONENT LAYOUT CHÍNH ──────────────────────────────────────────────────
 // Gom Sidebar và Header cũ thành một Layout dùng chung cho Trang chủ, Chi tiết truyện,...
@@ -95,6 +97,11 @@ export default function App() {
       <AudioPlayerProvider>
         <Toaster position="top-right" />
         <MiniPlayer />
+        <Suspense fallback={
+          <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyItems: 'center', backgroundColor: '#0f0f1a', color: '#00d4ff' }}>
+            <div style={{ margin: 'auto' }}>Đang tải...</div>
+          </div>
+        }>
         <Routes>
         {/* 1. Tuyến đường trang chủ: Cần có Sidebar + Header bao quanh */}
         <Route
@@ -251,6 +258,7 @@ export default function App() {
         {/* 4. Tuyến đường Quên mật khẩu: Hiển thị Full-screen độc lập */}
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Routes>
+      </Suspense>
       </AudioPlayerProvider>
     </BrowserRouter>
   );

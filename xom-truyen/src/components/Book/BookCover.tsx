@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Book } from "../../types";
+import { ImageLazy } from "../common/ImageLazy";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5172";
 
@@ -50,11 +51,10 @@ export default function BookCover({
       className="book-cover-hover"
     >
       {imageUrl && !hasError ? (
-        <img
+        <ImageLazy
           key={imageUrl}
           src={imageUrl}
           alt={`Bìa truyện ${book?.title || ""}`}
-          loading="lazy"
           style={{
             width: "100%",
             height: "100%",

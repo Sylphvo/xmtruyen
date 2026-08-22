@@ -162,6 +162,9 @@ builder.Services.AddHostedService<VideoConvertBackgroundWorker>();
 
 var app = builder.Build();
 
+// Register the global exception middleware as early as possible
+app.UseMiddleware<XomTruyen.API.Middleware.GlobalExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-// ==========================================
+import { errorService } from '../services/errorService';
 // 1. TYPES & INTERFACES
 // ==========================================
 
@@ -82,6 +81,7 @@ apiClient.interceptors.response.use(
     return response.data; 
   },
   (error) => {
+    errorService.captureApiError(error, error.config?.url);
     if (error.response?.status === 401) {
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('refreshToken');
