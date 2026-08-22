@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Xóm Truyện - Tổng hợp luồng chức năng và kế hoạch triển khai</title>
+  <style>
+    :root { --ink:#17202a; --muted:#5d6975; --line:#d6e0e4; --paper:#fff; --wash:#f2f7f7; --teal:#086f78; --deep:#06434b; --blue:#2c5282; --green:#277044; --orange:#a85d16; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:linear-gradient(135deg,#e6f3f3,#f7faf9 50%,#edf2f5); font:16px/1.6 Georgia,"Times New Roman",serif; }
+    main { width:min(1180px,calc(100% - 32px)); margin:30px auto 64px; }
+    header { padding:42px 46px; color:#fff; background:var(--deep); border-radius:8px; box-shadow:0 14px 30px #06434b25; }
+    h1,h2,h3 { font-family:Arial,Helvetica,sans-serif; line-height:1.2; }
+    h1 { max-width:900px; margin:0 0 12px; font-size:clamp(2rem,5vw,3.5rem); }
+    h2 { margin:0 0 17px; color:var(--deep); font-size:1.55rem; }
+    h3 { margin:20px 0 8px; font-size:1.08rem; }
+    .eyebrow { margin:0 0 10px; color:#bfe5e6; font:700 .78rem Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+    .lead { max-width:880px; margin:0; color:#e1f4f4; font-size:1.12rem; }
+    section { margin-top:22px; padding:28px 32px; background:var(--paper); border:1px solid var(--line); border-radius:8px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .card { padding:18px; background:var(--wash); border-left:4px solid var(--teal); }
+    .card strong { display:block; margin-bottom:5px; color:var(--deep); font:700 1.08rem Arial,sans-serif; }
+    .card p { margin:0; }
+    .flow { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin:18px 0; }
+    .flow div { min-height:100px; padding:13px 10px; color:#fff; background:var(--teal); border-radius:6px; font:700 .88rem/1.3 Arial,sans-serif; }
+    .flow small { display:block; margin-top:8px; color:#d7f0f0; font-weight:400; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:11px 10px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+    th { color:var(--deep); font:700 .8rem Arial,sans-serif; text-transform:uppercase; }
+    td:first-child { white-space:nowrap; color:var(--teal); font-weight:700; }
+    ul,ol { padding-left:24px; }
+    li { margin:7px 0; }
+    code { padding:2px 5px; color:#29445f; background:#edf2f7; font-family:Consolas,monospace; font-size:.9em; }
+    .pill { display:inline-block; margin:3px 5px 3px 0; padding:3px 8px; color:var(--deep); background:#d9eeee; border-radius:4px; font:700 .77rem Arial,sans-serif; }
+    .note,.warning,.success { padding:14px 17px; border-left:4px solid; }
+    .note { border-color:var(--blue); background:#eef5fb; }
+    .warning { border-color:var(--orange); background:#fff7eb; }
+    .success { border-color:var(--green); background:#eef8f0; }
+    .muted { color:var(--muted); }
+    @media (max-width:780px) { main { width:calc(100% - 20px); margin-top:10px; } header,section { padding:23px 19px; } .grid,.flow { grid-template-columns:1fr; } .flow div { min-height:auto; } table { display:block; overflow-x:auto; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Pending master brief · Xóm Truyện</p>
+      <h1>Tổng hợp các luồng dữ liệu, xuất bản và trải nghiệm đọc</h1>
+      <p class="lead">Tài liệu này gom toàn bộ yêu cầu đã trao đổi thành một backlog có thể triển khai từ đầu đến cuối: đưa dữ liệu truyện vào nhanh, tạo sách giấy từ ebook, giúp đọc lâu thoải mái hơn, hỗ trợ song ngữ và gợi ý thiết bị phù hợp.</p>
+    </header>
+
+    <section>
+      <h2>1. Phạm vi tổng thể</h2>
+      <div class="grid">
+        <div class="card"><strong>Nhập dữ liệu nhanh</strong><p>CSV/JSON, ảnh chụp OCR và văn bản dán vào bảng đều hội tụ về một cấu trúc dòng chuẩn.</p></div>
+        <div class="card"><strong>Ebook thành sách giấy</strong><p>Chọn ebook đã duyệt, dàn trang, chọn giấy, tính giá, duyệt proof rồi mới đặt in.</p></div>
+        <div class="card"><strong>Reader tốt cho người dùng</strong><p>Tối ưu hiển thị, nhắc nghỉ, accessibility, song ngữ, TTS và tư vấn thiết bị theo nhu cầu.</p></div>
+      </div>
+      <p><span class="pill">Admin</span><span class="pill">API .NET</span><span class="pill">Web reader</span><span class="pill">Mobile app</span><span class="pill">Background worker</span><span class="pill">Audit</span></p>
+      <div class="note"><strong>Nguyên tắc chung:</strong> dữ liệu do OCR/AI hoặc parser tạo ra chỉ là bản đề xuất. Luôn có preview, cảnh báo, chỉnh sửa và xác nhận rõ ràng trước khi ghi dữ liệu hoặc tạo đơn in.</div>
+    </section>
+
+    <section>
+      <h2>2. Luồng A: thêm hàng trăm quyển sách</h2>
+      <div class="flow">
+        <div>1. Nguồn<small>CSV, JSON, ảnh hoặc text</small></div>
+        <div>2. Phân tích<small>OCR/parser/AI mapping</small></div>
+        <div>3. Chuẩn hóa<small>NormalizedImportRow</small></div>
+        <div>4. Preview<small>Kiểm tra từng dòng/cột</small></div>
+        <div>5. Import job<small>Batch, progress, retry</small></div>
+        <div>6. Kết quả<small>Report, export, rollback</small></div>
+      </div>
+      <div class="grid">
+        <div class="card"><strong>Ảnh hoặc ảnh chụp website</strong><p>Upload nhiều ảnh/PDF; OCR giữ text gốc, vùng nhận diện và confidence. Cột confidence thấp phải được đánh dấu để sửa.</p></div>
+        <div class="card"><strong>Dán vào bảng</strong><p>Nhận text nhãn/giá trị, bảng tab-separated hoặc đoạn văn; tự gợi ý cột đích nhưng cho phép map và sửa lại.</p></div>
+        <div class="card"><strong>CSV/JSON chuẩn</strong><p>Template versioned dành cho dữ liệu lớn và trường hợp cần độ chính xác, tính lặp lại cao.</p></div>
+      </div>
+      <h3>Cột dữ liệu cần chuẩn hóa</h3>
+      <p><code>schema_version</code>, <code>entity_type</code>, <code>external_id</code>, tên truyện, tác giả, mô tả, category/topic, trạng thái, ảnh bìa, thứ tự chương, ngôn ngữ, nguồn dữ liệu và metadata. Mỗi field nên có kiểu dữ liệu, bắt buộc hay không, rule transform, confidence tối thiểu và nguồn provenance.</p>
+      <div class="warning"><strong>Không được làm:</strong> ghi thẳng kết quả OCR/AI vào database, dùng tên hiển thị làm khóa duy nhất, bỏ qua foreign key, hoặc cho phép import vượt quyền của tài khoản.</div>
+    </section>
+
+    <section>
+      <h2>3. Luồng B: chuyển ebook thành sách giấy</h2>
+      <div class="flow">
+        <div>1. Chọn bản<small>Ebook version bất biến</small></div>
+        <div>2. Dàn trang<small>Khổ, font, lề, bleed</small></div>
+        <div>3. Chọn vật liệu<small>Giấy, bìa, đóng sách</small></div>
+        <div>4. Preflight<small>PDF và bản xem trước</small></div>
+        <div>5. Estimate<small>Giá theo số lượng</small></div>
+        <div>6. Proof/order<small>Duyệt rồi đặt in</small></div>
+      </div>
+      <div class="grid">
+        <div class="card"><strong>Cấu hình tiết kiệm</strong><p>Ruột offset/book paper 70–80 gsm; bìa couche 250–300 gsm cán mờ; khổ A5; đóng keo gáy với sách thông thường.</p></div>
+        <div class="card"><strong>Kiểm tra PDF</strong><p>Font tiếng Việt được nhúng, lề gáy đủ, bleed bìa đúng, ảnh đủ độ phân giải, số trang hợp lệ và không có ký tự lỗi.</p></div>
+        <div class="card"><strong>Giá và đơn in</strong><p>Lưu nhà in, cấu hình giấy, số trang, số lượng, vận chuyển, giá ước tính, giá thực tế và trạng thái đơn.</p></div>
+      </div>
+      <p class="muted">Giấy và giá thực tế phải được xác nhận theo bảng giá của nhà in. Hệ thống chỉ đưa ra estimate, không cam kết giá cố định.</p>
+    </section>
+
+    <section>
+      <h2>4. Luồng C: đọc lâu thoải mái hơn</h2>
+      <div class="flow">
+        <div>1. Hồ sơ đọc<small>Nhu cầu, thiết bị, ngôn ngữ</small></div>
+        <div>2. Preset<small>Comfort, dark, sepia</small></div>
+        <div>3. Tùy chỉnh<small>Font, dòng, cột, tương phản</small></div>
+        <div>4. Nhắc nghỉ<small>Hẹn giờ mềm, trì hoãn</small></div>
+        <div>5. Accessibility<small>Chữ lớn, screen reader</small></div>
+        <div>6. Theo dõi<small>Lưu và đồng bộ thiết lập</small></div>
+      </div>
+      <ul>
+        <li>Cho phép chỉnh font, cỡ chữ, độ đậm, line-height, letter spacing, độ rộng cột, theme, tương phản và giảm chuyển động.</li>
+        <li>Hỗ trợ system dark mode, text-to-speech, screen reader, bàn phím, chữ lớn và layout không tràn trên mobile.</li>
+        <li>Nhắc nghỉ nhẹ nhàng theo khoảng thời gian người dùng chọn; có trì hoãn và tắt; không làm mất vị trí đọc hoặc chặn trang.</li>
+        <li>Lưu thiết lập theo người dùng, sách và thiết bị để mỗi loại nội dung có trải nghiệm phù hợp.</li>
+      </ul>
+      <div class="warning"><strong>Giới hạn:</strong> tính năng hỗ trợ sự thoải mái và thói quen đọc, không phải chẩn đoán hoặc điều trị bệnh mắt. Khi đau mắt, nhìn mờ hoặc đau đầu kéo dài, cần nghỉ và hỏi chuyên gia y tế.</div>
+    </section>
+
+    <section>
+      <h2>5. Luồng D: đọc song ngữ và gợi ý thiết bị</h2>
+      <div class="grid">
+        <div class="card"><strong>Song ngữ</strong><p>Liên kết bản gốc và bản dịch theo câu/đoạn; chọn song song hoặc tap-to-reveal; highlight câu tương ứng; hỗ trợ từ điển và TTS theo từng ngôn ngữ.</p></div>
+        <div class="card"><strong>Bản dịch có kiểm soát</strong><p>Lưu <code>source_id</code>, <code>translation_id</code>, language, version, nguồn và trạng thái review. Bản gốc luôn giữ nguyên; bản dịch thiếu phải báo rõ.</p></div>
+        <div class="card"><strong>Tư vấn thiết bị</strong><p>Hỏi loại nội dung, thời lượng, màu, tính di động và ngân sách. Chấm điểm minh bạch theo e-ink, chống chói, pin, kích thước và khả năng chỉnh sáng.</p></div>
+      </div>
+      <h3>Định hướng thiết bị</h3>
+      <ul>
+        <li>Đọc tiểu thuyết nhiều giờ: ưu tiên máy đọc sách e-ink có đèn trước, chỉnh nhiệt màu, font lớn và chống chói.</li>
+        <li>Đọc truyện tranh hoặc nội dung màu: ưu tiên màn hình màu và độ sáng ổn định; xem xét tính năng giảm ánh sáng xanh hoặc DC dimming nếu thiết bị hỗ trợ.</li>
+        <li>Không quảng cáo một thiết bị là bảo vệ mắt tuyệt đối; luôn hiển thị lý do, tiêu chí, giá tham khảo và ngày cập nhật.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. Danh sách task triển khai</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Phân hệ</th><th>Việc cần làm</th><th>Kết quả cần đạt</th></tr></thead>
+        <tbody>
+          <tr><td>FOUND-01</td><td>Khảo sát</td><td>Map entity, DTO, controller, quyền, database, màn hình và worker hiện có.</td><td>Có data contract và dependency map được xác nhận.</td></tr>
+          <tr><td>DATA-01</td><td>Import API</td><td>Template, upload, preview, confirm, status, error report và export.</td><td>Contract versioned, phân trang, giới hạn file và mã lỗi rõ.</td></tr>
+          <tr><td>DATA-02</td><td>OCR</td><td>OCR tiếng Việt cho ảnh/PDF; lưu ảnh gốc, text, bounding box, confidence, engine version.</td><td>Tạo bản nháp theo dòng/cột; lỗi nhận diện không tự commit.</td></tr>
+          <tr><td>DATA-03</td><td>Paste parser</td><td>Parse nhãn/giá trị, tab-separated và đoạn văn; normalize Unicode, ngày, số.</td><td>Dán được nội dung phổ biến; map lại được cột và không mất dòng.</td></tr>
+          <tr><td>DATA-04</td><td>Import worker</td><td>Batch processing, progress, retry, idempotency key, cancellation và rollback theo session.</td><td>Import hàng trăm dòng không khóa UI, retry không duplicate.</td></tr>
+          <tr><td>DATA-05</td><td>Admin import UI</td><td>Upload, preview bên cạnh nguồn, sửa ô, map cột, lọc lỗi, confirm và tải report.</td><td>Admin không cần SQL hoặc gọi API thủ công.</td></tr>
+          <tr><td>PRINT-01</td><td>Print contract</td><td>PrintJob gắn ebook version/checksum với khổ, giấy, bìa, đóng, số lượng, nhà in và giá.</td><td>Truy ngược đúng phiên bản ebook và quyền in.</td></tr>
+          <tr><td>PRINT-02</td><td>PDF pipeline</td><td>Render PDF in, font nhúng, lề gáy, bleed, mục lục và preflight report.</td><td>Proof không lỗi font, tràn lề, ảnh hoặc trang.</td></tr>
+          <tr><td>PRINT-03</td><td>Proof/order</td><td>Preview proof, ghi người duyệt, checksum, estimate, order status, tracking và hủy trước xác nhận nhà in.</td><td>Chỉ proof đã duyệt mới ở trạng thái ReadyToOrder.</td></tr>
+          <tr><td>READ-01</td><td>Reader comfort</td><td>Theme, font, cỡ chữ, line-height, column width, contrast, reduce motion, TTS và sync settings.</td><td>Thiết lập ổn định trên web/mobile, không đổi nội dung gốc.</td></tr>
+          <tr><td>READ-02</td><td>Break reminder</td><td>Timer nghỉ có trì hoãn/tắt, xử lý background theo giới hạn OS và giữ reading position.</td><td>Nhắc đúng lúc, không chặn hoặc làm gián đoạn bất ngờ.</td></tr>
+          <tr><td>READ-03</td><td>Bilingual</td><td>Model liên kết chapter/paragraph/sentence; side-by-side, tap-to-reveal, highlight, dictionary, TTS.</td><td>Đổi mode không mất vị trí; bản gốc và provenance luôn còn.</td></tr>
+          <tr><td>READ-04</td><td>Device advisor</td><td>Form nhu cầu và scoring minh bạch theo tiêu chí, ngân sách, giá và ngày cập nhật.</td><td>Gợi ý có lý do, không đưa tuyên bố y tế.</td></tr>
+          <tr><td>QA-01</td><td>Kiểm thử</td><td>Unit, integration, security, accessibility, OCR accuracy, import/export round-trip, PDF preflight và mobile smoke tests.</td><td>Đạt acceptance checklist ở staging.</td></tr>
+          <tr><td>OPS-01</td><td>Triển khai</td><td>Backup, feature flag, quota, cost limit AI/OCR, monitoring, audit, runbook và rollout từng nhóm.</td><td>Có rollback và theo dõi được lỗi/chi phí.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>7. Thứ tự triển khai tối ưu</h2>
+      <ol>
+        <li>Khảo sát contract và chốt schema dữ liệu dùng chung.</li>
+        <li>Làm import CSV/JSON, validation, preview, worker và error report trước để có nền tảng ổn định.</li>
+        <li>Thêm paste parser, sau đó thêm OCR ảnh/PDF; đo accuracy bằng bộ mẫu tiếng Việt.</li>
+        <li>Thêm reader comfort và accessibility trên web, rồi đồng bộ sang mobile.</li>
+        <li>Thêm model song ngữ, review bản dịch và TTS.</li>
+        <li>Thêm ebook-to-print: PDF pipeline, paper catalog, estimate, proof và order tracking.</li>
+        <li>Chạy staging bằng dữ liệu ẩn danh, bật feature flag theo nhóm admin và theo dõi lỗi trước khi mở rộng.</li>
+      </ol>
+      <div class="success"><strong>Definition of done:</strong> người có quyền có thể nhập dữ liệu từ file, ảnh hoặc text; xem và sửa preview; import an toàn; đọc nội dung với thiết lập thoải mái và song ngữ; tạo proof sách giấy, xem giá và đặt in có kiểm soát; mọi bước đều có audit, retry, report và rollback phù hợp.</div>
+    </section>
+
+    <section>
+      <h2>8. Acceptance checklist chung</h2>
+      <ul>
+        <li>Ảnh/PDF có thể tạo hàng trăm bản nháp theo dòng; confidence thấp được đánh dấu và có nguồn đối chiếu.</li>
+        <li>Text dán vào bảng được phân tích thành từng cột; admin có thể sửa mapping và ô dữ liệu.</li>
+        <li>Không có OCR/AI output nào được ghi ngầm hoặc xuất bản khi chưa xác nhận.</li>
+        <li>Import lớn chạy nền, có progress, retry idempotent, error report, audit và rollback.</li>
+        <li>Ebook chỉ tạo PDF in từ phiên bản đã duyệt; PDF có preflight và checksum.</li>
+        <li>Giấy offset/book 70–80 gsm và bìa couche 250–300 gsm xuất hiện như lựa chọn tiết kiệm, nhưng giá cuối do nhà in xác nhận.</li>
+        <li>Không thể đặt in nếu chưa duyệt proof hoặc thiếu quyền sử dụng nội dung.</li>
+        <li>Reader có preset thoải mái, tùy chỉnh font/theme, nhắc nghỉ, accessibility và không tràn trên mobile.</li>
+        <li>Song ngữ liên kết đúng câu/đoạn, giữ bản gốc, ghi provenance và hỗ trợ TTS theo ngôn ngữ.</li>
+        <li>Device advisor giải thích tiêu chí và không đưa cam kết y tế.</li>
+      </ul>
+      <p class="muted">Tài liệu này là master brief. Các tài liệu chi tiết trước đó trong thư mục <code>pending</code> có thể được giữ lại làm phụ lục hoặc checklist chuyên sâu.</p>
+    </section>
+  </main>
+</body>
+</html>
