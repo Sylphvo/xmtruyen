@@ -1,9 +1,108 @@
 {
-  "generatedAt": "2026-08-22T16:51:01.509Z",
+  "generatedAt": "2026-08-22T16:55:19.954Z",
   "latestVersion": "v0.0.0",
   "totalCommits": 50,
   "tags": [],
   "entries": [
+    {
+      "hash": "a7bcee63",
+      "date": "2026-08-22 23:53:40 +0700",
+      "author": "phudev",
+      "subject": "feat: Add CMS features, UX optimizations, and Static Pages",
+      "body": "",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Workspace",
+        "Web Client",
+        "Admin Portal",
+        "Overview Dashboard",
+        "Backend API"
+      ],
+      "filesChanged": 72,
+      "files": [
+        {
+          "status": "A",
+          "file": "run-all.bat"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/public/badges/appstore.svg"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/public/badges/bocongthuong.png"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/public/badges/dmca.png"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/public/badges/googleplay.svg"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/App.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Book/BookCard.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/BookDetail/BookInfo.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Layout/Footer.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/BilingualReader.css"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/BilingualReader.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/DeviceAdvisor.css"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/DeviceAdvisor.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/DictionaryPopup.css"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/DictionaryPopup.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/ReaderSettings.css"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/ReaderSettings.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/TTSPlayer.css"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/TTSPlayer.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/useBreakReminder.ts"
+        }
+      ]
+    },
     {
       "hash": "cb81d653",
       "date": "2026-08-22 18:09:31 +0700",
@@ -1431,25 +1530,6 @@
         {
           "status": "A",
           "file": "xomtruyen-overview/deployment-and-secrets-guide.html"
-        }
-      ]
-    },
-    {
-      "hash": "f40c75db",
-      "date": "2026-08-12 10:25:45 +0700",
-      "author": "Phuvo",
-      "subject": "Create deployment guide for XomTruyen",
-      "body": "Add detailed deployment guide for XomTruyen including frontend and backend setup.",
-      "version": null,
-      "changeType": "Giao Diện (UI/UX)",
-      "subsystems": [
-        "Overview Dashboard"
-      ],
-      "filesChanged": 1,
-      "files": [
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/huong-dan-deploy.html"
         }
       ]
     }
