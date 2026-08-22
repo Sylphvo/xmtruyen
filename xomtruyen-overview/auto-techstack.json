@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-17T11:53:24.725Z",
+  "generatedAt": "2026-08-22T16:51:01.539Z",
   "totalProjects": 4,
-  "totalUniqueTechnologies": 53,
+  "totalUniqueTechnologies": 60,
   "projects": [
     {
       "project": "xom-truyen (Web Client)",
@@ -31,6 +31,11 @@
           "type": "dependency"
         },
         {
+          "name": "@microsoft/signalr",
+          "version": "^10.0.11",
+          "type": "dependency"
+        },
+        {
           "name": "axios",
           "version": "^1.18.1",
           "type": "dependency"
@@ -38,6 +43,11 @@
         {
           "name": "bootstrap",
           "version": "^5.3.8",
+          "type": "dependency"
+        },
+        {
+          "name": "framer-motion",
+          "version": "^13.1.0",
           "type": "dependency"
         },
         {
@@ -63,6 +73,11 @@
         {
           "name": "react-hot-toast",
           "version": "^2.6.0",
+          "type": "dependency"
+        },
+        {
+          "name": "react-pageflip",
+          "version": "^2.0.3",
           "type": "dependency"
         },
         {
@@ -138,7 +153,7 @@
           "type": "devDependency"
         }
       ],
-      "totalDeps": 24
+      "totalDeps": 27
     },
     {
       "project": "xomtruyen-admin (Admin Portal)",
@@ -153,6 +168,16 @@
       },
       "dependencies": [
         {
+          "name": "@emotion/react",
+          "version": "^11.14.0",
+          "type": "dependency"
+        },
+        {
+          "name": "@emotion/styled",
+          "version": "^11.14.1",
+          "type": "dependency"
+        },
+        {
           "name": "@fortawesome/fontawesome-svg-core",
           "version": "^7.2.0",
           "type": "dependency"
@@ -165,6 +190,16 @@
         {
           "name": "@fortawesome/react-fontawesome",
           "version": "^3.3.1",
+          "type": "dependency"
+        },
+        {
+          "name": "@mui/icons-material",
+          "version": "^9.3.1",
+          "type": "dependency"
+        },
+        {
+          "name": "@mui/material",
+          "version": "^9.3.1",
           "type": "dependency"
         },
         {
@@ -365,7 +400,7 @@
           "type": "devDependency"
         }
       ],
-      "totalDeps": 42
+      "totalDeps": 46
     },
     {
       "project": "xomtruyen-app (Mobile App)",
@@ -641,12 +676,15 @@
       "project": "xom-truyen (Web Client)",
       "importedPackages": [
         "@fortawesome",
+        "@microsoft",
         "axios",
+        "framer-motion",
         "lucide-react",
         "react",
         "react-bootstrap",
         "react-dom",
         "react-hot-toast",
+        "react-pageflip",
         "react-router-dom",
         "swiper"
       ]
@@ -655,6 +693,7 @@
       "project": "xomtruyen-admin (Admin Portal)",
       "importedPackages": [
         "@fortawesome",
+        "@mui",
         "apexcharts",
         "axios",
         "date-fns",
@@ -691,11 +730,16 @@
     "@capacitor/ios",
     "@capacitor/keyboard",
     "@capacitor/status-bar",
+    "@emotion/react",
+    "@emotion/styled",
     "@fortawesome/fontawesome-svg-core",
     "@fortawesome/free-solid-svg-icons",
     "@fortawesome/react-fontawesome",
     "@ionic/react",
     "@ionic/react-router",
+    "@microsoft/signalr",
+    "@mui/icons-material",
+    "@mui/material",
     "@types/react-router",
     "@types/react-router-dom",
     "BCrypt.Net-Next",
@@ -719,6 +763,7 @@
     "datatables.net-react",
     "date-fns",
     "flatpickr",
+    "framer-motion",
     "ionicons",
     "jquery",
     "jwt-decode",
@@ -731,6 +776,7 @@
     "react-dom",
     "react-flatpickr",
     "react-hot-toast",
+    "react-pageflip",
     "react-router",
     "react-router-dom",
     "react-select",

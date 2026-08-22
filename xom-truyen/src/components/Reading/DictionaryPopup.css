@@ -1,0 +1,137 @@
+.dict-popup-overlay {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+}
+
+.dict-popup-content {
+    background: #fff;
+    border-radius: 12px;
+    width: 350px;
+    max-width: 90vw;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 20px;
+    position: relative;
+}
+
+.dict-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+}
+
+.dict-close:hover {
+    color: #333;
+}
+
+.dict-loading, .dict-error {
+    text-align: center;
+    padding: 20px 0;
+    color: #666;
+}
+
+.dict-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.dict-word-group h2 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+.dict-phonetic {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+.dict-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.dict-actions button {
+    background: #f0f7ff;
+    color: #3498db;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dict-actions button:hover {
+    background: #e3f2fd;
+}
+
+.dict-pos {
+    display: inline-block;
+    background: #eee;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.dict-meaning {
+    font-size: 1.05rem;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.dict-examples h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: #7f8c8d;
+}
+
+.dict-examples ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.dict-examples li {
+    margin-bottom: 5px;
+}
+
+/* Dark theme */
+:root[data-theme="dark"] .dict-popup-content {
+    background: #2a2a2a;
+    color: #eee;
+}
+:root[data-theme="dark"] .dict-word-group h2 {
+    color: #fff;
+}
+:root[data-theme="dark"] .dict-meaning {
+    color: #ddd;
+}
+:root[data-theme="dark"] .dict-examples ul {
+    color: #bbb;
+}
+:root[data-theme="dark"] .dict-pos {
+    background: #444;
+    color: #ddd;
+}
+:root[data-theme="dark"] .dict-actions button {
+    background: #1a365d;
+    color: #63b3ed;
+}

@@ -1,11 +1,11 @@
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import BookCover from "./BookCover";
 import type { Book } from "../../types";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
 import { BookOpen, Heart, Crown } from "lucide-react";
 
-export default function BookCard({
+const BookCard = React.memo(function BookCard({
   book,
   size: _size = "normal",
 }: {
@@ -31,11 +31,11 @@ export default function BookCard({
     };
   }, []);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     pointerStart.current = { x: e.clientX, y: e.clientY };
-  };
+  }, []);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
     const dx = Math.abs(e.clientX - pointerStart.current.x);
     const dy = Math.abs(e.clientY - pointerStart.current.y);
     // Nếu chuột di chuyển quá 5px, tức là đang kéo slider -> bỏ qua click
@@ -44,9 +44,9 @@ export default function BookCard({
       return;
     }
     navigate(`/book/${book.id}`, { state: { from: location.pathname } });
-  };
+  }, [navigate, book.id, location.pathname]);
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     if (leaveTimerRef.current) {
       clearTimeout(leaveTimerRef.current);
       leaveTimerRef.current = null;
@@ -64,9 +64,9 @@ export default function BookCard({
     hoverTimerRef.current = window.setTimeout(() => {
       setIsHovered(true);
     }, 70);
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
@@ -75,15 +75,15 @@ export default function BookCard({
     leaveTimerRef.current = window.setTimeout(() => {
       setIsHovered(false);
     }, 100);
-  };
+  }, []);
 
-  const handlePopoverMouseEnter = () => {
+  const handlePopoverMouseEnter = useCallback(() => {
     if (leaveTimerRef.current) {
       clearTimeout(leaveTimerRef.current);
       leaveTimerRef.current = null;
     }
     setIsHovered(true);
-  };
+  }, []);
 
   const defaultDescription =
     book.description ||
@@ -226,4 +226,6 @@ export default function BookCard({
       </div>
     </div>
   );
-}
+});
+
+export default BookCard;

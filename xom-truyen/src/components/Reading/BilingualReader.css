@@ -1,0 +1,120 @@
+.bilingual-reader-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.bilingual-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 30px;
+}
+
+.bilingual-controls button {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.bilingual-controls button.active {
+    background: #007bff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+}
+
+.bilingual-title {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2rem;
+    color: #2c3e50;
+}
+
+/* Side-by-side mode */
+.mode-side-by-side .bilingual-paragraph-pair {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 15px;
+}
+.mode-side-by-side .text-original,
+.mode-side-by-side .text-translated {
+    flex: 1;
+}
+
+/* Interleaved mode */
+.mode-interleaved .bilingual-paragraph-pair {
+    margin-bottom: 30px;
+    background: #fdfbf7;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+.mode-interleaved .text-original {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+.mode-interleaved .text-translated {
+    color: #555;
+    font-style: italic;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+/* Single modes */
+.mode-original-only .text-translated,
+.mode-translated-only .text-original {
+    display: none;
+}
+.mode-original-only .bilingual-paragraph-pair,
+.mode-translated-only .bilingual-paragraph-pair {
+    margin-bottom: 20px;
+}
+
+/* Clickable word (Dictionary interaction) */
+.clickable-word {
+    cursor: pointer;
+    transition: color 0.1s, background 0.1s;
+    border-radius: 2px;
+}
+.clickable-word:hover {
+    background: #e3f2fd;
+    color: #0056b3;
+}
+
+/* Dark mode overrides (Assuming parent has data-theme="dark") */
+:root[data-theme="dark"] .bilingual-controls {
+    background: #2a2a2a;
+}
+:root[data-theme="dark"] .bilingual-controls button {
+    color: #ccc;
+}
+:root[data-theme="dark"] .bilingual-controls button.active {
+    background: #3498db;
+    color: #fff;
+}
+:root[data-theme="dark"] .bilingual-title {
+    color: #eee;
+}
+:root[data-theme="dark"] .mode-interleaved .bilingual-paragraph-pair {
+    background: #1e1e1e;
+    border-color: #2980b9;
+}
+:root[data-theme="dark"] .mode-side-by-side .bilingual-paragraph-pair {
+    border-bottom-color: #333;
+}
+:root[data-theme="dark"] .clickable-word:hover {
+    background: #004085;
+    color: #8cb4d6;
+}

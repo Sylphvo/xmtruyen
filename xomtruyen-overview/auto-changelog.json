@@ -1,9 +1,574 @@
 {
-  "generatedAt": "2026-08-17T11:53:24.644Z",
+  "generatedAt": "2026-08-22T16:51:01.509Z",
   "latestVersion": "v0.0.0",
   "totalCommits": 50,
   "tags": [],
   "entries": [
+    {
+      "hash": "cb81d653",
+      "date": "2026-08-22 18:09:31 +0700",
+      "author": "phudev",
+      "subject": "feat: implement global error tracking system, retry logic for API requests, and update UI components with skeleton loaders and favorites support.",
+      "body": "",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Web Client",
+        "Admin Portal",
+        "Backend API"
+      ],
+      "filesChanged": 20,
+      "files": [
+        {
+          "status": "M",
+          "file": "xom-truyen/src/App.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Book/BookCover.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/BookDetail/BookInfo.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/common/ImageLazy.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xomtruyen-admin/src/App.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xomtruyen-admin/src/api/userApi.ts"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen-admin/src/components/ErrorBoundary.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen-admin/src/pages/ErrorLogPage.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen-admin/src/pages/HealthCheckPage.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen-admin/src/services/errorService.ts"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen-admin/src/utils/retryFetch.ts"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen.API/Controllers/ErrorLogController.cs"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen.API/Controllers/HealthCheckController.cs"
+        },
+        {
+          "status": "M",
+          "file": "xomtruyen.API/Data/ApplicationDbContext.cs"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen.API/Middleware/GlobalExceptionMiddleware.cs"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen.API/Migrations/20260820144708_AddErrorLogs.Designer.cs"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen.API/Migrations/20260820144708_AddErrorLogs.cs"
+        },
+        {
+          "status": "M",
+          "file": "xomtruyen.API/Migrations/ApplicationDbContextModelSnapshot.cs"
+        },
+        {
+          "status": "A",
+          "file": "xomtruyen.API/Models/ErrorLog.cs"
+        },
+        {
+          "status": "M",
+          "file": "xomtruyen.API/Program.cs"
+        }
+      ]
+    },
+    {
+      "hash": "38c5b112",
+      "date": "2026-08-22 14:24:03 +0700",
+      "author": "Phuvo",
+      "subject": "Add complete reading data workflows HTML document",
+      "body": "This file contains the complete reading data workflows for Xóm Truyện, detailing the processes for data import, ebook to print conversion, reading comfort, bilingual support, and implementation tasks.",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/xomtruyen-complete-reading-data-workflows.html"
+        }
+      ]
+    },
+    {
+      "hash": "f5b9189d",
+      "date": "2026-08-21 16:14:32 +0700",
+      "author": "Phuvo",
+      "subject": "Update print statement from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/admin-storage-manager.html"
+        }
+      ]
+    },
+    {
+      "hash": "206fe43e",
+      "date": "2026-08-21 08:43:32 +0700",
+      "author": "Phuvo",
+      "subject": "Update print statement from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/client-static-pages-footer.html"
+        }
+      ]
+    },
+    {
+      "hash": "eb5f7a82",
+      "date": "2026-08-20 16:06:29 +0700",
+      "author": "Phuvo",
+      "subject": "Update print statement from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/client-ux-performance-optimization.html"
+        }
+      ]
+    },
+    {
+      "hash": "899e45dc",
+      "date": "2026-08-20 15:09:40 +0700",
+      "author": "Phuvo",
+      "subject": "Add prevention skills section to error management",
+      "body": "Add prevention skills section with coding guidelines and best practices.",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "M",
+          "file": "xomtruyen-overview/pending/admin-error-management-system.html"
+        }
+      ]
+    },
+    {
+      "hash": "4c4ffc34",
+      "date": "2026-08-20 14:30:14 +0700",
+      "author": "Phuvo",
+      "subject": "Implement Error Resolution Module in admin error management",
+      "body": "Added a new section for the Error Resolution Module, including architecture, knowledge base schema, and backend service logic.",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "M",
+          "file": "xomtruyen-overview/pending/admin-error-management-system.html"
+        }
+      ]
+    },
+    {
+      "hash": "6335fcb2",
+      "date": "2026-08-20 14:13:21 +0700",
+      "author": "Phuvo",
+      "subject": "Create admin-error-management-system.html",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/admin-error-management-system.html"
+        }
+      ]
+    },
+    {
+      "hash": "dca6fdb3",
+      "date": "2026-08-19 23:19:45 +0700",
+      "author": "phudev",
+      "subject": "feat: implement audiobooks, comic-to-video pipelines, and enhanced reading experience with advanced page-flip effects",
+      "body": "",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Workspace",
+        "Web Client",
+        "Admin Portal",
+        "Overview Dashboard",
+        "Backend API"
+      ],
+      "filesChanged": 119,
+      "files": [
+        {
+          "status": "A",
+          "file": "python-worker/main.py"
+        },
+        {
+          "status": "A",
+          "file": "python-worker/requirements.txt"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/package-lock.json"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/package.json"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/App.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/AudioPlayer/AudioPlayer.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/AudioPlayer/ChapterList.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/AudioPlayer/MiniPlayer.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Book/BookSection.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/BookDetail/AnimatedBookComments.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/BookDetail/AnimatedChapterList.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/History/HistoryList.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Reading/ComicReadingContent.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/BookFlip.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/CardsStack.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/CoverflowView.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/MagazineFlip.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/NotebookFlip.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/OnePageView.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Reading/Effects/PageEffectSelector.tsx"
+        }
+      ]
+    },
+    {
+      "hash": "2298117b",
+      "date": "2026-08-19 23:19:30 +0700",
+      "author": "phudev",
+      "subject": "feat: implement comprehensive audiobook and book-to-video processing pipelines with advanced reader UI effects",
+      "body": "",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Admin Portal"
+      ],
+      "filesChanged": 2,
+      "files": [
+        {
+          "status": "M",
+          "file": "xomtruyen-admin/src/pages/Database.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xomtruyen-admin/src/pages/Users.tsx"
+        }
+      ]
+    },
+    {
+      "hash": "94272e24",
+      "date": "2026-08-19 16:32:46 +0700",
+      "author": "Phuvo",
+      "subject": "Update print statement from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/admin-book-to-video-pipeline.html"
+        }
+      ]
+    },
+    {
+      "hash": "efd064b8",
+      "date": "2026-08-19 16:32:03 +0700",
+      "author": "Phuvo",
+      "subject": "Update print statement from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/flipbook-page-effects-reader.html"
+        }
+      ]
+    },
+    {
+      "hash": "d3ba6920",
+      "date": "2026-08-19 16:13:59 +0700",
+      "author": "Phuvo",
+      "subject": "Update fmt.Println message from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/admin-comic-to-video-pipeline.html"
+        }
+      ]
+    },
+    {
+      "hash": "7e72d57d",
+      "date": "2026-08-18 14:36:10 +0700",
+      "author": "Phuvo",
+      "subject": "Incorporate UX research from major reading platforms",
+      "body": "Added UX research and features from popular reading platforms to enhance the reading experience on Xóm Truyện.",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "M",
+          "file": "xomtruyen-overview/pending/reading-ux-smooth-experience.html"
+        }
+      ]
+    },
+    {
+      "hash": "0a0fb3e3",
+      "date": "2026-08-18 13:51:57 +0700",
+      "author": "Phuvo",
+      "subject": "Update print statement from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/reading-ux-smooth-experience.html"
+        }
+      ]
+    },
+    {
+      "hash": "cad956ed",
+      "date": "2026-08-18 10:36:31 +0700",
+      "author": "Phuvo",
+      "subject": "Update fmt.Println output from 'Hello' to 'Goodbye'",
+      "body": "",
+      "version": null,
+      "changeType": "Cập Nhật (Update)",
+      "subsystems": [
+        "Overview Dashboard"
+      ],
+      "filesChanged": 1,
+      "files": [
+        {
+          "status": "A",
+          "file": "xomtruyen-overview/pending/reading-flow-design.html"
+        }
+      ]
+    },
+    {
+      "hash": "ad4850da",
+      "date": "2026-08-18 00:38:50 +0700",
+      "author": "phudev",
+      "subject": "feat: implement LMS core modules, real-time notification system, and cross-platform skeleton loading components",
+      "body": "",
+      "version": null,
+      "changeType": "Tính Năng Mới (Feature)",
+      "subsystems": [
+        "Web Client",
+        "Admin Portal",
+        "Mobile App",
+        "Overview Dashboard",
+        "Backend API"
+      ],
+      "filesChanged": 107,
+      "files": [
+        {
+          "status": "M",
+          "file": "xom-truyen/package-lock.json"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/package.json"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/App.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Auth/ForgotPasswordForm.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Book/BookSection.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Book/BookSlider.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/BookDetail/BookInfo.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Layout/Header.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Layout/NotificationBell.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/components/Layout/Sidebar.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/BookCardSkeleton.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/BookDetailSkeleton.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/ReadingPageSkeleton.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/Skeleton.scss"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/SkeletonBone.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/SkeletonGroup.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/Skeleton/SkeletonWrapper.tsx"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/components/common/Skeleton.tsx"
+        },
+        {
+          "status": "M",
+          "file": "xom-truyen/src/hooks/useAuth.ts"
+        },
+        {
+          "status": "A",
+          "file": "xom-truyen/src/hooks/useSkeleton.ts"
+        }
+      ]
+    },
     {
       "hash": "b14b4376",
       "date": "2026-08-17 14:52:50 +0700",
@@ -885,960 +1450,6 @@
         {
           "status": "A",
           "file": "xomtruyen-overview/huong-dan-deploy.html"
-        }
-      ]
-    },
-    {
-      "hash": "5dae445b",
-      "date": "2026-08-12 10:25:13 +0700",
-      "author": "Phuvo",
-      "subject": "Change greeting from 'Hello' to 'Goodbye'",
-      "body": "",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [
-        "Overview Dashboard"
-      ],
-      "filesChanged": 1,
-      "files": [
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/xomtruyen-roadmap.html"
-        }
-      ]
-    },
-    {
-      "hash": "ebcba479",
-      "date": "2026-08-12 09:03:13 +0700",
-      "author": "Phuvo",
-      "subject": "Add Vercel configuration for URL rewrites",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client"
-      ],
-      "filesChanged": 1,
-      "files": [
-        {
-          "status": "A",
-          "file": "xom-truyen/vercel.json"
-        }
-      ]
-    },
-    {
-      "hash": "1cd3de61",
-      "date": "2026-08-12 09:02:09 +0700",
-      "author": "Phuvo",
-      "subject": "Disable unused locals and parameters linting",
-      "body": "Changed noUnusedLocals and noUnusedParameters to false.",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [
-        "Web Client"
-      ],
-      "filesChanged": 1,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/tsconfig.app.json"
-        }
-      ]
-    },
-    {
-      "hash": "db1d14c3",
-      "date": "2026-08-12 09:01:44 +0700",
-      "author": "Phuvo",
-      "subject": "Simplify build script in package.json",
-      "body": "",
-      "version": null,
-      "changeType": "Giao Diện (UI/UX)",
-      "subsystems": [
-        "Web Client"
-      ],
-      "filesChanged": 1,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/package.json"
-        }
-      ]
-    },
-    {
-      "hash": "20dab1b3",
-      "date": "2026-08-12 08:42:18 +0700",
-      "author": "phudev",
-      "subject": "feat: initialize workspace overview dashboard and core reading components",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client",
-        "Overview Dashboard"
-      ],
-      "filesChanged": 5,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Reading/ComicReadingContent.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/ReadingPage.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/services/bookService.ts"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-overview/app.js"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-overview/index.html"
-        }
-      ]
-    },
-    {
-      "hash": "9733c43c",
-      "date": "2026-08-11 00:07:08 +0700",
-      "author": "phudev",
-      "subject": "Ignore upload directories and commit current source",
-      "body": "",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [
-        "Workspace",
-        "Web Client",
-        "Admin Portal",
-        "Overview Dashboard",
-        "Backend API"
-      ],
-      "filesChanged": 93,
-      "files": [
-        {
-          "status": "M",
-          "file": ".gitignore"
-        },
-        {
-          "status": "A",
-          "file": "xom-truyen-client.bat"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Book/BookCover.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/BookDetailPage.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin.bat"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/api/chapterApi.ts"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/api/uploadApi.ts"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/assets/scss/_variables.scss"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/components/BulkUploadModal.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/components/layout/Header.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/components/layout/Sidebar.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/constants/databaseDictionary.ts"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/BookDetails.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Books.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Categories.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Database.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/DatabaseTableViewer.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Topics.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Users.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app.bat"
-        }
-      ]
-    },
-    {
-      "hash": "f130974b",
-      "date": "2026-08-06 00:10:38 +0700",
-      "author": "phudev",
-      "subject": "feat: scaffold project structure with initial pages, services, custom hooks, and comprehensive styling",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client",
-        "Overview Dashboard"
-      ],
-      "filesChanged": 15,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Book/BookCard.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/hooks/useBooks.ts"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/index.css"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/BookDetailPage.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/ComicPage.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/LibraryPage.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/index.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xom-truyen/src/services/bookService.ts"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/styles/BookSlider.css"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/types/index.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/README.md"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/app.js"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/index.html"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/start-overview.bat"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-overview/style.css"
-        }
-      ]
-    },
-    {
-      "hash": "55788256",
-      "date": "2026-08-05 21:56:02 +0700",
-      "author": "phudev",
-      "subject": "feat(xom-truyen): add hover preview popover for book cards",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client"
-      ],
-      "filesChanged": 3,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Book/BookCard.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/styles/BookSlider.css"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/types/index.ts"
-        }
-      ]
-    },
-    {
-      "hash": "2e28e40a",
-      "date": "2026-08-05 20:53:09 +0700",
-      "author": "phudev",
-      "subject": "Merge remote-tracking branch 'origin/main' and resolve bin/obj conflicts",
-      "body": "",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [],
-      "filesChanged": 0,
-      "files": []
-    },
-    {
-      "hash": "174e01d6",
-      "date": "2026-08-05 20:50:11 +0700",
-      "author": "phudev",
-      "subject": "cmit all",
-      "body": "",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [
-        "Backend API"
-      ],
-      "filesChanged": 11,
-      "files": [
-        {
-          "status": "M",
-          "file": "xomtruyen.API/bin/Debug/net9.0/xomtruyen.API.dll"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/bin/Debug/net9.0/xomtruyen.API.exe"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/xomtruyen.API.pdb"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/apphost.exe"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/ref/xomtruyen.API.dll"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/refint/xomtruyen.API.dll"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/xomtruyen.API.AssemblyInfo.cs"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/xomtruyen.API.AssemblyInfoInputs.cache"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/xomtruyen.API.dll"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/xomtruyen.API.pdb"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/obj/Debug/net9.0/xomtruyen.API.sourcelink.json"
-        }
-      ]
-    },
-    {
-      "hash": "112d6ebc",
-      "date": "2026-07-25 23:14:14 +0700",
-      "author": "Phuvo",
-      "subject": "Update xomtruyen-app components, pages and configuration",
-      "body": "",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [
-        "Mobile App"
-      ],
-      "filesChanged": 11,
-      "files": [
-        {
-          "status": "M",
-          "file": "xomtruyen-app/.gitignore"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/BookDetail.css"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/BookDetail.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/ConfirmOrder.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/Home.css"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/Home.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/Onboarding.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/ReadBook.css"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/pages/ReadBook.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/src/theme/variables.css"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/vite.config.ts"
-        }
-      ]
-    },
-    {
-      "hash": "a8397393",
-      "date": "2026-07-25 23:06:51 +0700",
-      "author": "Phuvo",
-      "subject": "chore: remove API bin/obj from tracking",
-      "body": "",
-      "version": null,
-      "changeType": "Cập Nhật (Update)",
-      "subsystems": [
-        "Backend API"
-      ],
-      "filesChanged": 155,
-      "files": [
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/BCrypt-Net-Next.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Dapper.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Humanizer.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.AspNetCore.OpenApi.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.Bcl.AsyncInterfaces.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.Build.Locator.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.CSharp.Workspaces.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.CSharp.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.Workspaces.MSBuild.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.Workspaces.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Abstractions.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Design.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Relational.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.Extensions.DependencyModel.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.Abstractions.dll"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll"
-        }
-      ]
-    },
-    {
-      "hash": "3cf52a45",
-      "date": "2026-07-25 19:57:57 +0700",
-      "author": "Phuvo",
-      "subject": "feat: add application favicon and initialize base index.html files for app and admin modules",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Admin Portal",
-        "Mobile App"
-      ],
-      "filesChanged": 3,
-      "files": [
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/index.html"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-app/index.html"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/public/favicon.svg"
-        }
-      ]
-    },
-    {
-      "hash": "c53a7947",
-      "date": "2026-07-25 19:41:29 +0700",
-      "author": "Phuvo",
-      "subject": "thêm app",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Mobile App",
-        "Backend API"
-      ],
-      "filesChanged": 208,
-      "files": [
-        {
-          "status": "A",
-          "file": "xomtruyen-app/.browserslistrc"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/.gitignore"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/.vscode/extensions.json"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/.gitignore"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/.gitignore"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/build.gradle"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/capacitor.build.gradle"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/proguard-rules.pro"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/AndroidManifest.xml"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/java/io/ionic/starter/MainActivity.java"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-land-hdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-land-mdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-land-xhdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-land-xxhdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-land-xxxhdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-port-hdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-port-mdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-port-xhdpi/splash.png"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-app/android/app/src/main/res/drawable-port-xxhdpi/splash.png"
-        }
-      ]
-    },
-    {
-      "hash": "e49756f4",
-      "date": "2026-07-24 11:27:40 +0700",
-      "author": "phudev",
-      "subject": "feat: implement comic chapter management module with API endpoints and administrative UI components",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client",
-        "Admin Portal",
-        "Backend API"
-      ],
-      "filesChanged": 46,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/src/App.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/BookDetail/BookInfo.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Layout/Sidebar.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xom-truyen/src/components/Reading/ComicReadingContent.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/ReadingPage.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/demo_index.html"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/App.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/api/chapterApi.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/assets/css/nexlink.css"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/assets/scss/app.scss"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/components/layout/Header.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/index.scss"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/pages/BookDetails.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/BookFiles.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Books.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Database.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/DatabaseTableViewer.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen.API/Controllers/AdminComicChapterController.cs"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/Controllers/ManagerDBController.cs"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen.API/Models/Requests/ComicChapterRequest.cs"
-        }
-      ]
-    },
-    {
-      "hash": "6d4f88a9",
-      "date": "2026-07-22 00:34:57 +0700",
-      "author": "phudev",
-      "subject": "feat: implement Antigravity architecture including backend services, repository patterns, and core data models",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client",
-        "Admin Portal",
-        "Backend API"
-      ],
-      "filesChanged": 151,
-      "files": [
-        {
-          "status": "M",
-          "file": "xom-truyen/src/App.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Book/BookCard.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Bookmark/BookmarkItem.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/History/HistoryItem.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Layout/Sidebar.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xom-truyen/src/pages/LibraryPage.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/package-lock.json"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/package.json"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/App.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/api/bookApi.ts"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/components/users/ActionCellRenderer.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/BookFiles.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Books.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Categories.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/DatabaseTableViewer.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Topics.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/pages/Users.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen.API/Comparison_CurrentSource_vs_Antigravity.md"
-        },
-        {
-          "status": "D",
-          "file": "xomtruyen.API/Controllers/AdminBookController.cs"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen.API/Controllers/AdminCategoryController.cs"
-        }
-      ]
-    },
-    {
-      "hash": "47eef38b",
-      "date": "2026-07-21 00:42:07 +0700",
-      "author": "phudev",
-      "subject": "feat: implement comprehensive book upload, background processing, and database management system with admin dashboard features",
-      "body": "",
-      "version": null,
-      "changeType": "Tính Năng Mới (Feature)",
-      "subsystems": [
-        "Web Client",
-        "Admin Portal",
-        "Backend API"
-      ],
-      "filesChanged": 148,
-      "files": [
-        {
-          "status": "A",
-          "file": "xom-truyen/api_book_doc.md"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/App.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Book/BookCard.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Book/BookCover.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/components/Layout/Sidebar.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xom-truyen/src/hooks/useBooks.ts"
-        },
-        {
-          "status": "A",
-          "file": "xom-truyen/src/pages/ComicPage.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/pages/index.tsx"
-        },
-        {
-          "status": "M",
-          "file": "xom-truyen/src/types/index.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/api_book_doc.md"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/api_category_topic_doc.md"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/api_manager_db_doc.md"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/package-lock.json"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/package.json"
-        },
-        {
-          "status": "M",
-          "file": "xomtruyen-admin/src/App.tsx"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/api/bookApi.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/api/categoryApi.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/api/managerDbApi.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/api/topicApi.ts"
-        },
-        {
-          "status": "A",
-          "file": "xomtruyen-admin/src/api/uploadApi.ts"
         }
       ]
     }

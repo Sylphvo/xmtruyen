@@ -1,24 +1,44 @@
 {
-  "generatedAt": "2026-08-17T11:53:24.857Z",
+  "generatedAt": "2026-08-22T16:51:01.697Z",
   "workspace": "XomTruyen_Workspace",
   "latestVersion": "v0.0.0",
   "totalCommits": 50,
   "totalProjects": 4,
-  "totalTechnologies": 53,
+  "totalTechnologies": 60,
   "latestCommit": {
-    "commitHash": "b14b4376",
-    "diffStat": ".../pending/netflix-tech-optimization.html         | 815 +++++++++++++++++++++\n 1 file changed, 815 insertions(+)",
+    "commitHash": "cb81d653",
+    "diffStat": "xom-truyen/src/App.tsx                             |   44 +-\n xom-truyen/src/components/Book/BookCover.tsx       |    4 +-\n xom-truyen/src/components/BookDetail/BookInfo.tsx  |    4 +\n xom-truyen/src/components/common/ImageLazy.tsx     |   38 +\n xomtruyen-admin/src/App.tsx                        |  123 +-\n xomtruyen-admin/src/api/userApi.ts                 |    4 +-\n xomtruyen-admin/src/components/ErrorBoundary.tsx   |   80 +\n xomtruyen-admin/src/pages/ErrorLogPage.tsx         |  236 ++\n xomtruyen-admin/src/pages/HealthCheckPage.tsx      |  140 +\n xomtruyen-admin/src/services/errorService.ts       |  181 ++\n xomtruyen-admin/src/utils/retryFetch.ts            |   46 +\n xomtruyen.API/Controllers/ErrorLogController.cs    |  116 +\n xomtruyen.API/Controllers/HealthCheckController.cs |  101 +\n xomtruyen.API/Data/ApplicationDbContext.cs         |    1 +\n .../Middleware/GlobalExceptionMiddleware.cs        |   78 +\n .../20260820144708_AddErrorLogs.Designer.cs        | 2994 ++++++++++++++++++++\n .../Migrations/20260820144708_AddErrorLogs.cs      |   47 +\n .../ApplicationDbContextModelSnapshot.cs           |   65 +\n xomtruyen.API/Models/ErrorLog.cs                   |   34 +\n xomtruyen.API/Program.cs                           |    3 +\n 20 files changed, 4260 insertions(+), 79 deletions(-)",
     "summary": {
       "added": [
-        "xomtruyen-overview/pending/netflix-tech-optimization.html"
+        "xom-truyen/src/components/common/ImageLazy.tsx",
+        "xomtruyen-admin/src/components/ErrorBoundary.tsx",
+        "xomtruyen-admin/src/pages/ErrorLogPage.tsx",
+        "xomtruyen-admin/src/pages/HealthCheckPage.tsx",
+        "xomtruyen-admin/src/services/errorService.ts",
+        "xomtruyen-admin/src/utils/retryFetch.ts",
+        "xomtruyen.API/Controllers/ErrorLogController.cs",
+        "xomtruyen.API/Controllers/HealthCheckController.cs",
+        "xomtruyen.API/Middleware/GlobalExceptionMiddleware.cs",
+        "xomtruyen.API/Migrations/20260820144708_AddErrorLogs.Designer.cs",
+        "xomtruyen.API/Migrations/20260820144708_AddErrorLogs.cs",
+        "xomtruyen.API/Models/ErrorLog.cs"
       ],
-      "modified": [],
+      "modified": [
+        "xom-truyen/src/App.tsx",
+        "xom-truyen/src/components/Book/BookCover.tsx",
+        "xom-truyen/src/components/BookDetail/BookInfo.tsx",
+        "xomtruyen-admin/src/App.tsx",
+        "xomtruyen-admin/src/api/userApi.ts",
+        "xomtruyen.API/Data/ApplicationDbContext.cs",
+        "xomtruyen.API/Migrations/ApplicationDbContextModelSnapshot.cs",
+        "xomtruyen.API/Program.cs"
+      ],
       "deleted": [],
       "renamed": []
     },
-    "totalFiles": 1,
-    "totalAdded": 1,
-    "totalModified": 0,
+    "totalFiles": 20,
+    "totalAdded": 12,
+    "totalModified": 8,
     "totalDeleted": 0
   },
   "outputFiles": [

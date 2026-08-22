@@ -45,7 +45,7 @@ export default function BookInfo({ book, isLoading }: BookInfoProps) {
       {/* Book Cover */}
       <div style={{ flexShrink: 0 }}>
         {/* Reusing BookCover component, using a larger size */}
-        isLoading ? <Skeleton type="rectangular" width={240} height={340} borderRadius="12px" /> : <BookCover book={book} width={240} height={340} />
+        {isLoading ? <Skeleton type="rectangular" width={240} height={340} borderRadius="12px" /> : <BookCover book={book} width={240} height={340} />}
       </div>
 
       {/* Book Details */}
@@ -159,30 +159,7 @@ export default function BookInfo({ book, isLoading }: BookInfoProps) {
           </button>
         </div>}
 
-        {/* Description */}
-        {isLoading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <Skeleton type="text" width="100%" height="20px" />
-            <Skeleton type="text" width="100%" height="20px" />
-            <Skeleton type="text" width="80%" height="20px" />
-          </div>
-        ) : <div style={{ fontSize: "14px", color: "#4b5563", lineHeight: 1.6 }}>
-          <p style={{ margin: 0 }}>
-            Tống Thiên Thị luôn cảm thấy hàng xóm mới là một người không dễ sống chung, bởi hắn không chỉ lạnh lùng mà lời nói ra cũng chẳng dễ lọt tai. Mãi cho đến một ngày cô bị hàng xóm chặn trên hành lang.
-          </p>
-          <p style={{ margin: "4px 0 0 0" }}>
-            Đôi mắt của luật sư Ôn sáng quắc: "Trộm nhìn ít có quả, tôi chính là quả của em."
-          </p>
-          <p style={{ margin: "4px 0 0 0" }}>
-            Tống Thiên Thị nhìn người đàn ông ăn mặc chỉnh tề trước mặt, đột nhiên thay đổi quan điểm về anh.
-          </p>
-          <p style={{ margin: "4px 0 0 0" }}>
-            ...
-          </p>
-          <p style={{ margin: "4px 0 0 0" }}>
-            Cô cho rằng... <span style={{ color: "#2196f3", cursor: "pointer", fontWeight: 500 }}>Xem thêm</span>
-          </p>
-        </div>}
+        {/* Removed Description to move to Tabs */}
       </div>
     </div>
   );

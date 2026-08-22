@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using XomTruyen.API.Data;
@@ -11,9 +12,11 @@ using XomTruyen.API.Data;
 namespace xomtruyen.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260822120141_AddImportPipeline")]
+    partial class AddImportPipeline
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1112,38 +1115,6 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("ErrorLogs");
                 });
 
-            modelBuilder.Entity("XomTruyen.API.Models.FaqItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Answer")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FaqItems");
-                });
-
             modelBuilder.Entity("XomTruyen.API.Models.HelpArticle", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1715,44 +1686,6 @@ namespace xomtruyen.API.Migrations
                     b.ToTable("PublicationTopics");
                 });
 
-            modelBuilder.Entity("XomTruyen.API.Models.ReaderPreference", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("BreakReminderIntervalMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<float>("Contrast")
-                        .HasColumnType("real");
-
-                    b.Property<bool>("EnableBreakReminder")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("FontFamily")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("FontSize")
-                        .HasColumnType("integer");
-
-                    b.Property<float>("LineHeight")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Theme")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("ReaderPreferences");
-                });
-
             modelBuilder.Entity("XomTruyen.API.Models.ReadingAnalytic", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1893,51 +1826,6 @@ namespace xomtruyen.API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("XomTruyen.API.Models.StaticPage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("MetaDescription")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MetaTitle")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
-                    b.ToTable("StaticPages");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.SubscriptionPlan", b =>
@@ -2965,17 +2853,6 @@ namespace xomtruyen.API.Migrations
                     b.Navigation("Publication");
 
                     b.Navigation("Topic");
-                });
-
-            modelBuilder.Entity("XomTruyen.API.Models.ReaderPreference", b =>
-                {
-                    b.HasOne("XomTruyen.API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("XomTruyen.API.Models.ReadingAnalytic", b =>

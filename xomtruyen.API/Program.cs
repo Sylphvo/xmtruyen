@@ -12,6 +12,7 @@ using XomTruyen.API.Services.Implementations;
 using XomTruyen.API.Services.Background;
 using XomTruyen.API.Services;
 using XomTruyen.API.Services.VideoConvert;
+using XomTruyen.API.Services.Import;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,9 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<XomTruyen.API.Services.IPaymentService, XomTruyen.API.Services.PaymentService>();
 builder.Services.AddScoped<IEngagementService, EngagementService>();
 builder.Services.AddScoped<IDiscoveryService, DiscoveryService>();
+builder.Services.AddScoped<IImportService, ImportService>();
+builder.Services.AddScoped<IPasteParserService, PasteParserService>();
+builder.Services.AddScoped<IOcrService, OcrService>();
 
 // Register Audiobook Services
 builder.Services.AddSingleton<AudioJobQueue>();

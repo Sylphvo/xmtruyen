@@ -141,20 +141,34 @@ export default function ReadingPage() {
 
   const maxPages = isComicMode ? comicPages.length : textPages.length;
 
+  // Prefetch next chapter when reading past 80%
+  useEffect(() => {
+    if (chapters.length > 0 && currentChapterIndex < chapters.length - 1 && maxPages > 0) {
+      if (pageIndex / maxPages >= 0.8) {
+        const nextChapterId = chapters[currentChapterIndex + 1].id;
+        // Check if already in cache (we'll just call the API and let browser cache / ServiceWorker handle it or rely on react state caching if implemented, but just calling getChapterContent is fine here for network prefetch)
+        getChapterContent(nextChapterId).catch(() => {});
+      }
+    }
+  }, [pageIndex, maxPages, currentChapterIndex, chapters]);
+
   const handleToggleBookmark = async () => {
     if (chapters.length > 0 && chapters[currentChapterIndex]) {
       const chapterId = chapters[currentChapterIndex].id;
       const chapterType = isComicMode ? 2 : 1;
+      
+      const prevStatus = isBookmarked;
+      setIsBookmarked(!prevStatus); // Optimistic Update
+
       try {
         const res = await toggleBookmark(chapterId, chapterType);
         if (res.message === "Added bookmark") {
           setIsBookmarked(true);
-          alert("Đã thêm đánh dấu trang!");
         } else {
           setIsBookmarked(false);
-          alert("Đã bỏ đánh dấu trang!");
         }
       } catch (err) {
+        setIsBookmarked(prevStatus); // Rollback
         alert("Vui lòng đăng nhập để đánh dấu trang!");
       }
     }

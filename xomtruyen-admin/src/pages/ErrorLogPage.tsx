@@ -3,7 +3,7 @@ import {
     AlertTriangle, XCircle, AlertCircle, CheckCircle, Search, Filter, 
     RefreshCw, Trash2, X, Download
 } from 'lucide-react';
-import { api } from '../api';
+import { apiClient as api } from '../api/userApi';
 import toast from 'react-hot-toast';
 
 export const ErrorLogPage = () => {

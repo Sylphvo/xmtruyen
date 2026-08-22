@@ -1,0 +1,114 @@
+.tts-player-container {
+    background: #fff;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 10px 20px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.tts-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tts-btn {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.tts-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.play-btn {
+    background: #007bff;
+    color: white;
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+}
+
+.play-btn:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.tts-divider {
+    width: 1px;
+    height: 24px;
+    background: #ddd;
+    margin: 0 5px;
+}
+
+.tts-settings-panel {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.tts-setting-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.tts-setting-row input[type="range"] {
+    width: 100%;
+}
+
+.tts-setting-row select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+/* Dark mode */
+:root[data-theme="dark"] .tts-player-container {
+    background: #2a2a2a;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+:root[data-theme="dark"] .tts-btn {
+    color: #ccc;
+}
+:root[data-theme="dark"] .tts-btn:hover {
+    background: #444;
+    color: #fff;
+}
+:root[data-theme="dark"] .tts-divider {
+    background: #444;
+}
+:root[data-theme="dark"] .tts-settings-panel {
+    border-top-color: #444;
+}
+:root[data-theme="dark"] .tts-setting-row {
+    color: #ccc;
+}
+:root[data-theme="dark"] .tts-setting-row select {
+    background: #333;
+    color: #fff;
+    border-color: #555;
+}

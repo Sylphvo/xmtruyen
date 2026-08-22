@@ -31,6 +31,7 @@ export const ImageLazy: React.FC<ImageLazyProps> = ({
         if (props.onError) props.onError(e);
       }}
       loading="lazy"
+      decoding="async"
       {...props}
       style={{ ...props.style, transition: 'opacity 0.5s ease-in-out' }}
     />

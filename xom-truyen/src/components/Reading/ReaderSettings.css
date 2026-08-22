@@ -1,0 +1,160 @@
+.reader-settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.reader-settings-panel {
+    background: var(--surface-color, #ffffff);
+    color: var(--text-color, #333333);
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90vw;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eeeeee;
+    background: #f8f9fa;
+}
+
+.settings-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+.settings-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.setting-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-row {
+    display: flex;
+    gap: 20px;
+}
+.setting-row .setting-group {
+    flex: 1;
+}
+
+.theme-options {
+    display: flex;
+    gap: 10px;
+}
+
+.theme-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #fff;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.theme-btn.active {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+.theme-btn:nth-child(3) {
+    background: #1a1a1a;
+    color: #fff;
+    border-color: #333;
+}
+
+select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    width: 100%;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: #007bff;
+}
+
+.break-reminder-group {
+    background: #f0f7ff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #cce5ff;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #004085;
+    cursor: pointer;
+}
+
+.reminder-interval {
+    margin-top: 10px;
+    padding-left: 24px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.reminder-interval select {
+    width: auto;
+    padding: 4px 8px;
+    margin-left: 8px;
+}
+
+/* Dark mode adjustments for the panel itself if needed */
+:root[data-theme="dark"] .reader-settings-panel {
+    background: #2a2a2a;
+    color: #eee;
+}
+:root[data-theme="dark"] .settings-header {
+    background: #1f1f1f;
+    border-color: #444;
+}
+:root[data-theme="dark"] .break-reminder-group {
+    background: #1a2632;
+    border-color: #2c3e50;
+    color: #8cb4d6;
+}
+:root[data-theme="dark"] .checkbox-label {
+    color: #8cb4d6;
+}

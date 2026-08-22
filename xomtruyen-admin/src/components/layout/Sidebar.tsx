@@ -72,9 +72,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
       setActiveMenu('transactions');
     } else if (path.startsWith('/notifications') || path.startsWith('/reports') || path.startsWith('/reviews')) {
       setActiveMenu('notifications');
-    } else if (path.startsWith('/promotions') || path.startsWith('/banners') || path.startsWith('/home-sections') || path.startsWith('/email-templates') || path.startsWith('/help-articles')) {
+    } else if (path.startsWith('/promotions') || path.startsWith('/banners') || path.startsWith('/home-sections') || path.startsWith('/email-templates') || path.startsWith('/help-articles') || path.startsWith('/static-pages') || path.startsWith('/faq-management')) {
       setActiveMenu('marketing');
-    } else if (path.startsWith('/crawlers') || path.startsWith('/translation')) {
+    } else if (path.startsWith('/crawlers') || path.startsWith('/translation') || path.startsWith('/import') || path.startsWith('/print-pipeline')) {
       setActiveMenu('automation');
     } else if (path.startsWith('/audio') || path.startsWith('/book-video') || path.startsWith('/comic-video')) {
       setActiveMenu('audio');
@@ -361,12 +361,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                 <HelpCircle />
                 <span>Trợ giúp <span className="text-secondary small" style={{ fontSize: '12px' }}>(Help Center)</span></span>
               </NavLink>
+              <NavLink to="/static-pages" className="menu-link" end>
+                <FileText />
+                <span>Trang Tĩnh <span className="text-secondary small" style={{ fontSize: '12px' }}>(CMS)</span></span>
+              </NavLink>
+              <NavLink to="/faq-management" className="menu-link" end>
+                <HelpCircle />
+                <span>FAQ <span className="text-secondary small" style={{ fontSize: '12px' }}>(Hỏi đáp)</span></span>
+              </NavLink>
             </>
           )}
 
           {activeMenu === 'automation' && (
             <>
               <div className="menu-heading">Tự động hóa (Phase 1)</div>
+              <NavLink to="/import" className="menu-link" end>
+                <Database />
+                <span>Import Dữ Liệu <span className="text-secondary small" style={{ fontSize: '12px' }}>(CSV/JSON)</span></span>
+              </NavLink>
               <NavLink to="/crawlers" className="menu-link" end>
                 <Bot />
                 <span>Crawler Pipeline <span className="text-secondary small" style={{ fontSize: '12px' }}>(Bot)</span></span>
@@ -382,6 +394,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
               <NavLink to="/translation/glossary" className="menu-link" end>
                 <BookOpen />
                 <span>Từ điển (Glossary)</span>
+              </NavLink>
+              
+              <div className="menu-heading mt-3">Dàn Trang & In Ấn (Phase 5)</div>
+              <NavLink to="/print-pipeline" className="menu-link" end>
+                <BookOpen />
+                <span>Xuất bản PDF / CMYK</span>
               </NavLink>
             </>
           )}

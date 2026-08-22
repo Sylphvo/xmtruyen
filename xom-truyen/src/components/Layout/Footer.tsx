@@ -1,127 +1,114 @@
-import { ACCENT } from "../../constants";
-import { BookOpen } from "lucide-react";
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const FOOTER_LINKS = {
+    about: {
+        title: 'Về Chúng Tôi',
+        links: [
+            { label: 'Giới thiệu', path: '/about' },
+            { label: 'Liên hệ', path: '/contact' },
+            { label: 'Tuyển dụng', path: '/careers' },
+            { label: 'Cơ hội đầu tư', path: '/about/invest' },
+        ]
+    },
+    info: {
+        title: 'Thông Tin Hữu Ích',
+        links: [
+            { label: 'Thỏa thuận sử dụng', path: '/terms' },
+            { label: 'Quyền lợi hội viên', path: '/benefits' },
+            { label: 'Quy định riêng tư', path: '/privacy' },
+            { label: 'Câu hỏi thường gặp', path: '/faq' },
+            { label: 'Quy chế hoạt động', path: '/marketplace-rules' },
+        ]
+    },
+    support: {
+        title: 'Hỗ Trợ Khách Hàng',
+        links: [
+            { label: 'Chính sách đổi trả', path: '/refund-policy' },
+            { label: 'Chính sách thanh toán', path: '/payment-policy' },
+            { label: 'Giải quyết khiếu nại', path: '/complaints' },
+            { label: 'Bảo mật thông tin', path: '/security-policy' },
+        ]
+    },
+    news: {
+        title: 'Tin Tức',
+        links: [
+            { label: 'Tin dịch vụ', path: '/news' },
+            { label: 'Review sách', path: '/blog/reviews' },
+            { label: 'Lịch phát hành', path: '/schedule' },
+        ]
+    }
+};
 
 export default function Footer() {
-  const footerCols = [
-    {
-      title: "Services",
-      items: ["Email Marketing", "Campaigns", "Branding", "Offline"],
-    },
-    {
-      title: "About",
-      items: ["Our Story", "Benefits", "Team", "Careers"]
-    },
-    {
-      title: "Follow Us",
-      items: [
-        { name: "Facebook" },
-        { name: "Twitter" },
-        { name: "Instagram" }
-      ]
-    },
-  ];
+    return (
+        <footer style={{
+            backgroundColor: '#111827',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            padding: '60px 0 40px',
+            marginTop: 'auto'
+        }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 30px' }}>
+                {/* 4 Columns */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 40, marginBottom: 40 }}>
+                    {/* Column 1: Brand */}
+                    <div>
+                        <h3 style={{ fontSize: 20, fontWeight: 800, color: '#00d4ff', marginBottom: 12 }}>
+                            XÓM TRUYỆN
+                        </h3>
+                        <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20, lineHeight: 1.6 }}>
+                            Nền tảng đọc truyện trực tuyến hàng đầu Việt Nam. Sách nói, ebook, truyện tranh với hàng ngàn đầu sách chất lượng.
+                        </p>
+                        <div style={{ fontSize: 13, color: '#9ca3af', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <div>📞 Hotline: <strong style={{ color: '#e5e7eb' }}>0877.736.289</strong></div>
+                            <div>📧 Email: <strong style={{ color: '#e5e7eb' }}>support@xomtruyen.com</strong></div>
+                        </div>
+                        {/* App download badges */}
+                        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                            <img src="/badges/appstore.svg" alt="App Store" style={{ height: 36 }} />
+                            <img src="/badges/googleplay.svg" alt="Google Play" style={{ height: 36 }} />
+                        </div>
+                    </div>
 
-  return (
-    <footer
-      style={{
-        backgroundColor: "var(--bg-primary)",
-        color: "var(--text-primary)",
-        padding: "36px 28px 20px",
-        fontSize: 12,
-        marginTop: 8,
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
-          gap: 28,
-        }}
-      >
-        {/* Brand */}
-        <div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                border: "1.5px solid var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <BookOpen size={18} color="var(--text-primary)" />
+                    {/* Columns 2-4: Link groups */}
+                    {Object.values(FOOTER_LINKS).map(group => (
+                        <div key={group.title}>
+                            <h4 style={{ fontSize: 14, fontWeight: 700, color: '#e5e7eb', marginBottom: 16 }}>
+                                {group.title}
+                            </h4>
+                            <ul style={{ listStyle: 'none', padding: 0 }}>
+                                {group.links.map(link => (
+                                    <li key={link.path} style={{ marginBottom: 10 }}>
+                                        <Link to={link.path} style={{
+                                            fontSize: 13, color: '#9ca3af', textDecoration: 'none',
+                                            transition: 'color 200ms'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
+                                        onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Bottom bar */}
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, textAlign: 'center' }}>
+                    <p style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.8 }}>
+                        © 2026 Xóm Truyện. Nền tảng đọc truyện trực tuyến.<br/>
+                        Giấy xác nhận đăng ký hoạt động TMĐT số XXXXXXXX.<br/>
+                        Địa chỉ: Thành phố Hồ Chí Minh, Việt Nam.
+                    </p>
+                    {/* Trust badges */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 16 }}>
+                        <img src="/badges/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" style={{ height: 40 }} />
+                        <img src="/badges/dmca.png" alt="DMCA Protected" style={{ height: 40 }} />
+                    </div>
+                </div>
             </div>
-          </div>
-          <p
-            style={{ fontSize: 11, lineHeight: 1.8, margin: 0, color: "var(--text-muted, #666)", paddingRight: "40px" }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          </p>
-        </div>
-
-        <div style={{ display: "flex", gap: "60px", gridColumn: "span 3" }}>
-          {footerCols.map(({ title, items }) => (
-            <div key={title} style={{ flex: 1 }}>
-              <p
-                style={{
-                  fontWeight: 500,
-                  margin: "0 0 16px",
-                  fontSize: 12,
-                  color: "#9ca3af"
-                }}
-              >
-                {title}
-              </p>
-              {items.map((item) => (
-                <p
-                  key={typeof item === 'string' ? item : item.name}
-                  style={{
-                    margin: "0 0 12px",
-                    cursor: "pointer",
-                    color: "var(--text-primary)",
-                    fontSize: 11,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    fontWeight: 500
-                  }}
-                >
-                  {typeof item !== 'string' && item.icon}
-                  {typeof item === 'string' ? item : item.name}
-                </p>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 40,
-          paddingTop: 20,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: 10,
-          color: "#6b7280",
-        }}
-      >
-        <span>Copyright © 2020. LogoIpsum. All rights reserved.</span>
-        <div style={{ display: "flex", gap: 24, color: "#4b5563" }}>
-          <span style={{ cursor: "pointer" }}>Terms & Conditions</span>
-          <span style={{ cursor: "pointer" }}>Privacy Policy</span>
-        </div>
-      </div>
-    </footer>
-  );
+        </footer>
+    );
 }

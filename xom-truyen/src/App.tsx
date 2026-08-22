@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
-// import Footer from "./components/Layout/Footer";
+import Footer from "./components/Layout/Footer";
 import { lazy, Suspense } from 'react';
 
+const StaticPage = lazy(() => import("./pages/static/StaticPage"));
 const HomePage = lazy(() => import("./pages"));
 const LibraryPage = lazy(() => import("./pages/LibraryPage"));
 const ComicPage = lazy(() => import("./pages/ComicPage"));
@@ -52,7 +53,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       >
         <Header />
         {children}
-        {/* <Footer /> */}
+        <Footer />
       </div>
     </div>
   );
@@ -112,6 +113,19 @@ export default function App() {
             </MainLayout>
           }
         />
+
+        {/* Static Pages */}
+        {['about', 'terms', 'privacy', 'refund-policy', 'payment-policy', 'benefits', 'careers', 'marketplace-rules', 'security-policy', 'complaints', 'schedule'].map(slug => (
+          <Route
+            key={slug}
+            path={`/${slug}`}
+            element={
+              <MainLayout>
+                <StaticPage slugProp={slug} />
+              </MainLayout>
+            }
+          />
+        ))}
 
         {/* Tuyến đường Tìm kiếm */}
         <Route

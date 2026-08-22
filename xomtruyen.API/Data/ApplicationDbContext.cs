@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserFavorite> UserFavorites { get; set; }
     public DbSet<UserPublication> UserPublications { get; set; }
     public DbSet<Note> Notes { get; set; }
+    public DbSet<ReaderPreference> ReaderPreferences { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<UserToken> UserTokens { get; set; }
@@ -54,6 +55,14 @@ public class ApplicationDbContext : DbContext
     public DbSet<EmailTemplate> EmailTemplates { get; set; }
     public DbSet<HelpArticle> HelpArticles { get; set; }
     public DbSet<ErrorLog> ErrorLogs { get; set; }
+    
+    // Import Pipeline
+    public DbSet<ImportJob> ImportJobs { get; set; }
+    public DbSet<NormalizedImportRow> NormalizedImportRows { get; set; }
+
+    // CMS / Static Content
+    public DbSet<StaticPage> StaticPages { get; set; }
+    public DbSet<FaqItem> FaqItems { get; set; }
 
     // Audiobook Pipeline
     public DbSet<AudioChapter> AudioChapters { get; set; }
@@ -285,6 +294,12 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // ReaderPreference
+        modelBuilder.Entity<ReaderPreference>(entity =>
+        {
+            entity.HasKey(e => e.UserId);
+        });
+
         // Review
         modelBuilder.Entity<Review>(entity =>
         {
@@ -391,6 +406,33 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<AudioSfx>(entity =>
         {
             entity.HasKey(e => e.Id);
+        });
+
+        // Import Pipeline
+        modelBuilder.Entity<ImportJob>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.SourceType);
+        });
+
+        // CMS
+        modelBuilder.Entity<StaticPage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Slug).IsUnique();
+        });
+
+        modelBuilder.Entity<FaqItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        modelBuilder.Entity<NormalizedImportRow>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.ImportJobId, e.RowIndex });
+            entity.HasIndex(e => e.Status);
         });
     }
 }

@@ -48,6 +48,10 @@ import { ComicVideoJobDetail } from './pages/ComicVideoJobDetail';
 import { ErrorLogPage } from './pages/ErrorLogPage';
 import { HealthCheckPage } from './pages/HealthCheckPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import ImportData from './pages/ImportData';
+import PrintPipeline from './pages/PrintPipeline';
+import { StaticPages } from './pages/StaticPages';
+import { FaqManagement } from './pages/FaqManagement';
 
 function App() {
   return (
@@ -108,6 +112,13 @@ function App() {
             {/* Error Management Routes */}
             <Route path="/error-logs" element={<ErrorLogPage />} />
             <Route path="/health" element={<HealthCheckPage />} />
+            
+            <Route path="/import" element={<ImportData />} />
+            <Route path="/print-pipeline" element={<PrintPipeline />} />
+            
+            {/* CMS / Static Content */}
+            <Route path="/static-pages" element={<StaticPages />} />
+            <Route path="/faq-management" element={<FaqManagement />} />
               </Route>
             </Route>
           </Routes>
