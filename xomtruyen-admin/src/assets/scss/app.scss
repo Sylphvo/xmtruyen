@@ -424,14 +424,14 @@ html[data-bs-theme="dark"] body {
 
 .jira-table-header {
   background-color: transparent !important;
-  border-bottom: 2px solid var(--jira-border) !important;
 }
 
 .jira-table-header th {
   background-color: transparent !important;
   color: var(--jira-text-muted) !important;
   border: none !important;
-  border-right: none !important;
+  border-bottom: 2px solid var(--jira-border) !important;
+  border-right: 1px solid var(--jira-border) !important;
   padding: 10px 16px !important;
   font-size: 12px;
   font-weight: 600;
@@ -443,6 +443,33 @@ html[data-bs-theme="dark"] body {
   border-right: none !important;
 }
 
+.jira-status-item {
+  border-left: 2px solid transparent !important;
+  background-color: transparent !important;
+  
+  &:hover, &:focus {
+    background-color: var(--jira-hover-bg) !important;
+  }
+  
+  &.active {
+    background-color: var(--jira-hover-bg) !important;
+    border-left: 2px solid #0c66e4 !important;
+  }
+}
+
+.jira-action-toggle {
+  transition: background-color 0.1s ease;
+  
+  &::after {
+    display: none !important;
+  }
+  
+  &:hover, &:focus, &[aria-expanded="true"] {
+    background-color: var(--jira-hover-bg) !important;
+    border-radius: 4px;
+  }
+}
+
 .jira-empty-state {
   display: flex;
   flex-direction: column;
@@ -450,6 +477,13 @@ html[data-bs-theme="dark"] body {
   justify-content: center;
   height: 400px;
   text-align: center;
+
+  /* Sticky centering fix */
+  position: sticky;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 90vw;
 
   h4 {
     font-weight: 600;
@@ -522,11 +556,11 @@ html[data-bs-theme="dark"] body {
 }
 
 .jira-table-row {
-  border-bottom: 1px solid var(--jira-border) !important;
   background-color: transparent !important;
 
   td {
     border: none !important;
+    border-bottom: 1px solid var(--jira-border) !important;
     border-right: 1px solid var(--jira-border) !important;
     color: var(--jira-text) !important;
     background-color: transparent !important;
@@ -703,6 +737,99 @@ html[data-bs-theme="dark"] body {
   font-size: 12px;
   font-weight: 500;
   border: 1px solid transparent;
+}
+/* GLOBAL SELECT BOX JIRA STYLE */
+.form-select, select.form-select, select {
+  background-color: var(--bg-main) !important;
+  color: var(--jira-text) !important;
+  border: 1px solid var(--jira-border) !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 4px 8px !important;
+  padding-right: 24px !important; /* Make room for custom arrow */
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235e6c84" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') !important;
+  background-size: 14px !important;
+  background-position: right 6px center !important;
+  background-repeat: no-repeat !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-shadow: none !important;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.form-select:hover, select:hover {
+  background-color: var(--jira-hover-bg) !important;
+}
+
+.form-select:focus, select:focus {
+  border-color: #4c9aff !important;
+  background-color: var(--bg-main) !important;
+}
+
+/* React Select Jira Style Overrides */
+[class*="-control"] {
+  background-color: var(--bg-main) !important;
+  border: 1px solid var(--jira-border) !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  min-height: 32px !important;
+  box-shadow: none !important;
+  transition: background-color 0.2s;
+  cursor: pointer !important;
+}
+
+[class*="-control"]:hover {
+  background-color: var(--jira-hover-bg) !important;
+}
+
+[class*="-control"].css-1s2u09g-control, /* Focused state */
+[class*="-control"]:focus-within {
+  border-color: #4c9aff !important;
+  background-color: var(--bg-main) !important;
+}
+
+[class*="-menu"] {
+  background-color: var(--bg-main) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.3) !important;
+  margin-top: 0px !important;
+  padding: 0px 0 !important;
+}
+
+[class*="-option"] {
+  color: var(--jira-text) !important;
+  font-size: 13px !important;
+  padding: 6px 12px !important;
+  background-color: transparent !important;
+  border-left: 2px solid transparent !important;
+  cursor: pointer !important;
+}
+
+/* Hover / focused state of option */
+[class*="-option"]:hover,
+[class*="-option"][id*="-focused"] {
+  background-color: var(--jira-hover-bg) !important;
+  border-left: 2px solid #0c66e4 !important;
+}
+
+/* Selected state of option */
+[class*="-option"][aria-selected="true"] {
+  background-color: #e9f2ff !important;
+  color: #0c66e4 !important;
+  border-left: 2px solid #0c66e4 !important;
+}
+
+[class*="-singleValue"] {
+  color: var(--jira-text) !important;
+}
+
+[class*="-indicatorSeparator"] {
+  display: none !important;
 }
 
 @import '_infinite-scroll';

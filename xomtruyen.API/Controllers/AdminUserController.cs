@@ -97,6 +97,20 @@ public class AdminUserController : BaseApiController
         {
             return NotFound(new { Message = ex.Message });
         }
+}
+    [HttpPatch("{id}/preferences")]
+    public async Task<IActionResult> UpdatePreferences(Guid id, [FromBody] object preferences)
+    {
+        try
+        {
+            var preferencesJson = System.Text.Json.JsonSerializer.Serialize(preferences);
+            await _userService.UpdateAdminPreferencesAsync(id, preferencesJson);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { Message = ex.Message });
+        }
     }
 }
 

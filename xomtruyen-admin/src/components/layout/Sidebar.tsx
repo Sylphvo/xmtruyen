@@ -13,6 +13,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   const path = location.pathname;
 
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [activeBookSubMenu, setActiveBookSubMenu] = useState('');
   const [dbTables, setDbTables] = useState<string[]>([]);
 
   // Resize states
@@ -60,6 +61,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   }, [isResizing]);
 
   useEffect(() => {
+    // Trang chi tiết sách (/books/[id]) - dùng referrer để biết active menu con nào
+    if (/^\/books\/[^/]+$/.test(path)) {
+      const referrer = sessionStorage.getItem('bookDetailReferrer') || '';
+      setActiveMenu('books');
+      if (referrer.startsWith('/all-books')) setActiveBookSubMenu('/all-books');
+      else if (referrer === '/books' || referrer.startsWith('/books?')) setActiveBookSubMenu('/books');
+      else if (referrer.startsWith('/comics')) setActiveBookSubMenu('/comics');
+      else setActiveBookSubMenu('');
+      return;
+    }
+    // Xóa referrer và sub-menu khi rời khỏi trang chi tiết
+    if (!path.startsWith('/books/')) {
+      sessionStorage.removeItem('bookDetailReferrer');
+      setActiveBookSubMenu('');
+    }
+
     if (path.startsWith('/all-books') || path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/book-files') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-chapters') || path.startsWith('/authors') || path.startsWith('/reading-analytics')) {
       setActiveMenu('books');
     } else if (path.startsWith('/plans')) {
@@ -192,11 +209,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           {activeMenu === 'books' && (
             <>
               <div className="menu-heading">Quản lý Sách</div>
-              <NavLink to="/all-books" className="menu-link" end>
+              <NavLink to="/all-books" className={({ isActive }) => `menu-link${isActive || activeBookSubMenu === '/all-books' ? ' active' : ''}`} end>
                 <Database />
                 <span>Tất cả sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(All Books)</span></span>
               </NavLink>
-              <NavLink to="/books" className="menu-link" end>
+              <NavLink to="/books" className={({ isActive }) => `menu-link${isActive || activeBookSubMenu === '/books' ? ' active' : ''}`} end>
                 <Book />
                 <span>Sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Books)</span></span>
               </NavLink>
@@ -208,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                 <BarChart2 />
                 <span>Phân tích Lượt đọc <span className="text-secondary small" style={{ fontSize: '12px' }}>(Analytics)</span></span>
               </NavLink>
-              <NavLink to="/comics" className="menu-link">
+              <NavLink to="/comics" className={({ isActive }) => `menu-link${isActive || activeBookSubMenu === '/comics' ? ' active' : ''}`}>
                 <Book />
                 <span>Truyện <span className="text-secondary small" style={{ fontSize: '12px' }}>(Truyện tranh)</span></span>
               </NavLink>

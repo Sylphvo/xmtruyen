@@ -105,6 +105,15 @@ public class UserManagementService : IUserManagementService
         await _userRepository.UpdateUserAsync(user);
     }
 
+    public async Task UpdateAdminPreferencesAsync(Guid id, string? preferencesJson)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null) throw new KeyNotFoundException("User not found");
+
+        user.AdminPreferences = preferencesJson;
+        await _userRepository.UpdateUserAsync(user);
+    }
+
     private static AdminUserResponse MapToResponse(User user)
     {
         return new AdminUserResponse
@@ -121,7 +130,8 @@ public class UserManagementService : IUserManagementService
             TotalGuestReads = user.TotalGuestReads,
             DailyReadCount = user.DailyReadCount,
             CreatedAt = user.CreatedAt,
-            IsActive = user.IsActive
+            IsActive = user.IsActive,
+            AdminPreferences = user.AdminPreferences
         };
     }
 }

@@ -11,6 +11,7 @@ public interface IUserManagementService
     Task<AdminUserResponse?> GetUserByIdAsync(Guid id);
     Task<(IEnumerable<AdminUserResponse> Users, int TotalCount)> GetUsersAsync(UserFilterRequest filter);
     Task ToggleUserStatusAsync(Guid id, bool isActive);
+    Task UpdateAdminPreferencesAsync(Guid id, string? preferencesJson);
 }
 
 

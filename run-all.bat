@@ -11,6 +11,7 @@ echo.
 break > api.log
 break > client.log
 break > admin.log
+break > history.log
 
 echo Starting [XomTruyen.API] on port 5172...
 start /B cmd /c "cd xomtruyen.API && dotnet run > ..\api.log 2>&1"
@@ -20,6 +21,9 @@ start /B cmd /c "cd xom-truyen && npm run dev -- --port 3000 > ..\client.log 2>&
 
 echo Starting [XomTruyen Admin] on port 3001...
 start /B cmd /c "cd xomtruyen-admin && npm run dev -- --port 3001 > ..\admin.log 2>&1"
+
+echo Starting [XomTruyen History] on port 5555...
+start /B cmd /c "cd xomtruyen-overview && node server.js > ..\history.log 2>&1"
 
 set "LAST_STATE="
 
@@ -63,8 +67,18 @@ if !errorlevel! equ 0 (
     )
 )
 
+:: ---------------- CHECK HISTORY ----------------
+set "HISTORY_STATUS=STARTING "
+netstat -ano | findstr "5555" | findstr "LISTENING" >nul
+if !errorlevel! equ 0 (
+    set "HISTORY_STATUS=RUNNING  "
+) else (
+    findstr /i /C:"error" history.log >nul
+    if !errorlevel! equ 0 set "HISTORY_STATUS=ERROR    "
+)
+
 :: Kiem tra xem trang thai hien tai co gi thay doi so voi lan truoc khong
-set "CURRENT_STATE=!API_STATUS!!CLIENT_STATUS!!ADMIN_STATUS!"
+set "CURRENT_STATE=!API_STATUS!!CLIENT_STATUS!!ADMIN_STATUS!!HISTORY_STATUS!"
 
 if "!CURRENT_STATE!" neq "!LAST_STATE!" (
     set "LAST_STATE=!CURRENT_STATE!"
@@ -79,9 +93,10 @@ if "!CURRENT_STATE!" neq "!LAST_STATE!" (
     echo ^| XomTruyen.API        ^| 5172       ^| !API_STATUS!   ^|
     echo ^| XomTruyen Client     ^| 3000       ^| !CLIENT_STATUS!   ^|
     echo ^| XomTruyen Admin      ^| 3001       ^| !ADMIN_STATUS!   ^|
+    echo ^| XomTruyen History    ^| 5555       ^| !HISTORY_STATUS!   ^|
     echo =======================================================
     echo.
-    echo [LOGS] Log dang duoc ghi live vao file: api.log, client.log, admin.log
+    echo [LOGS] Log dang duoc ghi live vao file: api.log, client.log, admin.log, history.log
     echo [STOP] De DUNG tat ca cac services, chi can TAT CUA SO NAY ^(bam dau X^).
     echo.
     echo He thong dang theo doi ngam. Man hinh se CHi CAP NHAT khi co su thay doi trang thai...

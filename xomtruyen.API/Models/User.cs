@@ -21,4 +21,5 @@ public class User
     public DateTime? CreatedAt { get; set; }
     public bool IsActive { get; set; } = true;
     public string Role { get; set; } = "User";
+    public string? AdminPreferences { get; set; }
 }

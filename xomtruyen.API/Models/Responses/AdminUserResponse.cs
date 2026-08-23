@@ -15,6 +15,7 @@ public class AdminUserResponse
     public int? DailyReadCount { get; set; }
     public DateTime? CreatedAt { get; set; }
     public bool IsActive { get; set; }
+    public string? AdminPreferences { get; set; }
 }
 
 

@@ -143,3 +143,10 @@ export const updateUserStatus = async (id: string, isActive: boolean): Promise<v
 export const deleteUser = async (id: string): Promise<void> => {
   return apiClient.delete<any, void>(`/users/${id}`);
 };
+
+/**
+ * 7. Cập nhật Admin Preferences
+ */
+export const updateAdminPreferences = async (id: string, data: any): Promise<void> => {
+  return apiClient.patch<any, void>(`/users/${id}/preferences`, data);
+};

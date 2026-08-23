@@ -1,13 +1,23 @@
 import React, { useState, useRef } from 'react';
 
-export const ResizableHeader: React.FC<{
+interface ResizableHeaderProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   initialWidth?: number | string;
   minWidth?: number;
   onClick?: () => void;
   style?: React.CSSProperties;
   className?: string;
   children: React.ReactNode;
-}> = ({ initialWidth, minWidth = 40, onClick, style, className, children }) => {
+}
+
+export const ResizableHeader: React.FC<ResizableHeaderProps> = ({ 
+  initialWidth, 
+  minWidth = 40, 
+  onClick, 
+  style, 
+  className, 
+  children,
+  ...rest
+}) => {
   const [width, setWidth] = useState<number | string>(initialWidth || 'auto');
   const thRef = useRef<HTMLTableCellElement>(null);
 
@@ -43,6 +53,7 @@ export const ResizableHeader: React.FC<{
       }}
       onClick={onClick}
       className={className}
+      {...rest}
     >
       {children}
       <div

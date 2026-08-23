@@ -11,6 +11,7 @@ import type { IBook } from '../types/book';
 import { chapterApi, bookChapterApi, type ComicChapter, type ComicPage } from '../api/chapterApi';
 import { uploadChapterPage } from '../api/uploadApi';
 import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
+import defaultBookImage from '../assets/images/default.png';
 
 export const BookDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -291,6 +292,89 @@ export const BookDetails = () => {
                         <FontAwesomeIcon icon={faPlus} />
                         Thêm Chapter
                     </button>
+                </div>
+            </div>
+
+            {/* Book Info Panel */}
+            <div className="card border-0 shadow-sm rounded-4 mb-4">
+                <div className="card-body p-4">
+                    <div className="row g-4">
+                        {/* Ảnh bìa */}
+                        <div className="col-auto">
+                            <img
+                                src={book.coverImageUrl ? (book.coverImageUrl.startsWith('http') ? book.coverImageUrl : `http://localhost:5172/${book.coverImageUrl}`) : defaultBookImage}
+                                alt={book.title}
+                                style={{ width: 120, height: 160, objectFit: 'cover', borderRadius: 8, border: '1px solid #e2e8f0' }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = defaultBookImage; }}
+                            />
+                        </div>
+                        {/* Thông tin */}
+                        <div className="col">
+                            <h5 className="fw-bold mb-3">{book.title}</h5>
+                            <div className="row g-2" style={{ fontSize: '14px' }}>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Tác giả:</span>{' '}
+                                    <span className="fw-medium">{book.author || '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Loại sách:</span>{' '}
+                                    <span className="fw-medium">{book.formatType === 2 ? 'Truyện tranh' : book.formatType === 1 ? 'Sách' : '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Trạng thái:</span>{' '}
+                                    <span className="fw-medium">{book.status || '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Cấp truy cập:</span>{' '}
+                                    <span className="fw-medium">{book.accessLevel === 1 ? 'Miễn phí' : book.accessLevel === 2 ? 'VIP' : `Level ${book.accessLevel}`}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Danh mục hiển thị:</span>{' '}
+                                    <span className="fw-medium">{book.displayLabel || '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Lượt xem:</span>{' '}
+                                    <span className="fw-medium">{book.viewCount?.toLocaleString('vi-VN') ?? 0}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Đánh giá TB:</span>{' '}
+                                    <span className="fw-medium">⭐ {book.averageRating?.toFixed(1) ?? '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Ngày tạo:</span>{' '}
+                                    <span className="fw-medium">{book.createdAt ? new Date(book.createdAt).toLocaleString('vi-VN') : '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Cập nhật:</span>{' '}
+                                    <span className="fw-medium">{book.updatedAt ? new Date(book.updatedAt).toLocaleString('vi-VN') : '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Người tạo:</span>{' '}
+                                    <span className="fw-medium">{book.createdBy || '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Người cập nhật:</span>{' '}
+                                    <span className="fw-medium">{book.updatedBy || '—'}</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span className="text-muted">Slug:</span>{' '}
+                                    <span className="fw-medium text-muted small">{book.slug || '—'}</span>
+                                </div>
+                                {(book.categories && book.categories.length > 0) && (
+                                    <div className="col-md-6">
+                                        <span className="text-muted">Thể loại:</span>{' '}
+                                        <span className="fw-medium">{book.categories.map(c => c.name).join(', ')}</span>
+                                    </div>
+                                )}
+                                {(book.topics && book.topics.length > 0) && (
+                                    <div className="col-md-6">
+                                        <span className="text-muted">Chủ đề:</span>{' '}
+                                        <span className="fw-medium">{book.topics.map(t => t.name).join(', ')}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

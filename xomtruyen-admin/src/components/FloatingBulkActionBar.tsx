@@ -1,16 +1,29 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckDouble, faPen, faExchangeAlt, faEye, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import toast from 'react-hot-toast';
 
 interface FloatingBulkActionBarProps {
   selectedCount: number;
   onClearSelection: () => void;
   onSelectAll?: () => void;
+  
   onBulkEdit?: () => void;
+  editLabel?: string;
+  editIcon?: IconDefinition;
+  
   onBulkStatusChange?: () => void;
+  statusLabel?: string;
+  statusIcon?: IconDefinition;
+  
   onBulkWatch?: () => void;
+  watchLabel?: string;
+  watchIcon?: IconDefinition;
+  
   onBulkDelete?: () => void;
+  deleteLabel?: string;
+  deleteIcon?: IconDefinition;
 }
 
 export const FloatingBulkActionBar: React.FC<FloatingBulkActionBarProps> = ({ 
@@ -18,9 +31,17 @@ export const FloatingBulkActionBar: React.FC<FloatingBulkActionBarProps> = ({
   onClearSelection,
   onSelectAll,
   onBulkEdit,
+  editLabel = 'Edit fields',
+  editIcon = faPen,
   onBulkStatusChange,
+  statusLabel = 'Change status',
+  statusIcon = faExchangeAlt,
   onBulkWatch,
-  onBulkDelete
+  watchLabel = 'Watch options',
+  watchIcon = faEye,
+  onBulkDelete,
+  deleteLabel = 'Delete',
+  deleteIcon = faTrash
 }) => {
   if (selectedCount === 0) return null;
 
@@ -56,20 +77,20 @@ export const FloatingBulkActionBar: React.FC<FloatingBulkActionBarProps> = ({
       <div className="separator" style={{ width: '1px', height: '20px' }}></div>
 
       <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkEdit || (() => toast.error('Tính năng đang phát triển'))}>
-        <FontAwesomeIcon icon={faPen} className="me-2" />
-        Edit fields
+        <FontAwesomeIcon icon={editIcon} className="me-2" />
+        {editLabel}
       </div>
       <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkStatusChange || (() => toast.error('Tính năng đang phát triển'))}>
-        <FontAwesomeIcon icon={faExchangeAlt} className="me-2" />
-        Change status
+        <FontAwesomeIcon icon={statusIcon} className="me-2" />
+        {statusLabel}
       </div>
       <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkWatch || (() => toast.error('Tính năng đang phát triển'))}>
-        <FontAwesomeIcon icon={faEye} className="me-2" />
-        Watch options
+        <FontAwesomeIcon icon={watchIcon} className="me-2" />
+        {watchLabel}
       </div>
       <div className="action-item" style={{ cursor: 'pointer', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }} onClick={onBulkDelete || (() => toast.error('Tính năng đang phát triển'))}>
-        <FontAwesomeIcon icon={faTrash} className="me-2" />
-        Delete
+        <FontAwesomeIcon icon={deleteIcon} className="me-2" />
+        {deleteLabel}
       </div>
 
       <div className="separator" style={{ width: '1px', height: '20px' }}></div>
