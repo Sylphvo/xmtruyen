@@ -150,6 +150,17 @@ export const BookChapters: React.FC = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Bạn có chắc muốn xóa ${selectedIds.length} chương đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(api.deleteChapter));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      selectedIds.forEach(removeItem);
+      setSelectedIds([]);
+    } catch (error) { console.error('Lỗi khi xóa hàng loạt:', error); }
+  };
+
   return (
     <>
       <div className="jira-table-container">
@@ -232,7 +243,7 @@ export const BookChapters: React.FC = () => {
                 <tr><td colSpan={7} className="text-center p-4 text-muted">Truyện này chưa có chương nào.</td></tr>
               ) : (
                 chapters.map(chapter => (
-                  <tr key={chapter.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(chapter.id) ? '#ebf2fc' : 'transparent' }}>
+                  <tr key={chapter.id} className={`jira-table-row${selectedIds.includes(chapter.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                     <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"
@@ -284,6 +295,7 @@ export const BookChapters: React.FC = () => {
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

@@ -137,7 +137,7 @@ export const Reviews: React.FC = () => {
                     </tr>
                   )}
                   {reviews.map(review => (
-                  <tr key={review.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(review.id) ? '#ebf2fc' : 'transparent' }}>
+                  <tr key={review.id} className={`jira-table-row${selectedIds.includes(review.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                     <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"

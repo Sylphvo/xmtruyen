@@ -19,6 +19,8 @@ public class UserProfileResponse
     public int? TotalGuestReads { get; set; }
     public int? DailyReadCount { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public List<string> Roles { get; set; } = new();
+    public List<string> Permissions { get; set; } = new();
 }
 
 

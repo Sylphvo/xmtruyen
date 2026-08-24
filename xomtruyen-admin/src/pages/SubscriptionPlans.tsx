@@ -128,6 +128,17 @@ export const SubscriptionPlans = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} gói VIP đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(planApi.deletePlan));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      selectedIds.forEach(removeItem);
+      setSelectedIds([]);
+    } catch (error) { console.error('Lỗi khi xóa hàng loạt:', error); }
+  };
+
   return (
     <>
       <div className="jira-table-container m-4">
@@ -182,7 +193,7 @@ export const SubscriptionPlans = () => {
             </thead>
               <tbody>
                 {plans.map(plan => (
-                  <tr key={plan.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(plan.id) ? '#ebf2fc' : 'transparent' }}>
+                  <tr key={plan.id} className={`jira-table-row${selectedIds.includes(plan.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                     <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"
@@ -238,6 +249,7 @@ export const SubscriptionPlans = () => {
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

@@ -3,8 +3,8 @@
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // Variables
-$skeleton-bg: var(--skeleton-bg, #2a2a3e);
-$skeleton-highlight: var(--skeleton-highlight, #3a3a4e);
+$skeleton-bg: var(--skeleton-bg);
+$skeleton-highlight: var(--skeleton-highlight);
 $skeleton-radius: 4px;
 $skeleton-animation-duration: 1.5s;
 
@@ -60,6 +60,8 @@ $skeleton-animation-duration: 1.5s;
 }
 
 // â”€â”€â”€ Light Theme Override â”€â”€â”€
+:root,
+[data-bs-theme="light"],
 [data-theme="light"],
 .light-mode {
     --skeleton-bg: #e9ecef;
@@ -67,7 +69,9 @@ $skeleton-animation-duration: 1.5s;
 }
 
 // â”€â”€â”€ Dark Theme (default) â”€â”€â”€
-:root {
+[data-bs-theme="dark"],
+[data-theme="dark"],
+.dark-mode {
     --skeleton-bg: #2a2a3e;
     --skeleton-highlight: #3a3a4e;
 }

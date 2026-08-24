@@ -458,7 +458,7 @@ export const Users: React.FC = () => {
                   sortedData.map((user) => (
                     <React.Fragment key={user.id}>
                       {editingUserId === user.id ? (
-                        <tr className="jira-table-row inline-edit-row" style={{ height: '46px', backgroundColor: selectedUserIds.includes(user.id) ? '#ebf2fc' : 'transparent' }}>
+                        <tr className={`jira-table-row inline-edit-row${selectedUserIds.includes(user.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                           <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                             <Form.Check
                               type="checkbox"
@@ -540,7 +540,7 @@ export const Users: React.FC = () => {
                           </td>
                         </tr>
                       ) : (
-                        <tr className="jira-table-row" style={{ height: '46px', backgroundColor: selectedUserIds.includes(user.id) ? '#ebf2fc' : 'transparent' }} onDoubleClick={() => handleEditClick(user)}>
+                        <tr className={`jira-table-row${selectedUserIds.includes(user.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }} onDoubleClick={() => handleEditClick(user)}>
                           <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                             <Form.Check
                               type="checkbox"

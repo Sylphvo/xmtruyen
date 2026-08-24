@@ -231,7 +231,7 @@ export const Database: React.FC = () => {
                 paginatedData.map((table) => {
                   const info = getTableInfo(table.name);
                   return (
-                    <tr key={table.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(table.id) ? '#ebf2fc' : 'transparent' }}>
+                    <tr key={table.id} className={`jira-table-row${selectedIds.includes(table.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                       <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                         <Form.Check
                           type="checkbox"

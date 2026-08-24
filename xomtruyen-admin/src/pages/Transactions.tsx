@@ -160,7 +160,7 @@ export const Transactions: React.FC = () => {
               </thead>
               <tbody>
                 {transactions.map(t => (
-                  <tr key={t.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(t.id) ? '#ebf2fc' : 'transparent' }}>
+                  <tr key={t.id} className={`jira-table-row${selectedIds.includes(t.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                     <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"

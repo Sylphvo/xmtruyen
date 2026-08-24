@@ -19,6 +19,9 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .Include(u => u.CurrentPlan)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                    .ThenInclude(r => r.RolePermissions)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
@@ -26,12 +29,17 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .Include(u => u.CurrentPlan)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                    .ThenInclude(r => r.RolePermissions)
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     public async Task<User?> GetGuestUserByDeviceIdAsync(string deviceId, CancellationToken cancellationToken = default)
     {
         return await _context.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Provider == "guest" && u.ProviderId == deviceId, cancellationToken);
     }
 
@@ -124,6 +132,9 @@ public class UserRepository : IUserRepository
     {
         return await _context.UserTokens
             .Include(t => t.User)
+                .ThenInclude(u => u!.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                        .ThenInclude(r => r.RolePermissions)
             .FirstOrDefaultAsync(t => t.Token == tokenStr && t.TokenType == tokenType, cancellationToken);
     }
 

@@ -128,6 +128,17 @@ export const CoinPackages: React.FC = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} gói xu đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(api.deleteCoinPackage));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      selectedIds.forEach(removeItem);
+      setSelectedIds([]);
+    } catch (error) { console.error('Lỗi khi xóa hàng loạt:', error); }
+  };
+
   const handleImportExcel = async (importedData: any[]) => {
     let successCount = 0;
     let errorCount = 0;
@@ -234,7 +245,7 @@ export const CoinPackages: React.FC = () => {
             </thead>
               <tbody>
                 {packages.map(pkg => (
-                  <tr key={pkg.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(pkg.id) ? '#ebf2fc' : 'transparent' }}>
+                  <tr key={pkg.id} className={`jira-table-row${selectedIds.includes(pkg.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                     <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"
@@ -293,6 +304,7 @@ export const CoinPackages: React.FC = () => {
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

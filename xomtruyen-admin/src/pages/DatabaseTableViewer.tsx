@@ -164,6 +164,17 @@ export const DatabaseTableViewer: React.FC = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Xóa ${selectedIds.length} bản ghi đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(id => deleteRow(tableName!, id)));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      setSelectedIds([]);
+      refresh();
+    } catch (error) { console.error('Lỗi khi xóa hàng loạt:', error); }
+  };
+
   const handleSave = async () => {
     try {
       const payload = { ...formData };
@@ -322,7 +333,7 @@ export const DatabaseTableViewer: React.FC = () => {
                     const rowId = primaryKeyCol ? row[primaryKeyCol] : i;
                     const isSelected = selectedIds.includes(rowId);
                     return (
-                    <tr key={i} className="jira-table-row" style={{ height: '46px', backgroundColor: isSelected ? '#ebf2fc' : 'transparent' }}>
+                    <tr key={i} className={`jira-table-row${isSelected ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                       <td style={{ borderLeft: 0, padding: '10px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                         <Form.Check
                           type="checkbox"
@@ -423,6 +434,7 @@ export const DatabaseTableViewer: React.FC = () => {
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

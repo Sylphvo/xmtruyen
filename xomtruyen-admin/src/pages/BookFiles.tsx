@@ -67,6 +67,17 @@ export const BookFiles: React.FC = () => {
     }
   }
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Bạn có chắc muốn xóa ${selectedIds.length} file đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(id => deleteFile(id)));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      setSelectedIds([]);
+      refresh();
+    } catch (error) { console.error('Lỗi khi xóa hàng loạt:', error); }
+  }
+
   const formatSize = (bytes: number) => {
     if (bytes === 0) return '0 B';
     const k = 1024;
@@ -134,7 +145,7 @@ export const BookFiles: React.FC = () => {
               <tbody>
                 {files.length > 0 ? (
                   files.map((file, i) => (
-                    <tr key={file.name} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(file.name) ? '#ebf2fc' : 'transparent' }}>
+                    <tr key={file.name} className={`jira-table-row${selectedIds.includes(file.name) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                       <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                         <Form.Check
                           type="checkbox"
@@ -188,6 +199,7 @@ export const BookFiles: React.FC = () => {
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

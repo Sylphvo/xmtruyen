@@ -577,6 +577,14 @@ html[data-bs-theme="dark"] body {
   }
 }
 
+.jira-table-row.jira-row-selected {
+  background-color: #e8f0fd !important;
+}
+
+.jira-table-row.jira-row-selected td {
+  background-color: transparent !important;
+}
+
 /* Fix for inline row selection colors in Dark mode */
 [data-bs-theme="dark"] .jira-table-row[style*="background-color: rgb(235, 242, 252)"],
 [data-bs-theme="dark"] .jira-table-row[style*="backgroundColor: #ebf2fc"],

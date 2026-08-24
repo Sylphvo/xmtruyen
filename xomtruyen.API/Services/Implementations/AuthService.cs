@@ -80,7 +80,9 @@ public class AuthService : IAuthService
         {
             Token = token,
             RefreshToken = refreshToken,
-            Email = user.Email ?? string.Empty
+            Email = user.Email ?? string.Empty,
+            Roles = GetRoleNames(user),
+            Permissions = GetPermissionNames(user)
         };
     }
 
@@ -116,7 +118,9 @@ public class AuthService : IAuthService
         {
             Token = token,
             RefreshToken = refreshToken,
-            Email = "guest"
+            Email = "guest",
+            Roles = GetRoleNames(user),
+            Permissions = GetPermissionNames(user)
         };
     }
 
@@ -139,7 +143,9 @@ public class AuthService : IAuthService
             PlanExpiredAt = user.PlanExpiredAt,
             TotalGuestReads = user.TotalGuestReads,
             DailyReadCount = user.DailyReadCount,
-            CreatedAt = user.CreatedAt
+            CreatedAt = user.CreatedAt,
+            Roles = GetRoleNames(user),
+            Permissions = GetPermissionNames(user)
         };
     }
 
@@ -171,7 +177,9 @@ public class AuthService : IAuthService
         {
             Token = token,
             RefreshToken = newRefreshToken,
-            Email = storedToken.User.Email ?? storedToken.User.Provider ?? string.Empty
+            Email = storedToken.User.Email ?? storedToken.User.Provider ?? string.Empty,
+            Roles = GetRoleNames(storedToken.User),
+            Permissions = GetPermissionNames(storedToken.User)
         };
     }
 
@@ -244,15 +252,18 @@ public class AuthService : IAuthService
         var jwtSettings = _configuration.GetSection("Jwt");
         var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
 
+        var roleNames = GetRoleNames(user);
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.FullName ?? user.Email ?? "Unknown"),
+            new(ClaimTypes.Email, user.Email ?? user.Provider ?? string.Empty)
+        };
+        claims.AddRange(roleNames.Select(role => new Claim(ClaimTypes.Role, role)));
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.FullName ?? user.Email ?? "Unknown"),
-                new Claim(ClaimTypes.Email, user.Email ?? user.Provider ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.Role ?? "User")
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpireMinutes"]!)),
             Issuer = jwtSettings["Issuer"],
             Audience = jwtSettings["Audience"],
@@ -262,6 +273,35 @@ public class AuthService : IAuthService
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+
+    private static List<string> GetRoleNames(User user)
+    {
+        var roles = user.UserRoles
+            .Where(userRole => userRole.ExpiresAt == null || userRole.ExpiresAt > DateTime.UtcNow)
+            .Select(userRole => userRole.Role.Name)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        if (roles.Count == 0 && !string.IsNullOrWhiteSpace(user.Role))
+            roles.Add(user.Role);
+
+        if (roles.Contains("Admin"))
+            roles.Add("SuperAdmin");
+        if (roles.Contains("SuperAdmin"))
+            roles.Add("Admin");
+
+        return roles.ToList();
+    }
+
+    private static List<string> GetPermissionNames(User user)
+    {
+        return user.UserRoles
+            .Where(userRole => userRole.ExpiresAt == null || userRole.ExpiresAt > DateTime.UtcNow)
+            .SelectMany(userRole => userRole.Role.RolePermissions)
+            .Select(rolePermission => rolePermission.PermissionId)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private string GenerateRandomString(int length = 64)

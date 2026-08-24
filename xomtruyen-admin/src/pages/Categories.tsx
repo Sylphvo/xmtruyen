@@ -160,6 +160,19 @@ export const Categories: React.FC = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} thể loại đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(deleteCategory));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      selectedIds.forEach(removeItem);
+      setSelectedIds([]);
+    } catch (error) {
+      console.error('Lỗi khi xóa hàng loạt:', error);
+    }
+  };
+
   const handleImportExcel = async (importedData: any[]) => {
     let successCount = 0;
     let errorCount = 0;
@@ -303,7 +316,7 @@ export const Categories: React.FC = () => {
                           </td>
                         </tr>
                       ) : (
-                        <tr key={`view-${category.id}`} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(category.id) ? '#ebf2fc' : 'transparent' }} onDoubleClick={() => handleEditClick(category)}>
+                        <tr key={`view-${category.id}`} className={`jira-table-row${selectedIds.includes(category.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }} onDoubleClick={() => handleEditClick(category)}>
                           <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                             <Form.Check
                               type="checkbox"
@@ -365,6 +378,7 @@ export const Categories: React.FC = () => {
       <FloatingBulkActionBar 
         selectedCount={selectedIds.length} 
         onClearSelection={() => setSelectedIds([])} 
+        onBulkDelete={handleBulkDelete}
       />
     </div>
   );

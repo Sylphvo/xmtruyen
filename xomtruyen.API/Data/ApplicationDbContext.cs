@@ -55,6 +55,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<EmailTemplate> EmailTemplates { get; set; }
     public DbSet<HelpArticle> HelpArticles { get; set; }
     public DbSet<ErrorLog> ErrorLogs { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
+    public DbSet<RoleAuditLog> RoleAuditLogs { get; set; }
     
     // Import Pipeline
     public DbSet<ImportJob> ImportJobs { get; set; }
@@ -112,6 +117,112 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.CurrentPlanId)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(50).IsRequired();
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.Property(e => e.DisplayName).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Color).HasMaxLength(20);
+            entity.HasData(
+                new Role { Id = 1, Name = "SuperAdmin", DisplayName = "Quản trị viên", Level = 100, Color = "#ff4444" },
+                new Role { Id = 2, Name = "Editor", DisplayName = "Biên tập viên", Level = 50, Color = "#ff9800" },
+                new Role { Id = 3, Name = "Translator", DisplayName = "Dịch giả", Level = 30, Color = "#9c27b0" },
+                new Role { Id = 4, Name = "Moderator", DisplayName = "Quản lý viên", Level = 40, Color = "#2196f3" },
+                new Role { Id = 5, Name = "Author", DisplayName = "Tác giả", Level = 20, Color = "#4caf50" },
+                new Role { Id = 6, Name = "User", DisplayName = "Người dùng", Level = 10, Color = "#607d8b" });
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+            entity.HasOne(e => e.User).WithMany(u => u.UserRoles).HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Role).WithMany(r => r.UserRoles).HasForeignKey(e => e.RoleId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasMaxLength(100);
+            entity.Property(e => e.Module).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Action).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.DisplayName).HasMaxLength(200).IsRequired();
+            entity.HasData(
+                new Permission { Id = "publications.create", Module = "publications", Action = "create", DisplayName = "Tạo sách mới" },
+                new Permission { Id = "publications.read", Module = "publications", Action = "read", DisplayName = "Xem danh sách sách" },
+                new Permission { Id = "publications.update", Module = "publications", Action = "update", DisplayName = "Sửa thông tin sách" },
+                new Permission { Id = "publications.delete", Module = "publications", Action = "delete", DisplayName = "Xóa sách" },
+                new Permission { Id = "publications.publish", Module = "publications", Action = "publish", DisplayName = "Publish/Unpublish sách" },
+                new Permission { Id = "chapters.create", Module = "chapters", Action = "create", DisplayName = "Tạo chương mới" },
+                new Permission { Id = "chapters.update", Module = "chapters", Action = "update", DisplayName = "Sửa chương" },
+                new Permission { Id = "chapters.delete", Module = "chapters", Action = "delete", DisplayName = "Xóa chương" },
+                new Permission { Id = "users.read", Module = "users", Action = "read", DisplayName = "Xem danh sách users" },
+                new Permission { Id = "users.create", Module = "users", Action = "create", DisplayName = "Tạo user mới" },
+                new Permission { Id = "users.update", Module = "users", Action = "update", DisplayName = "Sửa thông tin user" },
+                new Permission { Id = "users.ban", Module = "users", Action = "ban", DisplayName = "Ban/Unban user" },
+                new Permission { Id = "users.assign_role", Module = "users", Action = "assign_role", DisplayName = "Gán/Gỡ role cho user" },
+                new Permission { Id = "transactions.read", Module = "transactions", Action = "read", DisplayName = "Xem giao dịch" },
+                new Permission { Id = "transactions.topup", Module = "transactions", Action = "topup", DisplayName = "Nạp xu thủ công" },
+                new Permission { Id = "transactions.approve", Module = "transactions", Action = "approve", DisplayName = "Duyệt giao dịch" },
+                new Permission { Id = "translation.create_job", Module = "translation", Action = "create_job", DisplayName = "Tạo translation job" },
+                new Permission { Id = "translation.review", Module = "translation", Action = "review", DisplayName = "Review bản dịch" },
+                new Permission { Id = "translation.approve", Module = "translation", Action = "approve", DisplayName = "Approve/Reject translation" },
+                new Permission { Id = "translation.publish", Module = "translation", Action = "publish", DisplayName = "Publish translated chapter" },
+                new Permission { Id = "translation.glossary", Module = "translation", Action = "glossary", DisplayName = "Quản lý glossary" },
+                new Permission { Id = "crawler.manage", Module = "crawler", Action = "manage", DisplayName = "Quản lý crawl sources" },
+                new Permission { Id = "crawler.trigger", Module = "crawler", Action = "trigger", DisplayName = "Trigger manual crawl" },
+                new Permission { Id = "audio.create", Module = "audio", Action = "create", DisplayName = "Tạo audio job" },
+                new Permission { Id = "audio.publish", Module = "audio", Action = "publish", DisplayName = "Publish audio chapter" },
+                new Permission { Id = "moderation.reviews", Module = "moderation", Action = "reviews", DisplayName = "Quản lý reviews" },
+                new Permission { Id = "moderation.reports", Module = "moderation", Action = "reports", DisplayName = "Xử lý reports" },
+                new Permission { Id = "moderation.notifications", Module = "moderation", Action = "notifications", DisplayName = "Gửi notifications" },
+                new Permission { Id = "system.database", Module = "system", Action = "database", DisplayName = "Quản lý database" },
+                new Permission { Id = "system.config", Module = "system", Action = "config", DisplayName = "Thay đổi system config" },
+                new Permission { Id = "system.audit_log", Module = "system", Action = "audit_log", DisplayName = "Xem audit logs" });
+        });
+
+        modelBuilder.Entity<RolePermission>(entity =>
+        {
+            entity.HasKey(e => new { e.RoleId, e.PermissionId });
+            entity.HasOne(e => e.Role).WithMany(r => r.RolePermissions).HasForeignKey(e => e.RoleId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Permission).WithMany(p => p.RolePermissions).HasForeignKey(e => e.PermissionId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasData(
+                new RolePermission { RoleId = 2, PermissionId = "publications.create" },
+                new RolePermission { RoleId = 2, PermissionId = "publications.read" },
+                new RolePermission { RoleId = 2, PermissionId = "publications.update" },
+                new RolePermission { RoleId = 2, PermissionId = "publications.delete" },
+                new RolePermission { RoleId = 2, PermissionId = "publications.publish" },
+                new RolePermission { RoleId = 2, PermissionId = "chapters.create" },
+                new RolePermission { RoleId = 2, PermissionId = "chapters.update" },
+                new RolePermission { RoleId = 2, PermissionId = "chapters.delete" },
+                new RolePermission { RoleId = 2, PermissionId = "translation.create_job" },
+                new RolePermission { RoleId = 2, PermissionId = "translation.review" },
+                new RolePermission { RoleId = 2, PermissionId = "translation.approve" },
+                new RolePermission { RoleId = 2, PermissionId = "translation.publish" },
+                new RolePermission { RoleId = 2, PermissionId = "translation.glossary" },
+                new RolePermission { RoleId = 2, PermissionId = "crawler.manage" },
+                new RolePermission { RoleId = 2, PermissionId = "crawler.trigger" },
+                new RolePermission { RoleId = 2, PermissionId = "audio.create" },
+                new RolePermission { RoleId = 2, PermissionId = "audio.publish" },
+                new RolePermission { RoleId = 2, PermissionId = "moderation.notifications" },
+                new RolePermission { RoleId = 3, PermissionId = "translation.review" },
+                new RolePermission { RoleId = 3, PermissionId = "translation.approve" },
+                new RolePermission { RoleId = 3, PermissionId = "translation.glossary" },
+                new RolePermission { RoleId = 4, PermissionId = "users.read" },
+                new RolePermission { RoleId = 4, PermissionId = "users.ban" },
+                new RolePermission { RoleId = 4, PermissionId = "moderation.reviews" },
+                new RolePermission { RoleId = 4, PermissionId = "moderation.reports" },
+                new RolePermission { RoleId = 4, PermissionId = "moderation.notifications" });
+        });
+
+        modelBuilder.Entity<RoleAuditLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Action).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Reason).HasMaxLength(1000);
+            entity.HasIndex(e => new { e.UserId, e.CreatedAt });
         });
 
         // Category

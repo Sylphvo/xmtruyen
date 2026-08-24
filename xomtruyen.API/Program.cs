@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -60,6 +61,8 @@ builder.Services.AddScoped<IPublicationRepository, PublicationRepository>();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IReadingService, ReadingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IAuthorizationHandler, XomTruyen.API.Authorization.PermissionHandler>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICategoryManagementService, CategoryManagementService>();
 builder.Services.AddScoped<ITopicManagementService, TopicManagementService>();
@@ -112,6 +115,18 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("SuperAdmin", "Admin"));
+    options.AddPolicy("EditorOrAbove", policy => policy.RequireRole("SuperAdmin", "Admin", "Editor"));
+    options.AddPolicy("TranslatorOrAbove", policy => policy.RequireRole("SuperAdmin", "Admin", "Editor", "Translator"));
+    options.AddPolicy("ModeratorOrAbove", policy => policy.RequireRole("SuperAdmin", "Admin", "Moderator"));
+    options.AddPolicy("AuthorOrAbove", policy => policy.RequireRole("SuperAdmin", "Admin", "Editor", "Author"));
+    options.AddPolicy("CanManagePublications", policy => policy.Requirements.Add(new XomTruyen.API.Authorization.PermissionRequirement("publications.create")));
+    options.AddPolicy("CanManageUsers", policy => policy.Requirements.Add(new XomTruyen.API.Authorization.PermissionRequirement("users.update")));
+    options.AddPolicy("CanViewTransactions", policy => policy.Requirements.Add(new XomTruyen.API.Authorization.PermissionRequirement("transactions.read")));
 });
 
 builder.Services.AddEndpointsApiExplorer();

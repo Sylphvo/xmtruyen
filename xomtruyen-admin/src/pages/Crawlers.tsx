@@ -88,6 +88,17 @@ export const Crawlers: React.FC = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length || !window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} Crawl Job đã chọn?`)) return;
+    const deletePromise = Promise.all(selectedIds.map(api.deleteCrawlJob));
+    toast.promise(deletePromise, { loading: 'Đang xóa...', success: 'Xóa thành công!', error: 'Có lỗi xảy ra khi xóa' });
+    try {
+      await deletePromise;
+      selectedIds.forEach(removeItem);
+      setSelectedIds([]);
+    } catch (error) { console.error('Lỗi khi xóa hàng loạt:', error); }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Running': return <Badge bg="primary">Đang chạy</Badge>;
@@ -144,7 +155,7 @@ export const Crawlers: React.FC = () => {
                 {jobs.map(job => {
                   const percent = job.totalItems > 0 ? Math.round((job.crawledItems / job.totalItems) * 100) : 0;
                   return (
-                  <tr key={job.id} className="jira-table-row" style={{ height: '46px', backgroundColor: selectedIds.includes(job.id) ? '#ebf2fc' : 'transparent' }}>
+                  <tr key={job.id} className={`jira-table-row${selectedIds.includes(job.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
                     <td style={{ padding: '12px 10px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"
@@ -217,6 +228,7 @@ export const Crawlers: React.FC = () => {
         <FloatingBulkActionBar 
           selectedCount={selectedIds.length} 
           onClearSelection={() => setSelectedIds([])} 
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 
