@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings, Headphones } from 'lucide-react';
+import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings, Headphones, ClipboardCheck, GitBranch } from 'lucide-react';
 import { getTables } from '../../api/managerDbApi';
 import { getTableInfo } from '../../constants/databaseDictionary';
 
@@ -93,6 +93,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
       setActiveMenu('marketing');
     } else if (path.startsWith('/crawlers') || path.startsWith('/translation') || path.startsWith('/import') || path.startsWith('/print-pipeline')) {
       setActiveMenu('automation');
+    } else if (path.startsWith('/test-cases')) {
+      setActiveMenu('test-cases');
+    } else if (path.startsWith('/build-process')) {
+      setActiveMenu('build-process');
     } else if (path.startsWith('/audio') || path.startsWith('/book-video') || path.startsWith('/comic-video')) {
       setActiveMenu('audio');
     } else {
@@ -187,6 +191,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           title="Audio & Video"
         >
           <Headphones />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'test-cases' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('test-cases')}
+          style={{ cursor: 'pointer' }}
+          title="Test Case & Bug Log"
+        >
+          <ClipboardCheck />
+        </div>
+        <div
+          className={`icon-nav-item ${activeMenu === 'build-process' ? 'active' : ''}`}
+          onClick={() => setActiveMenu('build-process')}
+          style={{ cursor: 'pointer' }}
+          title="Build Process & CI/CD"
+        >
+          <GitBranch />
         </div>
       </aside>
 
@@ -417,6 +437,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
               <NavLink to="/print-pipeline" className="menu-link" end>
                 <BookOpen />
                 <span>Xuất bản PDF / CMYK</span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'test-cases' && (
+            <>
+              <div className="menu-heading">Test Case Center</div>
+              <NavLink to="/test-cases" className="menu-link" end>
+                <ClipboardCheck />
+                <span>Test Cases <span className="text-secondary small" style={{ fontSize: '12px' }}>(QA & Bug Log)</span></span>
+              </NavLink>
+            </>
+          )}
+
+          {activeMenu === 'build-process' && (
+            <>
+              <div className="menu-heading">Build Process</div>
+              <NavLink to="/build-process" className="menu-link" end>
+                <GitBranch />
+                <span>Build Process <span className="text-secondary small" style={{ fontSize: '12px' }}>(CI/CD)</span></span>
               </NavLink>
             </>
           )}

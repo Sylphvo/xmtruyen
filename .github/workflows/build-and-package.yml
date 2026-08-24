@@ -1,0 +1,59 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [dev, pilot, main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deploy target environment
+        required: true
+        default: dev
+        type: choice
+        options: [dev, pilot, production]
+      deploy:
+        description: Deploy after successful build
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.AUTO_BUILD != 'false' }}
+    environment: ${{ inputs.environment || (github.ref_name == 'main' && 'production' || github.ref_name == 'pilot' && 'pilot' || 'dev') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Build web
+        working-directory: xom-truyen
+        run: npm ci && npm run build
+      - name: Build admin
+        working-directory: xomtruyen-admin
+        run: npm ci && npm run build
+      - name: Publish API
+        working-directory: xomtruyen.API
+        run: dotnet publish -c Release -o ../artifacts/api
+      - name: Assemble artifact
+        run: |
+          mkdir -p artifacts/web artifacts/admin
+          cp -r xom-truyen/dist/. artifacts/web/
+          cp -r xomtruyen-admin/dist/. artifacts/admin/
+          printf 'environment=%s\ncommit=%s\n' "${{ inputs.environment || 'dev' }}" "${GITHUB_SHA}" > artifacts/build-info.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xomtruyen-${{ inputs.environment || 'dev' }}-${{ github.sha }}
+          path: artifacts
+      - name: Deployment gate
+        if: ${{ inputs.deploy == true || vars.AUTO_DEPLOY == 'true' }}
+        run: echo "Build succeeded. Configure the deploy command for this GitHub Environment before enabling automatic deployment."

@@ -52,6 +52,8 @@ import ImportData from './pages/ImportData';
 import PrintPipeline from './pages/PrintPipeline';
 import { StaticPages } from './pages/StaticPages';
 import { FaqManagement } from './pages/FaqManagement';
+import { TestCases } from './pages/TestCases';
+import { BuildProcess } from './pages/BuildProcess';
 
 function App() {
   return (
@@ -119,6 +121,8 @@ function App() {
             {/* CMS / Static Content */}
             <Route path="/static-pages" element={<StaticPages />} />
             <Route path="/faq-management" element={<FaqManagement />} />
+                <Route path="/test-cases" element={<TestCases />} />
+                <Route path="/build-process" element={<BuildProcess />} />
               </Route>
             </Route>
           </Routes>

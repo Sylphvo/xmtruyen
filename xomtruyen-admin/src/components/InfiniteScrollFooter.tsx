@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,10 +10,7 @@ interface Props {
     showCreate?: boolean;
 }
 
-/**
- * Footer hiá»ƒn thá»‹ "50 of 149" + nÃºt Refresh + nÃºt Create
- * Thay tháº¿ hoÃ n toÃ n pagination controls cÅ©.
- */
+/** Footer with the loaded count, refresh control, and optional create action. */
 export const InfiniteScrollFooter: React.FC<Props> = ({
     loadedCount,
     totalCount,
@@ -21,6 +18,18 @@ export const InfiniteScrollFooter: React.FC<Props> = ({
     onCreateClick,
     showCreate = true
 }) => {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        if (isRefreshing) return;
+        setIsRefreshing(true);
+        try {
+            await onRefresh();
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
     return (
         <div className="jira-table-footer"
              style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', padding: '10px 16px', borderTop: 'none' }}>
@@ -36,9 +45,9 @@ export const InfiniteScrollFooter: React.FC<Props> = ({
                 <span className="infinite-scroll-counter">
                     {loadedCount} of {totalCount}
                 </span>
-                <button className="icon-btn" onClick={onRefresh} title="Refresh"
-                    style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', cursor: 'pointer', padding: '2px' }}>
-                    <FontAwesomeIcon icon={faSyncAlt} style={{ fontSize: '12px' }} />
+                <button className="icon-btn" onClick={handleRefresh} title={isRefreshing ? 'Refreshing' : 'Refresh'} aria-label={isRefreshing ? 'Refreshing' : 'Refresh'} disabled={isRefreshing}
+                    style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', cursor: isRefreshing ? 'wait' : 'pointer', padding: '2px', opacity: isRefreshing ? 0.65 : 1 }}>
+                    <FontAwesomeIcon icon={faSyncAlt} className={isRefreshing ? 'loading-spinner' : undefined} style={{ fontSize: '12px' }} />
                 </button>
             </div>
             <div />

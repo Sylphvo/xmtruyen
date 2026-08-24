@@ -26,6 +26,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const initAuth = () => {
+      const isDemoMode = import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE === 'true';
+      if (isDemoMode) {
+        setIsAuthenticated(true);
+        setUser({ id: 'demo-user', email: 'demo@xomtruyen.local', name: 'Demo Admin', role: 'Admin' });
+        setIsLoading(false);
+        return;
+      }
+
       const token = sessionStorage.getItem('accessToken');
       if (token) {
         try {
