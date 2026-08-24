@@ -43,12 +43,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             throw new Error('Token expired');
           }
           
+          const rawRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role || 'User';
+          
           setIsAuthenticated(true);
           setUser({
             id: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || decoded.sub || '',
             email: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || decoded.email || '',
             name: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || decoded.name || '',
-            role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role || 'User',
+            role: Array.isArray(rawRole) ? rawRole.join(',') : rawRole,
           });
         } catch (error) {
           console.error('Failed to decode token:', error);

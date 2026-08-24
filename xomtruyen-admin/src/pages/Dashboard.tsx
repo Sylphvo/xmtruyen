@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import Chart from 'react-apexcharts';
+import type { ApexOptions } from 'apexcharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHome, faChevronRight, faUsers, faBook, faBolt, 
   faCoins, faStar, faEye, faListOl, faCrown, faFileAlt, faImage
 } from '@fortawesome/free-solid-svg-icons';
-import { getOverviewStats, getTopPublications, type OverviewStats, type TopPublication } from '../api/statsApi';
+import { getOverviewStats, getTopPublications, getUsersChart, getRevenueChart, type OverviewStats, type TopPublication, type ChartSeries } from '../api/statsApi';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -12,6 +14,8 @@ import { vi } from 'date-fns/locale';
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [topPubs, setTopPubs] = useState<TopPublication[]>([]);
+  const [revenueChart, setRevenueChart] = useState<ChartSeries>({ labels: [], data: [] });
+  const [usersChart, setUsersChart] = useState<ChartSeries>({ labels: [], data: [] });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,12 +25,16 @@ export const Dashboard: React.FC = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [overview, topList] = await Promise.all([
+      const [overview, topList, revenue, users] = await Promise.all([
         getOverviewStats(),
-        getTopPublications(10)
+        getTopPublications(10),
+        getRevenueChart(30),
+        getUsersChart(30)
       ]);
       setStats(overview);
       setTopPubs(topList);
+      setRevenueChart(revenue);
+      setUsersChart(users);
     } catch (error) {
       toast.error('Không thể tải dữ liệu Dashboard');
       console.error(error);
@@ -126,6 +134,48 @@ export const Dashboard: React.FC = () => {
                 <span>Chữ: {stats.chapters.totalBook.toLocaleString()}</span>
                 <span>Tranh: {stats.chapters.totalComic.toLocaleString()}</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row g-4 mb-4">
+        <div className="col-12 col-xl-6">
+          <div className="card h-100">
+            <div className="card-header border-0 pb-0"><h6 className="mb-0">Doanh thu 30 ngày</h6></div>
+            <div className="card-body">
+              <Chart
+                type="bar"
+                height={280}
+                options={{
+                  chart: { toolbar: { show: false } },
+                  xaxis: { categories: revenueChart.labels },
+                  dataLabels: { enabled: false },
+                  colors: ['#198754'],
+                  yaxis: { labels: { formatter: value => value.toLocaleString('vi-VN') } }
+                } as ApexOptions}
+                series={[{ name: 'VNĐ', data: revenueChart.data }]}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-6">
+          <div className="card h-100">
+            <div className="card-header border-0 pb-0"><h6 className="mb-0">Người dùng mới 30 ngày</h6></div>
+            <div className="card-body">
+              <Chart
+                type="line"
+                height={280}
+                options={{
+                  chart: { toolbar: { show: false } },
+                  xaxis: { categories: usersChart.labels },
+                  dataLabels: { enabled: false },
+                  stroke: { curve: 'smooth' },
+                  colors: ['#5955D1'],
+                  yaxis: { min: 0, forceNiceScale: true }
+                } as ApexOptions}
+                series={[{ name: 'Users', data: usersChart.data }]}
+              />
             </div>
           </div>
         </div>

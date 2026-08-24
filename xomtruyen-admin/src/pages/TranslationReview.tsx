@@ -56,7 +56,7 @@ export const TranslationReview: React.FC = () => {
   const activePage = chapter.pages?.[activePageIdx];
 
   return (
-    <div className="d-flex flex-column" style={{ height: 'calc(100vh - 60px)', backgroundColor: '#0f0f1a', color: '#e0e0e0', margin: '-20px', padding: '10px' }}>
+    <div className="d-flex flex-column" style={{ backgroundColor: '#0f0f1a', color: '#e0e0e0', margin: '-20px', padding: '10px' }}>
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center p-2 mb-2 bg-dark rounded">
         <div className="d-flex align-items-center">

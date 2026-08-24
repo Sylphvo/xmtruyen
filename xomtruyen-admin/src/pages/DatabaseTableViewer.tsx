@@ -277,7 +277,7 @@ export const DatabaseTableViewer: React.FC = () => {
       <div className="d-flex justify-content-between align-items-center mb-3 mt-3 px-3">
       </div>
 
-      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
         {isLoading ? (
           <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
         ) : (

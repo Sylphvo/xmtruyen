@@ -127,25 +127,25 @@ namespace XomTruyen.API.Controllers.Admin
     public class CreateBookVideoRequest
     {
         public Guid PublicationId { get; set; }
-        public List<Guid> ChapterIds { get; set; }
-        public string ImageSource { get; set; }
-        public string ArtStyle { get; set; }
+        public List<Guid>? ChapterIds { get; set; }
+        public string? ImageSource { get; set; }
+        public string? ArtStyle { get; set; }
         public int SegmentWordCount { get; set; }
-        public string Language { get; set; }
-        public string VoiceId { get; set; }
-        public string SpeechRate { get; set; }
+        public string? Language { get; set; }
+        public string? VoiceId { get; set; }
+        public string? SpeechRate { get; set; }
         public bool EnableMultiVoice { get; set; }
-        public string Resolution { get; set; }
-        public string Transition { get; set; }
+        public string? Resolution { get; set; }
+        public string? Transition { get; set; }
         public bool AddSubtitles { get; set; }
         public bool AddIntroOutro { get; set; }
-        public BackgroundMusicConfig BackgroundMusic { get; set; }
+        public BackgroundMusicConfig? BackgroundMusic { get; set; }
     }
 
     public class BackgroundMusicConfig
     {
         public bool Enabled { get; set; }
-        public string Genre { get; set; }
+        public string? Genre { get; set; }
         public double Volume { get; set; }
     }
 }

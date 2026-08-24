@@ -3,16 +3,112 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Book, Hexagon, Tag, List, Database, TableProperties, Bell, Ticket, Bot, Languages, ShieldAlert, FileText, HelpCircle, MessageSquare, BookOpen, BarChart2, Settings, Headphones, ClipboardCheck, GitBranch } from 'lucide-react';
 import { getTables } from '../../api/managerDbApi';
 import { getTableInfo } from '../../constants/databaseDictionary';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableMenuItem } from './SortableMenuItem';
+
 
 interface SidebarProps {
   isCollapsed?: boolean;
 }
+
+
+const DEFAULT_MENU_DATA = {
+  books: [
+    { id: 'all-books', path: '/all-books', icon: Database, title: 'Tất cả sách', subtitle: '(All Books)' },
+    { id: 'books', path: '/books', icon: Book, title: 'Sách', subtitle: '(Books)' },
+    { id: 'book-chapters', path: '/book-chapters', icon: Book, title: 'QL Chương', subtitle: '(Chapters)' },
+    { id: 'reading-analytics', path: '/reading-analytics', icon: BarChart2, title: 'Phân tích Lượt đọc', subtitle: '(Analytics)' },
+    { id: 'comics', path: '/comics', icon: Book, title: 'Truyện', subtitle: '(Truyện tranh)' },
+    { id: 'book-files', path: '/book-files', icon: Database, title: 'File sách', subtitle: '(Lưu trữ)' },
+    { id: 'topics', path: '/topics', icon: Tag, title: 'Chủ đề', subtitle: '(Topics)' },
+    { id: 'categories', path: '/categories', icon: List, title: 'Thể loại', subtitle: '(Categories)' },
+    { id: 'authors', path: '/authors', icon: Users, title: 'Tác giả', subtitle: '(Authors)' }
+  ],
+  users: [
+    { id: 'users', path: '/users', icon: Users, title: 'User', subtitle: '(Người dùng)' }
+  ],
+  transactions: [
+    { id: 'transactions', path: '/transactions', icon: Tag, title: 'Giao dịch', subtitle: '(Nạp xu)' },
+    { id: 'coin-packages', path: '/coin-packages', icon: Tag, title: 'Gói Xu', subtitle: '(Nạp tiền)' }
+  ],
+  notifications: [
+    { id: 'notifications', path: '/notifications', icon: Bell, title: 'Thông báo', subtitle: '(Notifications)' },
+    { id: 'reviews', path: '/reviews', icon: MessageSquare, title: 'Đánh giá', subtitle: '(Reviews)' },
+    { id: 'reports', path: '/reports', icon: ShieldAlert, title: 'Báo cáo vi phạm', subtitle: '(Reports)' }
+  ],
+  marketing: [
+    { id: 'promotions', path: '/promotions', icon: Ticket, title: 'Khuyến mãi', subtitle: '(Promotions)' },
+    { id: 'banners', path: '/banners', icon: LayoutDashboard, title: 'Quản lý Banner' },
+    { id: 'home-sections', path: '/home-sections', icon: LayoutDashboard, title: 'Trang chủ (Home CMS)' },
+    { id: 'email-templates', path: '/email-templates', icon: FileText, title: 'Mẫu Email', subtitle: '(Templates)' },
+    { id: 'help-articles', path: '/help-articles', icon: HelpCircle, title: 'Trợ giúp', subtitle: '(Help Center)' },
+    { id: 'static-pages', path: '/static-pages', icon: FileText, title: 'Trang Tĩnh', subtitle: '(CMS)' },
+    { id: 'faq-management', path: '/faq-management', icon: HelpCircle, title: 'FAQ', subtitle: '(Hỏi đáp)' }
+  ],
+  automation: [
+    { id: 'import', path: '/import', icon: Database, title: 'Import Dữ Liệu', subtitle: '(CSV/JSON)' },
+    { id: 'crawlers', path: '/crawlers', icon: Bot, title: 'Crawler Pipeline', subtitle: '(Bot)' },
+    { id: 'translation', path: '/translation', icon: Languages, title: 'Dashboard Dịch thuật' },
+    { id: 'translation-upload', path: '/translation/upload', icon: Languages, title: 'Upload RAW' },
+    { id: 'translation-glossary', path: '/translation/glossary', icon: BookOpen, title: 'Từ điển (Glossary)' }
+  ]
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   const location = useLocation();
   const path = location.pathname;
 
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  // Load saved order from localStorage
+  const [menuOrders, setMenuOrders] = useState(() => {
+    const saved = localStorage.getItem('sidebarMenuOrders');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const restoredData: any = { ...DEFAULT_MENU_DATA };
+        Object.keys(parsed).forEach(key => {
+          if (Array.isArray(parsed[key]) && (DEFAULT_MENU_DATA as any)[key]) {
+             const defaultArray = (DEFAULT_MENU_DATA as any)[key];
+             const restoredArray = parsed[key].map((item: any) => defaultArray.find((d: any) => d.id === item.id)).filter(Boolean);
+             const missingItems = defaultArray.filter((d: any) => !parsed[key].find((item: any) => item.id === d.id));
+             restoredData[key] = [...restoredArray, ...missingItems];
+          }
+        });
+        return restoredData;
+      } catch (e) {}
+    }
+    return DEFAULT_MENU_DATA;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('sidebarMenuOrders', JSON.stringify(menuOrders));
+  }, [menuOrders]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id && over) {
+      setMenuOrders((prev: any) => {
+        const activeItems = prev[activeMenu];
+        if (!activeItems) return prev;
+        
+        const oldIndex = activeItems.findIndex((item: any) => item.id === active.id);
+        const newIndex = activeItems.findIndex((item: any) => item.id === over.id);
+        
+        return {
+          ...prev,
+          [activeMenu]: arrayMove(activeItems, oldIndex, newIndex)
+        };
+      });
+    }
+  };
+
   const [activeBookSubMenu, setActiveBookSubMenu] = useState('');
   const [dbTables, setDbTables] = useState<string[]>([]);
 
@@ -227,55 +323,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           )}
 
           {activeMenu === 'books' && (
-            <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <div className="menu-heading">Quản lý Sách</div>
-              <NavLink to="/all-books" className={({ isActive }) => `menu-link${isActive || activeBookSubMenu === '/all-books' ? ' active' : ''}`} end>
-                <Database />
-                <span>Tất cả sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(All Books)</span></span>
-              </NavLink>
-              <NavLink to="/books" className={({ isActive }) => `menu-link${isActive || activeBookSubMenu === '/books' ? ' active' : ''}`} end>
-                <Book />
-                <span>Sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Books)</span></span>
-              </NavLink>
-              <NavLink to="/book-chapters" className="menu-link">
-                <Book />
-                <span>QL Chương <span className="text-secondary small" style={{ fontSize: '12px' }}>(Chapters)</span></span>
-              </NavLink>
-              <NavLink to="/reading-analytics" className="menu-link">
-                <BarChart2 />
-                <span>Phân tích Lượt đọc <span className="text-secondary small" style={{ fontSize: '12px' }}>(Analytics)</span></span>
-              </NavLink>
-              <NavLink to="/comics" className={({ isActive }) => `menu-link${isActive || activeBookSubMenu === '/comics' ? ' active' : ''}`}>
-                <Book />
-                <span>Truyện <span className="text-secondary small" style={{ fontSize: '12px' }}>(Truyện tranh)</span></span>
-              </NavLink>
-              <NavLink to="/book-files" className="menu-link">
-                <Database />
-                <span>File sách <span className="text-secondary small" style={{ fontSize: '12px' }}>(Lưu trữ)</span></span>
-              </NavLink>
-              <NavLink to="/topics" className="menu-link">
-                <Tag />
-                <span>Chủ đề <span className="text-secondary small" style={{ fontSize: '12px' }}>(Topics)</span></span>
-              </NavLink>
-              <NavLink to="/categories" className="menu-link">
-                <List />
-                <span>Thể loại <span className="text-secondary small" style={{ fontSize: '12px' }}>(Categories)</span></span>
-              </NavLink>
-              <NavLink to="/authors" className="menu-link">
-                <Users />
-                <span>Tác giả <span className="text-secondary small" style={{ fontSize: '12px' }}>(Authors)</span></span>
-              </NavLink>
-            </>
+              <SortableContext items={menuOrders.books.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.books.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} isActive={item.path === activeBookSubMenu} />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
 
           {activeMenu === 'users' && (
-            <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <div className="menu-heading">Quản lý User</div>
-              <NavLink to="/users" className="menu-link">
-                <Users />
-                <span>User <span className="text-secondary small" style={{ fontSize: '12px' }}>(Người dùng)</span></span>
-              </NavLink>
-            </>
+              <SortableContext items={menuOrders.users.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.users.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
 
           {activeMenu === 'audio' && (
@@ -344,101 +410,53 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           )}
 
           {activeMenu === 'transactions' && (
-            <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <div className="menu-heading">Tài chính</div>
-              <NavLink to="/transactions" className="menu-link">
-                <Tag />
-                <span>Giao dịch <span className="text-secondary small" style={{ fontSize: '12px' }}>(Nạp xu)</span></span>
-              </NavLink>
-              <NavLink to="/coin-packages" className="menu-link">
-                <Tag />
-                <span>Gói Xu <span className="text-secondary small" style={{ fontSize: '12px' }}>(Nạp tiền)</span></span>
-              </NavLink>
-            </>
+              <SortableContext items={menuOrders.transactions.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.transactions.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
 
           {activeMenu === 'notifications' && (
-            <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <div className="menu-heading">Tương tác</div>
-              <NavLink to="/notifications" className="menu-link" end>
-                <Bell />
-                <span>Thông báo <span className="text-secondary small" style={{ fontSize: '12px' }}>(Notifications)</span></span>
-              </NavLink>
-              <NavLink to="/reviews" className="menu-link" end>
-                <MessageSquare />
-                <span>Đánh giá <span className="text-secondary small" style={{ fontSize: '12px' }}>(Reviews)</span></span>
-              </NavLink>
-              <NavLink to="/reports" className="menu-link" end>
-                <ShieldAlert />
-                <span>Báo cáo vi phạm <span className="text-secondary small" style={{ fontSize: '12px' }}>(Reports)</span></span>
-              </NavLink>
-            </>
+              <SortableContext items={menuOrders.notifications.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.notifications.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
 
           {activeMenu === 'marketing' && (
-            <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <div className="menu-heading">Trang chủ & Marketing</div>
-              <NavLink to="/promotions" className="menu-link" end>
-                <Ticket />
-                <span>Khuyến mãi <span className="text-secondary small" style={{ fontSize: '12px' }}>(Promotions)</span></span>
-              </NavLink>
-              <NavLink to="/banners" className="menu-link" end>
-                <LayoutDashboard />
-                <span>Quản lý Banner</span>
-              </NavLink>
-              <NavLink to="/home-sections" className="menu-link" end>
-                <LayoutDashboard />
-                <span>Trang chủ (Home CMS)</span>
-              </NavLink>
-              <NavLink to="/email-templates" className="menu-link" end>
-                <FileText />
-                <span>Mẫu Email <span className="text-secondary small" style={{ fontSize: '12px' }}>(Templates)</span></span>
-              </NavLink>
-              <NavLink to="/help-articles" className="menu-link" end>
-                <HelpCircle />
-                <span>Trợ giúp <span className="text-secondary small" style={{ fontSize: '12px' }}>(Help Center)</span></span>
-              </NavLink>
-              <NavLink to="/static-pages" className="menu-link" end>
-                <FileText />
-                <span>Trang Tĩnh <span className="text-secondary small" style={{ fontSize: '12px' }}>(CMS)</span></span>
-              </NavLink>
-              <NavLink to="/faq-management" className="menu-link" end>
-                <HelpCircle />
-                <span>FAQ <span className="text-secondary small" style={{ fontSize: '12px' }}>(Hỏi đáp)</span></span>
-              </NavLink>
-            </>
+              <SortableContext items={menuOrders.marketing.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.marketing.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
 
           {activeMenu === 'automation' && (
-            <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <div className="menu-heading">Tự động hóa (Phase 1)</div>
-              <NavLink to="/import" className="menu-link" end>
-                <Database />
-                <span>Import Dữ Liệu <span className="text-secondary small" style={{ fontSize: '12px' }}>(CSV/JSON)</span></span>
-              </NavLink>
-              <NavLink to="/crawlers" className="menu-link" end>
-                <Bot />
-                <span>Crawler Pipeline <span className="text-secondary small" style={{ fontSize: '12px' }}>(Bot)</span></span>
-              </NavLink>
-              <NavLink to="/translation" className="menu-link" end>
-                <Languages />
-                <span>Dashboard Dịch thuật</span>
-              </NavLink>
-              <NavLink to="/translation/upload" className="menu-link" end>
-                <Languages />
-                <span>Upload RAW</span>
-              </NavLink>
-              <NavLink to="/translation/glossary" className="menu-link" end>
-                <BookOpen />
-                <span>Từ điển (Glossary)</span>
-              </NavLink>
+              <SortableContext items={menuOrders.automation.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.automation.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
               
               <div className="menu-heading mt-3">Dàn Trang & In Ấn (Phase 5)</div>
               <NavLink to="/print-pipeline" className="menu-link" end>
                 <BookOpen />
                 <span>Xuất bản PDF / CMYK</span>
               </NavLink>
-            </>
+            </DndContext>
           )}
 
           {activeMenu === 'test-cases' && (

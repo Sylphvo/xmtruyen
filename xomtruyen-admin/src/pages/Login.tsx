@@ -57,6 +57,18 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-vh-100 w-100 d-flex" style={{ backgroundColor: '#f4f6fa' }}>
+      <style>
+        {`
+          .login-input {
+            border: 1px solid #dfe1e6 !important;
+            border-radius: 8px !important;
+          }
+          .login-input:focus {
+            border-color: var(--bs-primary) !important;
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important;
+          }
+        `}
+      </style>
       <div className="container-fluid min-vh-100 px-0">
         <div className="row g-0 min-vh-100 align-items-center justify-content-center w-100">
           {/* Left Column - Illustration */}
@@ -86,13 +98,13 @@ export const Login: React.FC = () => {
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label small fw-medium" htmlFor="loginEmail" style={{ color: '#42526e' }}>Email Address</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="form-control form-control-lg fs-6" id="loginEmail" placeholder="info@example.com" style={{ backgroundColor: '#fafbfc', borderColor: '#dfe1e6' }} />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="form-control form-control-lg fs-6 login-input" id="loginEmail" placeholder="info@example.com" style={{ backgroundColor: '#fafbfc' }} />
                 </div>
                 
                 <div className="mb-3">
                   <label className="form-label small fw-medium" htmlFor="loginPassword" style={{ color: '#42526e' }}>Password</label>
                   <div className="password-wrapper position-relative">
-                    <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} className="form-control form-control-lg fs-6 pe-5" id="loginPassword" placeholder="********" style={{ backgroundColor: '#fafbfc', borderColor: '#dfe1e6' }} />
+                    <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} className="form-control form-control-lg fs-6 pe-5 login-input" id="loginPassword" placeholder="********" style={{ backgroundColor: '#fafbfc' }} />
                     <button
                       type="button"
                       className="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted px-3"

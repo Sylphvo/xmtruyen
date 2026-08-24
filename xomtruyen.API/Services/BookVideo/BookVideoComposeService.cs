@@ -11,13 +11,13 @@ namespace XomTruyen.API.Services.BookVideo
 {
     public class BookVideoComposeRequest
     {
-        public BookVideoTask Task { get; set; }
-        public List<BookVideoSegment> Segments { get; set; }
-        public string WorkingDir { get; set; }
-        public string BookTitle { get; set; }
-        public string ChapterTitle { get; set; }
-        public string AuthorName { get; set; }
-        public string CoverImagePath { get; set; }
+        public BookVideoTask Task { get; set; } = null!;
+        public List<BookVideoSegment> Segments { get; set; } = new();
+        public string WorkingDir { get; set; } = string.Empty;
+        public string BookTitle { get; set; } = string.Empty;
+        public string ChapterTitle { get; set; } = string.Empty;
+        public string AuthorName { get; set; } = string.Empty;
+        public string CoverImagePath { get; set; } = string.Empty;
     }
 
     public class BookVideoComposeService
@@ -104,7 +104,7 @@ namespace XomTruyen.API.Services.BookVideo
             return effects[index % effects.Length];
         }
 
-        private async Task RunFFmpegAsync(string arguments, string workingDirectory = null)
+        private async Task RunFFmpegAsync(string arguments, string? workingDirectory = null)
         {
             var tcs = new TaskCompletionSource<bool>();
             

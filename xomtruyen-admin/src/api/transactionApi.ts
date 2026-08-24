@@ -26,6 +26,10 @@ export interface GetTransactionsParams {
   userId?: string;
   transactionType?: string;
   status?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
   page?: number;
   pageSize?: number;
 }
@@ -40,4 +44,20 @@ export const getRevenueSummary = async (): Promise<{ totalRevenue: number; today
 
 export const approveTransaction = async (id: string): Promise<{ message: string }> => {
   return apiClient.patch<any, { message: string }>(`/admin/transactions/${id}/approve`, {});
+};
+
+export const rejectTransaction = async (id: string, reason?: string): Promise<{ message: string }> => {
+  return apiClient.patch<any, { message: string }>(`/admin/transactions/${id}/reject`, { reason });
+};
+
+export interface ManualTopUpRequest {
+  userId: string;
+  amount: number;
+  coinAmount: number;
+  note?: string;
+  paymentMethod?: string;
+}
+
+export const manualTopUp = async (data: ManualTopUpRequest): Promise<Transaction> => {
+  return apiClient.post<any, Transaction>('/admin/transactions/manual-topup', data);
 };

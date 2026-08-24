@@ -289,6 +289,9 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
     setDragOverColumn(null);
     
     if (draggedColumn && draggedColumn !== targetColId) {
+      if (['checkbox', 'cover', 'title'].includes(targetColId)) return;
+      if (['checkbox', 'cover', 'title'].includes(draggedColumn)) return;
+
       setColumnOrder((prevOrder) => {
         const newOrder = [...prevOrder];
         const draggedIndex = newOrder.indexOf(draggedColumn);
@@ -864,7 +867,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
             /></div>
         </div>
 
-        <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
+        <div className="table-responsive jira-scroll" style={{ overflowX: 'auto', overflowY: 'auto' }}>
           <table className="table align-middle mb-0" style={{ borderCollapse: 'separate', borderSpacing: 0, backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1450px' }}>
             <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
               <tr>
@@ -938,6 +941,10 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                       break;
                   }
                   
+                  const stickyCheckbox = colId === 'checkbox';
+                  const stickyAction = colId === 'action';
+                  const isDraggable = !stickyCheckbox && !stickyAction;
+                  
                   return (
                     <ResizableHeader 
                       key={colId}
@@ -945,17 +952,22 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                       minWidth={minWidth}
                       onClick={onClick}
                       style={{ 
-                        borderLeft: colId === 'checkbox' ? 0 : undefined,
-                        borderRight: colId === 'action' ? 0 : undefined,
-                        backgroundColor: dragOverColumn === colId ? 'rgba(9, 30, 66, 0.08)' : 'transparent', 
+                        borderLeft: stickyCheckbox ? 0 : undefined,
+                        borderRight: stickyAction ? 0 : undefined,
+                        backgroundColor: dragOverColumn === colId ? 'rgba(9, 30, 66, 0.08)' : 'var(--jira-header-bg)', 
                         padding: '5px 6px', 
                         textAlign: 'center', 
                         color: 'var(--jira-text)',
-                        cursor: draggedColumn === colId ? 'grabbing' : 'grab',
+                        cursor: !isDraggable ? 'default' : (draggedColumn === colId ? 'grabbing' : 'grab'),
                         opacity: draggedColumn === colId ? 0.5 : 1,
-                        transition: 'background-color 0.2s, opacity 0.2s'
+                        transition: 'background-color 0.2s, opacity 0.2s',
+                        position: (stickyCheckbox || stickyAction) ? 'sticky' : undefined,
+                        left: stickyCheckbox ? 0 : undefined,
+                        right: stickyAction ? 0 : undefined,
+                        zIndex: (stickyCheckbox || stickyAction) ? 20 : undefined,
+                        boxShadow: stickyCheckbox ? 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' : stickyAction ? 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' : undefined
                       }}
-                      draggable
+                      draggable={isDraggable}
                       onDragStart={(e) => handleColumnDragStart(e, colId)}
                       onDragOver={(e) => handleColumnDragOver(e, colId)}
                       onDrop={(e) => handleColumnDrop(e, colId)}
@@ -967,7 +979,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                 })}
               </tr>
               </thead>
-              <tbody style={{ height: '1px' }}>
+              <tbody>
                 <>
                   {showSkeleton ? (
                     <tr>
@@ -985,7 +997,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                             switch(colId) {
                               case 'checkbox':
                                 return (
-                                  <td key={colId} style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                                  <td className="jira-sticky-left" key={colId} style={{ borderLeft: 0, padding: '5px 6px', backgroundColor: selectedIds.includes(book.id) ? 'var(--jira-selected-bg, #ebf2fc)' : 'var(--jira-table-bg, #ffffff)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 2, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }} onClick={(e) => e.stopPropagation()}>
                                     <Form.Check
                                       type="checkbox"
                                       checked={selectedIds.includes(book.id)}
@@ -1349,7 +1361,7 @@ export const Books: React.FC<{ formatType?: number }> = ({ formatType: _formatTy
                                 );
                               case 'action':
                                 return (
-                                  <td key={colId} style={{ borderRight: 0, padding: '5px 6px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)' }}>
+                                  <td className="jira-sticky-right" key={colId} style={{ borderRight: 0, padding: '5px 6px', backgroundColor: selectedIds.includes(book.id) ? 'var(--jira-selected-bg, #ebf2fc)' : 'var(--jira-table-bg, #ffffff)', textAlign: 'center', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 2, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                                     {editingBookId === book.id ? (
                                       <div className="d-flex gap-2 justify-content-center">
                                         <Button variant="light" size="sm" onClick={() => handleSaveEdit(book.id)} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#198754', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>

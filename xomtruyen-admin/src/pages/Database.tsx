@@ -183,7 +183,7 @@ export const Database: React.FC = () => {
         </div>
       </div>
 
-      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
         <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>

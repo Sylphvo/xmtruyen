@@ -14,29 +14,29 @@ namespace XomTruyen.API.Models
         public Guid PublicationId { get; set; }
         
         [ForeignKey("PublicationId")]
-        public Publication Publication { get; set; }
+        public Publication? Publication { get; set; }
 
         /// <summary>
         /// JSON array of chapter IDs to include in the video
         /// </summary>
         [Required]
-        public string ChapterIds { get; set; }
+        public string ChapterIds { get; set; } = string.Empty;
 
         [MaxLength(30)]
         public string ImageSource { get; set; } = "stable-diffusion";
 
         [MaxLength(50)]
-        public string ArtStyle { get; set; }
+        public string? ArtStyle { get; set; }
 
         public int SegmentWordCount { get; set; } = 150;
 
         [Required]
         [MaxLength(10)]
-        public string Language { get; set; }
+        public string Language { get; set; } = "vi-VN";
 
         [Required]
         [MaxLength(100)]
-        public string VoiceId { get; set; }
+        public string VoiceId { get; set; } = string.Empty;
 
         [MaxLength(10)]
         public string SpeechRate { get; set; } = "+0%";
@@ -56,7 +56,7 @@ namespace XomTruyen.API.Models
         public bool BgmEnabled { get; set; } = false;
 
         [MaxLength(50)]
-        public string BgmGenre { get; set; }
+        public string? BgmGenre { get; set; }
 
         public double BgmVolume { get; set; } = 0.2;
 
@@ -65,34 +65,34 @@ namespace XomTruyen.API.Models
 
         public int ProgressPercent { get; set; } = 0;
 
-        public string CurrentStep { get; set; }
+        public string? CurrentStep { get; set; }
 
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
         public int TotalSegments { get; set; } = 0;
 
         public int CompletedSegments { get; set; } = 0;
 
-        public string OutputVideoUrl { get; set; }
+        public string? OutputVideoUrl { get; set; }
 
-        public string OutputThumbnailUrl { get; set; }
+        public string? OutputThumbnailUrl { get; set; }
 
         public double? OutputDurationSeconds { get; set; }
 
         public long? OutputFileSizeBytes { get; set; }
 
-        public string OutputSubtitleUrl { get; set; }
+        public string? OutputSubtitleUrl { get; set; }
 
         public Guid? CreatedBy { get; set; }
         
         [ForeignKey("CreatedBy")]
-        public User Creator { get; set; }
+        public User? Creator { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? CompletedAt { get; set; }
 
         // Navigation property
-        public ICollection<BookVideoSegment> Segments { get; set; }
+        public ICollection<BookVideoSegment>? Segments { get; set; }
     }
 }

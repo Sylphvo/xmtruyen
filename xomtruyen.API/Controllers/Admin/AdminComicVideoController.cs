@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace XomTruyen.API.Controllers.Admin
 {
     [ApiController]
     [Route("api/admin/comic-video")]
+    [Authorize(Roles = "Admin")]
     public class AdminComicVideoController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

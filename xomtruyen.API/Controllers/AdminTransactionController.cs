@@ -22,6 +22,10 @@ public class AdminTransactionController : BaseApiController
         [FromQuery] string? userId,
         [FromQuery] string? transactionType,
         [FromQuery] string? status,
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate,
+        [FromQuery] decimal? minAmount,
+        [FromQuery] decimal? maxAmount,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
@@ -43,6 +47,28 @@ public class AdminTransactionController : BaseApiController
         if (!string.IsNullOrEmpty(status))
         {
             query = query.Where(t => t.Status == status);
+        }
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(t => t.CreatedAt >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            // Set to end of day
+            var end = endDate.Value.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(t => t.CreatedAt <= end);
+        }
+
+        if (minAmount.HasValue)
+        {
+            query = query.Where(t => t.Amount >= minAmount.Value);
+        }
+
+        if (maxAmount.HasValue)
+        {
+            query = query.Where(t => t.Amount <= maxAmount.Value);
         }
 
         var totalCount = await query.CountAsync();
@@ -159,5 +185,62 @@ public class AdminTransactionController : BaseApiController
 
         await _context.SaveChangesAsync();
         return Ok(new { message = "Duyệt giao dịch thành công" });
+    }
+
+    [HttpPatch("{id}/reject")]
+    public async Task<IActionResult> RejectTransaction(Guid id, [FromBody] RejectTransactionRequest? request)
+    {
+        var transaction = await _context.Transactions.FindAsync(id);
+        if (transaction == null) return NotFound(new { message = "Giao dịch không tồn tại" });
+        if (transaction.Status != "Pending") return BadRequest(new { message = "Giao dịch không ở trạng thái chờ duyệt" });
+
+        transaction.Status = "Failed";
+        transaction.Note = string.IsNullOrWhiteSpace(request?.Reason) ? transaction.Note : request.Reason;
+        transaction.CompletedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Đã từ chối giao dịch" });
+    }
+
+    [HttpPost("manual-topup")]
+    public async Task<IActionResult> ManualTopUp([FromBody] ManualTopUpRequest request)
+    {
+        if (request.UserId == Guid.Empty || request.Amount < 0 || request.CoinAmount <= 0)
+            return BadRequest(new { message = "Thông tin nạp xu không hợp lệ" });
+
+        var user = await _context.Users.FindAsync(request.UserId);
+        if (user == null) return NotFound(new { message = "Người dùng không tồn tại" });
+
+        user.CoinBalance = (user.CoinBalance ?? 0) + request.CoinAmount;
+        var transaction = new Transaction
+        {
+            Id = Guid.NewGuid(),
+            UserId = request.UserId,
+            Amount = request.Amount,
+            CoinAmount = request.CoinAmount,
+            TransactionType = "TopUp",
+            PaymentMethod = request.PaymentMethod ?? "Manual",
+            Status = "Completed",
+            Note = request.Note,
+            CreatedAt = DateTime.UtcNow,
+            CompletedAt = DateTime.UtcNow
+        };
+
+        _context.Transactions.Add(transaction);
+        await _context.SaveChangesAsync();
+        return Ok(transaction);
+    }
+
+    public class RejectTransactionRequest
+    {
+        public string? Reason { get; set; }
+    }
+
+    public class ManualTopUpRequest
+    {
+        public Guid UserId { get; set; }
+        public int Amount { get; set; }
+        public int CoinAmount { get; set; }
+        public string? Note { get; set; }
+        public string? PaymentMethod { get; set; }
     }
 }

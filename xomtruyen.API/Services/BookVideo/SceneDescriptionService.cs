@@ -8,10 +8,10 @@ namespace XomTruyen.API.Services.BookVideo
 {
     public class TextSegment
     {
-        public string Text { get; set; }
-        public string SceneDescription { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public string SceneDescription { get; set; } = string.Empty;
         public double EstimatedDurationSeconds { get; set; }
-        public List<string> Keywords { get; set; }
+        public List<string> Keywords { get; set; } = new();
     }
 
     public class SceneDescriptionService

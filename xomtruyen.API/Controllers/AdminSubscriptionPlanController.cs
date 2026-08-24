@@ -22,7 +22,20 @@ public class AdminSubscriptionPlanController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllPlans()
     {
-        var plans = await _context.SubscriptionPlans.OrderBy(p => p.Price).ToListAsync();
+        var plans = await _context.SubscriptionPlans
+            .OrderBy(p => p.Price)
+            .Select(plan => new
+            {
+                plan.Id,
+                plan.Name,
+                plan.Price,
+                plan.DurationDays,
+                plan.IsUnlimited,
+                plan.MaxChaptersPerDay,
+                plan.RemoveAds,
+                ActiveUsersCount = _context.Users.Count(user => user.CurrentPlanId == plan.Id && user.PlanExpiredAt > DateTime.UtcNow)
+            })
+            .ToListAsync();
         return Ok(plans);
     }
 
@@ -68,6 +81,10 @@ public class AdminSubscriptionPlanController : ControllerBase
     {
         var plan = await _context.SubscriptionPlans.FindAsync(id);
         if (plan == null) return NotFound();
+
+        var activeUsers = await _context.Users.CountAsync(user => user.CurrentPlanId == id && user.PlanExpiredAt > DateTime.UtcNow);
+        if (activeUsers > 0)
+            return BadRequest(new { message = "Không thể xóa gói đang được người dùng sử dụng" });
 
         _context.SubscriptionPlans.Remove(plan);
         await _context.SaveChangesAsync();

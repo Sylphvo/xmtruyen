@@ -20,7 +20,7 @@ export const ProtectedRoute: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (user?.role !== 'Admin') {
+  if (!user?.role || !user.role.includes('Admin')) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100 bg-dark text-white text-center">
         <div>

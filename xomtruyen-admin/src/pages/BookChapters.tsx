@@ -198,11 +198,11 @@ export const BookChapters: React.FC = () => {
             isLoading={typeof loading !== 'undefined' ? loading : false}
           /></div>
 
-      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
         <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'var(--jira-header-bg)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 11, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                 <Form.Check
                   type="checkbox"
                   checked={chapters.length > 0 && selectedIds.length === chapters.length}
@@ -229,12 +229,12 @@ export const BookChapters: React.FC = () => {
               <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Lượt xem</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+              <ResizableHeader initialWidth={120} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'var(--jira-header-bg)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                 <span className="fw-semibold text-nowrap">Thao tác</span>
               </ResizableHeader>
             </tr>
           </thead>
-          <tbody style={{ height: '1px' }}>
+          <tbody>
               {loading ? (
                 <tr><td colSpan={7} className="text-center p-4">Đang tải...</td></tr>
               ) : !selectedPubId ? (
@@ -244,7 +244,7 @@ export const BookChapters: React.FC = () => {
               ) : (
                 chapters.map(chapter => (
                   <tr key={chapter.id} className={`jira-table-row${selectedIds.includes(chapter.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
-                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                    <td className="jira-sticky-left" style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: selectedIds.includes(chapter.id) ? 'var(--jira-selected-bg, #ebf2fc)' : 'var(--jira-table-bg, #ffffff)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 2, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"
                         checked={selectedIds.includes(chapter.id)}
@@ -266,7 +266,7 @@ export const BookChapters: React.FC = () => {
                       )}
                     </td>
                     <td className="text-muted" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>{chapter.viewCount || 0}</td>
-                    <td className="px-4 text-end" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                    <td className="px-4 text-end jira-sticky-right" style={{ padding: '12px 16px', backgroundColor: selectedIds.includes(chapter.id) ? 'var(--jira-selected-bg, #ebf2fc)' : 'var(--jira-table-bg, #ffffff)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 2, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                       <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShowModal(chapter)}>
                         <Edit2 size={14} />
                       </Button>

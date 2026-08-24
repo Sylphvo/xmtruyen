@@ -13,6 +13,10 @@ import { ExcelActionButtons } from '../components/ExcelActionButtons';
 
 export const Transactions: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
   const [summary, setSummary] = useState({ totalRevenue: 0, todayRevenue: 0 });
   
   const {
@@ -27,10 +31,18 @@ export const Transactions: React.FC = () => {
     updateItem
   } = useInfiniteScroll<Transaction>({
     fetchFn: async (params) => {
-      return getTransactions({ status: params.statusFilter || undefined, page: params.page, pageSize: params.pageSize });
+      return getTransactions({ 
+        status: params.statusFilter || undefined, 
+        startDate: params.startDate || undefined,
+        endDate: params.endDate || undefined,
+        minAmount: params.minAmount ? Number(params.minAmount) : undefined,
+        maxAmount: params.maxAmount ? Number(params.maxAmount) : undefined,
+        page: params.page, 
+        pageSize: params.pageSize 
+      });
     },
     pageSize: 50,
-    params: { statusFilter }
+    params: { statusFilter, startDate, endDate, minAmount, maxAmount }
   });
   
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -97,13 +109,45 @@ export const Transactions: React.FC = () => {
               className="bg-transparent text-body border-secondary-subtle"
               value={statusFilter} 
               onChange={e => setStatusFilter(e.target.value)}
-              style={{ width: '200px', height: '32px', fontSize: '13px' }}
+              style={{ width: '150px', height: '32px', fontSize: '13px' }}
             >
               <option value="">Tất cả trạng thái</option>
-              <option value="Pending">Chờ duyệt (Pending)</option>
-              <option value="Completed">Hoàn thành (Completed)</option>
-              <option value="Failed">Thất bại (Failed)</option>
+              <option value="Pending">Chờ duyệt</option>
+              <option value="Completed">Hoàn thành</option>
+              <option value="Failed">Thất bại</option>
             </Form.Select>
+            <Form.Control
+              type="date"
+              size="sm"
+              placeholder="Từ ngày"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              style={{ width: '130px', height: '32px', fontSize: '13px' }}
+            />
+            <Form.Control
+              type="date"
+              size="sm"
+              placeholder="Đến ngày"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              style={{ width: '130px', height: '32px', fontSize: '13px' }}
+            />
+            <Form.Control
+              type="number"
+              size="sm"
+              placeholder="Min VNĐ"
+              value={minAmount}
+              onChange={e => setMinAmount(e.target.value)}
+              style={{ width: '100px', height: '32px', fontSize: '13px' }}
+            />
+            <Form.Control
+              type="number"
+              size="sm"
+              placeholder="Max VNĐ"
+              value={maxAmount}
+              onChange={e => setMaxAmount(e.target.value)}
+              style={{ width: '100px', height: '32px', fontSize: '13px' }}
+            />
             <ExcelActionButtons 
               dataToExport={transactions || []}
               exportFileName={typeof document !== 'undefined' ? document.title.replace(' | Xóm Truyện', '').replace(/ /g, '_') : 'Transactions'}
@@ -116,7 +160,7 @@ export const Transactions: React.FC = () => {
         {loading ? (
           <div className="p-5 text-center"><Spinner animation="border" /></div>
         ) : (
-          <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+          <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
             <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
               <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>

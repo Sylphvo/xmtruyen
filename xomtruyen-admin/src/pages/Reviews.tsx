@@ -85,11 +85,11 @@ export const Reviews: React.FC = () => {
         </div>
       </div>
 
-      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
         <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1000px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'var(--jira-header-bg)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 11, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                 <Form.Check
                   type="checkbox"
                   checked={reviews.length > 0 && selectedIds.length === reviews.length}
@@ -116,12 +116,12 @@ export const Reviews: React.FC = () => {
               <ResizableHeader initialWidth={150} style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                 <span className="fw-semibold text-nowrap">Ngày gửi</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+              <ResizableHeader initialWidth={100} style={{ padding: '12px 16px', textAlign: 'right', backgroundColor: 'var(--jira-header-bg)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                 <span className="fw-semibold text-nowrap">Thao tác</span>
               </ResizableHeader>
             </tr>
           </thead>
-          <tbody style={{ height: '1px' }}>
+          <tbody>
               {loading ? (
                 <tr><td colSpan={7} className="text-center p-4">Đang tải...</td></tr>
               ) : (
@@ -138,7 +138,7 @@ export const Reviews: React.FC = () => {
                   )}
                   {reviews.map(review => (
                   <tr key={review.id} className={`jira-table-row${selectedIds.includes(review.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
-                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                    <td className="jira-sticky-left" style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: selectedIds.includes(review.id) ? 'var(--jira-selected-bg, #ebf2fc)' : 'var(--jira-table-bg, #ffffff)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 2, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }} onClick={(e) => e.stopPropagation()}>
                       <Form.Check
                         type="checkbox"
                         checked={selectedIds.includes(review.id)}
@@ -156,7 +156,7 @@ export const Reviews: React.FC = () => {
                     <td className="text-muted small" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       {review.createdAt ? new Date(review.createdAt).toLocaleString() : ''}
                     </td>
-                    <td className="px-4 text-end" style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
+                    <td className="px-4 text-end jira-sticky-right" style={{ padding: '12px 16px', backgroundColor: selectedIds.includes(review.id) ? 'var(--jira-selected-bg, #ebf2fc)' : 'var(--jira-table-bg, #ffffff)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 2, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                       <Button variant="outline-danger" size="sm" onClick={() => handleDelete(review.id, review.userName)}>
                         <Trash size={14} />
                       </Button>

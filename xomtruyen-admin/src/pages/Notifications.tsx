@@ -116,7 +116,7 @@ export const Notifications: React.FC = () => {
 
   return (
     <>
-      <div className="jira-table-container m-4">
+      <div className="jira-table-container">
         <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid #dfe1e6' }}>
           <h5 className="mb-0 fw-semibold" style={{ color: '#172b4d', fontSize: '16px' }}>
             <Bell size={18} className="me-2 text-primary" />
@@ -146,7 +146,7 @@ export const Notifications: React.FC = () => {
         {loading ? (
           <div className="text-center p-4">Đang tải dữ liệu...</div>
         ) : (
-          <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+          <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
             <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '800px' }}>
               <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>

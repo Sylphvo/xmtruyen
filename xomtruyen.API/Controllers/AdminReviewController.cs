@@ -18,7 +18,12 @@ public class AdminReviewController : ControllerBase
 
     [HttpGet("api/admin/reviews")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetReviews([FromQuery] Guid? publicationId, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+    public async Task<IActionResult> GetReviews(
+        [FromQuery] Guid? publicationId,
+        [FromQuery] int? minRating,
+        [FromQuery] int? maxRating,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
     {
         var query = _context.Reviews
             .Include(r => r.User)
@@ -29,6 +34,9 @@ public class AdminReviewController : ControllerBase
         {
             query = query.Where(r => r.PublicationId == publicationId.Value);
         }
+
+        if (minRating.HasValue) query = query.Where(r => r.Rating >= minRating.Value);
+        if (maxRating.HasValue) query = query.Where(r => r.Rating <= maxRating.Value);
 
         var total = await query.CountAsync();
         var reviews = await query
@@ -56,6 +64,18 @@ public class AdminReviewController : ControllerBase
             CurrentPage = page,
             Items = reviews
         });
+    }
+
+    [HttpGet("api/admin/reviews/stats")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetReviewStats()
+    {
+        var totalReviews = await _context.Reviews.CountAsync();
+        var averageRating = totalReviews == 0 ? 0 : await _context.Reviews.AverageAsync(r => (double)r.Rating);
+        var today = DateTime.UtcNow.Date;
+        var reviewsToday = await _context.Reviews.CountAsync(r => r.CreatedAt >= today);
+
+        return Ok(new { totalReviews, averageRating, reviewsToday });
     }
 
     [HttpDelete("api/admin/reviews/{id}")]

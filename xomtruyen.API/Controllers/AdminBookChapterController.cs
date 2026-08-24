@@ -90,4 +90,74 @@ public class AdminBookChapterController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(new { message = "Deleted" });
     }
+
+    [HttpDelete("api/admin/book-chapters/publication/{publicationId}/all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteAllChapters(Guid publicationId)
+    {
+        var chapters = await _context.BookChapters
+            .Where(c => c.PublicationId == publicationId)
+            .ToListAsync();
+
+        _context.BookChapters.RemoveRange(chapters);
+        await _context.SaveChangesAsync();
+        return Ok(new { deletedCount = chapters.Count });
+    }
+
+    [HttpPatch("api/admin/book-chapters/reorder")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ReorderChapters([FromBody] List<ChapterOrderRequest> requests)
+    {
+        if (requests.Count == 0) return BadRequest(new { message = "Danh sách chương không được trống" });
+
+        var ids = requests.Select(r => r.Id).ToList();
+        var chapters = await _context.BookChapters.Where(c => ids.Contains(c.Id)).ToListAsync();
+        foreach (var request in requests)
+        {
+            var chapter = chapters.FirstOrDefault(c => c.Id == request.Id);
+            if (chapter != null) chapter.ChapterNumber = request.ChapterNumber;
+        }
+
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPost("api/admin/book-chapters/publication/{publicationId}/bulk-create")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> BulkCreateChapters(Guid publicationId, [FromBody] List<BulkChapterRequest> requests)
+    {
+        if (requests.Count == 0) return BadRequest(new { message = "Danh sách chương không được trống" });
+
+        var chapters = requests.Select(request => new BookChapter
+        {
+            Id = Guid.NewGuid(),
+            PublicationId = publicationId,
+            ChapterNumber = request.ChapterNumber,
+            Title = request.Title,
+            Content = request.Content,
+            IsLocked = request.IsLocked,
+            CoinPrice = request.CoinPrice,
+            ViewCount = 0,
+            CreatedAt = DateTime.UtcNow
+        }).ToList();
+
+        _context.BookChapters.AddRange(chapters);
+        await _context.SaveChangesAsync();
+        return Ok(chapters);
+    }
+
+    public class ChapterOrderRequest
+    {
+        public Guid Id { get; set; }
+        public float ChapterNumber { get; set; }
+    }
+
+    public class BulkChapterRequest
+    {
+        public float ChapterNumber { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public bool IsLocked { get; set; }
+        public int? CoinPrice { get; set; }
+    }
 }

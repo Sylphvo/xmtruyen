@@ -326,11 +326,11 @@ export const Users: React.FC = () => {
       </div>
 
       {/* Table Area */}
-      <div className="table-responsive jira-scroll" style={{ maxHeight: '1756px', overflowX: 'auto', overflowY: 'auto' }}>
+      <div className="table-responsive jira-scroll" style={{ overflowX: 'auto', overflowY: 'auto' }}>
         <table className="table align-middle mb-0" style={{ borderCollapse: 'collapse', backgroundColor: 'transparent', tableLayout: 'fixed', minWidth: '1300px' }}>
           <thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ borderBottom: '1px solid var(--bs-border-color)' }}>
-              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}>
+              <ResizableHeader initialWidth={40} minWidth={40} style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'var(--jira-header-bg)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 11, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                 <Form.Check
                   type="checkbox"
                   checked={sortedData.length > 0 && selectedUserIds.length === sortedData.length}
@@ -366,12 +366,12 @@ export const Users: React.FC = () => {
               <ResizableHeader initialWidth={120} style={{ cursor: 'pointer', padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)' }} onClick={() => handleSort('isActive')}>
                 <span className="fw-semibold text-nowrap">Status {getSortIcon('isActive')}</span>
               </ResizableHeader>
-              <ResizableHeader initialWidth={220} style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'transparent', textAlign: 'center', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, borderLeft: '1px solid var(--bs-border-color)' }}>
+              <ResizableHeader initialWidth={220} style={{ borderRight: 0, padding: '12px 16px', backgroundColor: 'var(--jira-header-bg)', textAlign: 'center', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 11, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                 <span className="fw-semibold text-nowrap">Thao Tác</span>
               </ResizableHeader>
             </tr>
           </thead>
-          <tbody style={{ height: '1px' }}>
+          <tbody>
             {loading ? (
               <tr>
                 <td colSpan={10} className="text-center py-5">
@@ -383,7 +383,7 @@ export const Users: React.FC = () => {
               <>
                 {isAddingNewUser && (
                   <tr className="inline-edit-row" style={{ borderBottom: '1px solid var(--bs-border-color)', height: '46px' }}>
-                    <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }}></td>
+                    <td className="jira-sticky-left" style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'var(--jira-table-bg, #ffffff)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 2, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }}></td>
                     <td style={{ padding: '12px 16px', backgroundColor: 'transparent', color: 'var(--jira-text)' }}>
                       <div className="d-flex align-items-center gap-3">
                         <img
@@ -446,7 +446,7 @@ export const Users: React.FC = () => {
                         className="d-inline-block"
                       />
                     </td>
-                    <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
+                    <td className="jira-sticky-right" style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'var(--jira-table-bg, #ffffff)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                       <div className="d-flex gap-2 justify-content-center">
                         <Button variant="success" size="sm" onClick={() => handleAddSubmit()} disabled={isSubmitting} className="px-3 rounded-2 fw-medium">Lưu</Button>
                         <Button variant="light" size="sm" onClick={handleCloseAdd} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
@@ -459,7 +459,7 @@ export const Users: React.FC = () => {
                     <React.Fragment key={user.id}>
                       {editingUserId === user.id ? (
                         <tr className={`jira-table-row inline-edit-row${selectedUserIds.includes(user.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }}>
-                          <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                          <td className="jira-sticky-left" style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'var(--jira-table-bg, #ffffff)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 2, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }} onClick={(e) => e.stopPropagation()}>
                             <Form.Check
                               type="checkbox"
                               checked={selectedUserIds.includes(user.id)}
@@ -532,7 +532,7 @@ export const Users: React.FC = () => {
                               className="d-inline-block"
                             />
                           </td>
-                          <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
+                          <td className="jira-sticky-right" style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'var(--jira-table-bg, #ffffff)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                             <div className="d-flex gap-2 justify-content-center">
                               <Button variant="success" size="sm" onClick={() => handleSaveEdit(user.id)} className="px-3 rounded-2 fw-medium">Lưu</Button>
                               <Button variant="light" size="sm" onClick={handleCancelEdit} className="px-3 rounded-2 border border-secondary-subtle">Hủy</Button>
@@ -541,7 +541,7 @@ export const Users: React.FC = () => {
                         </tr>
                       ) : (
                         <tr className={`jira-table-row${selectedUserIds.includes(user.id) ? ' jira-row-selected' : ''}`} style={{ height: '46px' }} onDoubleClick={() => handleEditClick(user)}>
-                          <td style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'transparent', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                          <td className="jira-sticky-left" style={{ borderLeft: 0, padding: '12px 10px', backgroundColor: 'var(--jira-table-bg, #ffffff)', textAlign: 'center', position: 'sticky', left: 0, zIndex: 2, boxShadow: 'inset -2px 0 4px -2px rgba(0,0,0,0.12)' }} onClick={(e) => e.stopPropagation()}>
                             <Form.Check
                               type="checkbox"
                               checked={selectedUserIds.includes(user.id)}
@@ -596,7 +596,7 @@ export const Users: React.FC = () => {
                               {user.isActive ? 'Hoạt động' : 'Bị khóa'}
                             </div>
                           </td>
-                          <td style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'transparent', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, borderLeft: '1px solid var(--bs-border-color)' }}>
+                          <td className="jira-sticky-right" style={{ borderRight: 0, padding: '12px 16px', textAlign: 'center', backgroundColor: 'var(--jira-table-bg, #ffffff)', color: 'var(--jira-text)', position: 'sticky', right: 0, zIndex: 5, boxShadow: 'inset 2px 0 4px -2px rgba(0,0,0,0.12)' }}>
                             <div className="d-flex gap-2 justify-content-center">
                               <Button variant="light" size="sm" onClick={() => handleStatusChange(user.id, !user.isActive)} className="px-2 py-1  d-flex align-items-center" style={{ fontSize: '13px', color: '#4b5563', border: '1px solid #e2e8f0', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                                 <FontAwesomeIcon icon={faExchangeAlt} className="me-2" style={{ color: '#9ca3af' }} />

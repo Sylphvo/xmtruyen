@@ -171,7 +171,7 @@ namespace XomTruyen.API.Services.BookVideo
                 
                 // Move final video to a served path (e.g., wwwroot)
                 var finalDest = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "videos", $"{task.Id}.mp4");
-                Directory.CreateDirectory(Path.GetDirectoryName(finalDest));
+                Directory.CreateDirectory(Path.GetDirectoryName(finalDest)!);
                 
                 if (File.Exists(finalVideo))
                 {

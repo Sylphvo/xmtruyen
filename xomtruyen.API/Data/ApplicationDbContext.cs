@@ -126,13 +126,14 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Name).IsUnique();
             entity.Property(e => e.DisplayName).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Color).HasMaxLength(20);
+            var staticDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             entity.HasData(
-                new Role { Id = 1, Name = "SuperAdmin", DisplayName = "Quản trị viên", Level = 100, Color = "#ff4444" },
-                new Role { Id = 2, Name = "Editor", DisplayName = "Biên tập viên", Level = 50, Color = "#ff9800" },
-                new Role { Id = 3, Name = "Translator", DisplayName = "Dịch giả", Level = 30, Color = "#9c27b0" },
-                new Role { Id = 4, Name = "Moderator", DisplayName = "Quản lý viên", Level = 40, Color = "#2196f3" },
-                new Role { Id = 5, Name = "Author", DisplayName = "Tác giả", Level = 20, Color = "#4caf50" },
-                new Role { Id = 6, Name = "User", DisplayName = "Người dùng", Level = 10, Color = "#607d8b" });
+                new Role { Id = 1, Name = "SuperAdmin", DisplayName = "Quản trị viên", Level = 100, Color = "#ff4444", CreatedAt = staticDate },
+                new Role { Id = 2, Name = "Editor", DisplayName = "Biên tập viên", Level = 50, Color = "#ff9800", CreatedAt = staticDate },
+                new Role { Id = 3, Name = "Translator", DisplayName = "Dịch giả", Level = 30, Color = "#9c27b0", CreatedAt = staticDate },
+                new Role { Id = 4, Name = "Moderator", DisplayName = "Quản lý viên", Level = 40, Color = "#2196f3", CreatedAt = staticDate },
+                new Role { Id = 5, Name = "Author", DisplayName = "Tác giả", Level = 20, Color = "#4caf50", CreatedAt = staticDate },
+                new Role { Id = 6, Name = "User", DisplayName = "Người dùng", Level = 10, Color = "#607d8b", CreatedAt = staticDate });
         });
 
         modelBuilder.Entity<UserRole>(entity =>

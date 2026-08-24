@@ -106,7 +106,7 @@ export const BookFiles: React.FC = () => {
           /></div>
       </div>
 
-      <div className="table-responsive flex-grow-1 jira-scroll" style={{ maxHeight: '1756px', overflowY: 'auto', overflowX: 'auto', minHeight: '616px' }}>
+      <div className="table-responsive flex-grow-1 jira-scroll" style={{ overflowY: 'auto', overflowX: 'auto' }}>
         {isLoading ? (
           <div className="text-center py-5"><Spinner animation="border" variant="secondary" size="sm" /></div>
         ) : (

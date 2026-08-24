@@ -177,6 +177,8 @@ h6 {
   flex: 1;
   overflow-y: auto;
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 // Cards
@@ -369,25 +371,27 @@ table.table tbody tr {
 // Theme Variables for Jira UI
 [data-bs-theme="light"] {
   --jira-page-bg: #F4F5F7;
-  --jira-table-bg: transparent;
+  --jira-table-bg: #FFFFFF;
   --jira-border: #DFE1E6;
   --jira-text: #172B4D;
   --jira-text-muted: #5E6C84;
-  --jira-header-bg: transparent;
+  --jira-header-bg: #FAFBFC;
   --jira-hover-bg: rgba(9, 30, 66, 0.04);
+  --jira-hover-bg-solid: #F0F1F3;
   --jira-selected-bg: #EBF2FC;
   --jira-scroll-thumb: #BABACA;
   --jira-scroll-track: transparent;
 }
 
 [data-bs-theme="dark"] {
-  --jira-page-bg: transparent;
-  --jira-table-bg: transparent;
+  --jira-page-bg: #1A1D21;
+  --jira-table-bg: #1D2125;
   --jira-border: #2C333A;
   --jira-text: #B6C2CF;
   --jira-text-muted: #8C9BAB;
-  --jira-header-bg: transparent;
+  --jira-header-bg: #161A1D;
   --jira-hover-bg: rgba(255, 255, 255, 0.04);
+  --jira-hover-bg-solid: #252A2F;
   --jira-selected-bg: #1C2B41;
   --jira-scroll-thumb: #596773;
   --jira-scroll-track: transparent;
@@ -401,36 +405,41 @@ html[data-bs-theme="light"] body {
 
 body[data-bs-theme="dark"],
 html[data-bs-theme="dark"] body {
-  // Let the app's dark theme handle the main background color
   background-color: #1a1d21 !important;
-}
-
-// Override hardcoded white classes inside the container
-.jira-table-container .bg-white {
-  background-color: transparent !important;
 }
 
 // Jira-like Table Redesign
 .jira-table-container {
-  background-color: transparent !important;
+  background-color: var(--jira-table-bg) !important;
   color: var(--jira-text) !important;
   border-radius: 8px !important;
   overflow: hidden;
   border: 1px solid var(--jira-border) !important;
   display: flex;
   flex-direction: column;
-  // height: 100%;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 100%;
+
+  .table-responsive {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
 }
 
 .jira-table-header {
-  background-color: transparent !important;
+  background-color: var(--jira-header-bg) !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .jira-table-header th {
-  background-color: transparent !important;
+  background-color: var(--jira-header-bg) !important;
   color: var(--jira-text-muted) !important;
   border: none !important;
-  border-bottom: 2px solid var(--jira-border) !important;
+  border-bottom: 1px solid var(--jira-border) !important;
   border-right: 1px solid var(--jira-border) !important;
   padding: 10px 16px !important;
   font-size: 12px;
@@ -501,8 +510,8 @@ html[data-bs-theme="dark"] body {
 }
 
 .jira-table-footer {
-  background-color: transparent !important;
-  border-top: none !important;
+  background-color: var(--jira-table-bg) !important;
+  border-top: 1px solid var(--jira-border) !important;
   padding: 10px 16px !important;
   display: flex !important;
   justify-content: space-between !important;
@@ -555,6 +564,12 @@ html[data-bs-theme="dark"] body {
   }
 }
 
+// Ensure dropdown/popover menus always appear above sticky table columns
+.dropdown-menu.show,
+.dropdown-menu[data-popper-placement] {
+  z-index: 9999 !important;
+}
+
 .jira-table-row {
   background-color: transparent !important;
 
@@ -572,17 +587,46 @@ html[data-bs-theme="dark"] body {
     border-right: none !important;
   }
 
+  // Sticky cells must have solid background to cover scrolling content
+  td.jira-sticky-left,
+  td.jira-sticky-right {
+    background-color: var(--jira-table-bg) !important;
+  }
+
+  // Elevate sticky cell's z-index when its dropdown is open or hovered
+  // so it renders above the next row's sticky cells
+  td.jira-sticky-left:hover,
+  td.jira-sticky-right:hover,
+  td.jira-sticky-left:focus-within,
+  td.jira-sticky-right:focus-within,
+  td.jira-sticky-left:has(.show),
+  td.jira-sticky-right:has(.show) {
+    z-index: 100 !important;
+  }
+
   &:hover td {
     background-color: var(--jira-hover-bg) !important;
+  }
+
+  // Sticky cells on hover: use SOLID color because hover-bg is semi-transparent
+  &:hover td.jira-sticky-left,
+  &:hover td.jira-sticky-right {
+    background-color: var(--jira-hover-bg-solid) !important;
   }
 }
 
 .jira-table-row.jira-row-selected {
-  background-color: #e8f0fd !important;
+  background-color: var(--jira-selected-bg) !important;
 }
 
 .jira-table-row.jira-row-selected td {
   background-color: transparent !important;
+}
+
+// Selected state: sticky cells get selected bg
+.jira-table-row.jira-row-selected td.jira-sticky-left,
+.jira-table-row.jira-row-selected td.jira-sticky-right {
+  background-color: var(--jira-selected-bg) !important;
 }
 
 /* Fix for inline row selection colors in Dark mode */
@@ -593,6 +637,11 @@ html[data-bs-theme="dark"] body {
 
   td {
     background-color: transparent !important;
+  }
+
+  td.jira-sticky-left,
+  td.jira-sticky-right {
+    background-color: var(--jira-selected-bg) !important;
   }
 }
 

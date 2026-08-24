@@ -38,3 +38,23 @@ export const getTopPublications = async (limit: number = 10): Promise<TopPublica
     params: { limit }
   });
 };
+
+export interface ChartSeries {
+  labels: string[];
+  data: number[];
+}
+
+export const getEngagementStats = async () =>
+  apiClient.get('/admin/stats/engagement');
+
+export const getUsersChart = async (days: number = 30): Promise<ChartSeries> =>
+  apiClient.get<any, ChartSeries>('/admin/stats/chart/users', { params: { days } });
+
+export const getRevenueChart = async (days: number = 30): Promise<ChartSeries> =>
+  apiClient.get<any, ChartSeries>('/admin/stats/chart/revenue', { params: { days } });
+
+export const getReadsChart = async (days: number = 30): Promise<ChartSeries> =>
+  apiClient.get<any, ChartSeries>('/admin/stats/chart/reads', { params: { days } });
+
+export const getRecentActivity = async (limit: number = 20) =>
+  apiClient.get('/admin/stats/recent-activity', { params: { limit } });
