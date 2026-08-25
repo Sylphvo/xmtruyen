@@ -15,44 +15,55 @@ interface SidebarProps {
 
 
 const DEFAULT_MENU_DATA = {
-  books: [
+  content: [
     { id: 'all-books', path: '/all-books', icon: Database, title: 'Tất cả sách', subtitle: '(All Books)' },
-    { id: 'books', path: '/books', icon: Book, title: 'Sách', subtitle: '(Books)' },
+    { id: 'books', path: '/books', icon: Book, title: 'Sách chữ', subtitle: '(Books)' },
+    { id: 'comics', path: '/comics', icon: Book, title: 'Truyện tranh', subtitle: '(Comics)' },
     { id: 'book-chapters', path: '/book-chapters', icon: Book, title: 'QL Chương', subtitle: '(Chapters)' },
-    { id: 'reading-analytics', path: '/reading-analytics', icon: BarChart2, title: 'Phân tích Lượt đọc', subtitle: '(Analytics)' },
-    { id: 'comics', path: '/comics', icon: Book, title: 'Truyện', subtitle: '(Truyện tranh)' },
     { id: 'book-files', path: '/book-files', icon: Database, title: 'File sách', subtitle: '(Lưu trữ)' },
-    { id: 'topics', path: '/topics', icon: Tag, title: 'Chủ đề', subtitle: '(Topics)' },
+    { id: 'authors', path: '/authors', icon: Users, title: 'Tác giả', subtitle: '(Authors)' },
     { id: 'categories', path: '/categories', icon: List, title: 'Thể loại', subtitle: '(Categories)' },
-    { id: 'authors', path: '/authors', icon: Users, title: 'Tác giả', subtitle: '(Authors)' }
-  ],
-  users: [
-    { id: 'users', path: '/users', icon: Users, title: 'User', subtitle: '(Người dùng)' }
-  ],
-  transactions: [
-    { id: 'transactions', path: '/transactions', icon: Tag, title: 'Giao dịch', subtitle: '(Nạp xu)' },
-    { id: 'coin-packages', path: '/coin-packages', icon: Tag, title: 'Gói Xu', subtitle: '(Nạp tiền)' }
-  ],
-  notifications: [
-    { id: 'notifications', path: '/notifications', icon: Bell, title: 'Thông báo', subtitle: '(Notifications)' },
-    { id: 'reviews', path: '/reviews', icon: MessageSquare, title: 'Đánh giá', subtitle: '(Reviews)' },
-    { id: 'reports', path: '/reports', icon: ShieldAlert, title: 'Báo cáo vi phạm', subtitle: '(Reports)' }
-  ],
-  marketing: [
-    { id: 'promotions', path: '/promotions', icon: Ticket, title: 'Khuyến mãi', subtitle: '(Promotions)' },
-    { id: 'banners', path: '/banners', icon: LayoutDashboard, title: 'Quản lý Banner' },
-    { id: 'home-sections', path: '/home-sections', icon: LayoutDashboard, title: 'Trang chủ (Home CMS)' },
-    { id: 'email-templates', path: '/email-templates', icon: FileText, title: 'Mẫu Email', subtitle: '(Templates)' },
-    { id: 'help-articles', path: '/help-articles', icon: HelpCircle, title: 'Trợ giúp', subtitle: '(Help Center)' },
-    { id: 'static-pages', path: '/static-pages', icon: FileText, title: 'Trang Tĩnh', subtitle: '(CMS)' },
-    { id: 'faq-management', path: '/faq-management', icon: HelpCircle, title: 'FAQ', subtitle: '(Hỏi đáp)' }
-  ],
-  automation: [
+    { id: 'topics', path: '/topics', icon: Tag, title: 'Chủ đề', subtitle: '(Topics)' },
     { id: 'import', path: '/import', icon: Database, title: 'Import Dữ Liệu', subtitle: '(CSV/JSON)' },
-    { id: 'crawlers', path: '/crawlers', icon: Bot, title: 'Crawler Pipeline', subtitle: '(Bot)' },
+    { id: 'crawlers', path: '/crawlers', icon: Bot, title: 'Crawler Pipeline', subtitle: '(Bot)' }
+  ],
+  translation: [
     { id: 'translation', path: '/translation', icon: Languages, title: 'Dashboard Dịch thuật' },
     { id: 'translation-upload', path: '/translation/upload', icon: Languages, title: 'Upload RAW' },
     { id: 'translation-glossary', path: '/translation/glossary', icon: BookOpen, title: 'Từ điển (Glossary)' }
+  ],
+  media: [
+    { id: 'audio', path: '/audio', icon: LayoutDashboard, title: 'Tổng quan Audio' },
+    { id: 'audio-voices', path: '/audio/voices', icon: Users, title: 'Quản lý Giọng đọc' },
+    { id: 'book-video', path: '/book-video', icon: LayoutDashboard, title: 'Video Truyện Chữ' },
+    { id: 'comic-video', path: '/comic-video', icon: LayoutDashboard, title: 'Video Truyện Tranh' },
+    { id: 'print-pipeline', path: '/print-pipeline', icon: BookOpen, title: 'Xuất bản PDF / CMYK' }
+  ],
+  community: [
+    { id: 'users', path: '/users', icon: Users, title: 'Người dùng', subtitle: '(Users)' },
+    { id: 'reviews', path: '/reviews', icon: MessageSquare, title: 'Đánh giá', subtitle: '(Reviews)' },
+    { id: 'reports', path: '/reports', icon: ShieldAlert, title: 'Báo cáo vi phạm', subtitle: '(Reports)' },
+    { id: 'notifications', path: '/notifications', icon: Bell, title: 'Thông báo', subtitle: '(Notifications)' }
+  ],
+  commerce: [
+    { id: 'plans', path: '/plans', icon: TableProperties, title: 'Gói VIP', subtitle: '(Subscription)' },
+    { id: 'coin-packages', path: '/coin-packages', icon: Tag, title: 'Gói Xu', subtitle: '(Coin Packages)' },
+    { id: 'transactions', path: '/transactions', icon: Tag, title: 'Giao dịch', subtitle: '(Transactions)' },
+    { id: 'promotions', path: '/promotions', icon: Ticket, title: 'Khuyến mãi', subtitle: '(Promotions)' }
+  ],
+  cms: [
+    { id: 'banners', path: '/banners', icon: LayoutDashboard, title: 'Quản lý Banner' },
+    { id: 'home-sections', path: '/home-sections', icon: LayoutDashboard, title: 'Trang chủ (Home CMS)' },
+    { id: 'static-pages', path: '/static-pages', icon: FileText, title: 'Trang Tĩnh', subtitle: '(CMS)' },
+    { id: 'faq-management', path: '/faq-management', icon: HelpCircle, title: 'FAQ', subtitle: '(Hỏi đáp)' },
+    { id: 'help-articles', path: '/help-articles', icon: HelpCircle, title: 'Trợ giúp', subtitle: '(Help Center)' },
+    { id: 'email-templates', path: '/email-templates', icon: FileText, title: 'Mẫu Email', subtitle: '(Templates)' }
+  ],
+  analytics: [
+    { id: 'system-reports', path: '/system-reports', icon: BarChart2, title: 'Báo cáo (Reports)' },
+    { id: 'reading-analytics', path: '/reading-analytics', icon: BarChart2, title: 'Phân tích Lượt đọc', subtitle: '(Analytics)' },
+    { id: 'test-cases', path: '/test-cases', icon: ClipboardCheck, title: 'Test Cases', subtitle: '(QA & Bug Log)' },
+    { id: 'build-process', path: '/build-process', icon: GitBranch, title: 'Build Process', subtitle: '(CI/CD)' }
   ]
 };
 
@@ -173,28 +184,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
       setActiveBookSubMenu('');
     }
 
-    if (path.startsWith('/all-books') || path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/book-files') || path.startsWith('/topics') || path.startsWith('/categories') || path.startsWith('/book-chapters') || path.startsWith('/authors') || path.startsWith('/reading-analytics')) {
-      setActiveMenu('books');
-    } else if (path.startsWith('/plans')) {
-      setActiveMenu('plans');
-    } else if (path.startsWith('/users')) {
-      setActiveMenu('users');
+    if (path.startsWith('/all-books') || path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/book-chapters') || path.startsWith('/book-files') || path.startsWith('/authors') || path.startsWith('/categories') || path.startsWith('/topics') || path.startsWith('/import') || path.startsWith('/crawlers')) {
+      setActiveMenu('content');
+    } else if (path.startsWith('/translation')) {
+      setActiveMenu('translation');
+    } else if (path.startsWith('/audio') || path.startsWith('/book-video') || path.startsWith('/comic-video') || path.startsWith('/print-pipeline')) {
+      setActiveMenu('media');
+    } else if (path.startsWith('/users') || path.startsWith('/reviews') || path.startsWith('/reports') || path.startsWith('/notifications')) {
+      setActiveMenu('community');
+    } else if (path.startsWith('/plans') || path.startsWith('/coin-packages') || path.startsWith('/transactions') || path.startsWith('/promotions')) {
+      setActiveMenu('commerce');
+    } else if (path.startsWith('/banners') || path.startsWith('/home-sections') || path.startsWith('/static-pages') || path.startsWith('/faq-management') || path.startsWith('/help-articles') || path.startsWith('/email-templates')) {
+      setActiveMenu('cms');
+    } else if (path.startsWith('/system-reports') || path.startsWith('/reading-analytics') || path.startsWith('/test-cases') || path.startsWith('/build-process')) {
+      setActiveMenu('analytics');
     } else if (path.startsWith('/database') || path.startsWith('/system-configs')) {
-      setActiveMenu('database');
-    } else if (path.startsWith('/transactions') || path.startsWith('/coin-packages')) {
-      setActiveMenu('transactions');
-    } else if (path.startsWith('/notifications') || path.startsWith('/reports') || path.startsWith('/reviews')) {
-      setActiveMenu('notifications');
-    } else if (path.startsWith('/promotions') || path.startsWith('/banners') || path.startsWith('/home-sections') || path.startsWith('/email-templates') || path.startsWith('/help-articles') || path.startsWith('/static-pages') || path.startsWith('/faq-management')) {
-      setActiveMenu('marketing');
-    } else if (path.startsWith('/crawlers') || path.startsWith('/translation') || path.startsWith('/import') || path.startsWith('/print-pipeline')) {
-      setActiveMenu('automation');
-    } else if (path.startsWith('/test-cases')) {
-      setActiveMenu('test-cases');
-    } else if (path.startsWith('/build-process')) {
-      setActiveMenu('build-process');
-    } else if (path.startsWith('/audio') || path.startsWith('/book-video') || path.startsWith('/comic-video')) {
-      setActiveMenu('audio');
+      setActiveMenu('system');
     } else {
       setActiveMenu('dashboard');
     }
@@ -217,92 +222,68 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
           <LayoutDashboard />
         </div>
         <div 
-          className={`icon-nav-item ${activeMenu === 'books' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('books')}
+          className={`icon-nav-item ${activeMenu === 'content' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('content')}
           style={{ cursor: 'pointer' }}
-          title="Quản lý Sách"
+          title="Nội dung"
         >
           <Book />
         </div>
         <div 
-          className={`icon-nav-item ${activeMenu === 'users' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('users')}
+          className={`icon-nav-item ${activeMenu === 'translation' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('translation')}
           style={{ cursor: 'pointer' }}
-          title="Quản lý User"
+          title="Biên tập và dịch thuật"
         >
-          <Users />
+          <Languages />
         </div>
         <div 
-          className={`icon-nav-item ${activeMenu === 'database' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('database')}
+          className={`icon-nav-item ${activeMenu === 'media' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('media')}
           style={{ cursor: 'pointer' }}
-          title="Quản lý Database"
-        >
-          <Database />
-        </div>
-        <div 
-          className={`icon-nav-item ${activeMenu === 'transactions' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('transactions')}
-          style={{ cursor: 'pointer' }}
-          title="Giao dịch"
-        >
-          <Tag />
-        </div>
-        <div 
-          className={`icon-nav-item ${activeMenu === 'plans' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('plans')}
-          style={{ cursor: 'pointer' }}
-          title="Gói VIP"
-        >
-          <TableProperties />
-        </div>
-        <div 
-          className={`icon-nav-item ${activeMenu === 'notifications' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('notifications')}
-          style={{ cursor: 'pointer' }}
-          title="Thông báo"
-        >
-          <Bell />
-        </div>
-        <div 
-          className={`icon-nav-item ${activeMenu === 'marketing' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('marketing')}
-          style={{ cursor: 'pointer' }}
-          title="Marketing"
-        >
-          <Ticket />
-        </div>
-        <div 
-          className={`icon-nav-item ${activeMenu === 'automation' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('automation')}
-          style={{ cursor: 'pointer' }}
-          title="Tự động hóa"
-        >
-          <Bot />
-        </div>
-        <div 
-          className={`icon-nav-item ${activeMenu === 'audio' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('audio')}
-          style={{ cursor: 'pointer' }}
-          title="Audio & Video"
+          title="Media và xuất bản"
         >
           <Headphones />
         </div>
         <div 
-          className={`icon-nav-item ${activeMenu === 'test-cases' ? 'active' : ''}`} 
-          onClick={() => setActiveMenu('test-cases')}
+          className={`icon-nav-item ${activeMenu === 'community' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('community')}
           style={{ cursor: 'pointer' }}
-          title="Test Case & Bug Log"
+          title="Người dùng và cộng đồng"
         >
-          <ClipboardCheck />
+          <Users />
         </div>
-        <div
-          className={`icon-nav-item ${activeMenu === 'build-process' ? 'active' : ''}`}
-          onClick={() => setActiveMenu('build-process')}
+        <div 
+          className={`icon-nav-item ${activeMenu === 'commerce' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('commerce')}
           style={{ cursor: 'pointer' }}
-          title="Build Process & CI/CD"
+          title="Thương mại"
         >
-          <GitBranch />
+          <Tag />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'cms' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('cms')}
+          style={{ cursor: 'pointer' }}
+          title="Trang chủ và CMS"
+        >
+          <FileText />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'analytics' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('analytics')}
+          style={{ cursor: 'pointer' }}
+          title="Phân tích và vận hành"
+        >
+          <BarChart2 />
+        </div>
+        <div 
+          className={`icon-nav-item ${activeMenu === 'system' ? 'active' : ''}`} 
+          onClick={() => setActiveMenu('system')}
+          style={{ cursor: 'pointer' }}
+          title="Hệ thống"
+        >
+          <Database />
         </div>
       </aside>
 
@@ -322,55 +303,86 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
             </>
           )}
 
-          {activeMenu === 'books' && (
+          {activeMenu === 'content' && (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className="menu-heading">Quản lý Sách</div>
-              <SortableContext items={menuOrders.books.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
-                {menuOrders.books.map((item: any) => (
+              <div className="menu-heading">Nội dung</div>
+              <SortableContext items={menuOrders.content.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.content.map((item: any) => (
                   <SortableMenuItem key={item.id} {...item} isActive={item.path === activeBookSubMenu} />
                 ))}
               </SortableContext>
             </DndContext>
           )}
 
-          {activeMenu === 'users' && (
+          {activeMenu === 'translation' && (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className="menu-heading">Quản lý User</div>
-              <SortableContext items={menuOrders.users.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
-                {menuOrders.users.map((item: any) => (
+              <div className="menu-heading">Biên tập & Dịch thuật</div>
+              <SortableContext items={menuOrders.translation.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.translation.map((item: any) => (
                   <SortableMenuItem key={item.id} {...item} end={true} />
                 ))}
               </SortableContext>
             </DndContext>
           )}
 
-          {activeMenu === 'audio' && (
-            <>
-              <div className="menu-heading">🎧 Sách nói (Audiobooks)</div>
-              <NavLink to="/audio" className="menu-link" end>
-                <LayoutDashboard />
-                <span>Tổng quan Audio</span>
-              </NavLink>
-              <NavLink to="/audio/voices" className="menu-link" end>
-                <Users />
-                <span>Quản lý Giọng đọc</span>
-              </NavLink>
-              
-              <div className="menu-heading mt-3">🎬 Video (Storytelling)</div>
-              <NavLink to="/book-video" className="menu-link" end>
-                <LayoutDashboard />
-                <span>Video Truyện Chữ</span>
-              </NavLink>
-              <NavLink to="/comic-video" className="menu-link" end>
-                <LayoutDashboard />
-                <span>Video Truyện Tranh</span>
-              </NavLink>
-            </>
+          {activeMenu === 'media' && (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <div className="menu-heading">Media & Xuất bản</div>
+              <SortableContext items={menuOrders.media.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.media.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
 
-          {activeMenu === 'database' && (
+          {activeMenu === 'community' && (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <div className="menu-heading">Người dùng & Cộng đồng</div>
+              <SortableContext items={menuOrders.community.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.community.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+
+          {activeMenu === 'commerce' && (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <div className="menu-heading">Thương mại</div>
+              <SortableContext items={menuOrders.commerce.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.commerce.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+
+          {activeMenu === 'cms' && (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <div className="menu-heading">Trang chủ & CMS</div>
+              <SortableContext items={menuOrders.cms.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.cms.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+
+          {activeMenu === 'analytics' && (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <div className="menu-heading">Phân tích & Vận hành</div>
+              <SortableContext items={menuOrders.analytics.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+                {menuOrders.analytics.map((item: any) => (
+                  <SortableMenuItem key={item.id} {...item} end={true} />
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+
+          {activeMenu === 'system' && (
             <>
-              <div className="menu-heading">Quản lý Database</div>
+              <div className="menu-heading">Hệ thống</div>
               <NavLink to="/database" className="menu-link" end>
                 <Database />
                 <span>Overview <span className="text-secondary small" style={{ fontSize: '12px' }}>(Tổng quan)</span></span>
@@ -395,86 +407,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
               <NavLink to="/system-configs" className="menu-link" end>
                 <Settings />
                 <span>Cấu hình (System Config)</span>
-              </NavLink>
-            </>
-          )}
-
-          {activeMenu === 'plans' && (
-            <>
-              <div className="menu-heading">Cấu hình VIP</div>
-              <NavLink to="/plans" className="menu-link" end>
-                <TableProperties />
-                <span>Gói VIP <span className="text-secondary small" style={{ fontSize: '12px' }}>(Subscription)</span></span>
-              </NavLink>
-            </>
-          )}
-
-          {activeMenu === 'transactions' && (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className="menu-heading">Tài chính</div>
-              <SortableContext items={menuOrders.transactions.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
-                {menuOrders.transactions.map((item: any) => (
-                  <SortableMenuItem key={item.id} {...item} end={true} />
-                ))}
-              </SortableContext>
-            </DndContext>
-          )}
-
-          {activeMenu === 'notifications' && (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className="menu-heading">Tương tác</div>
-              <SortableContext items={menuOrders.notifications.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
-                {menuOrders.notifications.map((item: any) => (
-                  <SortableMenuItem key={item.id} {...item} end={true} />
-                ))}
-              </SortableContext>
-            </DndContext>
-          )}
-
-          {activeMenu === 'marketing' && (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className="menu-heading">Trang chủ & Marketing</div>
-              <SortableContext items={menuOrders.marketing.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
-                {menuOrders.marketing.map((item: any) => (
-                  <SortableMenuItem key={item.id} {...item} end={true} />
-                ))}
-              </SortableContext>
-            </DndContext>
-          )}
-
-          {activeMenu === 'automation' && (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className="menu-heading">Tự động hóa (Phase 1)</div>
-              <SortableContext items={menuOrders.automation.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
-                {menuOrders.automation.map((item: any) => (
-                  <SortableMenuItem key={item.id} {...item} end={true} />
-                ))}
-              </SortableContext>
-              
-              <div className="menu-heading mt-3">Dàn Trang & In Ấn (Phase 5)</div>
-              <NavLink to="/print-pipeline" className="menu-link" end>
-                <BookOpen />
-                <span>Xuất bản PDF / CMYK</span>
-              </NavLink>
-            </DndContext>
-          )}
-
-          {activeMenu === 'test-cases' && (
-            <>
-              <div className="menu-heading">Test Case Center</div>
-              <NavLink to="/test-cases" className="menu-link" end>
-                <ClipboardCheck />
-                <span>Test Cases <span className="text-secondary small" style={{ fontSize: '12px' }}>(QA & Bug Log)</span></span>
-              </NavLink>
-            </>
-          )}
-
-          {activeMenu === 'build-process' && (
-            <>
-              <div className="menu-heading">Build Process</div>
-              <NavLink to="/build-process" className="menu-link" end>
-                <GitBranch />
-                <span>Build Process <span className="text-secondary small" style={{ fontSize: '12px' }}>(CI/CD)</span></span>
               </NavLink>
             </>
           )}

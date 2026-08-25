@@ -26,6 +26,7 @@ public class UserManagementService : IUserManagementService
         var user = new User
         {
             Id = Guid.NewGuid(),
+            ShortId = "UID-" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper(),
             Email = request.Email,
             FullName = request.FullName,
             AvatarUrl = request.AvatarUrl,
@@ -119,6 +120,7 @@ public class UserManagementService : IUserManagementService
         return new AdminUserResponse
         {
             Id = user.Id,
+            ShortId = user.ShortId,
             Email = user.Email,
             FullName = user.FullName,
             AvatarUrl = user.AvatarUrl,
@@ -131,7 +133,8 @@ public class UserManagementService : IUserManagementService
             DailyReadCount = user.DailyReadCount,
             CreatedAt = user.CreatedAt,
             IsActive = user.IsActive,
-            AdminPreferences = user.AdminPreferences
+            AdminPreferences = user.AdminPreferences,
+            Role = user.Role
         };
     }
 }

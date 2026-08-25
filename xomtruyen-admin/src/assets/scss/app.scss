@@ -762,6 +762,10 @@ html[data-bs-theme="dark"] body {
   border: none;
 }
 
+.jira-status-toggle.no-arrow::after {
+  display: none !important;
+}
+
 .jira-status-menu {
   background-color: var(--bg-main) !important;
   border: none !important;

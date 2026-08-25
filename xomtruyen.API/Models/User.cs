@@ -3,6 +3,7 @@ namespace XomTruyen.API.Models;
 public class User
 {
     public Guid Id { get; set; }
+    public string ShortId { get; set; } = string.Empty;
     public string? Email { get; set; }
     public string? PasswordHash { get; set; }
     public string? FullName { get; set; }

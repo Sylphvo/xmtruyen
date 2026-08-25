@@ -1,16 +1,26 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { Share2, Zap, MessageSquare, Maximize2, Users, MoreHorizontal, LayoutList, FileText, LayoutGrid, LayoutTemplate, Clock, File, FormInput, Archive, Calendar, Plus, Hexagon } from 'lucide-react';
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   if (location.pathname === '/' || location.pathname === '/dashboard') {
     return null;
   }
 
-  // Active tab logic (just visual for now)
-  const activeTab = 'List';
+  const activeTab = searchParams.get('view') === 'docs' ? 'Docs' : 'List';
+
+  const handleTabClick = (tabName: string) => {
+    if (tabName === 'Docs') {
+      searchParams.set('view', 'docs');
+    } else {
+      searchParams.delete('view');
+    }
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+  };
 
   return (
     <div className="pt-3 pb-0" style={{ backgroundColor: 'transparent', marginBottom: '16px', marginLeft: '-1.5rem', marginRight: '-1.5rem' }}>
@@ -99,6 +109,7 @@ export const Breadcrumbs: React.FC = () => {
         ].map((tab) => (
           <div 
             key={tab.name}
+            onClick={() => handleTabClick(tab.name)}
             className="d-flex align-items-center gap-2 pb-2 position-relative"
             style={{ 
               cursor: 'pointer',

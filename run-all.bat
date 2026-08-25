@@ -15,7 +15,7 @@ break > history.log
 
 echo [1/4] Building XomTruyen.API (chi build 1 lan, khong compile lai moi lan start)...
 cd xomtruyen.API
-dotnet build -c Release --nologo -v q > ..\api.log 2>&1
+dotnet build --nologo -v q > ..\api.log 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Build that bai! Xem api.log de biet chi tiet.
     pause
@@ -24,7 +24,7 @@ if %errorlevel% neq 0 (
 echo [1/4] Build thanh cong!
 cd ..
 echo Starting [XomTruyen.API] on port 5172...
-start /B cmd /c "cd xomtruyen.API && dotnet run -c Release --no-build >> ..\api.log 2>&1"
+start /B cmd /c "cd xomtruyen.API && dotnet watch >> ..\api.log 2>&1"
 
 echo Starting [XomTruyen Client] on port 3000...
 start /B cmd /c "cd xom-truyen && npm run dev -- --port 3000 > ..\client.log 2>&1"

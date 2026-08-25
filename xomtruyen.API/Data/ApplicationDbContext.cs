@@ -85,9 +85,21 @@ public class ApplicationDbContext : DbContext
     public DbSet<ComicVideoTask> ComicVideoTasks { get; set; }
     public DbSet<ComicVideoSegment> ComicVideoSegments { get; set; }
 
+    // Docs
+    public DbSet<Document> Documents { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.ShortId)
+            .HasMaxLength(16)
+            .IsRequired();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.ShortId)
+            .IsUnique();
 
         // SubscriptionPlan
         modelBuilder.Entity<SubscriptionPlan>(entity =>
@@ -545,6 +557,20 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.ImportJobId, e.RowIndex });
             entity.HasIndex(e => e.Status);
+        });
+
+        // Document
+        modelBuilder.Entity<Document>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.WorkspaceId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.Type);
+            entity.HasIndex(e => e.UpdatedAt);
+            entity.HasIndex(e => e.Title);
+            
+            entity.Property(e => e.Status).HasConversion<string>();
+            entity.Property(e => e.Type).HasConversion<string>();
         });
     }
 }

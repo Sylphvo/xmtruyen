@@ -33,6 +33,7 @@ public class AuthService : IAuthService
         var user = new User
         {
             Id = Guid.NewGuid(),
+            ShortId = "UID-" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper(),
             Email = request.Email,
             FullName = request.FullName,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),

@@ -5,6 +5,7 @@ import { errorService } from '../services/errorService';
 
 export interface User {
   id: string;
+  shortId: string;
   email: string;
   fullName: string | null;
   avatarUrl: string | null;
@@ -17,6 +18,7 @@ export interface User {
   dailyReadCount: number;
   createdAt: string;
   isActive: boolean;
+  role: string;
 }
 
 export interface PaginatedResponse<T> {

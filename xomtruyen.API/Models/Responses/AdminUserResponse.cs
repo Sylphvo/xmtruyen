@@ -3,6 +3,7 @@ namespace XomTruyen.API.Models.Responses;
 public class AdminUserResponse
 {
     public Guid Id { get; set; }
+    public string ShortId { get; set; } = string.Empty;
     public string? Email { get; set; }
     public string? FullName { get; set; }
     public string? AvatarUrl { get; set; }
@@ -16,6 +17,7 @@ public class AdminUserResponse
     public DateTime? CreatedAt { get; set; }
     public bool IsActive { get; set; }
     public string? AdminPreferences { get; set; }
+    public string Role { get; set; } = "User";
 }
 
 
