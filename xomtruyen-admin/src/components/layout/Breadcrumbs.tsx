@@ -95,15 +95,7 @@ export const Breadcrumbs: React.FC = () => {
       <div className="d-flex align-items-center gap-4 px-4" style={{ borderBottom: '2px solid var(--jira-border)', paddingBottom: '0', overflowX: 'auto', whiteSpace: 'nowrap' }}>
         {[
           { name: 'List', icon: LayoutList },
-          { name: 'Summary', icon: FileText },
-          { name: 'Backlog', icon: LayoutGrid },
-          { name: 'Board', icon: LayoutTemplate },
-          { name: 'Development', icon: Zap },
-          { name: 'Timeline', icon: Clock },
           { name: 'Docs', icon: File },
-          { name: 'Forms', icon: FormInput },
-          { name: 'Archived work items', icon: Archive },
-          { name: 'Calendar', icon: Calendar },
         ].map((tab) => (
           <div 
             key={tab.name}
