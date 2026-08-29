@@ -1,9 +1,9 @@
 @echo off
 setlocal EnableDelayedExpansion
-TITLE XomTruyen System Manager
+TITLE xmtruyen System Manager
 
 echo =======================================================
-echo        STARTING XOMTRUYEN SYSTEM SERVICES
+echo        STARTING xmtruyen SYSTEM SERVICES
 echo =======================================================
 echo.
 
@@ -13,8 +13,8 @@ break > client.log
 break > admin.log
 break > history.log
 
-echo [1/4] Building XomTruyen.API (chi build 1 lan, khong compile lai moi lan start)...
-cd xomtruyen.API
+echo [1/4] Building xmtruyen.API (chi build 1 lan, khong compile lai moi lan start)...
+cd xmtruyen.API
 dotnet build --nologo -v q > ..\api.log 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Build that bai! Xem api.log de biet chi tiet.
@@ -23,17 +23,17 @@ if %errorlevel% neq 0 (
 )
 echo [1/4] Build thanh cong!
 cd ..
-echo Starting [XomTruyen.API] on port 5172...
-start /B cmd /c "cd xomtruyen.API && dotnet watch >> ..\api.log 2>&1"
+echo Starting [xmtruyen.API] on port 5172...
+start /B cmd /c "cd xmtruyen.API && dotnet watch >> ..\api.log 2>&1"
 
-echo Starting [XomTruyen Client] on port 3000...
-start /B cmd /c "cd xom-truyen && npm run dev -- --port 3000 > ..\client.log 2>&1"
+echo Starting [xmtruyen Client] on port 3000...
+start /B cmd /c "cd xmtruyen-client && npm run dev -- --port 3000 > ..\client.log 2>&1"
 
-echo Starting [XomTruyen Admin] on port 3001...
-start /B cmd /c "cd xomtruyen-admin && npm run dev -- --port 3001 > ..\admin.log 2>&1"
+echo Starting [xmtruyen Admin] on port 3001...
+start /B cmd /c "cd xmtruyen-admin && npm run dev -- --port 3001 > ..\admin.log 2>&1"
 
-echo Starting [XomTruyen History] on port 5555...
-start /B cmd /c "cd xomtruyen-overview && node server.js > ..\history.log 2>&1"
+echo Starting [xmtruyen History] on port 5555...
+start /B cmd /c "cd xmtruyen-overview && node server.js > ..\history.log 2>&1"
 
 set "LAST_STATE="
 
@@ -176,16 +176,16 @@ if "!CURRENT_STATE!" neq "!LAST_STATE!" (
     set "LAST_STATE=!CURRENT_STATE!"
     CLS
     echo ================================================================
-    echo         XOMTRUYEN SYSTEM DASHBOARD  ^(Live Sync^)
+    echo         xmtruyen SYSTEM DASHBOARD  ^(Live Sync^)
     echo ================================================================
     echo.
     echo +----------------------+-------+-----------+-------+----------+
     echo ^| Name                 ^| Port  ^| Status    ^| Start ^| CPU %%    ^|
     echo +----------------------+-------+-----------+-------+----------+
-    echo ^| XomTruyen.API        ^| 5172  ^| !API_STATUS!^| !API_PCT!  ^| !API_CPU!    ^|
-    echo ^| XomTruyen Client     ^| 3000  ^| !CLIENT_STATUS!^| !CLIENT_PCT!  ^| !CLIENT_CPU!    ^|
-    echo ^| XomTruyen Admin      ^| 3001  ^| !ADMIN_STATUS!^| !ADMIN_PCT!  ^| !ADMIN_CPU!    ^|
-    echo ^| XomTruyen History    ^| 5555  ^| !HISTORY_STATUS!^| !HISTORY_PCT!  ^| !HISTORY_CPU!    ^|
+    echo ^| xmtruyen.API        ^| 5172  ^| !API_STATUS!^| !API_PCT!  ^| !API_CPU!    ^|
+    echo ^| xmtruyen Client     ^| 3000  ^| !CLIENT_STATUS!^| !CLIENT_PCT!  ^| !CLIENT_CPU!    ^|
+    echo ^| xmtruyen Admin      ^| 3001  ^| !ADMIN_STATUS!^| !ADMIN_PCT!  ^| !ADMIN_CPU!    ^|
+    echo ^| xmtruyen History    ^| 5555  ^| !HISTORY_STATUS!^| !HISTORY_PCT!  ^| !HISTORY_CPU!    ^|
     echo +----------------------+-------+-----------+-------+----------+
     echo.
     echo  Milestone API: 0%% Bat dau ^> 10%% Restore ^> 25%% Nuget ^> 50%% Build
@@ -195,6 +195,16 @@ if "!CURRENT_STATE!" neq "!LAST_STATE!" (
     echo [STOP] De DUNG tat ca cac services, chi can TAT CUA SO NAY ^(bam dau X^).
     echo.
     echo He thong dang theo doi ngam. Man hinh se CHi CAP NHAT khi co thay doi...
+)
+
+if "!API_STATUS!" == "RUNNING  " if "!CLIENT_STATUS!" == "RUNNING  " if "!ADMIN_STATUS!" == "RUNNING  " if "!HISTORY_STATUS!" == "RUNNING  " (
+    if not defined BROWSERS_OPENED (
+        echo Tat ca dich vu da san sang! Dang mo trinh duyet...
+        start http://localhost:5172/swagger
+        start http://localhost:3000
+        start http://localhost:3001
+        set "BROWSERS_OPENED=1"
+    )
 )
 
 timeout /t 2 /nobreak >nul

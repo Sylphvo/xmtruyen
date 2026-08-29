@@ -1,0 +1,579 @@
+commit abfde4ebea0caf2cff79994b6afba2ab8e64244a
+Author: phudev <phuvo1288@gmail.com>
+Date:   Sat Jun 27 12:06:33 2026 +0700
+
+    cmit all
+
+A	xom-truyen/.env
+A	xom-truyen/TaiLieuNghiepVu_AppDocSach.md
+R100	xom-truyen/02-frontend-agent.md	xom-truyen/client-reactjs.md
+M	xom-truyen/package-lock.json
+M	xom-truyen/package.json
+M	xom-truyen/src/App.tsx
+M	xom-truyen/src/components/Auth/LoginForm.tsx
+M	xom-truyen/src/components/Auth/RegisterForm.tsx
+M	xom-truyen/src/components/Book/BookCard.tsx
+M	xom-truyen/src/components/Layout/Header.tsx
+A	xom-truyen/src/hooks/useAuth.ts
+M	xom-truyen/src/index.css
+M	xom-truyen/src/types/index.ts
+A	xom-truyen/test.json
+A	xom-truyen/test_admin.json
+A	xom-truyen/test_login.json
+A	xmtruyen-admin/.gitignore
+A	xmtruyen-admin/NexLink_NghiepVu.md
+A	xmtruyen-admin/README.md
+A	xmtruyen-admin/demo.html
+A	xmtruyen-admin/eslint.config.js
+A	xmtruyen-admin/index.html
+A	xmtruyen-admin/package-lock.json
+A	xmtruyen-admin/package.json
+A	xmtruyen-admin/public/favicon.svg
+A	xmtruyen-admin/public/icons.svg
+A	xmtruyen-admin/src/App.tsx
+A	xmtruyen-admin/src/assets/hero.png
+A	xmtruyen-admin/src/assets/react.svg
+A	xmtruyen-admin/src/assets/scss/_variables.scss
+A	xmtruyen-admin/src/assets/scss/app.scss
+A	xmtruyen-admin/src/assets/vite.svg
+A	xmtruyen-admin/src/components/layout/AppLayout.tsx
+A	xmtruyen-admin/src/components/layout/Header.tsx
+A	xmtruyen-admin/src/components/layout/Sidebar.tsx
+A	xmtruyen-admin/src/components/users/ActionCellRenderer.tsx
+A	xmtruyen-admin/src/constants/chartConfig.ts
+A	xmtruyen-admin/src/constants/mockData.ts
+A	xmtruyen-admin/src/index.scss
+A	xmtruyen-admin/src/main.tsx
+A	xmtruyen-admin/src/pages/Dashboard.tsx
+A	xmtruyen-admin/src/pages/Users.tsx
+A	xmtruyen-admin/src/types/user.ts
+A	xmtruyen-admin/tsconfig.app.json
+A	xmtruyen-admin/tsconfig.json
+A	xmtruyen-admin/tsconfig.node.json
+A	xmtruyen-admin/vite.config.ts
+A	xmtruyen.API/Controllers/AdminBookController.cs
+A	xmtruyen.API/Controllers/AdminCategoryController.cs
+A	xmtruyen.API/Controllers/AdminUserController.cs
+M	xmtruyen.API/Data/ApplicationDbContext.cs
+A	xmtruyen.API/Migrations/20260625125843_UpdateBookAndChapterSchema.Designer.cs
+A	xmtruyen.API/Migrations/20260625125843_UpdateBookAndChapterSchema.cs
+A	xmtruyen.API/Migrations/20260625143615_AddUserIsActive.Designer.cs
+A	xmtruyen.API/Migrations/20260625143615_AddUserIsActive.cs
+M	xmtruyen.API/Migrations/ApplicationDbContextModelSnapshot.cs
+M	xmtruyen.API/Models/Book.cs
+M	xmtruyen.API/Models/Chapter.cs
+A	xmtruyen.API/Models/Enums/AccessLevel.cs
+A	xmtruyen.API/Models/Enums/FormatType.cs
+A	xmtruyen.API/Models/Requests/AdminUserRequest.cs
+A	xmtruyen.API/Models/Requests/BookFilterRequest.cs
+A	xmtruyen.API/Models/Requests/BookRequest.cs
+A	xmtruyen.API/Models/Requests/CategoryFilterRequest.cs
+A	xmtruyen.API/Models/Requests/CategoryRequest.cs
+A	xmtruyen.API/Models/Requests/UserFilterRequest.cs
+A	xmtruyen.API/Models/Responses/AdminUserResponse.cs
+A	xmtruyen.API/Models/Responses/BookListResponse.cs
+M	xmtruyen.API/Models/User.cs
+M	xmtruyen.API/Program.cs
+A	xmtruyen.API/Repositories/Implementations/BookRepository.cs
+A	xmtruyen.API/Repositories/Implementations/CategoryRepository.cs
+M	xmtruyen.API/Repositories/Implementations/UserRepository.cs
+A	xmtruyen.API/Repositories/Interfaces/IBookRepository.cs
+A	xmtruyen.API/Repositories/Interfaces/ICategoryRepository.cs
+M	xmtruyen.API/Repositories/Interfaces/IUserRepository.cs
+A	xmtruyen.API/Services/Implementations/BookManagementService.cs
+A	xmtruyen.API/Services/Implementations/CategoryManagementService.cs
+A	xmtruyen.API/Services/Implementations/UserManagementService.cs
+A	xmtruyen.API/Services/Interfaces/IBookManagementService.cs
+A	xmtruyen.API/Services/Interfaces/ICategoryManagementService.cs
+A	xmtruyen.API/Services/Interfaces/IUserManagementService.cs
+A	xmtruyen.API/Utils/SlugHelper.cs
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.dll
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.exe
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.pdb
+M	xmtruyen.API/business_logic.md
+M	xmtruyen.API/obj/Debug/net9.0/apphost.exe
+M	xmtruyen.API/obj/Debug/net9.0/ref/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/refint/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfo.cs
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfoInputs.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.CoreCompileInputs.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.pdb
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.sourcelink.json
+
+commit ef8726a4b44fa06eb3b35fd45fb746e72737e2b0
+Author: phudev <phuvo1288@gmail.com>
+Date:   Thu Jun 25 00:54:49 2026 +0700
+
+    feat: scaffold core project structure and initialize authentication and database services
+
+M	xmtruyen.API/Controllers/AuthController.cs
+A	xmtruyen.API/Controllers/ReadingController.cs
+M	xmtruyen.API/Data/ApplicationDbContext.cs
+D	xmtruyen.API/Migrations/20260624001333_InitialCreate.Designer.cs
+D	xmtruyen.API/Migrations/20260624001333_InitialCreate.cs
+A	xmtruyen.API/Migrations/20260624172641_InitDbSchema.Designer.cs
+A	xmtruyen.API/Migrations/20260624172641_InitDbSchema.cs
+A	xmtruyen.API/Migrations/20260624175039_AddUserTokens.Designer.cs
+A	xmtruyen.API/Migrations/20260624175039_AddUserTokens.cs
+M	xmtruyen.API/Migrations/ApplicationDbContextModelSnapshot.cs
+M	xmtruyen.API/Models/AuthResponse.cs
+A	xmtruyen.API/Models/Book.cs
+A	xmtruyen.API/Models/BookCategory.cs
+A	xmtruyen.API/Models/Bookmark.cs
+A	xmtruyen.API/Models/Category.cs
+A	xmtruyen.API/Models/Chapter.cs
+A	xmtruyen.API/Models/ChapterImage.cs
+M	xmtruyen.API/Models/LoginRequest.cs
+A	xmtruyen.API/Models/Note.cs
+A	xmtruyen.API/Models/ReadingHistory.cs
+M	xmtruyen.API/Models/RegisterRequest.cs
+A	xmtruyen.API/Models/Requests/ChangePasswordRequest.cs
+A	xmtruyen.API/Models/Requests/ForgotPasswordRequest.cs
+A	xmtruyen.API/Models/Requests/GuestLoginRequest.cs
+A	xmtruyen.API/Models/Requests/RefreshTokenRequest.cs
+A	xmtruyen.API/Models/Requests/ResetPasswordRequest.cs
+A	xmtruyen.API/Models/Requests/VerifyEmailRequest.cs
+A	xmtruyen.API/Models/Responses/ChapterContentResponse.cs
+A	xmtruyen.API/Models/Responses/UserProfileResponse.cs
+A	xmtruyen.API/Models/Review.cs
+A	xmtruyen.API/Models/SubscriptionPlan.cs
+A	xmtruyen.API/Models/Transaction.cs
+M	xmtruyen.API/Models/User.cs
+A	xmtruyen.API/Models/UserFavorite.cs
+A	xmtruyen.API/Models/UserPurchasedChapter.cs
+A	xmtruyen.API/Models/UserToken.cs
+M	xmtruyen.API/Program.cs
+A	xmtruyen.API/Repositories/Implementations/ChapterRepository.cs
+A	xmtruyen.API/Repositories/Implementations/PurchaseRepository.cs
+A	xmtruyen.API/Repositories/Implementations/UserRepository.cs
+A	xmtruyen.API/Repositories/Interfaces/IChapterRepository.cs
+A	xmtruyen.API/Repositories/Interfaces/IPurchaseRepository.cs
+A	xmtruyen.API/Repositories/Interfaces/IUserRepository.cs
+A	xmtruyen.API/Services/Implementations/AuthService.cs
+A	xmtruyen.API/Services/Implementations/EmailService.cs
+A	xmtruyen.API/Services/Implementations/ReadingService.cs
+A	xmtruyen.API/Services/Interfaces/IAuthService.cs
+A	xmtruyen.API/Services/Interfaces/IEmailService.cs
+A	xmtruyen.API/Services/Interfaces/IReadingService.cs
+M	xmtruyen.API/appsettings.json
+M	xmtruyen.API/bin/Debug/net9.0/appsettings.json
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.dll
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.exe
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.pdb
+A	xmtruyen.API/business_logic.md
+A	xmtruyen.API/noted.txt
+M	xmtruyen.API/obj/Debug/net9.0/apphost.exe
+M	xmtruyen.API/obj/Debug/net9.0/ref/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/refint/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfo.cs
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfoInputs.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.CoreCompileInputs.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.pdb
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.sourcelink.json
+
+commit 0ec590fbf36f8787ed020b71264db2bd930215dc
+Author: phudev <phuvo1288@gmail.com>
+Date:   Wed Jun 24 23:53:33 2026 +0700
+
+    feat: initialize base .NET 9 API project with authentication and database infrastructure
+
+A	.gitignore
+D	01-master-protocol.md
+M	xom-truyen/.gitignore
+D	xmtruyen.API/03-backend-agent.md
+A	xmtruyen.API/Contracts/Responses/DatabaseCheckResponse.cs
+A	xmtruyen.API/Controllers/AuthController.cs
+A	xmtruyen.API/Controllers/SystemController.cs
+M	xmtruyen.API/Controllers/WeatherForecastController.cs
+A	xmtruyen.API/Data/ApplicationDbContext.cs
+A	xmtruyen.API/Migrations/20260624001333_InitialCreate.Designer.cs
+A	xmtruyen.API/Migrations/20260624001333_InitialCreate.cs
+A	xmtruyen.API/Migrations/ApplicationDbContextModelSnapshot.cs
+M	xmtruyen.API/Models/ApiResponse.cs
+A	xmtruyen.API/Models/AuthResponse.cs
+A	xmtruyen.API/Models/LoginRequest.cs
+A	xmtruyen.API/Models/RegisterRequest.cs
+A	xmtruyen.API/Models/User.cs
+M	xmtruyen.API/Program.cs
+M	xmtruyen.API/Properties/launchSettings.json
+A	xmtruyen.API/Repositories/Implementations/SystemRepository.cs
+A	xmtruyen.API/Repositories/Interfaces/ISystemRepository.cs
+A	xmtruyen.API/Services/Implementations/SystemService.cs
+A	xmtruyen.API/Services/Interfaces/ISystemService.cs
+M	xmtruyen.API/appsettings.json
+A	xmtruyen.API/bin/Debug/net9.0/BCrypt-Net-Next.dll
+A	xmtruyen.API/bin/Debug/net9.0/Dapper.dll
+A	xmtruyen.API/bin/Debug/net9.0/Humanizer.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.AspNetCore.OpenApi.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.Bcl.AsyncInterfaces.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.Build.Locator.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.CSharp.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.Workspaces.MSBuild.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.Workspaces.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.CodeAnalysis.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Design.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Relational.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.Extensions.DependencyModel.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.Abstractions.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.Logging.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.dll
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
+M	xmtruyen.API/bin/Debug/net9.0/Microsoft.OpenApi.dll
+A	xmtruyen.API/bin/Debug/net9.0/Mono.TextTemplating.dll
+A	xmtruyen.API/bin/Debug/net9.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+A	xmtruyen.API/bin/Debug/net9.0/Npgsql.dll
+A	xmtruyen.API/bin/Debug/net9.0/Scalar.AspNetCore.dll
+D	xmtruyen.API/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
+D	xmtruyen.API/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+D	xmtruyen.API/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.CodeDom.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.Composition.AttributedModel.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.Composition.Convention.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.Composition.Hosting.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.Composition.Runtime.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.Composition.TypedParts.dll
+A	xmtruyen.API/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll
+M	xmtruyen.API/bin/Debug/net9.0/appsettings.json
+A	xmtruyen.API/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/de/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/de/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/de/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/de/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/de/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/es/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/es/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/es/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/es/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/es/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/fr/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/fr/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/fr/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/fr/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/fr/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/it/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/it/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/it/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/it/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/it/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ja/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ja/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ja/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ja/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ja/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ko/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ko/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ko/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ko/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ko/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pl/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pl/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pl/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pl/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pl/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pt-BR/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pt-BR/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pt-BR/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/pt-BR/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ru/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ru/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ru/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ru/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/ru/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.resources.dll
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.deps.json
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.dll
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.exe
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.pdb
+M	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.runtimeconfig.json
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll
+A	xmtruyen.API/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.resources.dll
+A	xmtruyen.API/dotnet.md
+M	xmtruyen.API/obj/Debug/net9.0/apphost.exe
+M	xmtruyen.API/obj/Debug/net9.0/ref/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/refint/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfo.cs
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfoInputs.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.GeneratedMSBuildEditorConfig.editorconfig
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.MvcApplicationPartsAssemblyInfo.cs
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.assets.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.AssemblyReference.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.CoreCompileInputs.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.FileListAbsolute.txt
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.dll
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.genruntimeconfig.cache
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.pdb
+M	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.sourcelink.json
+M	xmtruyen.API/obj/project.assets.json
+M	xmtruyen.API/obj/project.nuget.cache
+A	xmtruyen.API/obj/xmtruyen.API.csproj.EntityFrameworkCore.targets
+M	xmtruyen.API/obj/xmtruyen.API.csproj.nuget.dgspec.json
+M	xmtruyen.API/obj/xmtruyen.API.csproj.nuget.g.props
+M	xmtruyen.API/obj/xmtruyen.API.csproj.nuget.g.targets
+M	xmtruyen.API/xmtruyen.API.csproj
+
+commit fa23286a06d66cdca1ff4c81548f0ae414371e65
+Author: phudev <phuvo1288@gmail.com>
+Date:   Tue Jun 23 23:26:30 2026 +0700
+
+    feat: initialize backend API project with .NET 9 and scaffold frontend authentication components
+
+A	01-master-protocol.md
+R064	xom-truyen/agents.md	xom-truyen/02-frontend-agent.md
+M	xom-truyen/src/App.tsx
+M	xom-truyen/src/components/Auth/ForgotPasswordForm.tsx
+M	xom-truyen/src/components/Auth/LoginForm.tsx
+M	xom-truyen/src/components/Auth/RegisterForm.tsx
+M	xom-truyen/src/components/Layout/AuthLayout.tsx
+M	xom-truyen/src/components/Layout/Header.tsx
+M	xom-truyen/src/components/Layout/Sidebar.tsx
+M	xom-truyen/src/index.css
+M	xom-truyen/src/pages/ForgotPasswordPage.tsx
+A	xmtruyen.API/03-backend-agent.md
+A	xmtruyen.API/Controllers/BaseApiController.cs
+A	xmtruyen.API/Controllers/WeatherForecastController.cs
+A	xmtruyen.API/Models/ApiResponse.cs
+A	xmtruyen.API/Models/WeatherForecast.cs
+A	xmtruyen.API/Program.cs
+A	xmtruyen.API/Properties/launchSettings.json
+A	xmtruyen.API/appsettings.Development.json
+A	xmtruyen.API/appsettings.json
+A	xmtruyen.API/bin/Debug/net9.0/Microsoft.OpenApi.dll
+A	xmtruyen.API/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
+A	xmtruyen.API/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+A	xmtruyen.API/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+A	xmtruyen.API/bin/Debug/net9.0/appsettings.Development.json
+A	xmtruyen.API/bin/Debug/net9.0/appsettings.json
+A	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.deps.json
+A	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.dll
+A	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.exe
+A	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.pdb
+A	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.runtimeconfig.json
+A	xmtruyen.API/bin/Debug/net9.0/xmtruyen.API.staticwebassets.endpoints.json
+A	xmtruyen.API/obj/Debug/net9.0/.NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+A	xmtruyen.API/obj/Debug/net9.0/apphost.exe
+A	xmtruyen.API/obj/Debug/net9.0/ref/xmtruyen.API.dll
+A	xmtruyen.API/obj/Debug/net9.0/refint/xmtruyen.API.dll
+A	xmtruyen.API/obj/Debug/net9.0/staticwebassets.build.endpoints.json
+A	xmtruyen.API/obj/Debug/net9.0/staticwebassets.build.json
+A	xmtruyen.API/obj/Debug/net9.0/staticwebassets/msbuild.build.xmtruyen.API.props
+A	xmtruyen.API/obj/Debug/net9.0/staticwebassets/msbuild.buildMultiTargeting.xmtruyen.API.props
+A	xmtruyen.API/obj/Debug/net9.0/staticwebassets/msbuild.buildTransitive.xmtruyen.API.props
+A	xmtruyen.API/obj/Debug/net9.0/xomtruye.79DB6F27.Up2Date
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfo.cs
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.AssemblyInfoInputs.cache
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.GeneratedMSBuildEditorConfig.editorconfig
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.GlobalUsings.g.cs
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.MvcApplicationPartsAssemblyInfo.cache
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.MvcApplicationPartsAssemblyInfo.cs
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.assets.cache
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.AssemblyReference.cache
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.CoreCompileInputs.cache
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.csproj.FileListAbsolute.txt
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.dll
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.genruntimeconfig.cache
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.pdb
+A	xmtruyen.API/obj/Debug/net9.0/xmtruyen.API.sourcelink.json
+A	xmtruyen.API/obj/project.assets.json
+A	xmtruyen.API/obj/project.nuget.cache
+A	xmtruyen.API/obj/xmtruyen.API.csproj.nuget.dgspec.json
+A	xmtruyen.API/obj/xmtruyen.API.csproj.nuget.g.props
+A	xmtruyen.API/obj/xmtruyen.API.csproj.nuget.g.targets
+A	xmtruyen.API/xmtruyen.API.csproj
+A	xmtruyen.API/xmtruyen.API.http
+
+commit efdc8c62916f6330ad61fb0c3590fa4af63266ae
+Author: phudev <phuvo1288@gmail.com>
+Date:   Tue Jun 23 02:24:10 2026 +0700
+
+    UI tương đối đã oke
+
+M	xom-truyen/src/components/Book/BookCard.tsx
+M	xom-truyen/src/components/Book/BookCover.tsx
+M	xom-truyen/src/components/Book/BookSlider.tsx
+M	xom-truyen/src/components/Book/SectionHeader.tsx
+M	xom-truyen/src/components/Bookmark/BookmarkItem.tsx
+M	xom-truyen/src/components/History/HistoryItem.tsx
+M	xom-truyen/src/components/Layout/Header.tsx
+M	xom-truyen/src/components/Layout/Sidebar.tsx
+M	xom-truyen/src/constants/index.ts
+M	xom-truyen/src/main.tsx
+M	xom-truyen/src/pages/BookmarkPage.tsx
+M	xom-truyen/src/pages/HistoryPage.tsx
+
+commit 4da750828ba92baf03a4125fb157ff11f4c59d46
+Author: phudev <phuvo1288@gmail.com>
+Date:   Tue Jun 23 01:28:33 2026 +0700
+
+    feat: implement base UI components and page structures for Xmtruyen application
+
+A	.vscode/settings.json
+A	xom-truyen/agents.md
+M	xom-truyen/src/App.tsx
+M	xom-truyen/src/components/Auth/LeftPanel.tsx
+M	xom-truyen/src/components/Auth/LoginForm.tsx
+M	xom-truyen/src/components/Book/BookCard.tsx
+M	xom-truyen/src/components/Book/SectionHeader.tsx
+A	xom-truyen/src/components/BookDetail/BookComments.tsx
+A	xom-truyen/src/components/BookDetail/BookInfo.tsx
+A	xom-truyen/src/components/Bookmark/BookmarkItem.tsx
+A	xom-truyen/src/components/History/HistoryItem.tsx
+M	xom-truyen/src/components/Layout/AuthLayout.tsx
+M	xom-truyen/src/components/Layout/Footer.tsx
+M	xom-truyen/src/components/Layout/Header.tsx
+M	xom-truyen/src/components/Layout/Sidebar.tsx
+A	xom-truyen/src/components/Profile/ProfileAvatar.tsx
+A	xom-truyen/src/components/Profile/ProfileForm.tsx
+A	xom-truyen/src/components/Reading/ReadingContent.tsx
+A	xom-truyen/src/components/Reading/ReadingHeader.tsx
+A	xom-truyen/src/components/common/Modal.tsx
+M	xom-truyen/src/constants/index.ts
+M	xom-truyen/src/index.css
+A	xom-truyen/src/pages/BookDetailPage.tsx
+A	xom-truyen/src/pages/BookmarkPage.tsx
+M	xom-truyen/src/pages/ForgotPasswordPage.tsx
+A	xom-truyen/src/pages/HistoryPage.tsx
+A	xom-truyen/src/pages/ProfilePage.tsx
+A	xom-truyen/src/pages/ReadingPage.tsx
+M	xom-truyen/src/styles/BookSlider.css
+A	xom-truyen/src/styles/Modal.css
+
+commit 4c79ed2d2595276baa3e047e3537849eba48f5c5
+Author: phudev <phuvo1288@gmail.com>
+Date:   Sun Jun 14 23:33:48 2026 +0700
+
+    cmit các file auth
+
+M	xom-truyen/package-lock.json
+M	xom-truyen/package.json
+M	xom-truyen/src/App.tsx
+A	xom-truyen/src/components/Auth/BookCovers.tsx
+A	xom-truyen/src/components/Auth/ForgotPasswordForm.tsx
+A	xom-truyen/src/components/Auth/LeftPanel.tsx
+A	xom-truyen/src/components/Auth/LoginForm.tsx
+A	xom-truyen/src/components/Auth/RegisterForm.tsx
+M	xom-truyen/src/components/Book/BookCard.tsx
+M	xom-truyen/src/components/Book/BookSection.tsx
+M	xom-truyen/src/components/Book/BookSlider.tsx
+M	xom-truyen/src/components/Book/SectionHeader.tsx
+A	xom-truyen/src/components/Layout/AuthLayout.tsx
+M	xom-truyen/src/components/Layout/Footer.tsx
+M	xom-truyen/src/components/Layout/Header.tsx
+M	xom-truyen/src/constants/index.ts
+A	xom-truyen/src/pages/ForgotPasswordPage.tsx
+D	xom-truyen/src/pages/HomePage/index.tsx
+A	xom-truyen/src/pages/LoginPage.tsx
+A	xom-truyen/src/pages/RegisterPage.tsx
+A	xom-truyen/src/pages/index.tsx
+A	xom-truyen/src/styles/BookSlider.css
+A	xom-truyen/src/styles/Header.css
+
+commit 33b7a6a892a3897517ce0b63bd0d5572f8387a82
+Author: Phuvo <phuvo1288@gmail.com>
+Date:   Sat Jun 13 16:58:41 2026 +0700
+
+    cmit all
+
+M	xom-truyen/package-lock.json
+M	xom-truyen/package.json
+A	xom-truyen/src/components/Book/BookSlider.tsx
+M	xom-truyen/src/components/Layout/Header.tsx
+M	xom-truyen/src/components/Layout/Sidebar.tsx
+M	xom-truyen/src/constants/index.ts
+
+commit 99d1a5f2ef8b4838d4804adf1743463de7ab92cc
+Author: Phuvo <phuvo1288@gmail.com>
+Date:   Tue May 26 18:39:20 2026 +0700
+
+    first comit source
+
+A	xom-truyen/.gitignore
+A	xom-truyen/README.md
+A	xom-truyen/eslint.config.js
+A	xom-truyen/index.html
+A	xom-truyen/package-lock.json
+A	xom-truyen/package.json
+A	xom-truyen/public/favicon.svg
+A	xom-truyen/public/icons.svg
+A	xom-truyen/src/App.css
+A	xom-truyen/src/App.tsx
+A	xom-truyen/src/assets/hero.png
+A	xom-truyen/src/assets/images/Khu-Vuon-Thang-Nam.jpg
+A	xom-truyen/src/assets/images/Kiem-Thanh-Thien-Tai-Cua-Hoc-Vien.jpg
+A	xom-truyen/src/assets/images/Ky-Nguyen-Ky-La.jpg
+A	xom-truyen/src/assets/images/Thuan-Tuy-Bat-Luong.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-59-Hinh-02.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-60-Hinh-03.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-61-Hinh-04.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-62-Hinh-05.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-63-Hinh-06.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-64-Hinh-07.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-66-Hinh-08.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-67-Hinh-09.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-69-Hinh-10.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Bia-74-Hinh-01.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Hanh-Dong-TruyenQQ.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Ngon-Tinh-01.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Ngon-Tinh-02.jpg
+A	xom-truyen/src/assets/images/Truyen-Tranh-Ngon-Tinh-Hien-Dai.jpg
+A	xom-truyen/src/assets/react.svg
+A	xom-truyen/src/assets/vite.svg
+A	xom-truyen/src/components/Book/BookCard.tsx
+A	xom-truyen/src/components/Book/BookCover.tsx
+A	xom-truyen/src/components/Book/BookSection.tsx
+A	xom-truyen/src/components/Book/SectionHeader.tsx
+A	xom-truyen/src/components/Layout/Footer.tsx
+A	xom-truyen/src/components/Layout/Header.tsx
+A	xom-truyen/src/components/Layout/Sidebar.tsx
+A	xom-truyen/src/constants/index.ts
+A	xom-truyen/src/index.css
+A	xom-truyen/src/main.tsx
+A	xom-truyen/src/pages/HomePage/index.tsx
+A	xom-truyen/src/types/index.ts
+A	xom-truyen/tsconfig.app.json
+A	xom-truyen/tsconfig.json
+A	xom-truyen/tsconfig.node.json
+A	xom-truyen/vite.config.ts
+
+commit 73b126804c00f4a113599af32a85a223d73162b6
+Author: Phuvo <46224858+Sylphvo@users.noreply.github.com>
+Date:   Sun May 24 14:44:07 2026 +0700
+
+    thêm mô tả
+    
+    Updated the description to enhance clarity.
+
+M	README.md
+
+commit 45b1e449bb7deb7e6766f0be4c93cfad8a611c7e
+Author: Phuvo <46224858+Sylphvo@users.noreply.github.com>
+Date:   Sun May 24 14:43:29 2026 +0700
+
+    Initial commit
+
+A	README.md

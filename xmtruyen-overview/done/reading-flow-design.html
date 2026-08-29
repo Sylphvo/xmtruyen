@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xmtruyen — Luồng Đọc Truyện (Truyện Tranh & Sách Chữ) — Thiết Kế UX & Chức Năng</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-done { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .badge-partial { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid #f97316; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.88em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .feature-tag { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: #00d4ff; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; margin: 3px; }
+        .feature-tag.done { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+        .feature-tag.new { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3); color: #a78bfa; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>📖 Luồng Đọc Truyện — Truyện Tranh & Sách Chữ</h1>
+    <p class="subtitle">
+        <span class="badge badge-done">Đã Implement Cơ Bản</span>
+        <span class="badge badge-partial">Cần Bổ Sung Thêm</span>
+        Sơ đồ luồng đọc hoàn chỉnh — từ click sách → phân loại → hiển thị → controls → chức năng hữu ích
+    </p>
+
+    <!-- MỤC LỤC -->
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#main-flow">1. Sơ Đồ Luồng Chính (Entry → Routing → Display)</a>
+        <a href="#detection">2. Phân Loại Tự Động: Truyện Tranh vs Sách Chữ</a>
+        <a href="#comic-flow">3. Luồng Đọc Truyện Tranh (Comic Reader)</a>
+        <a href="#text-flow">4. Luồng Đọc Sách / Truyện Chữ (Text Reader)</a>
+        <a href="#controls">5. Combo Buttons & Controls Chuyển Trang</a>
+        <a href="#features">6. Chức Năng Hữu Ích Cho User</a>
+        <a href="#toolbar">7. Thanh Công Cụ Đọc (Reading Toolbar)</a>
+        <a href="#states">8. Các Trạng Thái Đặc Biệt</a>
+        <a href="#keyboard">9. Phím Tắt & Cử Chỉ (Keyboard & Gestures)</a>
+        <a href="#data-flow">10. Data Flow (API ↔ Client)</a>
+    </div>
+
+    <!-- 1. LUỒNG CHÍNH -->
+    <h2 id="main-flow">1. Sơ Đồ Luồng Chính (Entry → Routing → Display)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     LUỒNG ĐỌC TRUYỆN — TỔNG QUAN                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  User Click "Đọc ngay" tại /book/{id}
+        │
+        ▼
+  ┌──────────────────────────────────┐
+  │  Navigate → /read/{bookId}       │
+  │  ReadingPage.tsx load            │
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  Fetch book info (formatType)    │
+  │  GET /api/Publications/{id}      │
+  └──────────────┬───────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────┐
+  │  formatType === 2?               │
+  │  (hoặc location.state.isComic)   │
+  └────────┬────────────┬────────────┘
+           │            │
+      YES (Comic)    NO (Book/Text)
+           │            │
+           ▼            ▼
+  ┌────────────────┐  ┌────────────────┐
+  │ Fetch comic    │  │ Fetch text     │
+  │ chapters       │  │ chapters       │
+  │ getComicChap() │  │ getTextChap()  │
+  └───────┬────────┘  └───────┬────────┘
+          │                    │
+          ▼                    ▼
+  ┌────────────────┐  ┌────────────────┐
+  │ Fetch content  │  │ Fetch content  │
+  │ → imageUrls[]  │  │ → textContent  │
+  └───────┬────────┘  └───────┬────────┘
+          │                    │
+          ▼                    ▼
+  ┌────────────────┐  ┌────────────────┐
+  │ ComicReading   │  │ ReadingContent │
+  │ Content.tsx    │  │ .tsx           │
+  │                │  │                │
+  │ • Ảnh cuộn dọc│  │ • Text content │
+  │ • Lazy load   │  │ • Font control │
+  │ • Zoom        │  │ • Theme switch │
+  └────────────────┘  └────────────────┘
+          │                    │
+          └────────────────────┘
+                    │
+                    ▼
+  ┌──────────────────────────────────┐
+  │  SHARED CONTROLS:                │
+  │  • Chương trước / Chương sau     │
+  │  • Bookmark                      │
+  │  • Chuyển chế độ đọc            │
+  │  • Danh sách chương (drawer)    │
+  │  • Auto-save progress           │
+  └──────────────────────────────────┘
+    </div>
+
+    <!-- 2. PHÂN LOẠI -->
+    <h2 id="detection">2. Phân Loại Tự Động: Truyện Tranh vs Sách Chữ</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  LOGIC PHÂN LOẠI (ReadingPage.tsx)                               │
+└─────────────────────────────────────────────────────────────────┘
+
+  Input: book.formatType + location.state.isComic
+         │
+         ▼
+  ┌─────────────────────────────────────┐
+  │ 1. location.state.isComic defined?  │
+  │    (từ BookDetailPage truyền qua)   │
+  └───────┬──────────────┬──────────────┘
+      YES │              │ NO
+          ▼              ▼
+  Dùng giá trị      ┌──────────────────┐
+  từ state           │ 2. book.formatType│
+                     │    === 2?        │
+                     └───┬──────────┬───┘
+                     YES │          │ NO
+                         ▼          ▼
+                  isComic = true   isComic = false
+                         │          │
+                         ▼          ▼
+              ┌──────────────┐  ┌──────────────┐
+              │ COMIC MODE   │  │  TEXT MODE   │
+              │ Load ảnh     │  │  Load chữ    │
+              └──────────────┘  └──────────────┘
+
+  ⚡ User có thể toggle mode bất kỳ lúc nào (nút "Đang đọc: Truyện Tranh/Chữ")
+    </div>
+
+    <table>
+        <thead><tr><th>formatType</th><th>Ý nghĩa</th><th>Giao diện</th><th>API gọi</th></tr></thead>
+        <tbody>
+            <tr><td><code>1</code></td><td>Sách / Truyện chữ</td><td>ReadingContent (text)</td><td><code>getTextChapters()</code></td></tr>
+            <tr><td><code>2</code></td><td>Truyện tranh / Webtoon</td><td>ComicReadingContent (images)</td><td><code>getComicChapters()</code></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 3. COMIC FLOW -->
+    <h2 id="comic-flow">3. Luồng Đọc Truyện Tranh (Comic Reader)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  COMIC READER — LAYOUT & INTERACTION                             │
+└─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────┐
+  │  HEADER BAR                                      │
+  │  [← Back] [Tên Truyện]    [🔖 Bookmark] [Mode] │
+  └─────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────┐
+  │               CHAPTER TITLE                      │
+  │          "Chương 5: Trận Chiến Cuối"            │
+  └─────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────┐
+  │                                                  │
+  │    ┌─────────────────────────────────────┐      │
+  │    │         PAGE 1 (image)              │      │
+  │    │                                     │      │
+  │    │    ┌───────────────────────────┐    │      │
+  │    │    │                           │    │      │
+  │    │    │      COMIC IMAGE          │    │  ← Cuộn dọc
+  │    │    │      (lazy loaded)        │    │    liên tục
+  │    │    │      max-width: 800px     │    │    (webtoon style)
+  │    │    │                           │    │      │
+  │    │    └───────────────────────────┘    │      │
+  │    │                                     │      │
+  │    ├─────────────────────────────────────┤      │
+  │    │         PAGE 2 (image)              │      │
+  │    │    ┌───────────────────────────┐    │      │
+  │    │    │      COMIC IMAGE          │    │      │
+  │    │    └───────────────────────────┘    │      │
+  │    ├─────────────────────────────────────┤      │
+  │    │         PAGE 3 (image)              │      │
+  │    │    ┌───────────────────────────┐    │      │
+  │    │    │      COMIC IMAGE          │    │      │
+  │    │    └───────────────────────────┘    │      │
+  │    └─────────────────────────────────────┘      │
+  │                                                  │
+  └─────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────┐
+  │  BOTTOM NAVIGATION                               │
+  │  [← Chương trước]  Chương 5/120  [Chương sau →] │
+  └─────────────────────────────────────────────────┘
+    </div>
+
+    <h3>3.1 Tính năng Comic Reader</h3>
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>Đã có ✅</h4>
+            <ul>
+                <li>Load ảnh cuộn dọc (webtoon style)</li>
+                <li>Lazy loading images (<code>loading="lazy"</code>)</li>
+                <li>Chuyển chương (Trước/Sau)</li>
+                <li>Header hiển thị tên truyện</li>
+                <li>Hiển thị số chương hiện tại / tổng</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Cần bổ sung 🆕</h4>
+            <ul>
+                <li>Đổi CDN server (Server 1 / Server 2)</li>
+                <li>Zoom pinch-to-zoom (mobile)</li>
+                <li>Chế độ lật trang (page-by-page) ngoài cuộn dọc</li>
+                <li>Preload 3 trang tiếp theo</li>
+                <li>Chế độ toàn màn hình (fullscreen)</li>
+                <li>Slider nhảy nhanh đến trang X</li>
+                <li>Đổi nền (sáng/tối) cho viền ảnh</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. TEXT FLOW -->
+    <h2 id="text-flow">4. Luồng Đọc Sách / Truyện Chữ (Text Reader)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  TEXT READER — LAYOUT & INTERACTION                              │
+└─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────┐
+  │  HEADER BAR                                      │
+  │  [← Back] [Tên Truyện]    [🔖 Bookmark] [Mode] │
+  └─────────────────────────────────────────────────┘
+
+  ┌───┐ ┌─────────────────────────────────────┐ ┌───┐
+  │   │ │           CHAPTER TITLE              │ │   │
+  │   │ │      "Chương 12: Bí Mật"            │ │   │
+  │   │ │                                      │ │   │
+  │ ← │ │   Nội dung truyện chữ hiển thị     │ │ → │
+  │   │ │   ở đây. Font size có thể điều      │ │   │
+  │ C │ │   chỉnh. Line-height 1.8.           │ │ C │
+  │ h │ │                                      │ │ h │
+  │ ư │ │   Hỗ trợ HTML content (từ API)      │ │ ư │
+  │ ơ │ │   hoặc plain text.                  │ │ ơ │
+  │ n │ │                                      │ │ n │
+  │ g │ │   Đoạn văn tiếp theo...             │ │ g │
+  │   │ │   ...                               │ │   │
+  │ t │ │   Max-width: 720px (dễ đọc)         │ │ s │
+  │ r │ │                                      │ │ a │
+  │ ư │ │                                      │ │ u │
+  │ ớ │ │                                      │ │   │
+  │ c │ │                                      │ │   │
+  │   │ │                                      │ │   │
+  └───┘ └─────────────────────────────────────┘ └───┘
+               │
+               ▼
+  ┌─────────────────────────────────────────────────┐
+  │  FOOTER: Chương 12/85                            │
+  └─────────────────────────────────────────────────┘
+    </div>
+
+    <h3>4.1 Tính năng Text Reader</h3>
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>Đã có ✅</h4>
+            <ul>
+                <li>Hiển thị nội dung text/HTML</li>
+                <li>Chuyển chương (mũi tên trái/phải)</li>
+                <li>Header hiển thị tên truyện</li>
+                <li>Footer hiển thị vị trí chương</li>
+                <li>Max-width giới hạn dễ đọc</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h4>Cần bổ sung 🆕</h4>
+            <ul>
+                <li>Tăng/giảm cỡ chữ (A- / A+)</li>
+                <li>Đổi font chữ (Roboto, Literata, Merriweather)</li>
+                <li>Đổi theme (Sáng / Tối / Sepia)</li>
+                <li>Điều chỉnh line-height</li>
+                <li>Cuộn tự động (auto-scroll với tốc độ tùy chỉnh)</li>
+                <li>Lưu vị trí đọc (scroll %) → resume</li>
+                <li>Chế độ toàn màn hình</li>
+                <li>Ước tính thời gian đọc còn lại</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 5. CONTROLS -->
+    <h2 id="controls">5. Combo Buttons & Controls Chuyển Trang</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  READING CONTROLS — PHÂN BỐ TRÊN GIAO DIỆN                      │
+└─────────────────────────────────────────────────────────────────┘
+
+  ╔═══════════════════════════════════════════════════════════════╗
+  ║  TOP BAR (luôn hiển thị)                                      ║
+  ║                                                               ║
+  ║  [← Quay lại]  "Tên Truyện — Chương X"  [🔖][📋][⚙️][⛶]  ║
+  ║                                                               ║
+  ║  Giải thích icons:                                            ║
+  ║  🔖 = Đánh dấu trang (Bookmark)                              ║
+  ║  📋 = Mở danh sách chương (Chapter List Drawer)              ║
+  ║  ⚙️ = Cài đặt đọc (Settings Panel)                          ║
+  ║  ⛶  = Toàn màn hình (Fullscreen)                             ║
+  ╚═══════════════════════════════════════════════════════════════╝
+
+  ╔═══════════════════════════════════════════════════════════════╗
+  ║  BOTTOM BAR (hiện khi tap/hover hoặc luôn hiện)              ║
+  ║                                                               ║
+  ║  [← Chương trước]  ═══●═══════════  [Chương sau →]          ║
+  ║                     ↑ Slider chương                           ║
+  ║                     (kéo nhảy nhanh đến chương X)             ║
+  ║                                                               ║
+  ║  Chương 12/85           🔊 TTS           ☀️🌙 Theme          ║
+  ╚═══════════════════════════════════════════════════════════════╝
+
+  ╔═══════════════════════════════════════════════════════════════╗
+  ║  SIDE CONTROLS (Text Mode — mũi tên 2 bên)                   ║
+  ║                                                               ║
+  ║  [◀]  ═══════════ CONTENT ═══════════  [▶]                   ║
+  ║  Trước                                  Sau                   ║
+  ╚═══════════════════════════════════════════════════════════════╝
+    </div>
+
+    <h3>5.1 Chi tiết từng control</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Control</th>
+                <th>Vị trí</th>
+                <th>Hành vi</th>
+                <th>Phím tắt</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>← Chương trước</td><td>Bottom left + Side left</td><td>Load chương trước (index - 1)</td><td><code>←</code> hoặc <code>A</code></td><td><span class="feature-tag done">✅ Có</span></td></tr>
+            <tr><td>→ Chương sau</td><td>Bottom right + Side right</td><td>Load chương tiếp (index + 1)</td><td><code>→</code> hoặc <code>D</code></td><td><span class="feature-tag done">✅ Có</span></td></tr>
+            <tr><td>Slider chương</td><td>Bottom center</td><td>Kéo nhảy nhanh đến chương bất kỳ</td><td>—</td><td><span class="feature-tag new">🆕 Mới</span></td></tr>
+            <tr><td>🔖 Bookmark</td><td>Top right</td><td>Toggle bookmark chương hiện tại</td><td><code>B</code></td><td><span class="feature-tag done">✅ Có</span></td></tr>
+            <tr><td>📋 Danh sách chương</td><td>Top right</td><td>Mở drawer sidebar liệt kê tất cả chương</td><td><code>C</code></td><td><span class="feature-tag new">🆕 Mới</span></td></tr>
+            <tr><td>⚙️ Settings</td><td>Top right</td><td>Mở panel cài đặt font/theme/speed</td><td><code>S</code></td><td><span class="feature-tag new">🆕 Mới</span></td></tr>
+            <tr><td>⛶ Fullscreen</td><td>Top right</td><td>Toggle fullscreen mode (Fullscreen API)</td><td><code>F</code></td><td><span class="feature-tag new">🆕 Mới</span></td></tr>
+            <tr><td>☀️🌙 Theme</td><td>Bottom / Settings</td><td>Đổi nền: Sáng / Tối / Sepia</td><td><code>T</code></td><td><span class="feature-tag new">🆕 Mới</span></td></tr>
+            <tr><td>A- / A+</td><td>Settings panel</td><td>Giảm/Tăng font size (14-24px)</td><td><code>-</code> / <code>+</code></td><td><span class="feature-tag new">🆕 Mới</span></td></tr>
+            <tr><td>Chuyển mode</td><td>Top right</td><td>Toggle Truyện Tranh ↔ Truyện Chữ</td><td><code>M</code></td><td><span class="feature-tag done">✅ Có</span></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 6. FEATURES -->
+    <h2 id="features">6. Chức Năng Hữu Ích Cho User</h2>
+
+    <h3>6.1 Tổng hợp tính năng theo nhóm</h3>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>📖 Nhóm: Trải nghiệm đọc</h4>
+            <p><span class="feature-tag done">Có</span> Cuộn dọc liên tục (webtoon)</p>
+            <p><span class="feature-tag new">Mới</span> Lật trang (page-by-page mode)</p>
+            <p><span class="feature-tag new">Mới</span> Đổi font chữ (3-5 font)</p>
+            <p><span class="feature-tag new">Mới</span> Tăng/giảm cỡ chữ</p>
+            <p><span class="feature-tag new">Mới</span> Đổi khoảng cách dòng</p>
+            <p><span class="feature-tag new">Mới</span> 3 theme: Sáng / Tối / Sepia</p>
+            <p><span class="feature-tag new">Mới</span> Fullscreen mode</p>
+            <p><span class="feature-tag new">Mới</span> Auto-scroll (text mode)</p>
+        </div>
+        <div class="section-card">
+            <h4>🧭 Nhóm: Điều hướng</h4>
+            <p><span class="feature-tag done">Có</span> Chương trước / Chương sau</p>
+            <p><span class="feature-tag new">Mới</span> Slider nhảy nhanh chương</p>
+            <p><span class="feature-tag new">Mới</span> Drawer danh sách chương</p>
+            <p><span class="feature-tag new">Mới</span> Phím tắt (← → Enter)</p>
+            <p><span class="feature-tag new">Mới</span> Swipe trái/phải (mobile)</p>
+            <p><span class="feature-tag new">Mới</span> "Về đầu trang" button</p>
+            <p><span class="feature-tag new">Mới</span> Auto-chuyển chương khi cuộn hết</p>
+        </div>
+        <div class="section-card">
+            <h4>💾 Nhóm: Lưu trữ & Tiến độ</h4>
+            <p><span class="feature-tag done">Có</span> Bookmark chương</p>
+            <p><span class="feature-tag done">Có</span> Lưu lịch sử đọc (API)</p>
+            <p><span class="feature-tag done">Có</span> Tăng view count</p>
+            <p><span class="feature-tag new">Mới</span> Lưu scroll position (%)</p>
+            <p><span class="feature-tag new">Mới</span> Resume từ vị trí cuối</p>
+            <p><span class="feature-tag new">Mới</span> Ghi chú / highlight text</p>
+            <p><span class="feature-tag new">Mới</span> Đọc offline (cache chapter)</p>
+        </div>
+        <div class="section-card">
+            <h4>🖼️ Nhóm: Ảnh & Media (Comic)</h4>
+            <p><span class="feature-tag done">Có</span> Lazy loading images</p>
+            <p><span class="feature-tag new">Mới</span> Zoom pinch (mobile)</p>
+            <p><span class="feature-tag new">Mới</span> Đổi server CDN (fallback)</p>
+            <p><span class="feature-tag new">Mới</span> Preload 3 trang tiếp</p>
+            <p><span class="feature-tag new">Mới</span> Progressive load (blur→clear)</p>
+            <p><span class="feature-tag new">Mới</span> Fit width / Fit height toggle</p>
+            <p><span class="feature-tag new">Mới</span> Double-tap zoom (mobile)</p>
+        </div>
+    </div>
+
+    <!-- 7. TOOLBAR -->
+    <h2 id="toolbar">7. Thanh Công Cụ Đọc (Reading Toolbar)</h2>
+
+    <h3>7.1 Settings Panel (mở khi click ⚙️)</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────┐
+│  ⚙️ CÀI ĐẶT ĐỌC                       │
+├─────────────────────────────────────────┤
+│                                         │
+│  Cỡ chữ:     [A-] ═══●═══════ [A+]    │
+│               14px ──── 18px ──── 24px  │
+│                                         │
+│  Font chữ:   [Roboto ▼]                │
+│               • Roboto (default)        │
+│               • Literata (serif)        │
+│               • Merriweather            │
+│               • JetBrains Mono          │
+│                                         │
+│  Khoảng cách: [─] ═══●═══════ [+]      │
+│               1.4 ──── 1.8 ──── 2.2    │
+│                                         │
+│  Nền:        [☀️ Sáng] [🌙 Tối] [📜 Sepia] │
+│                                         │
+│  Chế độ ảnh: [Fit Width] [Fit Height]   │
+│  (chỉ hiện khi đọc comic)              │
+│                                         │
+│  Cuộn tự động: [OFF] ═══●═══ [Nhanh]   │
+│  (chỉ hiện khi đọc text)               │
+│                                         │
+└─────────────────────────────────────────┘
+    </div>
+
+    <h3>7.2 Chapter List Drawer (mở khi click 📋)</h3>
+    <div class="flow-diagram">
+┌──────────────────────────────────┐
+│  📋 DANH SÁCH CHƯƠNG             │
+├──────────────────────────────────┤
+│  🔍 Tìm chương...               │
+├──────────────────────────────────┤
+│  ▶ Chương 1: Khởi Đầu      ✅  │  ← đã đọc
+│    Chương 2: Gặp Gỡ        ✅  │  ← đã đọc
+│    Chương 3: Thử Thách      ✅  │  ← đã đọc
+│  ● Chương 4: Biến Cố       ◄─  │  ← đang đọc (highlight)
+│    Chương 5: Hành Trình         │
+│    Chương 6: Bí Mật             │
+│    Chương 7: Phản Bội      🔒  │  ← VIP (locked)
+│    Chương 8: Quyết Chiến   🔒  │
+│    ...                          │
+│    Chương 85: Kết Thúc     🔒  │
+├──────────────────────────────────┤
+│  Tiến độ: 4/85 (4.7%)           │
+│  ████░░░░░░░░░░░░░░░░░░░░░░░░░ │
+└──────────────────────────────────┘
+    </div>
+
+    <!-- 8. TRẠNG THÁI -->
+    <h2 id="states">8. Các Trạng Thái Đặc Biệt</h2>
+
+    <table>
+        <thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hiển thị</th><th>Hành động user</th></tr></thead>
+        <tbody>
+            <tr><td>🔄 Loading</td><td>Đang fetch chapter content</td><td>Skeleton hoặc spinner</td><td>Chờ</td></tr>
+            <tr><td>🔒 Locked (VIP)</td><td>Chapter có accessLevel=2, user chưa mua</td><td>Blur content + overlay "Mua chương" + giá xu</td><td>Click "Mua" hoặc "Nạp xu"</td></tr>
+            <tr><td>📭 Empty</td><td>Chapter chưa có nội dung</td><td>Message "Chưa có nội dung"</td><td>Quay lại hoặc chuyển chương</td></tr>
+            <tr><td>❌ Error</td><td>API trả lỗi</td><td>Message lỗi + nút "Thử lại"</td><td>Click retry</td></tr>
+            <tr><td>🏁 End</td><td>Đã chương cuối cùng</td><td>"Hết truyện" + gợi ý truyện tương tự</td><td>Xem gợi ý hoặc quay lại</td></tr>
+            <tr><td>📶 Offline</td><td>Mất mạng</td><td>Hiện nội dung cached (nếu có) hoặc message offline</td><td>Đọc cache / chờ mạng</td></tr>
+        </tbody>
+    </table>
+
+    <h3>8.1 UI Locked Chapter</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────┐
+│                                                  │
+│           🔒 CHƯƠNG NÀY YÊU CẦU MUA             │
+│                                                  │
+│     ┌───────────────────────────────────┐       │
+│     │  ░░░░░░░ blur content ░░░░░░░░░  │       │
+│     │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │       │
+│     │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │       │
+│     └───────────────────────────────────┘       │
+│                                                  │
+│         Giá: 5 xu                                │
+│         Số dư hiện tại: 12 xu                    │
+│                                                  │
+│     [  🔓 MUA CHƯƠNG (5 xu)  ]                   │
+│     [  💰 NẠP THÊM XU        ]                   │
+│                                                  │
+└─────────────────────────────────────────────────┘
+    </div>
+
+    <!-- 9. KEYBOARD -->
+    <h2 id="keyboard">9. Phím Tắt & Cử Chỉ (Keyboard & Gestures)</h2>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>⌨️ Phím tắt Desktop</h4>
+            <table>
+                <thead><tr><th>Phím</th><th>Hành vi</th></tr></thead>
+                <tbody>
+                    <tr><td><code>←</code> hoặc <code>A</code></td><td>Chương trước</td></tr>
+                    <tr><td><code>→</code> hoặc <code>D</code></td><td>Chương sau</td></tr>
+                    <tr><td><code>Space</code></td><td>Cuộn xuống 1 màn hình</td></tr>
+                    <tr><td><code>Shift+Space</code></td><td>Cuộn lên 1 màn hình</td></tr>
+                    <tr><td><code>F</code></td><td>Toggle fullscreen</td></tr>
+                    <tr><td><code>B</code></td><td>Toggle bookmark</td></tr>
+                    <tr><td><code>C</code></td><td>Mở/đóng chapter list</td></tr>
+                    <tr><td><code>S</code></td><td>Mở/đóng settings</td></tr>
+                    <tr><td><code>T</code></td><td>Đổi theme (cycle)</td></tr>
+                    <tr><td><code>+</code> / <code>-</code></td><td>Tăng/giảm font size</td></tr>
+                    <tr><td><code>Home</code></td><td>Về đầu chương</td></tr>
+                    <tr><td><code>End</code></td><td>Về cuối chương</td></tr>
+                    <tr><td><code>Escape</code></td><td>Thoát fullscreen / đóng panel</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="section-card">
+            <h4>👆 Cử chỉ Mobile (Touch)</h4>
+            <table>
+                <thead><tr><th>Cử chỉ</th><th>Hành vi</th></tr></thead>
+                <tbody>
+                    <tr><td>Swipe trái</td><td>Chương sau</td></tr>
+                    <tr><td>Swipe phải</td><td>Chương trước</td></tr>
+                    <tr><td>Tap giữa màn hình</td><td>Hiện/ẩn toolbar</td></tr>
+                    <tr><td>Tap cạnh trái</td><td>Chương trước</td></tr>
+                    <tr><td>Tap cạnh phải</td><td>Chương sau</td></tr>
+                    <tr><td>Pinch zoom</td><td>Zoom ảnh (comic)</td></tr>
+                    <tr><td>Double-tap</td><td>Zoom 2x / Reset zoom</td></tr>
+                    <tr><td>Long press text</td><td>Highlight / Copy</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 10. DATA FLOW -->
+    <h2 id="data-flow">10. Data Flow (API ↔ Client)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DATA FLOW: Client ↔ API ↔ Database                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ① User mở /read/{bookId}
+     │
+     ├──▶ GET /api/Publications/{bookId}
+     │    → { title, formatType, ... }
+     │
+     ├──▶ GET /api/comic-chapters?publicationId={bookId}   (if comic)
+     │    → [{ id, title, chapterNumber, orderIndex }]
+     │    HOẶC
+     ├──▶ GET /api/text-chapters?publicationId={bookId}    (if text)
+     │    → [{ id, title, chapterNumber, content }]
+     │
+  ② User click chương / auto-load chương đầu
+     │
+     ├──▶ GET /api/reading/chapter/{chapterId}
+     │    → Comic: { imageUrls: ["url1", "url2", ...] }
+     │    → Text:  { content: "HTML string..." }
+     │    → Locked: { isLocked: true, unlockPrice: 5 }
+     │
+  ③ Tracking (gửi ngầm)
+     │
+     ├──▶ POST /api/engagement/history
+     │    → { publicationId, chapterId, chapterType }
+     │
+     ├──▶ POST /api/Publications/{bookId}/view
+     │    → increment view count
+     │
+  ④ User bookmark
+     │
+     ├──▶ POST /api/bookmarks/toggle
+     │    → { chapterId, chapterType }
+     │    ← { message: "Added bookmark" | "Removed bookmark" }
+     │
+  ⑤ User mua chương VIP
+     │
+     ├──▶ POST /api/reading/purchase/{chapterId}
+     │    ← { success: true } → reload content
+     │    ← { success: false } → redirect /wallet
+     │
+  ⑥ Lưu tiến độ (auto, mỗi 30 giây)
+     │
+     └──▶ POST /api/reading/progress
+          → { chapterId, scrollPercent, lastPosition }
+    </div>
+
+    <div class="note">
+        <strong>💡 Tóm tắt:</strong> ReadingPage.tsx là controller chính — phân loại nội dung (comic/text), quản lý chapters navigation, gọi API, và render đúng component con. Tất cả controls (bookmark, mode toggle, chapter nav) đều nằm ở page level và truyền xuống components qua props.
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Luồng Đọc Truyện — Xóm Truyện Web Client<br>
+        Đã implement: Cơ bản (load ảnh/text, chuyển chương, bookmark)<br>
+        Cần bổ sung: Settings panel, keyboard shortcuts, progressive loading, offline cache<br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>

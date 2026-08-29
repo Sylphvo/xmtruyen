@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xmtruyen Admin — Infinite Scroll / Load More cho toàn bộ trang quản trị</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-new { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-plan { background: rgba(168,85,247,0.15); color: #a78bfa; border: 1px solid #a78bfa; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.85em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .affected-page { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); padding: 4px 10px; border-radius: 6px; margin: 3px; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>♾️ Infinite Scroll / Load More — Toàn Trang Admin</h1>
+    <p class="subtitle">
+        <span class="badge badge-new">Tính Năng Mới</span>
+        <span class="badge badge-plan">Chưa Triển Khai</span>
+        Thay thế pagination truyền thống bằng cơ chế cuộn tải thêm kiểu Jira — tất cả bảng dữ liệu trong Admin Portal
+    </p>
+
+    <!-- MỤC LỤC -->
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#overview">1. Tổng Quan & Lý Do Chuyển Đổi</a>
+        <a href="#affected">2. Danh Sách Trang Bị Ảnh Hưởng</a>
+        <a href="#architecture">3. Kiến Trúc Kỹ Thuật</a>
+        <a href="#hook">4. Custom Hook: useInfiniteScroll</a>
+        <a href="#integration">5. Tích Hợp Vào Bảng Hiện Tại (Books mẫu)</a>
+        <a href="#ui">6. UI Components (Loading More + Footer Counter)</a>
+        <a href="#css">7. CSS Styles</a>
+        <a href="#migration">8. Hướng Dẫn Migration Từng Trang</a>
+        <a href="#edge-cases">9. Xử Lý Edge Cases</a>
+        <a href="#backend">10. Backend API — Không Cần Thay Đổi</a>
+    </div>
+
+    <!-- 1. TỔNG QUAN -->
+    <h2 id="overview">1. Tổng Quan & Lý Do Chuyển Đổi</h2>
+
+    <h3>1.1 Vấn đề hiện tại</h3>
+    <div class="section-card">
+        <ul>
+            <li>Tất cả bảng admin đang dùng <strong>pagination truyền thống</strong> (page 1, 2, 3... với 10-20 dòng/trang)</li>
+            <li>Khi có 500+ bản ghi, người dùng phải click qua nhiều trang để xem hết</li>
+            <li>Mất context khi chuyển trang — không nhìn được dòng trước đó</li>
+            <li>Mỗi lần chuyển trang → re-render toàn bộ bảng → giật</li>
+        </ul>
+    </div>
+
+    <h3>1.2 Giải pháp: Infinite Scroll (kiểu Jira)</h3>
+    <div class="section-card">
+        <ul>
+            <li>Load 50 dòng đầu tiên → user cuộn xuống → tự động load thêm 50 dòng tiếp</li>
+            <li>Hiển thị tooltip <strong>"⟳ Loading more"</strong> ở cuối bảng khi đang fetch</li>
+            <li>Footer hiển thị <strong>"50 of 149"</strong> — biết đang ở đâu trong tổng số</li>
+            <li>Giữ nguyên tất cả tính năng: inline edit, sort, search, bulk select, upload</li>
+            <li><strong>API backend không thay đổi gì</strong> — vẫn dùng ?page=X&pageSize=Y</li>
+        </ul>
+    </div>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   SO SÁNH: PAGINATION vs INFINITE SCROLL                     │
+├─────────────────────────────────────┬───────────────────────────────────────┤
+│         HIỆN TẠI (Pagination)       │        MỚI (Infinite Scroll)          │
+├─────────────────────────────────────┼───────────────────────────────────────┤
+│  [1] [2] [3] ... [15]  ← click     │  Cuộn xuống → tự động load thêm      │
+│  Hiện 10 dòng / trang              │  Hiện 50 dòng → append 50 → append...│
+│  Mất context khi chuyển trang      │  Giữ toàn bộ context đã xem          │
+│  Footer: "1 of 15"                 │  Footer: "50 of 149 ⟳"               │
+│  Re-render mỗi lần chuyển trang    │  Chỉ append thêm rows mới            │
+└─────────────────────────────────────┴───────────────────────────────────────┘
+    </div>
+
+    <!-- 2. DANH SÁCH TRANG -->
+    <h2 id="affected">2. Danh Sách Trang Bị Ảnh Hưởng</h2>
+
+    <p>Tất cả các trang trong admin sử dụng bảng dữ liệu với pagination sẽ được chuyển sang infinite scroll:</p>
+
+    <div style="margin: 20px 0;">
+        <span class="affected-page">📚 Books.tsx</span>
+        <span class="affected-page">📂 Categories.tsx</span>
+        <span class="affected-page">🏷️ Topics.tsx</span>
+        <span class="affected-page">👥 Users.tsx</span>
+        <span class="affected-page">📁 BookFiles.tsx</span>
+        <span class="affected-page">📖 BookChapters.tsx</span>
+        <span class="affected-page">💳 Transactions.tsx</span>
+        <span class="affected-page">🔔 Notifications.tsx</span>
+        <span class="affected-page">⭐ Reviews.tsx</span>
+        <span class="affected-page">🎯 Promotions.tsx</span>
+        <span class="affected-page">💰 CoinPackages.tsx</span>
+        <span class="affected-page">📊 SubscriptionPlans.tsx</span>
+        <span class="affected-page">🕷️ Crawlers.tsx</span>
+        <span class="affected-page">🗄️ Database.tsx</span>
+        <span class="affected-page">🗄️ DatabaseTableViewer.tsx</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Trang</th>
+                <th>API Endpoint</th>
+                <th>pageSize hiện tại</th>
+                <th>pageSize mới</th>
+                <th>Độ phức tạp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Books.tsx</td><td>/Publications</td><td>10</td><td>50</td><td>Cao (inline edit, upload, bulk)</td></tr>
+            <tr><td>Users.tsx</td><td>/admin/users</td><td>10</td><td>50</td><td>Cao (inline edit, status, bulk)</td></tr>
+            <tr><td>Categories.tsx</td><td>/admin/categories</td><td>10</td><td>50</td><td>Trung bình</td></tr>
+            <tr><td>Topics.tsx</td><td>/admin/topics</td><td>10</td><td>50</td><td>Trung bình</td></tr>
+            <tr><td>BookFiles.tsx</td><td>/Publications/{id}/files</td><td>10</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>Transactions.tsx</td><td>/admin/transactions</td><td>20</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>Reviews.tsx</td><td>/admin/reviews</td><td>20</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>Notifications.tsx</td><td>/admin/notifications</td><td>20</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>CoinPackages.tsx</td><td>/admin/coin-packages</td><td>10</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>Crawlers.tsx</td><td>/admin/crawlers</td><td>10</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>Database.tsx</td><td>/ManagerDB/tables</td><td>10</td><td>50</td><td>Thấp</td></tr>
+            <tr><td>DatabaseTableViewer.tsx</td><td>/ManagerDB/{table}</td><td>100</td><td>100</td><td>Thấp</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 3. KIẾN TRÚC -->
+    <h2 id="architecture">3. Kiến Trúc Kỹ Thuật</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   KIẾN TRÚC INFINITE SCROLL                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌────────────────────────────────────────────────────────────────┐
+  │  useInfiniteScroll&lt;T&gt; (Custom Hook - tái sử dụng)             │
+  │                                                                │
+  │  Input:  fetchFn(page, pageSize) → { data, totalCount }       │
+  │          pageSize (default 50)                                 │
+  │          keyword (search debounced)                            │
+  │                                                                │
+  │  Output: items[]           ← mảng tích lũy (append mỗi page) │
+  │          totalCount        ← tổng số từ backend               │
+  │          isLoading         ← lần đầu load                     │
+  │          isLoadingMore     ← đang fetch page tiếp             │
+  │          hasMore           ← còn dữ liệu chưa load?          │
+  │          loadedCount       ← items.length hiện tại            │
+  │          sentinelRef       ← ref gắn vào div cuối bảng        │
+  │          reset()           ← reload từ đầu                    │
+  │          refresh()         ← reload trang hiện tại            │
+  └──────────────────────────────┬─────────────────────────────────┘
+                                 │
+              ┌──────────────────┼───────────────────┐
+              │                  │                   │
+    ┌─────────▼──────┐  ┌───────▼──────┐  ┌────────▼───────┐
+    │ Books.tsx      │  │ Users.tsx    │  │ Categories.tsx │  ...
+    │                │  │              │  │                │
+    │ Thay thế:      │  │ Thay thế:    │  │ Thay thế:      │
+    │ - currentPage  │  │ - currentPage│  │ - currentPage  │
+    │ - itemsPerPage │  │ - itemsPerPage│ │ - itemsPerPage │
+    │ - totalPages   │  │ - totalPages │  │ - totalPages   │
+    │ + sentinelRef  │  │ + sentinelRef│  │ + sentinelRef  │
+    └────────────────┘  └──────────────┘  └────────────────┘
+              │                  │                   │
+              └──────────────────┼───────────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │  IntersectionObserver   │
+                    │  (Browser Native API)   │
+                    │                         │
+                    │  Quan sát sentinel div  │
+                    │  Khi vào viewport →     │
+                    │  gọi fetchMore()        │
+                    └─────────────────────────┘
+    </div>
+
+    <!-- 4. CUSTOM HOOK -->
+    <h2 id="hook">4. Custom Hook: useInfiniteScroll</h2>
+
+    <div class="code-title">📁 xmtruyen-admin/src/hooks/useInfiniteScroll.ts</div>
+    <pre><code>import { useState, useCallback, useRef, useEffect } from 'react';
+import type { PaginatedResponse } from '../api/userApi';
+
+// ============================================================
+// useInfiniteScroll — Hook tái sử dụng cho toàn bộ bảng Admin
+// ============================================================
+
+interface UseInfiniteScrollOptions&lt;T, P = any&gt; {
+    /** Hàm fetch dữ liệu — trả về { data, totalCount, page, pageSize } */
+    fetchFn: (params: P & { page: number; pageSize: number }) => Promise&lt;PaginatedResponse&lt;T&gt;&gt;;
+    /** Số dòng mỗi lần load (default: 50) */
+    pageSize?: number;
+    /** Các params filter/search — khi thay đổi sẽ reset về trang 1 */
+    params?: P;
+    /** Có tự động load lần đầu không (default: true) */
+    autoLoad?: boolean;
+}
+
+interface UseInfiniteScrollReturn&lt;T&gt; {
+    /** Mảng tích lũy toàn bộ items đã load */
+    items: T[];
+    /** Tổng số bản ghi từ backend */
+    totalCount: number;
+    /** Đang load lần đầu */
+    isLoading: boolean;
+    /** Đang load thêm (page 2, 3...) */
+    isLoadingMore: boolean;
+    /** Còn dữ liệu để load thêm không */
+    hasMore: boolean;
+    /** Số items đã load */
+    loadedCount: number;
+    /** Ref gắn vào sentinel element (div cuối bảng) */
+    sentinelRef: React.RefObject&lt;HTMLDivElement | null&gt;;
+    /** Reset về trang 1 (khi filter/search thay đổi) */
+    reset: () => void;
+    /** Reload toàn bộ dữ liệu đã load (giữ nguyên vị trí) */
+    refresh: () => void;
+    /** Cập nhật 1 item trong mảng (inline edit) */
+    updateItem: (id: string, updater: (item: T) => T) => void;
+    /** Xóa 1 item khỏi mảng (optimistic delete) */
+    removeItem: (id: string) => void;
+    /** Thêm 1 item vào đầu mảng (sau khi tạo mới) */
+    prependItem: (item: T) => void;
+}
+
+export function useInfiniteScroll&lt;T extends { id: string }, P = any&gt;({
+    fetchFn,
+    pageSize = 50,
+    params,
+    autoLoad = true,
+}: UseInfiniteScrollOptions&lt;T, P&gt;): UseInfiniteScrollReturn&lt;T&gt; {
+    const [items, setItems] = useState&lt;T[]&gt;([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0); // 0 = chưa load gì
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+    const sentinelRef = useRef&lt;HTMLDivElement | null&gt;(null);
+    const observerRef = useRef&lt;IntersectionObserver | null&gt;(null);
+    const isFetchingRef = useRef(false); // Tránh race condition
+
+    const hasMore = items.length &lt; totalCount;
+
+    // ─── Fetch page tiếp theo ───
+    const fetchNextPage = useCallback(async (isInitial = false) => {
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
+
+        const nextPage = isInitial ? 1 : currentPage + 1;
+
+        if (isInitial) {
+            setIsLoading(true);
+        } else {
+            setIsLoadingMore(true);
+        }
+
+        try {
+            const res = await fetchFn({
+                ...params as any,
+                page: nextPage,
+                pageSize
+            });
+
+            if (isInitial) {
+                setItems(res.data);
+            } else {
+                setItems(prev => [...prev, ...res.data]);
+            }
+            setTotalCount(res.totalCount);
+            setCurrentPage(nextPage);
+        } catch (err) {
+            console.error('[useInfiniteScroll] Fetch error:', err);
+        } finally {
+            setIsLoading(false);
+            setIsLoadingMore(false);
+            isFetchingRef.current = false;
+        }
+    }, [fetchFn, params, currentPage, pageSize]);
+
+    // ─── Load lần đầu ───
+    useEffect(() => {
+        if (autoLoad) {
+            fetchNextPage(true);
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // ─── Reset khi params thay đổi (search, filter) ───
+    const paramsRef = useRef(params);
+    useEffect(() => {
+        // So sánh shallow
+        if (JSON.stringify(paramsRef.current) !== JSON.stringify(params)) {
+            paramsRef.current = params;
+            setItems([]);
+            setCurrentPage(0);
+            setTotalCount(0);
+            // Debounce để tránh fetch liên tục khi user đang gõ
+            const timer = setTimeout(() => {
+                fetchNextPage(true);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // ─── Intersection Observer — phát hiện sentinel vào viewport ───
+    useEffect(() => {
+        if (observerRef.current) {
+            observerRef.current.disconnect();
+        }
+
+        observerRef.current = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting && hasMore && !isFetchingRef.current) {
+                    fetchNextPage(false);
+                }
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '200px' // Bắt đầu fetch trước khi user cuộn tới sentinel 200px
+            }
+        );
+
+        if (sentinelRef.current) {
+            observerRef.current.observe(sentinelRef.current);
+        }
+
+        return () => observerRef.current?.disconnect();
+    }, [hasMore, fetchNextPage]);
+
+    // ─── Public methods ───
+    const reset = useCallback(() => {
+        setItems([]);
+        setCurrentPage(0);
+        setTotalCount(0);
+        setTimeout(() => fetchNextPage(true), 0);
+    }, [fetchNextPage]);
+
+    const refresh = useCallback(async () => {
+        // Reload tất cả pages đã load (giữ scroll position)
+        isFetchingRef.current = true;
+        setIsLoading(true);
+        try {
+            const totalPages = currentPage;
+            const allItems: T[] = [];
+            for (let p = 1; p &lt;= totalPages; p++) {
+                const res = await fetchFn({ ...params as any, page: p, pageSize });
+                allItems.push(...res.data);
+                setTotalCount(res.totalCount);
+            }
+            setItems(allItems);
+        } catch (err) {
+            console.error('[useInfiniteScroll] Refresh error:', err);
+        } finally {
+            setIsLoading(false);
+            isFetchingRef.current = false;
+        }
+    }, [fetchFn, params, currentPage, pageSize]);
+
+    const updateItem = useCallback((id: string, updater: (item: T) => T) => {
+        setItems(prev => prev.map(item => item.id === id ? updater(item) : item));
+    }, []);
+
+    const removeItem = useCallback((id: string) => {
+        setItems(prev => prev.filter(item => item.id !== id));
+        setTotalCount(prev => prev - 1);
+    }, []);
+
+    const prependItem = useCallback((item: T) => {
+        setItems(prev => [item, ...prev]);
+        setTotalCount(prev => prev + 1);
+    }, []);
+
+    return {
+        items,
+        totalCount,
+        isLoading,
+        isLoadingMore,
+        hasMore,
+        loadedCount: items.length,
+        sentinelRef,
+        reset,
+        refresh,
+        updateItem,
+        removeItem,
+        prependItem,
+    };
+}</code></pre>
+
+    <!-- 5. TÍCH HỢP VÀO BẢNG -->
+    <h2 id="integration">5. Tích Hợp Vào Bảng Hiện Tại (Books.tsx — Ví dụ mẫu)</h2>
+
+    <h3>5.1 Thay đổi cần làm</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Xóa bỏ (code cũ)</th>
+                <th>Thay bằng (code mới)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>const [currentPage, setCurrentPage] = useState(1)</code></td>
+                <td rowspan="4"><code>const { items, totalCount, isLoadingMore, hasMore, sentinelRef, loadedCount, reset, refresh, updateItem, removeItem, prependItem } = useInfiniteScroll({...})</code></td>
+            </tr>
+            <tr><td><code>const [itemsPerPage, setItemsPerPage] = useState(10)</code></td></tr>
+            <tr><td><code>const totalPages = Math.ceil(...)</code></td></tr>
+            <tr><td><code>useEffect fetchBooks (page, pageSize)</code></td></tr>
+            <tr>
+                <td>Pagination controls (Select dòng/trang, "1 of 15")</td>
+                <td>Footer counter: "50 of 149 ⟳"</td>
+            </tr>
+            <tr>
+                <td><code>setData(res.data)</code> (replace)</td>
+                <td>Hook tự append — không cần setData</td>
+            </tr>
+            <tr>
+                <td><code>setRefreshTrigger(prev => prev + 1)</code></td>
+                <td><code>refresh()</code> hoặc <code>reset()</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>5.2 Code sau khi migrate (Books.tsx)</h3>
+    <div class="code-title">📁 xmtruyen-admin/src/pages/Books.tsx — Phần thay đổi chính</div>
+    <pre><code>import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { getBooks } from '../api/bookApi';
+import type { IBook } from '../types/book';
+
+export const Books: React.FC&lt;{ formatType?: number }&gt; = ({ formatType: _formatType }) => {
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // ═══════════════════════════════════════════════
+    // THAY THẾ: currentPage, itemsPerPage, useEffect fetchBooks
+    // BẰNG: useInfiniteScroll hook
+    // ═══════════════════════════════════════════════
+    const {
+        items: data,          // thay thế: const [data, setData]
+        totalCount,           // thay thế: totalItems
+        isLoading,            // giữ nguyên tên
+        isLoadingMore,        // MỚI: đang load thêm
+        hasMore,              // MỚI: còn dữ liệu?
+        loadedCount,          // MỚI: số dòng đã load
+        sentinelRef,          // MỚI: ref cho sentinel div
+        reset,                // thay thế: setRefreshTrigger khi search thay đổi
+        refresh,              // thay thế: setRefreshTrigger khi CRUD
+        updateItem,           // MỚI: optimistic update inline edit
+        removeItem,           // MỚI: optimistic delete
+        prependItem,          // MỚI: thêm vào đầu sau create
+    } = useInfiniteScroll&lt;IBook&gt;({
+        fetchFn: (params) => getBooks({
+            page: params.page,
+            pageSize: params.pageSize,
+            keyword: searchTerm || undefined,
+            formatType: _formatType
+        }),
+        pageSize: 50,
+        params: { keyword: searchTerm, formatType: _formatType }
+    });
+
+    // ═══════════════════════════════════════════════
+    // INLINE EDIT — Dùng updateItem thay vì setRefreshTrigger
+    // ═══════════════════════════════════════════════
+    const handleSaveEdit = async (id: string) => {
+        try {
+            await updateBook(id, editBookData as SaveBookRequest);
+            // Optimistic update — cập nhật ngay trong mảng, không cần re-fetch
+            updateItem(id, (book) => ({ ...book, ...editBookData }));
+            setEditingBookId(null);
+            toast.success('Cập nhật thành công');
+        } catch (error) {
+            toast.error('Không thể cập nhật');
+        }
+    };
+
+    // ═══════════════════════════════════════════════
+    // DELETE — Dùng removeItem (optimistic)
+    // ═══════════════════════════════════════════════
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('Bạn có chắc?')) return;
+        try {
+            await deleteBook(id);
+            removeItem(id); // Xóa khỏi mảng ngay lập tức
+            toast.success('Đã xóa');
+        } catch (err) {
+            toast.error('Lỗi xóa');
+        }
+    };
+
+    // ═══════════════════════════════════════════════
+    // CREATE — Dùng prependItem (thêm vào đầu)
+    // ═══════════════════════════════════════════════
+    const handleAddSubmit = async () => {
+        try {
+            const newBook = await createBook(request);
+            prependItem(newBook); // Hiển thị ngay đầu bảng
+            setIsAddingNew(false);
+            toast.success('Thêm thành công');
+        } catch (err) {
+            toast.error('Lỗi thêm');
+        }
+    };
+
+    // ═══════════════════════════════════════════════
+    // SORT — Chỉ sort client-side trên items đã load
+    // ═══════════════════════════════════════════════
+    const sortedData = useMemo(() => {
+        if (!sortConfig.key || !sortConfig.direction) return data;
+        return [...data].sort((a, b) => {
+            const aVal = a[sortConfig.key!];
+            const bVal = b[sortConfig.key!];
+            if (aVal &lt; bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [data, sortConfig]);
+
+    return (
+        &lt;&gt;
+            &lt;div className="jira-table-container"&gt;
+                {/* Header — BỎ dropdown "dòng/trang", giữ search */}
+                &lt;div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--jira-border)' }}&gt;
+                    &lt;div /&gt;
+                    &lt;div style={{ width: '250px' }}&gt;
+                        &lt;Form.Control size="sm" type="text" placeholder="Tìm kiếm..."
+                            className="bg-transparent text-body border-secondary-subtle"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        /&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+
+                {/* Table */}
+                &lt;div className="table-responsive jira-scroll"
+                     style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto' }}&gt;
+                    &lt;table className="table align-middle mb-0" style={{ tableLayout: 'fixed', minWidth: '1450px' }}&gt;
+                        &lt;thead className="jira-table-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}&gt;
+                            {/* ... giữ nguyên thead ... */}
+                        &lt;/thead&gt;
+                        &lt;tbody&gt;
+                            {/* Loading ban đầu */}
+                            {isLoading ? (
+                                &lt;tr&gt;&lt;td colSpan={11} className="text-center py-4"&gt;Đang tải...&lt;/td&gt;&lt;/tr&gt;
+                            ) : sortedData.length &gt; 0 ? (
+                                sortedData.map(book =&gt; (
+                                    &lt;tr key={book.id} className="jira-table-row"&gt;
+                                        {/* ... giữ nguyên render cells ... */}
+                                    &lt;/tr&gt;
+                                ))
+                            ) : (
+                                &lt;tr&gt;&lt;td colSpan={11}&gt;Không có dữ liệu&lt;/td&gt;&lt;/tr&gt;
+                            )}
+
+                            {/* ═══ LOADING MORE ROW (Jira-style) ═══ */}
+                            {isLoadingMore && (
+                                &lt;tr className="loading-more-row"&gt;
+                                    &lt;td colSpan={11} style={{ border: 0, padding: '12px 0', background: 'transparent' }}&gt;
+                                        &lt;div className="loading-more-indicator"&gt;
+                                            &lt;div className="loading-more-tooltip"&gt;
+                                                &lt;span className="loading-spinner"&gt;&amp;#x27F3;&lt;/span&gt;
+                                                Loading more
+                                            &lt;/div&gt;
+                                        &lt;/div&gt;
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            )}
+                        &lt;/tbody&gt;
+                    &lt;/table&gt;
+
+                    {/* ═══ SENTINEL ELEMENT — Trigger load more khi cuộn tới ═══ */}
+                    {hasMore && &lt;div ref={sentinelRef} className="scroll-sentinel" /&gt;}
+                &lt;/div&gt;
+
+                {/* ═══ FOOTER — "50 of 149" style Jira ═══ */}
+                &lt;div className="jira-table-footer" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', padding: '10px 16px' }}&gt;
+                    &lt;div className="d-flex align-items-center"&gt;
+                        &lt;button className="btn-create" onClick={() =&gt; setIsAddingNew(true)}
+                            style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', fontWeight: 500, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', padding: 0 }}&gt;
+                            &lt;FontAwesomeIcon icon={faPlus} /&gt; Create
+                        &lt;/button&gt;
+                    &lt;/div&gt;
+                    &lt;div className="d-flex align-items-center gap-2" style={{ color: 'var(--jira-text-muted)', fontSize: '12px' }}&gt;
+                        &lt;span&gt;{loadedCount} of {totalCount}&lt;/span&gt;
+                        &lt;button className="icon-btn" onClick={refresh} title="Refresh"
+                            style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', cursor: 'pointer' }}&gt;
+                            &lt;FontAwesomeIcon icon={faSyncAlt} style={{ fontSize: '12px' }} /&gt;
+                        &lt;/button&gt;
+                    &lt;/div&gt;
+                    &lt;div /&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/&gt;
+    );
+}</code></pre>
+
+    <!-- 6. UI COMPONENTS -->
+    <h2 id="ui">6. UI Components (Loading More + Footer Counter)</h2>
+
+    <h3>6.1 LoadingMoreIndicator Component</h3>
+    <div class="code-title">📁 xmtruyen-admin/src/components/LoadingMoreIndicator.tsx</div>
+    <pre><code>import React from 'react';
+
+interface Props {
+    isVisible: boolean;
+    colSpan?: number;
+}
+
+/**
+ * Hiển thị tooltip "Loading more" ở cuối bảng khi đang fetch thêm dữ liệu.
+ * Style giống Jira — tooltip nổi giữa dòng cuối.
+ */
+export const LoadingMoreIndicator: React.FC&lt;Props&gt; = ({ isVisible, colSpan = 11 }) => {
+    if (!isVisible) return null;
+
+    return (
+        &lt;tr className="loading-more-row"&gt;
+            &lt;td colSpan={colSpan} style={{ border: 0, padding: '12px 0', background: 'transparent' }}&gt;
+                &lt;div className="loading-more-indicator"&gt;
+                    &lt;div className="loading-more-tooltip"&gt;
+                        &lt;span className="loading-spinner"&gt;⟳&lt;/span&gt;
+                        Loading more
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    );
+};</code></pre>
+
+    <h3>6.2 InfiniteScrollFooter Component</h3>
+    <div class="code-title">📁 xmtruyen-admin/src/components/InfiniteScrollFooter.tsx</div>
+    <pre><code>import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+
+interface Props {
+    loadedCount: number;
+    totalCount: number;
+    onRefresh: () => void;
+    onCreateClick?: () => void;
+    showCreate?: boolean;
+}
+
+/**
+ * Footer hiển thị "50 of 149" + nút Refresh + nút Create
+ * Thay thế hoàn toàn pagination controls cũ.
+ */
+export const InfiniteScrollFooter: React.FC&lt;Props&gt; = ({
+    loadedCount,
+    totalCount,
+    onRefresh,
+    onCreateClick,
+    showCreate = true
+}) => {
+    return (
+        &lt;div className="jira-table-footer"
+             style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', padding: '10px 16px', borderTop: 'none' }}&gt;
+            &lt;div className="d-flex align-items-center"&gt;
+                {showCreate && onCreateClick && (
+                    &lt;button className="btn-create" onClick={onCreateClick}
+                        style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', fontWeight: 500, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', padding: 0, cursor: 'pointer' }}&gt;
+                        &lt;FontAwesomeIcon icon={faPlus} /&gt; Create
+                    &lt;/button&gt;
+                )}
+            &lt;/div&gt;
+            &lt;div className="d-flex align-items-center gap-2" style={{ color: 'var(--jira-text-muted)', fontSize: '12px' }}&gt;
+                &lt;span className="infinite-scroll-counter"&gt;
+                    {loadedCount} of {totalCount}
+                &lt;/span&gt;
+                &lt;button className="icon-btn" onClick={onRefresh} title="Refresh"
+                    style={{ background: 'none', border: 'none', color: 'var(--jira-text-muted)', cursor: 'pointer', padding: '2px' }}&gt;
+                    &lt;FontAwesomeIcon icon={faSyncAlt} style={{ fontSize: '12px' }} /&gt;
+                &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;div /&gt;
+        &lt;/div&gt;
+    );
+};</code></pre>
+
+    <!-- 7. CSS -->
+    <h2 id="css">7. CSS Styles</h2>
+
+    <div class="code-title">📁 xmtruyen-admin/src/assets/scss/_infinite-scroll.scss (file mới)</div>
+    <pre><code>// ═══════════════════════════════════════════════════════════
+// INFINITE SCROLL STYLES — Jira-style Load More
+// ═══════════════════════════════════════════════════════════
+
+// Loading More Tooltip
+.loading-more-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.loading-more-tooltip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--jira-tooltip-bg, #1d2125);
+    color: var(--jira-tooltip-text, #b6c2cf);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.31);
+    animation: loadMoreFadeIn 0.2s ease;
+    white-space: nowrap;
+}
+
+// Light theme override
+[data-theme="light"] .loading-more-tooltip,
+.light-mode .loading-more-tooltip {
+    background: #fff;
+    color: #44546f;
+    box-shadow: 0 4px 12px rgba(9, 30, 66, 0.15), 0 0 1px rgba(9, 30, 66, 0.31);
+}
+
+.loading-spinner {
+    display: inline-block;
+    animation: spinLoader 1s linear infinite;
+    font-size: 14px;
+    line-height: 1;
+}
+
+// Sentinel Element (invisible trigger)
+.scroll-sentinel {
+    height: 1px;
+    width: 100%;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+// Footer Counter
+.infinite-scroll-counter {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 12px;
+    letter-spacing: -0.2px;
+}
+
+// Loading More Row — no hover effect
+.loading-more-row {
+    &:hover {
+        background: transparent !important;
+    }
+    td {
+        background: transparent !important;
+    }
+}
+
+// Animations
+@keyframes loadMoreFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spinLoader {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+// Scroll container — đảm bảo chiều cao đầy đủ
+.jira-scroll {
+    // Thay max-height cố định bằng calc viewport
+    max-height: calc(100vh - 180px) !important;
+    overflow-y: auto;
+
+    // Smooth scroll behavior
+    scroll-behavior: smooth;
+
+    // Scrollbar styling
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.3);
+        border-radius: 4px;
+        &:hover {
+            background: rgba(128, 128, 128, 0.5);
+        }
+    }
+}</code></pre>
+
+    <div class="code-title">📁 xmtruyen-admin/src/assets/scss/app.scss (thêm import)</div>
+    <pre><code>// ... existing imports ...
+@import '_infinite-scroll';</code></pre>
+
+    <!-- 8. MIGRATION GUIDE -->
+    <h2 id="migration">8. Hướng Dẫn Migration Từng Trang</h2>
+
+    <h3>8.1 Checklist cho mỗi trang (5 bước)</h3>
+    <div class="section-card">
+        <ol>
+            <li><strong>Import hook:</strong> <code>import { useInfiniteScroll } from '../hooks/useInfiniteScroll';</code></li>
+            <li><strong>Xóa state cũ:</strong> Xóa <code>currentPage</code>, <code>itemsPerPage</code>, <code>totalPages</code>, <code>refreshTrigger</code> và useEffect fetch</li>
+            <li><strong>Thêm hook:</strong> Gọi <code>useInfiniteScroll</code> với <code>fetchFn</code> tương ứng</li>
+            <li><strong>Thêm sentinel:</strong> Đặt <code>&lt;div ref={sentinelRef} className="scroll-sentinel" /&gt;</code> ngay sau <code>&lt;/table&gt;</code></li>
+            <li><strong>Thay footer:</strong> Dùng <code>&lt;InfiniteScrollFooter /&gt;</code> thay pagination controls</li>
+        </ol>
+    </div>
+
+    <h3>8.2 Ví dụ: Categories.tsx (trang đơn giản)</h3>
+    <div class="code-title">📁 Trước (pagination)</div>
+    <pre><code>// XÓA những dòng này:
+const [itemsPerPage, setItemsPerPage] = useState(10);
+const [currentPage, setCurrentPage] = useState(1);
+const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+useEffect(() => {
+    const fetch = async () => {
+        const res = await getCategories({ page: currentPage, pageSize: itemsPerPage, searchKeyword });
+        setData(res.data);
+        setTotalItems(res.totalCount);
+    };
+    fetch();
+}, [currentPage, itemsPerPage, searchKeyword, refreshTrigger]);</code></pre>
+
+    <div class="code-title">📁 Sau (infinite scroll)</div>
+    <pre><code>// THAY BẰNG:
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { LoadingMoreIndicator } from '../components/LoadingMoreIndicator';
+import { InfiniteScrollFooter } from '../components/InfiniteScrollFooter';
+
+const {
+    items: data,
+    totalCount,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    loadedCount,
+    sentinelRef,
+    refresh,
+    removeItem,
+    prependItem,
+} = useInfiniteScroll&lt;ICategory&gt;({
+    fetchFn: (params) => getCategories({
+        page: params.page,
+        pageSize: params.pageSize,
+        searchKeyword: debouncedSearch
+    }),
+    pageSize: 50,
+    params: { searchKeyword: debouncedSearch }
+});
+
+// Trong JSX tbody:
+// ... rows ...
+&lt;LoadingMoreIndicator isVisible={isLoadingMore} colSpan={6} /&gt;
+
+// Sau &lt;/table&gt;:
+{hasMore && &lt;div ref={sentinelRef} className="scroll-sentinel" /&gt;}
+
+// Footer:
+&lt;InfiniteScrollFooter
+    loadedCount={loadedCount}
+    totalCount={totalCount}
+    onRefresh={refresh}
+    onCreateClick={() => setIsAddingNew(true)}
+/&gt;</code></pre>
+
+    <h3>8.3 Thứ tự migration (từ đơn giản → phức tạp)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Pha</th>
+                <th>Trang</th>
+                <th>Lý do</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Categories, Topics</td><td>Bảng đơn giản, ít tính năng → test hook trước</td></tr>
+            <tr><td>2</td><td>CoinPackages, Notifications, Promotions</td><td>Bảng trung bình, không có inline edit</td></tr>
+            <tr><td>3</td><td>Transactions, Reviews, Crawlers</td><td>Bảng có filter nhưng read-only</td></tr>
+            <tr><td>4</td><td>Users, Books</td><td>Bảng phức tạp — inline edit, upload, bulk actions</td></tr>
+            <tr><td>5</td><td>Database, DatabaseTableViewer</td><td>Bảng đặc biệt — dynamic columns</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 9. EDGE CASES -->
+    <h2 id="edge-cases">9. Xử Lý Edge Cases</h2>
+
+    <div class="grid-2">
+        <div class="section-card">
+            <h4>🔍 Search thay đổi</h4>
+            <p>Khi user gõ search → <code>params</code> thay đổi → hook tự động reset về page 1 (với debounce 300ms). Mảng items bị clear và load lại từ đầu.</p>
+        </div>
+        <div class="section-card">
+            <h4>✏️ Inline Edit</h4>
+            <p>Sau khi save → gọi <code>updateItem(id, updater)</code> để cập nhật ngay trong mảng. Không cần re-fetch toàn bộ → giữ scroll position.</p>
+        </div>
+        <div class="section-card">
+            <h4>🗑️ Delete</h4>
+            <p>Gọi <code>removeItem(id)</code> → xóa ngay khỏi mảng + giảm totalCount. Không bị "lỗ" trong danh sách. Nếu xóa nhiều (bulk) → gọi <code>refresh()</code> sau.</p>
+        </div>
+        <div class="section-card">
+            <h4>➕ Create New</h4>
+            <p>Gọi <code>prependItem(newItem)</code> → thêm vào đầu mảng + tăng totalCount. Item mới hiển thị ngay trên đầu bảng.</p>
+        </div>
+        <div class="section-card">
+            <h4>🔄 Sort</h4>
+            <p>Sort chỉ áp dụng client-side trên items đã load. Nếu muốn sort server-side → thêm sortBy vào params → hook tự reset.</p>
+        </div>
+        <div class="section-card">
+            <h4>📶 Mất mạng giữa chừng</h4>
+            <p>Nếu fetchMore thất bại → <code>isLoadingMore</code> trở về false, sentinel vẫn visible → user cuộn lại sẽ trigger retry tự động.</p>
+        </div>
+        <div class="section-card">
+            <h4>⚡ Race Condition</h4>
+            <p><code>isFetchingRef</code> đảm bảo chỉ 1 request đang chạy tại 1 thời điểm. Intersection Observer trigger nhiều lần cũng chỉ 1 fetch.</p>
+        </div>
+        <div class="section-card">
+            <h4>📱 Table Scroll Container</h4>
+            <p>Sentinel element đặt bên trong <code>.jira-scroll</code> div (container có overflow-y: auto). Observer dùng rootMargin "200px" → fetch trước khi user tới cuối.</p>
+        </div>
+    </div>
+
+    <!-- 10. BACKEND -->
+    <h2 id="backend">10. Backend API — Không Cần Thay Đổi</h2>
+
+    <div class="note">
+        <strong>💡 Điểm mạnh:</strong> Backend API giữ nguyên 100%. Tất cả endpoint đã hỗ trợ <code>?page=X&pageSize=Y</code> và trả về <code>{ data, totalCount, page, pageSize }</code>. Chỉ frontend thay đổi cách sử dụng response.
+    </div>
+
+    <h3>10.1 Response Format hiện tại (giữ nguyên)</h3>
+    <pre><code>// GET /api/Publications?page=2&pageSize=50&keyword=harry
+// Response:
+{
+    "data": [ /* 50 items */ ],
+    "totalCount": 149,
+    "page": 2,
+    "pageSize": 50
+}
+
+// TypeScript type (đã có sẵn):
+export interface PaginatedResponse&lt;T&gt; {
+    data: T[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+}</code></pre>
+
+    <h3>10.2 Khuyến nghị tối ưu backend (không bắt buộc)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Tối ưu</th>
+                <th>Mô tả</th>
+                <th>Ưu tiên</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cursor-based pagination</td>
+                <td>Thay ?page=X bằng ?cursor=lastId cho dataset lớn (>10k rows). Tránh OFFSET chậm.</td>
+                <td>Thấp (chỉ khi >10k)</td>
+            </tr>
+            <tr>
+                <td>Response caching</td>
+                <td>Thêm ETag / Last-Modified header để client skip re-fetch nếu data không đổi.</td>
+                <td>Trung bình</td>
+            </tr>
+            <tr>
+                <td>Giới hạn pageSize tối đa</td>
+                <td>Server reject nếu pageSize > 100 để tránh query quá nặng.</td>
+                <td>Cao (nên làm)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+
+    <h2>📋 Tóm Tắt File Cần Tạo / Sửa</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>File</th>
+                <th>Hành động</th>
+                <th>Mô tả</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><code>src/hooks/useInfiniteScroll.ts</code></td><td>🆕 Tạo mới</td><td>Custom hook reusable</td></tr>
+            <tr><td><code>src/components/LoadingMoreIndicator.tsx</code></td><td>🆕 Tạo mới</td><td>Component tooltip "Loading more"</td></tr>
+            <tr><td><code>src/components/InfiniteScrollFooter.tsx</code></td><td>🆕 Tạo mới</td><td>Component footer "50 of 149"</td></tr>
+            <tr><td><code>src/assets/scss/_infinite-scroll.scss</code></td><td>🆕 Tạo mới</td><td>CSS styles cho infinite scroll</td></tr>
+            <tr><td><code>src/assets/scss/app.scss</code></td><td>✏️ Sửa</td><td>Thêm @import '_infinite-scroll'</td></tr>
+            <tr><td><code>src/pages/Books.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Users.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Categories.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Topics.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Transactions.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Reviews.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Notifications.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/CoinPackages.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Crawlers.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/Database.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+            <tr><td><code>src/pages/BookFiles.tsx</code></td><td>✏️ Sửa</td><td>Migrate sang useInfiniteScroll</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn">
+        <strong>⚠️ Lưu ý quan trọng:</strong> Không migrate tất cả cùng lúc. Làm theo từng pha (mục 8.3) để dễ test và rollback nếu có bug. Hook <code>useInfiniteScroll</code> đã xử lý hết logic phức tạp — các trang chỉ cần "plug in".
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu đặc tả Infinite Scroll cho toàn Admin Portal — Xóm Truyện Workspace<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>

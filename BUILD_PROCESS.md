@@ -9,7 +9,7 @@ Each successful run uploads one artifact with this layout:
 ```text
 artifacts/
   web/       # xom-truyen/dist
-  admin/     # xomtruyen-admin/dist
+  admin/     # xmtruyen-admin/dist
   api/       # dotnet publish -c Release
   build-info.txt
 ```

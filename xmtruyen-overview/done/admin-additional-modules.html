@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xmtruyen Admin — Modules bổ sung & Luồng nghiệp vụ cần thêm</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 15px; overflow-x: auto; margin: 12px 0; font-size: 0.88em; }
+        code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; color: #7ee787; }
+        p { margin-bottom: 12px; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin-bottom: 6px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px;
+               font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+        .tag-critical { background: #ff4444; color: #fff; }
+        .tag-high { background: #ff9800; color: #fff; }
+        .tag-medium { background: #4caf50; color: #fff; }
+        .tag-low { background: #2196f3; color: #fff; }
+        .tag-new { background: #e040fb; color: #fff; }
+        .section-box { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 15px 0; }
+        .module-box { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                      padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #333; }
+        .api-block { background: #1a1a2e; padding: 15px; border-radius: 8px;
+                     margin: 10px 0; border-left: 3px solid #a78bfa; }
+        .flow-diagram { background: #0d1117; padding: 20px; border-radius: 8px;
+                        margin: 15px 0; text-align: left; font-family: monospace;
+                        color: #7ee787; line-height: 2; white-space: pre-wrap; }
+        hr { border: 1px solid #222; margin: 40px 0; }
+        .highlight { color: #ffd93d; }
+        .success { color: #7ee787; }
+        .warning { color: #ff6b6b; }
+        .info { color: #64b5f6; }
+        .note-box { background: #1a2e1a; border-left: 4px solid #7ee787; padding: 15px 20px;
+                    border-radius: 0 12px 12px 0; margin: 15px 0; }
+        .warn-box { background: #2e1a1a; border-left: 4px solid #ff6b6b; padding: 15px 20px;
+                    border-radius: 0 12px 12px 0; margin: 15px 0; }
+
+        @media (max-width: 768px) {
+            body { padding: 15px 10px; }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.2em; padding-left: 10px; }
+            h3 { font-size: 1em; }
+            table { font-size: 0.78em; display: block; overflow-x: auto; }
+            th, td { padding: 6px 8px; }
+            pre { font-size: 0.78em; padding: 10px; }
+            .flow-diagram { font-size: 0.72em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>🧩 Xmtruyen Admin — Modules bổ sung cần thêm</h1>
+<p class="subtitle">Phân tích sâu source code backend + client + mobile | Đề xuất 10 modules mới & luồng nghiệp vụ</p>
+
+<div class="note-box">
+    <h4 style="color:#7ee787; margin-top:0;">📌 Context</h4>
+    <p>Tài liệu trước (admin-panel-gap-analysis.html) đã liệt kê <strong>8 modules thiếu</strong> dựa trên DB tables hiện có. Tài liệu này phân tích sâu hơn — kiểm tra cả mobile app, client web, business logic, và đề xuất <strong>modules hoàn toàn mới</strong> mà hệ thống cần nhưng chưa có trong database schema.</p>
+</div>
+
+<div class="toc">
+    <h3 style="color:#fff; margin-bottom:10px;">📌 Mục lục</h3>
+    <a href="#summary">Tổng quan: 10 modules mới đề xuất</a>
+    <a href="#m1">Module 1: 🔔 Notifications / Thông báo & Tin tức</a>
+    <a href="#m2">Module 2: 🎫 Promotions / Khuyến mãi & Coupon</a>
+    <a href="#m3">Module 3: 🖼️ Banner & Homepage CMS</a>
+    <a href="#m4">Module 4: 👤 Author / Tác giả (entity riêng)</a>
+    <a href="#m5">Module 5: 💰 Coin Packages / Gói nạp xu</a>
+    <a href="#m6">Module 6: 🚨 Report / Báo cáo vi phạm</a>
+    <a href="#m7">Module 7: ⚙️ System Config / Cấu hình hệ thống</a>
+    <a href="#m8">Module 8: 📧 Email Templates / Mẫu email</a>
+    <a href="#m9">Module 9: 📊 Reading Analytics / Thống kê đọc</a>
+    <a href="#m10">Module 10: ❓ Help Center / Trung tâm hỗ trợ</a>
+    <a href="#flows">Luồng nghiệp vụ cần bổ sung</a>
+    <a href="#priority">Thứ tự ưu tiên tổng hợp</a>
+    <a href="#sidebar">Sidebar Admin đầy đủ sau khi hoàn thành</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="summary">📊 Tổng quan: 10 modules mới đề xuất</h2>
+
+<p>Sau khi phân tích source code:</p>
+<ul>
+    <li><strong>Backend (.NET 9):</strong> 18 entity models, business_logic.md, ReadingController</li>
+    <li><strong>Client Web (xom-truyen):</strong> Services gọi API, pages, hooks</li>
+    <li><strong>Mobile App (xmtruyen-app):</strong> 30+ pages, phần lớn dùng mock data</li>
+    <li><strong>SubscriptionPlan model:</strong> Có <code>IsUnlimited</code>, <code>MaxChaptersPerDay</code>, <code>RemoveAds</code> — phức tạp hơn schema gợi ý</li>
+</ul>
+
+<table>
+    <tr><th>#</th><th>Module mới</th><th>Lý do cần</th><th>Priority</th><th>Backend</th><th>Admin UI</th></tr>
+    <tr>
+        <td>1</td><td><strong>Notifications</strong></td>
+        <td>Mobile app có page Notifications (tabs Orders/News) nhưng 0% backend</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>2</td><td><strong>Promotions / Coupon</strong></td>
+        <td>Mobile có page Offers (50% OFF, coupon codes) nhưng 0% backend</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>3</td><td><strong>Banner & Homepage CMS</strong></td>
+        <td>Client web & mobile có banner/slider nhưng hardcoded. Admin cần quản lý content trang chủ</td>
+        <td><span class="tag tag-high">High</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>4</td><td><strong>Author (entity riêng)</strong></td>
+        <td>Mobile có AuthorsList + AuthorDetail. Hiện "author" chỉ là string field trên Publication</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>5</td><td><strong>Coin Packages</strong></td>
+        <td>Cần quản lý các gói nạp xu (10K=50xu, 20K=120xu...) — hiện chỉ nằm trong document</td>
+        <td><span class="tag tag-critical">Critical</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>6</td><td><strong>Report / Báo cáo vi phạm</strong></td>
+        <td>Platform có reviews/comments, cần cơ chế user report nội dung vi phạm</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>7</td><td><strong>System Config</strong></td>
+        <td>Nhiều business rules hardcoded (guest limit=10, daily limit). Cần admin config runtime</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>8</td><td><strong>Email Templates</strong></td>
+        <td>Auth flow gửi email (verify, reset password). Cần quản lý mẫu email</td>
+        <td><span class="tag tag-low">Low</span></td>
+        <td>Cần tạo</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>9</td><td><strong>Reading Analytics</strong></td>
+        <td>Business logic track DailyReadCount, ViewCount. Cần admin xem analytics chi tiết</td>
+        <td><span class="tag tag-medium">Medium</span></td>
+        <td>Cần endpoint mới</td><td>Cần tạo</td>
+    </tr>
+    <tr>
+        <td>10</td><td><strong>Help Center CMS</strong></td>
+        <td>Mobile app có HelpCenter page. Cần admin quản lý nội dung FAQ/help</td>
+        <td><span class="tag tag-low">Low</span></td>
+        <td>Cần tạo model + API</td><td>Cần tạo</td>
+    </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m1">🔔 Module 1: Notifications / Thông báo & Tin tức</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-high">High Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Mobile app (xmtruyen-app) có page <code>Notifications.tsx</code> với 2 tab "Orders" và "News". Client web Header có icon bell thông báo. Nhưng <strong>backend không có model/API nào cho notifications</strong>.</p>
+</div>
+
+<h3>Database Schema cần tạo</h3>
+<div class="api-block">
+<pre><code>-- Table: Notifications
+CREATE TABLE "Notifications" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "UserId" UUID REFERENCES "Users"("Id"),       -- NULL = broadcast to all
+    "Title" VARCHAR(200) NOT NULL,
+    "Message" TEXT NOT NULL,
+    "Type" VARCHAR(50) NOT NULL,                   -- 'system', 'chapter_update', 'payment', 'promotion'
+    "ReferenceId" UUID,                            -- Link to related entity (publicationId, transactionId...)
+    "ReferenceType" VARCHAR(50),                   -- 'publication', 'transaction', 'chapter'
+    "IsRead" BOOLEAN DEFAULT FALSE,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Index
+CREATE INDEX idx_notifications_user ON "Notifications"("UserId", "IsRead", "CreatedAt" DESC);</code></pre>
+</div>
+
+<h3>Backend Model</h3>
+<div class="api-block">
+<pre><code>// Models/Notification.cs
+public class Notification
+{
+    public Guid Id { get; set; }
+    public Guid? UserId { get; set; }              // null = broadcast
+    public User? User { get; set; }
+    public string Title { get; set; } = null!;
+    public string Message { get; set; } = null!;
+    public string Type { get; set; } = null!;      // system, chapter_update, payment, promotion
+    public Guid? ReferenceId { get; set; }
+    public string? ReferenceType { get; set; }
+    public bool IsRead { get; set; } = false;
+    public DateTime? CreatedAt { get; set; }
+}</code></pre>
+</div>
+
+<h3>API Endpoints</h3>
+<div class="api-block">
+<h4>Client (cho user)</h4>
+<pre><code>GET    /api/notifications?page=1&pageSize=20      [Authorize]
+       → List thông báo của user hiện tại (bao gồm broadcast)
+GET    /api/notifications/unread-count              [Authorize]
+       → { count: 5 }
+PATCH  /api/notifications/{id}/read                [Authorize]
+       → Mark 1 notification as read
+PATCH  /api/notifications/read-all                 [Authorize]
+       → Mark all as read</code></pre>
+</div>
+<div class="api-block">
+<h4>Admin</h4>
+<pre><code>GET    /api/admin/notifications?type=&page=1       [Admin]
+       → List tất cả notifications đã gửi
+POST   /api/admin/notifications                    [Admin]
+       Body: { title, message, type, targetUserId (optional), targetAll: true }
+       → Tạo notification (gửi cho 1 user hoặc broadcast all)
+POST   /api/admin/notifications/broadcast          [Admin]
+       Body: { title, message, type }
+       → Gửi cho tất cả users
+DELETE /api/admin/notifications/{id}               [Admin]</code></pre>
+</div>
+
+<h3>Admin UI — Trang <code>/notifications</code></h3>
+<div class="section-box">
+    <ul>
+        <li>Tab 1: "Đã gửi" — List notifications đã tạo (filter by type)</li>
+        <li>Tab 2: "Tạo mới" — Form: Title, Message, Type (dropdown), Target (All users / Specific user)</li>
+        <li>Auto-trigger: Khi có chương mới → tự tạo notification cho users đã favorite truyện đó</li>
+    </ul>
+</div>
+
+<h3>Luồng tự động</h3>
+<div class="flow-diagram">
+Trigger tự động (không cần admin bấm):
+1. User nạp xu thành công → Notification: "Nạp 120 xu thành công!"
+2. Truyện yêu thích có chương mới → Notification: "Đấu Phá Thương Khung có chương 156 mới!"
+3. Gói VIP sắp hết hạn (3 ngày) → Notification: "Gói VIP của bạn sắp hết hạn"
+4. Admin broadcast khuyến mãi → Notification cho all users
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m2">🎫 Module 2: Promotions / Khuyến mãi & Coupon</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-high">High Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Mobile app có page <code>Offers.tsx</code> hiển thị các coupon (50% OFF, 23% OFF) với color codes. Cũng có <code>PromotionDetail.tsx</code>. Nhưng tất cả là <strong>mock data hardcoded</strong>, không có backend.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>-- Table: Promotions
+CREATE TABLE "Promotions" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Code" VARCHAR(50) UNIQUE NOT NULL,            -- Mã coupon: XOMVIP50, TETMOI2027
+    "Title" VARCHAR(200) NOT NULL,
+    "Description" TEXT,
+    "DiscountType" VARCHAR(20) NOT NULL,           -- 'percentage', 'fixed_coin', 'free_chapter'
+    "DiscountValue" INT NOT NULL,                  -- 50 (50%), hoặc 100 (100 xu)
+    "MinPurchase" INT DEFAULT 0,                   -- Đơn hàng tối thiểu (xu)
+    "MaxUsage" INT,                                -- Số lần dùng tối đa (null = unlimited)
+    "UsageCount" INT DEFAULT 0,                    -- Đã dùng bao nhiêu lần
+    "MaxPerUser" INT DEFAULT 1,                    -- Mỗi user dùng tối đa bao nhiêu lần
+    "StartDate" TIMESTAMP NOT NULL,
+    "EndDate" TIMESTAMP NOT NULL,
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Table: UserPromotionUsages (tracking)
+CREATE TABLE "UserPromotionUsages" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "UserId" UUID REFERENCES "Users"("Id"),
+    "PromotionId" UUID REFERENCES "Promotions"("Id"),
+    "UsedAt" TIMESTAMP DEFAULT NOW()
+);</code></pre>
+</div>
+
+<h3>API Endpoints</h3>
+<div class="api-block">
+<h4>Client</h4>
+<pre><code>GET    /api/promotions/active                      → List promotions đang active (cho user xem)
+POST   /api/promotions/apply                       [Authorize]
+       Body: { code: "XOMVIP50" }
+       → Validate & apply: trả xu bonus hoặc giảm giá
+       Response: { success: true, discountAmount: 50, message: "Áp dụng thành công!" }</code></pre>
+</div>
+<div class="api-block">
+<h4>Admin</h4>
+<pre><code>GET    /api/admin/promotions?isActive=&page=1      → List tất cả promotions
+POST   /api/admin/promotions                       → Create promotion
+PUT    /api/admin/promotions/{id}                  → Update
+PATCH  /api/admin/promotions/{id}/toggle           → Active/Inactive
+DELETE /api/admin/promotions/{id}
+GET    /api/admin/promotions/{id}/usage            → Xem ai đã dùng coupon này</code></pre>
+</div>
+
+<h3>Admin UI — Trang <code>/promotions</code></h3>
+<div class="section-box">
+    <ul>
+        <li>Table: Code, Title, Type (badge), Value, Usage (x/max), Start-End date, Status, Actions</li>
+        <li>Modal tạo/sửa: Code (auto-gen hoặc tự nhập), Title, Description, Type dropdown, Value, Min purchase, Max usage, Date range</li>
+        <li>Analytics: Tổng coupon đã dùng, top coupon phổ biến, doanh thu từ promotions</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m3">🖼️ Module 3: Banner & Homepage CMS</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-high">High Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Client web trang chủ có các sections (Mới nhất, Đề xuất, Độc quyền, Slider) nhưng hiện tại query cố định từ API. Mobile app có promo banners. Admin <strong>không thể customize trang chủ</strong> mà không sửa code.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>-- Table: Banners
+CREATE TABLE "Banners" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Title" VARCHAR(200) NOT NULL,
+    "ImageUrl" VARCHAR(500) NOT NULL,
+    "LinkUrl" VARCHAR(500),                         -- Click banner → đi đâu
+    "LinkType" VARCHAR(50),                        -- 'publication', 'category', 'external', 'promotion'
+    "ReferenceId" UUID,                            -- publicationId / categoryId
+    "Position" VARCHAR(50) NOT NULL,               -- 'hero', 'sidebar', 'mobile_top', 'popup'
+    "OrderIndex" INT DEFAULT 0,
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "StartDate" TIMESTAMP,
+    "EndDate" TIMESTAMP,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Table: HomeSections (quản lý layout trang chủ)
+CREATE TABLE "HomeSections" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Title" VARCHAR(200) NOT NULL,                 -- "Truyện Đề Cử", "Mới Cập Nhật", ...
+    "SectionType" VARCHAR(50) NOT NULL,            -- 'recommended', 'latest', 'exclusive', 'category', 'custom'
+    "QueryType" VARCHAR(50),                       -- 'auto' (query DB) hoặc 'manual' (chọn tay)
+    "QueryParams" TEXT,                            -- JSON: { "categoryId": "...", "limit": 10, "sortBy": "viewCount" }
+    "ManualPublicationIds" TEXT,                   -- JSON array nếu QueryType = 'manual'
+    "OrderIndex" INT DEFAULT 0,
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "DisplayStyle" VARCHAR(50) DEFAULT 'grid'      -- 'grid', 'slider', 'list', 'featured'
+);</code></pre>
+</div>
+
+<h3>API Endpoints</h3>
+<div class="api-block">
+<h4>Client (public)</h4>
+<pre><code>GET /api/home/banners?position=hero               → Banners active cho vị trí hero
+GET /api/home/sections                             → List sections + books cho trang chủ
+    Response: [
+        { title: "Truyện Đề Cử", displayStyle: "slider", publications: [...] },
+        { title: "Mới Cập Nhật", displayStyle: "grid", publications: [...] },
+        ...
+    ]</code></pre>
+</div>
+<div class="api-block">
+<h4>Admin</h4>
+<pre><code>// Banners
+GET    /api/admin/banners                          → List all
+POST   /api/admin/banners                          → Create (upload image)
+PUT    /api/admin/banners/{id}                     → Update
+DELETE /api/admin/banners/{id}
+PATCH  /api/admin/banners/reorder                  → Reorder banners
+
+// Home Sections
+GET    /api/admin/home-sections                    → List all sections
+POST   /api/admin/home-sections                    → Create section
+PUT    /api/admin/home-sections/{id}               → Update (đổi query, đổi truyện)
+DELETE /api/admin/home-sections/{id}
+PATCH  /api/admin/home-sections/reorder            → Reorder sections</code></pre>
+</div>
+
+<h3>Admin UI — 2 trang</h3>
+<div class="section-box">
+    <h4>Trang <code>/banners</code></h4>
+    <ul>
+        <li>Grid/List banners: Ảnh thumbnail, Title, Position, Link, Active, Date range</li>
+        <li>Upload ảnh banner + chọn link đến (truyện / thể loại / URL ngoài)</li>
+        <li>Drag-drop reorder</li>
+    </ul>
+    <h4>Trang <code>/home-sections</code></h4>
+    <ul>
+        <li>List sections trang chủ (drag-drop reorder)</li>
+        <li>Mỗi section: Title, Type, Display style, Books included</li>
+        <li>Auto mode: chọn query (top view, latest, category X, VIP)</li>
+        <li>Manual mode: pick truyện cụ thể bằng tay</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m4">👤 Module 4: Author / Tác giả (entity riêng)</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-medium">Medium Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Mobile app có <code>AuthorsList.tsx</code> và <code>AuthorDetail.tsx</code> với mock data (name, role, image, description, rating). Hiện tại "Author" chỉ là <strong>string field</strong> trên Publication model — không có entity riêng, không search, không có trang tác giả.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>CREATE TABLE "Authors" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(200) NOT NULL,
+    "Slug" VARCHAR(200) UNIQUE,
+    "AvatarUrl" VARCHAR(500),
+    "Bio" TEXT,
+    "Country" VARCHAR(100),                        -- 'CN', 'KR', 'JP', 'VN'
+    "IsVerified" BOOLEAN DEFAULT FALSE,
+    "FollowerCount" INT DEFAULT 0,
+    "PublicationCount" INT DEFAULT 0,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Sửa Publications: thêm FK
+ALTER TABLE "Publications" ADD COLUMN "AuthorId" UUID REFERENCES "Authors"("Id");
+-- Giữ field Author (string) cho backward compatibility, dần migrate sang AuthorId</code></pre>
+</div>
+
+<h3>Giá trị mang lại</h3>
+<div class="section-box">
+    <ul>
+        <li><strong>SEO:</strong> Trang <code>/author/thien-tam-tho-dau</code> → Google index tên tác giả</li>
+        <li><strong>Discovery:</strong> User xem tác giả → thấy tất cả truyện của họ → đọc thêm</li>
+        <li><strong>Analytics:</strong> Biết tác giả nào popular nhất → ưu tiên mua bản quyền</li>
+        <li><strong>Mobile:</strong> AuthorsList + AuthorDetail đã có UI, chỉ cần kết nối API</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m5">💰 Module 5: Coin Packages / Gói nạp xu</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-critical">Critical Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Roadmap đề cập gói xu (10K=50xu, 20K=120xu...) nhưng chỉ nằm trong document. Backend <strong>không có table CoinPackage</strong>. Khi user muốn nạp xu, client cần biết có bao nhiêu gói, giá bao nhiêu → phải có API trả về danh sách gói.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>CREATE TABLE "CoinPackages" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(100) NOT NULL,                  -- "Gói Starter", "Gói Tiết Kiệm"
+    "CoinAmount" INT NOT NULL,                     -- 50, 120, 350, 800
+    "BonusCoins" INT DEFAULT 0,                    -- Bonus thêm: 0, 20, 50, 150
+    "PriceVND" INT NOT NULL,                       -- 10000, 20000, 50000, 100000
+    "IsPopular" BOOLEAN DEFAULT FALSE,             -- Badge "Hot" trên UI
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "OrderIndex" INT DEFAULT 0,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);</code></pre>
+</div>
+
+<h3>API Endpoints</h3>
+<div class="api-block">
+<pre><code>// Public (client hiển thị cho user chọn mua)
+GET    /api/coin-packages                          → List gói active, sorted by OrderIndex
+
+// Admin
+GET    /api/admin/coin-packages                    → List all (kể cả inactive)
+POST   /api/admin/coin-packages                    → Create package
+PUT    /api/admin/coin-packages/{id}               → Update (đổi giá, đổi bonus)
+PATCH  /api/admin/coin-packages/{id}/toggle        → Active/Inactive
+DELETE /api/admin/coin-packages/{id}
+PATCH  /api/admin/coin-packages/reorder            → Reorder display</code></pre>
+</div>
+
+<h3>Admin UI — Trang <code>/coin-packages</code></h3>
+<div class="section-box">
+    <ul>
+        <li>Table/Card: Tên gói, Xu nhận, Bonus, Giá VNĐ, Popular badge, Status, Actions</li>
+        <li>Form: Name, CoinAmount, BonusCoins, PriceVND, IsPopular checkbox</li>
+        <li>Preview: Hiển thị giống UI mà user sẽ thấy trên client</li>
+    </ul>
+</div>
+
+<div class="warn-box">
+    <h4 style="color:#ff6b6b; margin-top:0;">⚠️ Lưu ý quan trọng</h4>
+    <p>Module này <strong>PHẢI CÓ</strong> trước khi làm payment gateway (Sprint 1). Luồng nạp xu: User chọn CoinPackage → thanh toán → API verify → cộng coins. Nếu không có table CoinPackage, client không biết hiển thị gì.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m6">🚨 Module 6: Report / Báo cáo vi phạm</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-medium">Medium Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Platform có reviews, comments (sẽ thêm). Khi có user-generated content → cần cơ chế report nội dung vi phạm. Nếu không có, admin phải tự đọc từng review để tìm vi phạm — không scale được.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>CREATE TABLE "Reports" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "ReporterId" UUID REFERENCES "Users"("Id"),    -- Ai báo cáo
+    "TargetType" VARCHAR(50) NOT NULL,             -- 'review', 'comment', 'publication', 'user'
+    "TargetId" UUID NOT NULL,                      -- ID của entity bị report
+    "Reason" VARCHAR(100) NOT NULL,                -- 'spam', 'offensive', 'copyright', 'misinformation'
+    "Description" TEXT,                            -- Mô tả thêm
+    "Status" VARCHAR(50) DEFAULT 'pending',        -- 'pending', 'reviewed', 'resolved', 'dismissed'
+    "AdminNote" TEXT,                              -- Admin ghi chú khi xử lý
+    "ResolvedBy" UUID,
+    "ResolvedAt" TIMESTAMP,
+    "CreatedAt" TIMESTAMP DEFAULT NOW()
+);</code></pre>
+</div>
+
+<h3>Admin UI — Trang <code>/reports</code></h3>
+<div class="section-box">
+    <ul>
+        <li>Table: Reporter, Target (link to review/user/publication), Reason (badge), Status, Date</li>
+        <li>Filter: by Status (Pending/Resolved/Dismissed), by Type, by Date</li>
+        <li>Actions: View target content, Resolve (xóa content + ban user nếu cần), Dismiss (bỏ qua)</li>
+        <li>Badge count "Pending reports" trên sidebar</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m7">⚙️ Module 7: System Config / Cấu hình hệ thống</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-medium">Medium Priority</span> <span class="tag tag-new">NEW — Chưa có trong DB</span></p>
+    <p><strong>Lý do:</strong> Business logic file <code>business_logic.md</code> có nhiều magic numbers hardcoded:</p>
+    <ul>
+        <li>Guest read limit = 10 chương</li>
+        <li>Default coin price per chapter</li>
+        <li>VIP daily chapter limit (MaxChaptersPerDay)</li>
+    </ul>
+    <p>Nếu muốn thay đổi (VD: tăng guest limit lên 15) → phải sửa code + deploy lại. Cần admin config runtime.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>CREATE TABLE "SystemConfigs" (
+    "Key" VARCHAR(100) PRIMARY KEY,
+    "Value" TEXT NOT NULL,
+    "ValueType" VARCHAR(20) DEFAULT 'string',      -- 'string', 'int', 'bool', 'json'
+    "Description" VARCHAR(500),
+    "Category" VARCHAR(50),                        -- 'reading', 'payment', 'general', 'seo'
+    "UpdatedAt" TIMESTAMP DEFAULT NOW(),
+    "UpdatedBy" VARCHAR(100)
+);
+
+-- Seed default configs
+INSERT INTO "SystemConfigs" VALUES
+('reading.guest_max_chapters', '10', 'int', 'Số chương tối đa khách chưa đăng nhập được đọc', 'reading', NOW(), 'system'),
+('reading.default_coin_price', '10', 'int', 'Giá xu mặc định khi tạo chương VIP mới', 'reading', NOW(), 'system'),
+('payment.min_topup_amount', '10000', 'int', 'Số tiền tối thiểu nạp xu (VNĐ)', 'payment', NOW(), 'system'),
+('general.site_name', 'Xóm Truyện', 'string', 'Tên hiển thị website', 'general', NOW(), 'system'),
+('general.maintenance_mode', 'false', 'bool', 'Bật chế độ bảo trì', 'general', NOW(), 'system'),
+('seo.default_title', 'Xóm Truyện - Đọc truyện online miễn phí', 'string', 'SEO title mặc định', 'seo', NOW(), 'system'),
+('seo.default_description', 'Nền tảng đọc truyện tranh, tiên hiệp online', 'string', 'SEO description', 'seo', NOW(), 'system');</code></pre>
+</div>
+
+<h3>Admin UI — Trang <code>/settings</code></h3>
+<div class="section-box">
+    <ul>
+        <li>Group by Category (tabs: Reading, Payment, General, SEO)</li>
+        <li>Mỗi config: Key (readonly), Description, Value (input field theo ValueType)</li>
+        <li>Nút Save → PUT /api/admin/config/{key}</li>
+        <li>History: ai đã sửa gì lúc nào (audit log)</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m8">📧 Module 8: Email Templates / Mẫu email</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-low">Low Priority</span> <span class="tag tag-new">NEW</span></p>
+    <p><strong>Lý do:</strong> Backend có <code>IEmailService</code> gửi email verify account + reset password. Hiện template hardcoded trong code. Khi cần thay đổi nội dung email → phải sửa code. Admin nên quản lý được mẫu email.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>CREATE TABLE "EmailTemplates" (
+    "Id" VARCHAR(50) PRIMARY KEY,                  -- 'verify_email', 'reset_password', 'welcome', 'vip_expired'
+    "Subject" VARCHAR(200) NOT NULL,
+    "HtmlBody" TEXT NOT NULL,                      -- HTML template with {{placeholders}}
+    "Description" VARCHAR(500),
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "UpdatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+-- Seed
+INSERT INTO "EmailTemplates" VALUES
+('verify_email', 'Xác nhận email - Xóm Truyện', '...html...', 'Gửi khi user đăng ký', true, NOW()),
+('reset_password', 'Đặt lại mật khẩu - Xóm Truyện', '...html...', 'Gửi khi user quên mật khẩu', true, NOW()),
+('welcome', 'Chào mừng đến Xóm Truyện!', '...html...', 'Gửi sau khi verify thành công', true, NOW()),
+('payment_success', 'Nạp xu thành công', '...html...', 'Gửi khi nạp xu thành công', true, NOW());</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m9">📊 Module 9: Reading Analytics / Thống kê đọc chi tiết</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-medium">Medium Priority</span></p>
+    <p><strong>Lý do:</strong> Business logic track <code>ViewCount</code> (per publication & chapter), <code>DailyReadCount</code> (per user). Nhưng admin <strong>không có cách xem analytics chi tiết</strong>: truyện nào hot nhất tuần này? user nào đọc nhiều nhất? thời gian đọc peak là mấy giờ?</p>
+</div>
+
+<h3>Thêm table tracking chi tiết</h3>
+<div class="api-block">
+<pre><code>-- Table: ReadingEvents (event log cho analytics)
+CREATE TABLE "ReadingEvents" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "UserId" UUID,
+    "PublicationId" UUID NOT NULL,
+    "ChapterId" UUID NOT NULL,
+    "ChapterType" INT,                             -- 0=Book, 1=Comic
+    "ReadAt" TIMESTAMP DEFAULT NOW(),
+    "DeviceType" VARCHAR(20)                       -- 'web', 'mobile', 'tablet'
+);
+
+-- Index cho query analytics
+CREATE INDEX idx_reading_events_date ON "ReadingEvents"("ReadAt" DESC);
+CREATE INDEX idx_reading_events_pub ON "ReadingEvents"("PublicationId", "ReadAt");</code></pre>
+</div>
+
+<h3>Admin UI — Trang <code>/analytics</code></h3>
+<div class="section-box">
+    <ul>
+        <li><strong>Chart 1:</strong> Lượt đọc theo ngày (30 ngày gần nhất) — line chart</li>
+        <li><strong>Chart 2:</strong> Top 10 truyện hot nhất tuần — bar chart horizontal</li>
+        <li><strong>Chart 3:</strong> Phân bố thời gian đọc (giờ trong ngày) — heatmap</li>
+        <li><strong>Chart 4:</strong> Tỉ lệ device (Web vs Mobile) — pie chart</li>
+        <li><strong>Table:</strong> Top readers (user đọc nhiều nhất), Truyện tăng trưởng nhanh nhất</li>
+        <li><strong>Filter:</strong> Date range, publication, format type</li>
+    </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="m10">❓ Module 10: Help Center CMS</h2>
+
+<div class="module-box">
+    <p><span class="tag tag-low">Low Priority</span> <span class="tag tag-new">NEW</span></p>
+    <p><strong>Lý do:</strong> Mobile app có page <code>HelpCenter.tsx</code>. Cần admin quản lý nội dung FAQ, hướng dẫn sử dụng mà không cần sửa code.</p>
+</div>
+
+<h3>Database Schema</h3>
+<div class="api-block">
+<pre><code>CREATE TABLE "HelpArticles" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Title" VARCHAR(200) NOT NULL,
+    "Content" TEXT NOT NULL,                        -- HTML content
+    "Category" VARCHAR(100),                       -- 'account', 'payment', 'reading', 'general'
+    "OrderIndex" INT DEFAULT 0,
+    "IsPublished" BOOLEAN DEFAULT TRUE,
+    "ViewCount" INT DEFAULT 0,
+    "CreatedAt" TIMESTAMP DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP DEFAULT NOW()
+);</code></pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="flows">🔄 Luồng nghiệp vụ cần bổ sung</h2>
+
+<p>Ngoài modules, có những <strong>luồng (flows)</strong> xuyên suốt nhiều module cần thiết kế:</p>
+
+<h3>Flow 1: Luồng nạp xu hoàn chỉnh</h3>
+<div class="flow-diagram">
+USER FLOW:
+1. User vào trang /wallet
+2. GET /api/coin-packages → hiển thị danh sách gói ← Module 5 (CoinPackages)
+3. User chọn gói "120 xu - 20K VNĐ"
+4. POST /api/payment/create-order { packageId, paymentMethod }
+5. Backend:
+   - Tạo Transaction (status=Pending)
+   - Nếu MoMo/VNPay: gọi API payment gateway → trả paymentUrl
+   - Nếu chuyển khoản: trả QR code + thông tin CK
+6. User thanh toán
+7. Webhook callback / Admin duyệt thủ công
+8. Backend: Transaction → Success, User.CoinBalance += coinAmount + bonusCoins
+9. Notification: "Nạp 120 xu thành công!" ← Module 1 (Notifications)
+10. Nếu user có coupon → apply giảm giá ← Module 2 (Promotions)
+
+ADMIN FLOW:
+- Xem danh sách transactions pending
+- Duyệt/Reject giao dịch CK thủ công
+- Xem revenue dashboard
+</div>
+
+<h3>Flow 2: Luồng mua gói VIP</h3>
+<div class="flow-diagram">
+1. User vào /subscription
+2. GET /api/plans → hiển thị gói (Free/Basic/VIP)
+3. User chọn gói VIP (59K/tháng)
+4. POST /api/payment/subscribe { planId, paymentMethod }
+5. Thanh toán (tương tự flow nạp xu)
+6. Backend sau khi payment success:
+   - User.CurrentPlanId = planId
+   - User.PlanExpiredAt = NOW() + plan.DurationDays
+   - Tạo Transaction (type=BuyVIP)
+7. Notification: "Kích hoạt VIP thành công! Hạn dùng đến 14/09/2026"
+8. Auto-renew reminder: 3 ngày trước hết hạn → Notification nhắc gia hạn
+
+ADMIN:
+- Xem users VIP active
+- Extend/Cancel VIP cho user cụ thể
+- Thay đổi giá gói (Module D: Subscription Plans)
+</div>
+
+<h3>Flow 3: Luồng đọc chương VIP (mua lẻ bằng xu)</h3>
+<div class="flow-diagram">
+1. User đọc truyện VIP, chạm vào chương bị khóa (IsLocked=true)
+2. Client gọi GET /api/reading/chapter/{id}
+3. Backend check (theo business_logic.md):
+   a. Chapter.CoinPrice == 0? → Cho đọc (free)
+   b. User là Guest? → Check TotalGuestReads < 10? → Cho đọc : Error "Hết lượt thử"
+   c. User có VIP (IsUnlimited)? → Cho đọc
+   d. User có Basic? → Check DailyReadCount < MaxChaptersPerDay? → Cho đọc
+   e. Đã mua chương này? (UserPurchasedChapters) → Cho đọc
+   f. CoinBalance >= CoinPrice? → Trừ xu, insert UserPurchasedChapter, cho đọc
+   g. Không đủ xu → Error "Không đủ xu, vui lòng nạp thêm" + link đến /wallet
+
+ADMIN cần:
+- Xem UserPurchasedChapters (ai mua chương nào)
+- Thống kê: truyện nào bán nhiều chương nhất → focus content
+- Config: default coin price cho chương mới (Module 7: SystemConfig)
+</div>
+
+<h3>Flow 4: Luồng content management (Admin đăng truyện)</h3>
+<div class="flow-diagram">
+A. TRUYỆN TRANH (Comic):
+1. Admin tạo Publication (formatType=Comic)
+2. Upload file ZIP chứa chapters (bulk upload) → Background processing
+3. System extract → tạo ComicChapters + ComicPages (đã hoạt động ✅)
+4. Admin review: sửa title, set isLocked, set coinPrice
+5. Publish (status=Active)
+
+B. TRUYỆN CHỮ (Text) — CHƯA CÓ FLOW:
+1. Admin tạo Publication (formatType=Text)
+2. ??? THIẾU: Không có UI thêm BookChapter ← Task E (đã liệt kê)
+3. Cần: Form nhập content (HTML/plaintext) hoặc upload TXT/DOCX
+4. Admin set isLocked, coinPrice per chapter
+5. Publish
+
+C. TRUYỆN TỰ ĐỘNG (Phase 1 Vision — Crawler):
+1. Crawler lấy truyện từ nguồn ngoài
+2. AI dịch → raw content
+3. Đẩy vào Admin queue "Pending Review" ← CẦN MODULE MỚI
+4. Editor/QC review trên admin → Approve
+5. Auto-publish → tạo BookChapter + Notification cho users favorite
+</div>
+
+<h3>Flow 5: Luồng quản lý trang chủ (Homepage)</h3>
+<div class="flow-diagram">
+HIỆN TẠI (không linh hoạt):
+- Client web hardcoded: section "Mới nhất" → query latest
+- "Đề xuất" → query isRecommended=true
+- "Độc quyền" → query isExclusive=true
+- Muốn thay đổi layout → phải sửa code client → deploy lại
+
+SAU KHI CÓ MODULE 3 (Banner + Homepage CMS):
+1. Admin vào /home-sections
+2. Tạo section mới: "Tết Nguyên Đán 2027 - Top truyện hay"
+3. Chọn display style: slider
+4. Chọn truyện manual (hoặc auto: category=Ngôn tình, limit=10)
+5. Kéo thả reorder vị trí sections
+6. Client web GET /api/home/sections → render dynamic
+7. Không cần deploy lại client!
+
+BANNERS:
+1. Admin upload ảnh banner Tết
+2. Link đến: promotion "TETMOI2027" hoặc category "Ngôn Tình"
+3. Set date range: 20/01 → 10/02
+4. Auto-enable khi đến date, auto-disable khi hết
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="priority">🎯 Thứ tự ưu tiên tổng hợp (Cũ + Mới)</h2>
+
+<h3>Tất cả modules cần làm (18 tổng cộng)</h3>
+<table>
+    <tr><th>Tier</th><th>Module</th><th>Source</th><th>Effort</th><th>Lý do ưu tiên</th></tr>
+    <tr style="background:#2a1010;">
+        <td rowspan="5"><span class="tag tag-critical">Tier 1<br>CRITICAL</span></td>
+        <td>Authentication & Protected Routes</td><td>Gap doc</td><td>2-3 ngày</td><td>Bảo mật cơ bản</td>
+    </tr>
+    <tr style="background:#2a1010;">
+        <td>Book Chapter (Text) CRUD</td><td>Gap doc</td><td>3-4 ngày</td><td>50% content không quản lý được</td>
+    </tr>
+    <tr style="background:#2a1010;">
+        <td><strong>Coin Packages</strong></td><td class="highlight">MỚI</td><td>1-2 ngày</td><td>Phải có trước payment flow</td>
+    </tr>
+    <tr style="background:#2a1010;">
+        <td>Transaction Management</td><td>Gap doc</td><td>3-4 ngày</td><td>Monetization blocker</td>
+    </tr>
+    <tr style="background:#2a1010;">
+        <td>Subscription Plans CRUD</td><td>Gap doc</td><td>1-2 ngày</td><td>VIP system cần quản lý</td>
+    </tr>
+
+    <tr style="background:#2a2010;">
+        <td rowspan="5"><span class="tag tag-high">Tier 2<br>HIGH</span></td>
+        <td>Dashboard thật (data real)</td><td>Gap doc</td><td>2-3 ngày</td><td>Cần overview thực tế</td>
+    </tr>
+    <tr style="background:#2a2010;">
+        <td>Bookmark/Favorite/History APIs</td><td>Gap doc</td><td>2-3 ngày</td><td>Engagement features</td>
+    </tr>
+    <tr style="background:#2a2010;">
+        <td><strong>Notifications</strong></td><td class="highlight">MỚI</td><td>3-4 ngày</td><td>Mobile app cần, re-engagement</td>
+    </tr>
+    <tr style="background:#2a2010;">
+        <td><strong>Banner & Homepage CMS</strong></td><td class="highlight">MỚI</td><td>3-4 ngày</td><td>Content curation, không cần sửa code</td>
+    </tr>
+    <tr style="background:#2a2010;">
+        <td><strong>Promotions / Coupon</strong></td><td class="highlight">MỚI</td><td>2-3 ngày</td><td>Marketing tool, mobile app cần</td>
+    </tr>
+
+    <tr style="background:#102a10;">
+        <td rowspan="5"><span class="tag tag-medium">Tier 3<br>MEDIUM</span></td>
+        <td>Reviews moderation</td><td>Gap doc</td><td>2 ngày</td><td>UGC moderation</td>
+    </tr>
+    <tr style="background:#102a10;">
+        <td><strong>Author entity</strong></td><td class="highlight">MỚI</td><td>2-3 ngày</td><td>SEO + discovery + mobile app</td>
+    </tr>
+    <tr style="background:#102a10;">
+        <td><strong>Report / Vi phạm</strong></td><td class="highlight">MỚI</td><td>2 ngày</td><td>Platform safety</td>
+    </tr>
+    <tr style="background:#102a10;">
+        <td><strong>System Config</strong></td><td class="highlight">MỚI</td><td>1-2 ngày</td><td>Linh hoạt business rules</td>
+    </tr>
+    <tr style="background:#102a10;">
+        <td><strong>Reading Analytics</strong></td><td class="highlight">MỚI</td><td>3-4 ngày</td><td>Business intelligence</td>
+    </tr>
+
+    <tr style="background:#10102a;">
+        <td rowspan="3"><span class="tag tag-low">Tier 4<br>LOW</span></td>
+        <td>Role-based auth (advanced)</td><td>Gap doc</td><td>1 ngày</td><td>Cần khi có nhiều admin</td>
+    </tr>
+    <tr style="background:#10102a;">
+        <td><strong>Email Templates</strong></td><td class="highlight">MỚI</td><td>1-2 ngày</td><td>Nice-to-have</td>
+    </tr>
+    <tr style="background:#10102a;">
+        <td><strong>Help Center CMS</strong></td><td class="highlight">MỚI</td><td>1-2 ngày</td><td>Mobile app cần nhưng không urgent</td>
+    </tr>
+</table>
+
+<h3>Timeline gợi ý (nếu 1 người làm full-time)</h3>
+<div class="flow-diagram">
+TUẦN 1-2: Tier 1 (Critical)
+  ├── Auth + Protected Routes
+  ├── Coin Packages (nhanh, 1-2 ngày)
+  ├── Book Chapter Text CRUD
+  ├── Transaction Management
+  └── Subscription Plans
+
+TUẦN 3-4: Tier 2 (High)
+  ├── Dashboard thật
+  ├── Bookmark/Favorite/History APIs
+  ├── Notifications (model + API + admin UI)
+  ├── Promotions/Coupon
+  └── Banner & Homepage CMS
+
+TUẦN 5-6: Tier 3 (Medium)
+  ├── Reviews
+  ├── Author entity
+  ├── Report system
+  ├── System Config
+  └── Reading Analytics
+
+TUẦN 7 (nếu cần): Tier 4 (Low)
+  ├── Advanced roles
+  ├── Email templates
+  └── Help Center CMS
+
+═══════════════════════════════════════════
+TỔNG: ~6-7 tuần (Backend + Frontend) cho 18 modules
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<hr>
+<h2 id="sidebar">📱 Sidebar Admin đầy đủ (sau khi hoàn thành tất cả)</h2>
+
+<div class="section-box">
+<pre><code>ADMIN PANEL — FULL SIDEBAR:
+
+📊 Dashboard
+   └── Tổng quan (real data)
+
+📚 Quản lý Nội dung
+   ├── Sách (Publications)
+   ├── Tác giả (Authors) ← MỚI
+   ├── Chủ đề (Topics)
+   ├── Thể loại (Categories)
+   ├── File sách (Uploads)
+   └── Đánh giá (Reviews)
+
+🏠 Trang chủ & Marketing
+   ├── Banner (Banners) ← MỚI
+   ├── Sections trang chủ (HomeSections) ← MỚI
+   └── Khuyến mãi (Promotions) ← MỚI
+
+💰 Tài chính
+   ├── Giao dịch (Transactions)
+   ├── Gói nạp xu (Coin Packages) ← MỚI
+   └── Gói VIP (Subscription Plans)
+
+👥 Quản lý User
+   ├── Người dùng
+   └── Báo cáo vi phạm (Reports) ← MỚI
+
+🔔 Thông báo
+   └── Notifications ← MỚI
+
+📈 Analytics
+   ├── Thống kê đọc (Reading Analytics) ← MỚI
+   └── Engagement (Bookmark/Favorite stats)
+
+⚙️ Cài đặt
+   ├── Cấu hình hệ thống (System Config) ← MỚI
+   ├── Email Templates ← MỚI
+   └── Help Center ← MỚI
+
+🗄️ Database (Dev only)
+   ├── Overview
+   └── [Dynamic tables...]
+</code></pre>
+</div>
+
+<h3>So sánh trước vs sau</h3>
+<table>
+    <tr><th>Tiêu chí</th><th>Hiện tại</th><th>Sau khi bổ sung đầy đủ</th></tr>
+    <tr><td>Số trang Admin</td><td>10</td><td class="success">28+</td></tr>
+    <tr><td>Sidebar groups</td><td>4</td><td class="success">8</td></tr>
+    <tr><td>DB tables có Admin UI</td><td>6/18 (33%)</td><td class="success">18/18 + 8 tables mới (100%)</td></tr>
+    <tr><td>API modules (admin)</td><td>7</td><td class="success">18+</td></tr>
+    <tr><td>Auth/Security</td><td class="warning">Không có</td><td class="success">JWT + Role + Protected Routes</td></tr>
+    <tr><td>Dashboard</td><td class="warning">Mock data</td><td class="success">Real-time analytics</td></tr>
+    <tr><td>Content management</td><td>Chỉ comic chapters</td><td class="success">Comic + Text + Banners + Sections</td></tr>
+    <tr><td>Financial management</td><td class="warning">Không có</td><td class="success">Transactions + Coin + VIP + Promotions</td></tr>
+    <tr><td>User engagement</td><td class="warning">Không theo dõi</td><td class="success">Notifications + Analytics + Reports</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center; color:#666; margin-top:40px; font-size:0.9em;">
+    📅 Phân tích ngày: 14/08/2026 | Xmtruyen Admin — Additional Modules Analysis<br>
+    Nguồn: Backend models (.NET 9) + Client Web (React) + Mobile App (Ionic) + Business Logic doc<br>
+    Kết luận: Cần thêm 10 modules mới (ngoài 8 gaps đã liệt kê) | Tổng effort ước tính: 6-7 tuần
+</p>
+
+</div>
+</body>
+</html>

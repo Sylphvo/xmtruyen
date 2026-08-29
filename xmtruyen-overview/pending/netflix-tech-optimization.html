@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xmtruyen — Áp Dụng Công Nghệ Netflix-Scale vào Nền Tảng Đọc Truyện</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px;
+             border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-apply { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .badge-partial { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid #f97316; }
+        .badge-future { background: rgba(168,85,247,0.15); color: #a78bfa; border: 1px solid #a78bfa; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.88em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px;
+              padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .success { background: rgba(34,197,94,0.08); border-left: 3px solid #22c55e;
+                padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0;
+                        font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .applicability { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75em; font-weight: 600; }
+        .app-yes { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .app-partial { background: rgba(249,115,22,0.15); color: #f97316; }
+        .app-no { background: rgba(239,68,68,0.15); color: #ef4444; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🚀 Áp Dụng Công Nghệ Netflix-Scale vào Xóm Truyện</h1>
+    <p class="subtitle">
+        <span class="badge badge-apply">Áp Dụng Được</span>
+        <span class="badge badge-partial">Áp Dụng Một Phần</span>
+        <span class="badge badge-future">Tương Lai</span>
+        Phân tích 5 nhóm công nghệ lõi và cách triển khai thực tế cho nền tảng đọc truyện Xóm Truyện
+    </p>
+
+    <!-- MỤC LỤC -->
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#summary">1. Tổng Kết: Công Nghệ Nào Áp Dụng Được?</a>
+        <a href="#cdn">2. CDN & Phân Phối Ảnh Truyện (Image Delivery)</a>
+        <a href="#storage">3. Storage & Byte-Range cho Ảnh Truyện Tranh</a>
+        <a href="#compression">4. Nén Ảnh: WebP, Progressive Loading & Image Tiling</a>
+        <a href="#recommendation">5. Hệ Thống Gợi Ý Truyện (AI Recommendation)</a>
+        <a href="#architecture">6. Kiến Trúc Phần Mềm — Áp Dụng Cho Quy Mô Nhỏ</a>
+        <a href="#implementation">7. Triển Khai Cụ Thể — Code & Cấu Hình</a>
+        <a href="#roadmap">8. Lộ Trình Triển Khai Theo Pha</a>
+    </div>
+
+    <!-- 1. TỔNG KẾT -->
+    <h2 id="summary">1. Tổng Kết: Công Nghệ Nào Áp Dụng Được?</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:50px">#</th>
+                <th>Công Nghệ Gốc (Netflix)</th>
+                <th>Áp Dụng Cho Xóm Truyện</th>
+                <th style="width:100px">Khả thi</th>
+                <th style="width:80px">Ưu tiên</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="5" style="background:#1a1a2e; color:#ff6b9d; font-weight:600;">Nhóm 1: Networking & Delivery</td>
+            </tr>
+            <tr>
+                <td>1.1</td>
+                <td>Open Connect (CDN chuyên biệt)</td>
+                <td>Dùng CDN bên thứ 3 (Cloudflare, BunnyCDN) serve ảnh truyện tranh</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Cao</td>
+            </tr>
+            <tr>
+                <td>1.2</td>
+                <td>Adaptive Bitrate Streaming</td>
+                <td>Serve ảnh truyện nhiều chất lượng (low/mid/high) theo bandwidth user</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Cao</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="background:#1a1a2e; color:#ff6b9d; font-weight:600;">Nhóm 2: Storage Architecture</td>
+            </tr>
+            <tr>
+                <td>2.1</td>
+                <td>Stream Multiplication</td>
+                <td>Tạo 3 bản ảnh (thumbnail 200px, medium 720px, full 1080px) cho mỗi trang truyện</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Cao</td>
+            </tr>
+            <tr>
+                <td>2.2</td>
+                <td>Byte-range requests + Manifest</td>
+                <td>Dùng HTTP Range headers cho progressive image loading (ảnh lớn)</td>
+                <td><span class="applicability app-partial">⚠️ Một phần</span></td>
+                <td>Thấp</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="background:#1a1a2e; color:#ff6b9d; font-weight:600;">Nhóm 3: Data Compression</td>
+            </tr>
+            <tr>
+                <td>3.1</td>
+                <td>Per-Title Encoding (AI)</td>
+                <td>Auto-detect ảnh tĩnh (cover) nén mạnh, ảnh chi tiết (comic page) giữ sắc nét</td>
+                <td><span class="applicability app-partial">⚠️ Một phần</span></td>
+                <td>Trung bình</td>
+            </tr>
+            <tr>
+                <td>3.2</td>
+                <td>Image Tiling</td>
+                <td>Chia trang webtoon dài thành tiles, chỉ load tiles trong viewport</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Cao</td>
+            </tr>
+            <tr>
+                <td>3.3</td>
+                <td>Progressive Loading</td>
+                <td>Hiển thị ảnh blur → sắc nét (BlurHash / LQIP)</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Cao</td>
+            </tr>
+            <tr>
+                <td>3.4</td>
+                <td>WebP Encoding</td>
+                <td>Convert tất cả ảnh sang WebP khi upload (giảm 25-34% dung lượng)</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Cao</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="background:#1a1a2e; color:#ff6b9d; font-weight:600;">Nhóm 4: AI & Recommendation</td>
+            </tr>
+            <tr>
+                <td>4.1</td>
+                <td>Implicit Data (hành vi ẩn)</td>
+                <td>Track thời gian đọc, tốc độ lật trang, chương bỏ dở → gợi ý tốt hơn</td>
+                <td><span class="applicability app-yes">✅ Áp dụng</span></td>
+                <td>Trung bình</td>
+            </tr>
+            <tr>
+                <td>4.2</td>
+                <td>Micro-tagging</td>
+                <td>Gắn tag chi tiết cho truyện (tone, bối cảnh, đặc điểm nhân vật)</td>
+                <td><span class="applicability app-partial">⚠️ Một phần</span></td>
+                <td>Thấp</td>
+            </tr>
+            <tr>
+                <td>4.3</td>
+                <td>Artwork Personalization</td>
+                <td>Hiển thị ảnh bìa khác nhau theo sở thích user (A/B test thumbnail)</td>
+                <td><span class="applicability app-partial">⚠️ Một phần</span></td>
+                <td>Tương lai</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="background:#1a1a2e; color:#ff6b9d; font-weight:600;">Nhóm 5: Software Engineering</td>
+            </tr>
+            <tr>
+                <td>5.1</td>
+                <td>Microservices</td>
+                <td>Tách Background Worker thành service riêng (image processing, recommendation)</td>
+                <td><span class="applicability app-partial">⚠️ Một phần</span></td>
+                <td>Tương lai</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 2. CDN -->
+    <h2 id="cdn">2. CDN & Phân Phối Ảnh Truyện (Image Delivery)</h2>
+
+    <h3>2.1 Vấn đề hiện tại</h3>
+    <div class="section-card">
+        <ul>
+            <li>Ảnh truyện tranh serve trực tiếp từ server .NET (port 5000) → bottleneck</li>
+            <li>User ở xa server → latency cao, ảnh load chậm</li>
+            <li>Không cache → mỗi lần mở lại cùng chương đều fetch lại từ server</li>
+        </ul>
+    </div>
+
+    <h3>2.2 Giải pháp: CDN Layer</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                  IMAGE DELIVERY PIPELINE (CDN)                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  User Request: GET /images/chapter/123/page-01.webp
+        │
+        ▼
+  ┌──────────────────┐    HIT?    ┌──────────────┐
+  │ CDN Edge Server  │──────Yes──▶│ Return cached │ (< 50ms)
+  │ (Cloudflare/Bunny)│           │ image         │
+  └────────┬─────────┘           └──────────────┘
+           │ MISS
+           ▼
+  ┌──────────────────┐
+  │ Origin Server    │  (.NET API hoặc S3 bucket)
+  │ Generate/Fetch   │
+  └────────┬─────────┘
+           │
+           ▼
+  ┌──────────────────┐
+  │ Cache tại Edge   │  (TTL: 30 ngày cho ảnh comic)
+  │ + Return to user │
+  └──────────────────┘
+    </div>
+
+    <h3>2.3 Cấu hình Cloudflare (miễn phí)</h3>
+    <div class="code-title">📁 Nginx config — proxy ảnh qua Cloudflare</div>
+    <pre><code># Trong nginx.conf, thêm cache headers cho ảnh:
+location /uploads/ {
+    alias D:/deploy/xmtruyen/uploads/;
+    
+    # Cache ảnh 30 ngày
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+    add_header X-Content-Type-Options "nosniff";
+    
+    # Cho phép CDN cache
+    add_header CDN-Cache-Control "public, max-age=2592000";
+}
+
+# Hoặc dùng BunnyCDN Pull Zone:
+# Origin URL: http://your-server-ip/uploads/
+# CDN URL: https://xmtruyen-cdn.b-cdn.net/uploads/</code></pre>
+
+    <h3>2.4 Adaptive Image Quality (giống ABR cho ảnh)</h3>
+    <div class="code-title">📁 xmtruyen.API/Services/ImageOptimizationService.cs</div>
+    <pre><code>/// &lt;summary&gt;
+/// Serve ảnh theo chất lượng phù hợp với bandwidth/device của user.
+/// Tương tự Adaptive Bitrate Streaming nhưng áp dụng cho ảnh tĩnh.
+/// &lt;/summary&gt;
+public class ImageOptimizationService
+{
+    // Khi upload ảnh comic page → tạo 3 bản:
+    public async Task&lt;ImageVariants&gt; ProcessComicPageAsync(string sourcePath)
+    {
+        return new ImageVariants
+        {
+            // Thumbnail: preview nhỏ cho danh sách chương
+            Thumbnail = await ResizeAndConvert(sourcePath, width: 200, quality: 60, "webp"),
+            
+            // Medium: đọc trên mobile (tiết kiệm data)
+            Medium = await ResizeAndConvert(sourcePath, width: 720, quality: 75, "webp"),
+            
+            // Full: đọc trên desktop (chất lượng cao)
+            Full = await ResizeAndConvert(sourcePath, width: 1200, quality: 85, "webp"),
+        };
+    }
+}
+
+// Client chọn chất lượng dựa trên:
+// - connection.effectiveType (4g/3g/2g) → JS Navigator API
+// - screen width (mobile < 768px → medium, desktop → full)
+// - user preference (tiết kiệm data toggle)</code></pre>
+
+    <div class="code-title">📁 xom-truyen/src/utils/imageQuality.ts</div>
+    <pre><code>/**
+ * Chọn chất lượng ảnh phù hợp dựa trên device + network.
+ * Tương đương Adaptive Bitrate Streaming cho ảnh.
+ */
+export function getImageQuality(): 'thumbnail' | 'medium' | 'full' {
+    // 1. Kiểm tra network (Navigator API)
+    const connection = (navigator as any).connection;
+    if (connection) {
+        if (connection.effectiveType === '2g' || connection.saveData) return 'thumbnail';
+        if (connection.effectiveType === '3g') return 'medium';
+    }
+
+    // 2. Kiểm tra screen width
+    if (window.innerWidth < 768) return 'medium';
+
+    // 3. Default: full quality
+    return 'full';
+}
+
+// Sử dụng:
+// const quality = getImageQuality();
+// const imageUrl = `${API_BASE}/uploads/chapters/${chapterId}/page-${num}_${quality}.webp`;</code></pre>
+
+    <!-- 3. STORAGE -->
+    <h2 id="storage">3. Storage & Byte-Range cho Ảnh Truyện Tranh</h2>
+
+    <h3>3.1 Stream Multiplication — Tạo multi-resolution khi upload</h3>
+    <div class="flow-diagram">
+┌────────────────────────────────────────────────────────────────┐
+│  UPLOAD PIPELINE: 1 ảnh gốc → 3 bản output                    │
+└────────────────────────────────────────────────────────────────┘
+
+  Upload: page-01.png (2MB, 1920x2700px)
+       │
+       ▼ Background Worker (ImageSharp / FFmpeg)
+       │
+       ├──▶ page-01_thumb.webp    (15KB,  200x280px,  q60)
+       ├──▶ page-01_medium.webp   (80KB,  720x1010px, q75)
+       └──▶ page-01_full.webp     (200KB, 1200x1680px, q85)
+
+  Storage structure:
+  uploads/chapters/{chapterId}/
+  ├── page-01_thumb.webp
+  ├── page-01_medium.webp
+  ├── page-01_full.webp
+  ├── page-02_thumb.webp
+  ├── page-02_medium.webp
+  └── page-02_full.webp
+    </div>
+
+    <h3>3.2 Cấu hình Backend Worker xử lý ảnh</h3>
+    <div class="code-title">📁 xmtruyen.API/Services/Workers/ImageProcessingWorker.cs</div>
+    <pre><code>using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Webp;
+
+public class ImageProcessingWorker
+{
+    private readonly record struct ImageProfile(string Suffix, int MaxWidth, int Quality);
+    
+    private static readonly ImageProfile[] Profiles = new[]
+    {
+        new ImageProfile("thumb",  200,  60),
+        new ImageProfile("medium", 720,  75),
+        new ImageProfile("full",   1200, 85),
+    };
+
+    public async Task ProcessComicPageAsync(string inputPath, string outputDir, int pageNumber)
+    {
+        using var image = await Image.LoadAsync(inputPath);
+        
+        foreach (var profile in Profiles)
+        {
+            using var clone = image.Clone(ctx =>
+            {
+                // Resize giữ tỉ lệ
+                ctx.Resize(new ResizeOptions
+                {
+                    Size = new Size(profile.MaxWidth, 0), // height auto
+                    Mode = ResizeMode.Max
+                });
+            });
+
+            var outputPath = Path.Combine(outputDir, $"page-{pageNumber:D3}_{profile.Suffix}.webp");
+            
+            await clone.SaveAsync(outputPath, new WebpEncoder
+            {
+                Quality = profile.Quality,
+                FileFormat = WebpFileFormatType.Lossy
+            });
+        }
+        
+        // Tạo BlurHash cho progressive loading
+        var blurHash = GenerateBlurHash(inputPath, componentX: 4, componentY: 3);
+        // Lưu blurHash vào DB (ComicPages.BlurHash)
+    }
+}</code></pre>
+
+    <!-- 4. COMPRESSION -->
+    <h2 id="compression">4. Nén Ảnh: WebP, Progressive Loading & Image Tiling</h2>
+
+    <h3>4.1 WebP Encoding — Giảm 25-34% so với JPEG/PNG</h3>
+    <div class="section-card">
+        <p><strong>Hiện tại:</strong> Ảnh truyện upload giữ nguyên định dạng gốc (PNG/JPEG) → dung lượng lớn.</p>
+        <p><strong>Giải pháp:</strong> Auto-convert sang WebP trong Background Worker khi upload.</p>
+        <ul>
+            <li>PNG → WebP Lossy (q85): giảm ~60% dung lượng</li>
+            <li>JPEG → WebP Lossy (q85): giảm ~25-34% dung lượng</li>
+            <li>Giữ Alpha Channel (ảnh nền trong suốt) khi cần</li>
+            <li>Fallback: serve JPEG cho browser không hỗ trợ WebP (IE11) — dùng <code>&lt;picture&gt;</code> tag</li>
+        </ul>
+    </div>
+
+    <h3>4.2 Progressive Loading — BlurHash / LQIP</h3>
+    <div class="code-title">📁 xom-truyen/src/components/Reading/ProgressiveImage.tsx</div>
+    <pre><code>import React, { useState, useRef, useEffect } from 'react';
+
+interface Props {
+    src: string;           // URL ảnh full
+    blurHash?: string;     // BlurHash string từ DB (4x3 components)
+    width: number;
+    height: number;
+    alt: string;
+}
+
+/**
+ * Hiển thị ảnh theo kiểu Netflix Progressive Loading:
+ * 1. Hiện placeholder BlurHash (màu mờ, ~20 bytes inline)
+ * 2. Load ảnh thật ở background
+ * 3. Khi load xong → fade-in ảnh thật, fade-out blur
+ */
+export const ProgressiveImage: React.FC&lt;Props&gt; = ({ src, blurHash, width, height, alt }) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isInView, setIsInView] = useState(false);
+    const containerRef = useRef&lt;HTMLDivElement&gt;(null);
+
+    // Lazy load: chỉ load khi vào viewport
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) setIsInView(true); },
+            { rootMargin: '200px' } // Preload trước 200px
+        );
+        if (containerRef.current) observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        &lt;div ref={containerRef} style={{ position: 'relative', width, aspectRatio: `${width}/${height}`, overflow: 'hidden', borderRadius: 4 }}&gt;
+            {/* Layer 1: BlurHash placeholder (inline, siêu nhẹ) */}
+            {blurHash && !isLoaded && (
+                &lt;canvas
+                    className="blurhash-canvas"
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'blur(20px)', transform: 'scale(1.1)' }}
+                    // Render blurHash via canvas (thư viện blurhash-js)
+                /&gt;
+            )}
+
+            {/* Layer 2: Ảnh thật (lazy loaded) */}
+            {isInView && (
+                &lt;img
+                    src={src}
+                    alt={alt}
+                    loading="lazy"
+                    onLoad={() => setIsLoaded(true)}
+                    style={{
+                        position: 'absolute', inset: 0,
+                        width: '100%', height: '100%', objectFit: 'cover',
+                        opacity: isLoaded ? 1 : 0,
+                        transition: 'opacity 300ms ease'
+                    }}
+                /&gt;
+            )}
+        &lt;/div&gt;
+    );
+};</code></pre>
+
+    <h3>4.3 Image Tiling — Webtoon dài chia thành tiles</h3>
+    <div class="note">
+        <strong>Bối cảnh:</strong> Webtoon (truyện tranh cuộn dọc) có ảnh rất dài (1200x20000px+). Nếu load nguyên ảnh → RAM explode, render chậm.
+    </div>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  IMAGE TILING CHO WEBTOON                                        │
+└─────────────────────────────────────────────────────────────────┘
+
+  Ảnh gốc: page-01.png (1200 x 18000px, 8MB)
+       │
+       ▼ Backend Worker: cắt thành tiles 1200x800px
+       │
+       ├──▶ page-01_tile-01.webp  (1200x800,  50KB) ← viewport
+       ├──▶ page-01_tile-02.webp  (1200x800,  55KB) ← preload
+       ├──▶ page-01_tile-03.webp  (1200x800,  48KB) ← preload
+       ├──▶ page-01_tile-04.webp  (1200x800,  52KB)
+       ├──▶ ...
+       └──▶ page-01_tile-23.webp  (1200x200,  20KB) ← tile cuối (nhỏ hơn)
+
+  Client: IntersectionObserver → chỉ render tiles trong viewport + 2 tiles buffer
+    </div>
+
+    <div class="code-title">📁 xom-truyen/src/components/Reading/WebtoonTiledReader.tsx</div>
+    <pre><code>/**
+ * Webtoon Reader với Image Tiling:
+ * - Backend cắt ảnh dài thành tiles 800px
+ * - Client dùng IntersectionObserver chỉ load tiles gần viewport
+ * - Preload 2 tiles phía trước
+ */
+export const WebtoonTiledReader: React.FC&lt;{ tiles: TileInfo[] }&gt; = ({ tiles }) => {
+    return (
+        &lt;div className="webtoon-scroll-container"&gt;
+            {tiles.map((tile, idx) => (
+                &lt;ProgressiveImage
+                    key={tile.id}
+                    src={tile.url}
+                    blurHash={tile.blurHash}
+                    width={tile.width}
+                    height={tile.height}
+                    alt={`Tile ${idx + 1}`}
+                /&gt;
+            ))}
+        &lt;/div&gt;
+    );
+};
+
+// API response format:
+// GET /api/reading/chapter/{id}
+// { tiles: [{ id, url, width, height, blurHash, order }] }</code></pre>
+
+    <!-- 5. RECOMMENDATION -->
+    <h2 id="recommendation">5. Hệ Thống Gợi Ý Truyện (AI Recommendation)</h2>
+
+    <h3>5.1 Implicit Data — Thu thập hành vi đọc</h3>
+    <div class="code-title">📁 xom-truyen/src/services/engagementService.ts</div>
+    <pre><code>/**
+ * Thu thập dữ liệu hành vi ẩn (implicit signals) gửi về API.
+ * Tương tự Netflix: track tốc độ xem, thời gian nán lại, thói quen bỏ dở.
+ */
+interface ReadingEngagement {
+    userId: string;
+    publicationId: string;
+    chapterId: string;
+    
+    // Implicit signals:
+    timeSpentSeconds: number;       // Thời gian đọc chương này
+    scrollSpeedAvg: number;         // Tốc độ cuộn trung bình (px/s)
+    pagesViewed: number;            // Số trang đã xem
+    totalPages: number;             // Tổng số trang
+    completionRate: number;         // % hoàn thành (0-100)
+    didFinishChapter: boolean;      // Có đọc hết chương không
+    didGoToNextChapter: boolean;    // Có chuyển chương tiếp không
+    backtrackCount: number;         // Số lần cuộn ngược (đọc lại)
+    sessionTimeOfDay: string;       // Khung giờ đọc (morning/afternoon/night)
+    deviceType: string;             // mobile/desktop/tablet
+}
+
+// Gửi khi user rời chương (beforeunload hoặc navigate away):
+export async function trackEngagement(data: ReadingEngagement) {
+    await fetch('/api/engagement/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        keepalive: true // Đảm bảo gửi được ngay cả khi tab đang đóng
+    });
+}</code></pre>
+
+    <h3>5.2 Recommendation Engine (đơn giản, không cần ML phức tạp)</h3>
+    <div class="code-title">📁 xmtruyen.API/Services/RecommendationService.cs</div>
+    <pre><code>/// &lt;summary&gt;
+/// Hệ thống gợi ý đơn giản dựa trên:
+/// 1. Content-based: Truyện cùng thể loại/chủ đề user đã đọc
+/// 2. Collaborative: "Người đọc truyện A cũng đọc truyện B"
+/// 3. Engagement-weighted: Ưu tiên thể loại user đọc lâu nhất
+/// &lt;/summary&gt;
+public class RecommendationService
+{
+    public async Task&lt;List&lt;Publication&gt;&gt; GetRecommendationsAsync(Guid userId, int count = 10)
+    {
+        // 1. Lấy thể loại user đọc nhiều nhất (weighted by time spent)
+        var topCategories = await _db.ReadingHistories
+            .Where(r => r.UserId == userId)
+            .GroupBy(r => r.Publication.Categories.First().CategoryId)
+            .OrderByDescending(g => g.Sum(r => r.TimeSpentSeconds))
+            .Take(3)
+            .Select(g => g.Key)
+            .ToListAsync();
+
+        // 2. Lấy sách cùng thể loại mà user CHƯA đọc
+        var readIds = await _db.ReadingHistories
+            .Where(r => r.UserId == userId)
+            .Select(r => r.PublicationId)
+            .Distinct()
+            .ToListAsync();
+
+        var recommendations = await _db.Publications
+            .Where(p => !readIds.Contains(p.Id))
+            .Where(p => p.Categories.Any(c => topCategories.Contains(c.CategoryId)))
+            .OrderByDescending(p => p.ViewCount * 0.3 + p.AverageRating * 0.7) // Score
+            .Take(count)
+            .ToListAsync();
+
+        // 3. Collaborative filtering đơn giản:
+        // "Users đọc truyện X cũng hay đọc truyện Y"
+        var collaborativeIds = await _db.ReadingHistories
+            .Where(r => readIds.Contains(r.PublicationId) && r.UserId != userId)
+            .Select(r => r.UserId)
+            .Distinct()
+            .Take(50) // Top 50 users có chung sở thích
+            .SelectMany(uid => _db.ReadingHistories
+                .Where(r => r.UserId == uid && !readIds.Contains(r.PublicationId))
+                .Select(r => r.PublicationId))
+            .GroupBy(id => id)
+            .OrderByDescending(g => g.Count())
+            .Take(count / 2)
+            .Select(g => g.Key)
+            .ToListAsync();
+
+        var collaborative = await _db.Publications
+            .Where(p => collaborativeIds.Contains(p.Id))
+            .ToListAsync();
+
+        // Merge và loại trùng
+        return recommendations
+            .Union(collaborative)
+            .DistinctBy(p => p.Id)
+            .Take(count)
+            .ToList();
+    }
+}</code></pre>
+
+    <h3>5.3 Micro-tagging — Gắn tag chi tiết cho truyện</h3>
+    <div class="section-card">
+        <p>Thêm bảng <code>PublicationTags</code> với các tag siêu chi tiết (admin nhập thủ công):</p>
+        <table>
+            <thead><tr><th>Tag Group</th><th>Ví dụ</th></tr></thead>
+            <tbody>
+                <tr><td>Tone/Mood</td><td>Hài hước, u ám, lãng mạn, căng thẳng, nhẹ nhàng</td></tr>
+                <tr><td>Bối cảnh</td><td>Thời hiện đại, cổ đại, giả tưởng, du hành thời gian</td></tr>
+                <tr><td>Nhân vật chính</td><td>Nam chính mạnh, nữ chính thông minh, phản diện phức tạp</td></tr>
+                <tr><td>Pacing</td><td>Chậm rãi, nhanh, action liên tục, slice-of-life</td></tr>
+                <tr><td>Art style (comic)</td><td>Chibi, realistic, manhwa, manga, webtoon full-color</td></tr>
+            </tbody>
+        </table>
+        <p>→ Recommendation engine dùng tags để matching chính xác hơn: "User thích truyện <em>tone hài + bối cảnh hiện đại</em> → gợi ý truyện cùng tag"</p>
+    </div>
+
+    <!-- 6. ARCHITECTURE -->
+    <h2 id="architecture">6. Kiến Trúc Phần Mềm — Áp Dụng Cho Quy Mô Nhỏ</h2>
+
+    <h3>6.1 Từ Monolith → Modular Monolith (trước khi lên Microservices)</h3>
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  KIẾN TRÚC HIỆN TẠI (Monolith đơn)                              │
+│                                                                   │
+│  xmtruyen.API (1 project, tất cả controllers + services)       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼ Refactor thành:
+┌─────────────────────────────────────────────────────────────────┐
+│  KIẾN TRÚC MỚI (Modular Monolith + Background Workers)          │
+│                                                                   │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌────────────────┐│
+│  │ API Module       │  │ Worker Module    │  │ Scheduler      ││
+│  │ (Controllers)    │  │ (Image Process)  │  │ (Cron Jobs)    ││
+│  │                  │  │ (Book Extract)   │  │ (Stats calc)   ││
+│  │ Auth, Reading,   │  │ (Recommendation  │  │ (Cleanup old   ││
+│  │ Publications,    │  │  score refresh)  │  │  files)        ││
+│  │ Admin, Upload    │  │                  │  │                ││
+│  └────────┬─────────┘  └────────┬─────────┘  └────────┬───────┘│
+│           │                     │                      │         │
+│           └─────────────────────┼──────────────────────┘         │
+│                                 ▼                                 │
+│                    ┌──────────────────────┐                       │
+│                    │   Shared Kernel      │                       │
+│                    │   (DbContext, DTOs,  │                       │
+│                    │    Interfaces)       │                       │
+│                    └──────────────────────┘                       │
+└─────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <div class="note">
+        <strong>💡 Netflix dùng Microservices vì có 1000+ engineers.</strong> Xóm Truyện quy mô nhỏ → dùng <strong>Modular Monolith</strong>: 1 solution .NET nhưng tách rõ modules. Khi scale lên mới tách thành services riêng.
+    </div>
+
+    <h3>6.2 High Availability cho quy mô nhỏ</h3>
+    <div class="section-card">
+        <ul>
+            <li><strong>Health Check endpoint:</strong> <code>GET /api/system/health</code> → trả về status các module</li>
+            <li><strong>Auto-restart:</strong> NSSM tự restart service khi crash (đã có)</li>
+            <li><strong>Graceful degradation:</strong> Nếu Recommendation service lỗi → hiển thị "Truyện phổ biến" (fallback static list)</li>
+            <li><strong>Circuit Breaker:</strong> Nếu CDN lỗi → fallback về serve ảnh trực tiếp từ server</li>
+        </ul>
+    </div>
+
+    <!-- 7. IMPLEMENTATION -->
+    <h2 id="implementation">7. Triển Khai Cụ Thể — Code & Cấu Hình</h2>
+
+    <h3>7.1 NuGet Packages cần thêm (.NET API)</h3>
+    <pre><code>&lt;!-- Image processing (WebP, resize, BlurHash) --&gt;
+&lt;PackageReference Include="SixLabors.ImageSharp" Version="3.*" /&gt;
+&lt;PackageReference Include="SixLabors.ImageSharp.Web" Version="3.*" /&gt;
+&lt;PackageReference Include="Blurhash.ImageSharp" Version="3.*" /&gt;
+
+&lt;!-- Background job scheduling --&gt;
+&lt;PackageReference Include="Hangfire" Version="1.*" /&gt;
+&lt;!-- Hoặc giữ BackgroundService hiện có --&gt;</code></pre>
+
+    <h3>7.2 NPM Packages cần thêm (Client)</h3>
+    <pre><code># Progressive loading / BlurHash decode:
+npm install blurhash
+
+# Intersection Observer (polyfill cho browser cũ):
+npm install react-intersection-observer</code></pre>
+
+    <h3>7.3 Database migration — thêm columns</h3>
+    <pre><code>-- Thêm BlurHash và multi-resolution URLs vào ComicPages:
+ALTER TABLE "ComicPages" ADD COLUMN "BlurHash" VARCHAR(50);
+ALTER TABLE "ComicPages" ADD COLUMN "ThumbnailUrl" TEXT;
+ALTER TABLE "ComicPages" ADD COLUMN "MediumUrl" TEXT;
+ALTER TABLE "ComicPages" ADD COLUMN "FullUrl" TEXT;
+
+-- Thêm bảng ReadingEngagement:
+CREATE TABLE "ReadingEngagements" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "UserId" UUID REFERENCES "Users"("Id"),
+    "PublicationId" UUID REFERENCES "Publications"("Id"),
+    "ChapterId" UUID,
+    "TimeSpentSeconds" INT DEFAULT 0,
+    "ScrollSpeedAvg" FLOAT DEFAULT 0,
+    "CompletionRate" FLOAT DEFAULT 0,
+    "DidFinishChapter" BOOLEAN DEFAULT FALSE,
+    "DeviceType" VARCHAR(20),
+    "SessionTimeOfDay" VARCHAR(10),
+    "CreatedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Thêm bảng PublicationTags (micro-tagging):
+CREATE TABLE "PublicationTags" (
+    "Id" SERIAL PRIMARY KEY,
+    "PublicationId" UUID REFERENCES "Publications"("Id"),
+    "TagGroup" VARCHAR(50),   -- 'tone', 'setting', 'character', 'pacing', 'art_style'
+    "TagValue" VARCHAR(100)   -- 'hài hước', 'u ám', 'cổ đại'...
+);</code></pre>
+
+    <!-- 8. ROADMAP -->
+    <h2 id="roadmap">8. Lộ Trình Triển Khai Theo Pha</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pha</th>
+                <th>Công nghệ</th>
+                <th>Effort</th>
+                <th>Impact</th>
+                <th>Thời gian</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background: rgba(34,197,94,0.05);">
+                <td><strong>Pha 1</strong><br>(Ngay)</td>
+                <td>
+                    • WebP auto-convert khi upload<br>
+                    • CDN (Cloudflare free) cho ảnh tĩnh<br>
+                    • Cache headers (30 ngày cho ảnh)
+                </td>
+                <td>2-3 ngày</td>
+                <td>Giảm 30% bandwidth, ảnh load nhanh hơn 2x</td>
+                <td>Tuần 1</td>
+            </tr>
+            <tr style="background: rgba(34,197,94,0.05);">
+                <td><strong>Pha 2</strong><br>(Sớm)</td>
+                <td>
+                    • Multi-resolution images (thumb/medium/full)<br>
+                    • Progressive loading (BlurHash)<br>
+                    • Lazy loading images (IntersectionObserver)
+                </td>
+                <td>1 tuần</td>
+                <td>UX mượt hơn 40%, không layout shift, ảnh "hiện" từ blur→rõ</td>
+                <td>Tuần 2-3</td>
+            </tr>
+            <tr style="background: rgba(249,115,22,0.05);">
+                <td><strong>Pha 3</strong><br>(Trung hạn)</td>
+                <td>
+                    • Image Tiling cho webtoon<br>
+                    • Adaptive Image Quality (theo network)<br>
+                    • Engagement tracking (implicit data)
+                </td>
+                <td>2 tuần</td>
+                <td>Webtoon dài load mượt, tiết kiệm data mobile</td>
+                <td>Tuần 4-5</td>
+            </tr>
+            <tr style="background: rgba(168,85,247,0.05);">
+                <td><strong>Pha 4</strong><br>(Dài hạn)</td>
+                <td>
+                    • Recommendation engine<br>
+                    • Micro-tagging system<br>
+                    • Artwork personalization (A/B test thumbnail)
+                </td>
+                <td>3-4 tuần</td>
+                <td>Tăng engagement 20-30%, user quay lại nhiều hơn</td>
+                <td>Tháng 2-3</td>
+            </tr>
+            <tr style="background: rgba(168,85,247,0.05);">
+                <td><strong>Pha 5</strong><br>(Tương lai)</td>
+                <td>
+                    • Modular Monolith refactor<br>
+                    • Tách Worker thành service riêng<br>
+                    • Circuit Breaker + Graceful degradation
+                </td>
+                <td>Ongoing</td>
+                <td>Codebase dễ maintain, sẵn sàng scale</td>
+                <td>Khi cần</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="success">
+        <strong>🎯 Kết luận:</strong> Xóm Truyện có thể áp dụng <strong>8/12 công nghệ</strong> từ kiến trúc Netflix-scale. Các kỹ thuật quan trọng nhất (WebP, CDN, Progressive Loading, Image Tiling, Adaptive Quality) đều khả thi với quy mô 1-2 developer và không tốn chi phí hạ tầng lớn.
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Áp Dụng Công Nghệ Netflix-Scale — Xóm Truyện Workspace<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>

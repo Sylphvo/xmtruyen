@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xóm Truyện - Tổng Quan Cấu Trúc Ứng Dụng & Hệ Sinh Thái</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Grid -->
+  <div class="cyber-background"></div>
+
+  <!-- App Wrapper -->
+  <div id="app">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <span>XÓM TRUYỆN</span>
+          <span class="badge">Architecture Flow</span>
+        </div>
+      </div>
+
+      <!-- View Mode Switcher -->
+      <div class="view-mode-tabs">
+        <button class="view-mode-btn active" id="btn-mode-table">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span>Bảng Danh Sách Luồng</span>
+        </button>
+        <button class="view-mode-btn" id="btn-mode-diagram">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <span>Sơ Đồ Trực Quan (Pipeline)</span>
+        </button>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <!-- Search -->
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm module / app...">
+        </div>
+
+        <!-- Theme Toggle -->
+        <button class="theme-switch-btn" id="theme-toggle-btn" title="Chuyển đổi giao diện (Sáng / Slate Tối / Cyberpunk)">
+          <span class="theme-switch-icon" id="theme-switch-icon">🌙</span>
+          <span id="theme-switch-label">Giao diện Tối</span>
+        </button>
+
+        <!-- Audio toggle -->
+        <button class="action-btn active" id="sound-btn" title="Bật/Tắt âm thanh hiệu ứng">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <!-- Reset Zoom -->
+        <button class="action-btn" id="reset-view-btn" title="Căn giữa lại sơ đồ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+        </button>
+
+        <!-- Fullscreen -->
+        <button class="action-btn" id="fullscreen-btn" title="Toàn màn hình">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace Container -->
+    <div class="workspace-container">
+      
+      <!-- 1. Table / List Directory View -->
+      <section class="table-view-container" id="table-view-container">
+        <div class="table-content-inner">
+
+          <!-- Top Sub-Navigation Tabs Switcher -->
+          <div class="table-subnav-bar">
+            <div class="table-subnav-group">
+              <button class="subnav-pill active" id="subnav-btn-flows">
+                <span class="subnav-icon">⚡</span>
+                <span class="subnav-text">Danh Sách Luồng Nghiệp Vụ</span>
+                <span class="subnav-badge" id="flows-badge-count">05 Luồng</span>
+              </button>
+              <button class="subnav-pill" id="subnav-btn-changelog">
+                <span class="subnav-icon">📜</span>
+                <span class="subnav-text">Lịch Sử Phát Triển & Nhật Ký</span>
+                <span class="subnav-badge highlight" id="changelog-badge-count">08 Phiên Bản</span>
+              </button>
+              <button class="subnav-pill" id="subnav-btn-docs">
+                <span class="subnav-icon">📘</span>
+                <span class="subnav-text">Tài Liệu Hướng Dẫn Sử Dụng</span>
+                <span class="subnav-badge doc-badge" id="docs-badge-count">Cẩm Nang Vận Hành</span>
+              </button>
+              <button class="subnav-pill" id="subnav-btn-settings">
+                <span class="subnav-icon">⚙️</span>
+                <span class="subnav-text">Quản Trị Hệ Thống</span>
+                <span class="subnav-badge" id="settings-badge-count">Admin</span>
+              </button>
+              <button class="subnav-pill" id="subnav-btn-history">
+                <span class="subnav-icon">🤖</span>
+                <span class="subnav-text">Lịch Sử Trò Chuyện (AI)</span>
+                <span class="subnav-badge" style="background: var(--purple-glow);">Log</span>
+              </button>
+            </div>
+            <div class="subnav-hint">
+              <span class="subnav-dot">●</span> Tự động đồng bộ với mã nguồn thực tế
+            </div>
+          </div>
+
+          <!-- TAB 1: FLOWS DIRECTORY VIEW -->
+          <div class="tab-view-pane active" id="pane-flows">
+            <!-- Hero Summary Banner -->
+            <div class="table-hero-banner">
+              <div class="table-hero-left">
+                <span class="table-hero-tag">⚡ Kiến Trúc Hệ Thống Xóm Truyện</span>
+                <h1 class="table-hero-title">Danh Sách Toàn Bộ Luồng Xử Lý & Phân Hệ</h1>
+                <p class="table-hero-desc">
+                  Nhấp vào bất kỳ dòng nào dưới đây để mở <strong>Sơ Đồ Trực Quan Pipeline</strong> hiển thị chi tiết các bước truyền tải dữ liệu giữa Frontend, API, Tiến Trình Ngầm và PostgreSQL.
+                </p>
+              </div>
+              <div class="table-hero-stats">
+                <div class="stat-box">
+                  <div class="stat-number">05</div>
+                  <div class="stat-label">Luồng Nghiệp Vụ</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number">05</div>
+                  <div class="stat-label">Ứng Dụng Core</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number">18</div>
+                  <div class="stat-label">Bảng CSDL</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Cyber Table -->
+            <div class="table-wrapper">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th style="width: 80px; text-align: center;">STT</th>
+                    <th style="width: 290px;">Tên Luồng / Phân Hệ</th>
+                    <th>Quy Trình Xử Lý Dữ Liệu (Data Pipeline)</th>
+                    <th style="width: 150px; text-align: center;">Phân Loại</th>
+                    <th style="width: 95px; text-align: center;">Số Bước</th>
+                    <th style="width: 210px; text-align: right;">Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody id="flows-table-body">
+                  <!-- Rendered dynamically via app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 2: SYSTEM EVOLUTION & CHANGELOG VIEW -->
+          <div class="tab-view-pane" id="pane-changelog" style="display: none;">
+            <!-- Changelog Hero Banner -->
+            <div class="table-hero-banner changelog-hero">
+              <div class="table-hero-left">
+                <span class="table-hero-tag" style="color: var(--purple-glow);">📜 System Evolution & Feature Documentation</span>
+                <h1 class="table-hero-title">Nhật Ký Phát Triển & Tài Liệu Chức Năng</h1>
+                <p class="table-hero-desc">
+                  Theo dõi toàn bộ lịch sử nâng cấp mã nguồn của các ứng dụng trong Workspace Xóm Truyện. Nhấp <strong>[ 📖 Xem Tài Liệu ]</strong> để đọc đặc tả kỹ thuật, danh sách tệp thay đổi, endpoint API và code mẫu của từng tính năng.
+                </p>
+              </div>
+              <div class="table-hero-stats">
+                <div class="stat-box">
+                  <div class="stat-number" style="color: var(--purple-glow);">08</div>
+                  <div class="stat-label">Bản Cập Nhật</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" style="color: var(--green-glow);">100%</div>
+                  <div class="stat-label">Tài Liệu Chi Tiết</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" style="color: var(--amber-glow);">v1.3.0</div>
+                  <div class="stat-label">Bản Mới Nhất</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter Categories Bar -->
+            <div class="changelog-filter-bar">
+              <span class="filter-label">Lọc Theo Phân Hệ:</span>
+              <div class="filter-pills" id="changelog-filter-pills">
+                <button class="filter-pill active" data-filter="all">Tất Cả (08)</button>
+                <button class="filter-pill" data-filter="web">Web Client</button>
+                <button class="filter-pill" data-filter="api">Backend API</button>
+                <button class="filter-pill" data-filter="admin">Admin Portal</button>
+                <button class="filter-pill" data-filter="mobile">Mobile App</button>
+                <button class="filter-pill" data-filter="db">PostgreSQL DB</button>
+              </div>
+            </div>
+
+            <!-- Changelog Cyber Table -->
+            <div class="table-wrapper">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px; text-align: center;">Phiên Bản / Commit</th>
+                    <th style="width: 130px; text-align: center;">Thời Gian</th>
+                    <th>Tên Chức Năng & Tóm Tắt Kỹ Thuật</th>
+                    <th style="width: 210px;">Phân Hệ Ứng Dụng</th>
+                    <th style="width: 160px; text-align: center;">Loại Cập Nhật</th>
+                    <th style="width: 170px; text-align: right;">Tài Liệu Chi Tiết</th>
+                  </tr>
+                </thead>
+                <tbody id="changelog-table-body">
+                  <!-- Rendered dynamically via app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 3: USER MANUAL & DOCUMENTATION VIEW -->
+          <!-- TAB 4: SETTINGS & COMMANDS VIEW -->
+          <div class="tab-view-pane" id="pane-settings" style="display: none;">
+             <div class="table-hero-banner" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(30, 41, 59, 0.8) 100%);">
+              <div class="table-hero-left">
+                <span class="table-hero-tag" style="color: #ef4444;">⚙️ Cấu Hình Hệ Thống</span>
+                <h1 class="table-hero-title">Bảng Điều Khiển & Quản Trị Server</h1>
+                <p class="table-hero-desc">Thay đổi thông số hệ thống, giới hạn dung lượng tải lên và khởi động/dừng các service của hệ sinh thái Xóm Truyện.</p>
+              </div>
+            </div>
+
+            <div class="settings-container" style="padding: 24px; color: #fff;">
+                <div class="settings-card" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-bottom: 15px; font-size: 18px; color: var(--cyan-glow);">Thiết lập Upload File (API)</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label style="font-size: 14px; color: #aaa;">Giới hạn dung lượng (MB):</label>
+                        <input type="number" id="upload-limit-input" value="500" style="padding: 10px; border-radius: 6px; background: #1a1a24; border: 1px solid #444; color: white; width: 120px; font-family: 'JetBrains Mono', monospace;">
+                        <button style="padding: 10px 20px; background: var(--cyan-glow); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;" onclick="alert('Lưu ý: Để cập nhật giới hạn tải lên, bạn cần chỉnh sửa [RequestSizeLimit] trong UploadController.cs và cấu hình Kestrel trong Program.cs. Tính năng đồng bộ tự động đang trong quá trình phát triển!')">Lưu cấu hình</button>
+                    </div>
+                </div>
+
+                <div class="settings-card" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-bottom: 15px; font-size: 18px; color: var(--amber-glow);">Quản lý Trạng Thái Projects (Startup)</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button type="button" style="padding: 12px 20px; background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="fetch('http://127.0.0.1:5555/api/start-web')">
+                            ▶️ Start Web Client (React)
+                        </button>
+                        <button type="button" style="padding: 12px 20px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="fetch('http://127.0.0.1:5555/api/start-admin')">
+                            ▶️ Start Admin Portal
+                        </button>
+                        <button type="button" style="padding: 12px 20px; background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="fetch('http://127.0.0.1:5555/api/start-api')">
+                            ▶️ Start Backend API (.NET)
+                        </button>
+                        <button type="button" style="padding: 12px 20px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="alert('Hãy tự đóng các cửa sổ Terminal vừa được bật lên để dừng project nhé.')">
+                            ⏹️ Cách Dừng Projects
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 25px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                        <h4 style="color: #aaa; margin-bottom: 10px;">Trạng Thái Khởi Động:</h4>
+                        <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+                            <li style="display: flex; align-items: center; gap: 10px;">
+                                <span id="status-web" style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                                <span><strong>Web Client:</strong> <span id="text-web" style="color: #ef4444;">Đã dừng</span> (Port 5173)</span>
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 10px;">
+                                <span id="status-admin" style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                                <span><strong>Admin Portal:</strong> <span id="text-admin" style="color: #ef4444;">Đã dừng</span> (Port 5174)</span>
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 10px;">
+                                <span id="status-api" style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                                <span><strong>Backend API:</strong> <span id="text-api" style="color: #ef4444;">Đã dừng</span> (Port 5000)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          <script>
+            // Polling status
+            setInterval(async () => {
+                try {
+                    const res = await fetch('http://127.0.0.1:5555/api/status');
+                    if(res.ok) {
+                        const data = await res.json();
+                        const updateStatus = (id, isRunning) => {
+                            document.getElementById('status-' + id).style.background = isRunning ? '#22c55e' : '#ef4444';
+                            document.getElementById('status-' + id).style.boxShadow = isRunning ? '0 0 8px #22c55e' : 'none';
+                            document.getElementById('text-' + id).textContent = isRunning ? 'Đang chạy' : 'Đã dừng';
+                            document.getElementById('text-' + id).style.color = isRunning ? '#22c55e' : '#ef4444';
+                        };
+                        updateStatus('web', data.web);
+                        updateStatus('admin', data.admin);
+                        updateStatus('api', data.api);
+                    }
+                } catch(e) {
+                    // Server is down or not running via server.js
+                }
+            }, 2000);
+          </script>
+
+          <div class="tab-view-pane" id="pane-docs" style="display: none;">
+            <!-- Docs Hero Banner -->
+            <div class="table-hero-banner docs-hero">
+              <div class="table-hero-left">
+                <span class="table-hero-tag" style="color: var(--blue-glow);">📘 Cẩm Nang Vận Hành & Sử Dụng Phần Mềm</span>
+                <h1 class="table-hero-title">Tài Liệu Hướng Dẫn Sử Dụng Hệ Sinh Thái Xóm Truyện</h1>
+                <p class="table-hero-desc">
+                  Tài liệu chi tiết hướng dẫn thao tác từ cơ bản đến chuyên sâu cho <strong>Độc Giả</strong>, <strong>Tác Giả / Nhóm Dịch</strong>, <strong>Quản Trị Viên (Admin)</strong> và <strong>Kỹ Sư Triển Khai (DevOps)</strong>.
+                </p>
+              </div>
+              <div class="table-hero-stats">
+                <div class="stat-box">
+                  <div class="stat-number" style="color: var(--blue-glow);">06</div>
+                  <div class="stat-label">Chuyên Mục</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" style="color: var(--green-glow);">100%</div>
+                  <div class="stat-label">Khớp Source Code</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" style="color: var(--amber-glow);">05</div>
+                  <div class="stat-label">Phân Hệ Ứng Dụng</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Docs Layout -->
+            <div class="user-docs-layout">
+              <!-- Left Docs Menu -->
+              <aside class="docs-sidebar">
+                <div class="docs-sidebar-header">
+                  <span class="docs-nav-title">MỤC LỤC TÀI LIỆU</span>
+                </div>
+                <nav class="docs-nav-menu" id="docs-nav-menu">
+                  <button class="docs-nav-item active" data-doc-target="doc-section-quickstart">
+                    <span class="docs-nav-icon">🚀</span>
+                    <div class="docs-nav-text">
+                      <span class="docs-nav-main">1. Khởi Động & Cài Đặt</span>
+                      <span class="docs-nav-sub">Môi trường Dev, API & DB</span>
+                    </div>
+                  </button>
+                  <button class="docs-nav-item" data-doc-target="doc-section-reader">
+                    <span class="docs-nav-icon">📖</span>
+                    <div class="docs-nav-text">
+                      <span class="docs-nav-main">2. Hướng Dẫn Độc Giả</span>
+                      <span class="docs-nav-sub">Đọc chữ, truyện tranh, đổi CDN</span>
+                    </div>
+                  </button>
+                  <button class="docs-nav-item" data-doc-target="doc-section-creator">
+                    <span class="docs-nav-icon">✍️</span>
+                    <div class="docs-nav-text">
+                      <span class="docs-nav-main">3. Tác Giả & Dịch Giả</span>
+                      <span class="docs-nav-sub">Đăng truyện, tạo chương, up 500MB</span>
+                    </div>
+                  </button>
+                  <button class="docs-nav-item" data-doc-target="doc-section-admin">
+                    <span class="docs-nav-icon">🛡️</span>
+                    <div class="docs-nav-text">
+                      <span class="docs-nav-main">4. Quản Trị Hệ Thống</span>
+                      <span class="docs-nav-sub">AG-Grid, phân quyền, kiểm duyệt</span>
+                    </div>
+                  </button>
+                  <button class="docs-nav-item" data-doc-target="doc-section-architecture">
+                    <span class="docs-nav-icon">⚙️</span>
+                    <div class="docs-nav-text">
+                      <span class="docs-nav-main">5. CSDL & API Backend</span>
+                      <span class="docs-nav-sub">18 DbSets, JWT Cookie, Endpoints</span>
+                    </div>
+                  </button>
+                  <button class="docs-nav-item" data-doc-target="doc-section-troubleshooting">
+                    <span class="docs-nav-icon">❓</span>
+                    <div class="docs-nav-text">
+                      <span class="docs-nav-main">6. Xử Lý Sự Cố & FAQs</span>
+                      <span class="docs-nav-sub">CORS, kết nối DB, lỗi nén ảnh</span>
+                    </div>
+                  </button>
+                </nav>
+              </aside>
+
+              <!-- Right Docs Main Content -->
+              <main class="docs-main-content">
+
+                <!-- SECTION 1: QUICKSTART -->
+                <section class="docs-content-section active" id="doc-section-quickstart">
+                  <div class="docs-section-header">
+                    <div class="docs-badge-category">Chương 1 • Thiết Lập Môi Trường</div>
+                    <h2 class="docs-section-title">🚀 Hướng Dẫn Khởi Động & Cài Đặt Hệ Thống</h2>
+                    <p class="docs-section-desc">Hướng dẫn chạy toàn bộ 5 phân hệ ứng dụng trong Workspace Xóm Truyện trên máy tính cục bộ (Local Development).</p>
+                  </div>
+
+                  <div class="docs-grid-cards">
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag">Bước 1</span>
+                        <h4 class="guide-card-title">Khởi Động Backend API (.NET 8)</h4>
+                      </div>
+                      <p class="guide-card-desc">Cung cấp toàn bộ RESTful API, xác thực JWT, tương tác PostgreSQL và phân luồng tác vụ ngầm.</p>
+                      <div class="guide-code-terminal">
+                        <code>cd xmtruyen.API
+dotnet restore
+dotnet ef database update
+dotnet run</code>
+                      </div>
+                      <div class="guide-tip-box">
+                        <strong>💡 Mặc định:</strong> API chạy tại <code>http://localhost:5000</code> hoặc <code>https://localhost:7001</code>. Swagger UI tại <code>/swagger</code>.
+                      </div>
+                    </div>
+
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag">Bước 2</span>
+                        <h4 class="guide-card-title">Khởi Động Web Client (Next.js / React)</h4>
+                      </div>
+                      <p class="guide-card-desc">Cổng thông tin và đọc truyện trực tuyến dành cho độc giả với giao diện tối ưu SEO.</p>
+                      <div class="guide-code-terminal">
+                        <code>cd xom-truyen
+npm install
+npm run dev</code>
+                      </div>
+                      <div class="guide-tip-box">
+                        <strong>💡 Mặc định:</strong> Web Client chạy tại <code>http://localhost:3000</code>.
+                      </div>
+                    </div>
+
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag">Bước 3</span>
+                        <h4 class="guide-card-title">Khởi Động Admin Portal (React / Vite)</h4>
+                      </div>
+                      <p class="guide-card-desc">Trang quản trị toàn diện với bảng AG-Grid Enterprise dành cho Quản Trị Viên và Biên Tập Viên.</p>
+                      <div class="guide-code-terminal">
+                        <code>cd xmtruyen-admin
+npm install
+npm run dev</code>
+                      </div>
+                      <div class="guide-tip-box">
+                        <strong>💡 Mặc định:</strong> Admin Portal chạy tại <code>http://localhost:5173</code>.
+                      </div>
+                    </div>
+
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag">Bước 4</span>
+                        <h4 class="guide-card-title">Khởi Động Mobile App (Ionic 8 & Capacitor)</h4>
+                      </div>
+                      <p class="guide-card-desc">Ứng dụng di động đa nền tảng (Android / iOS) hỗ trợ đọc ngoại tuyến và thông báo đẩy.</p>
+                      <div class="guide-code-terminal">
+                        <code>cd xmtruyen-app
+npm install
+ionic serve
+# Hoặc build Android:
+npx cap sync android && npx cap open android</code>
+                      </div>
+                      <div class="guide-tip-box">
+                        <strong>💡 Mặc định:</strong> Giao diện Web preview chạy tại <code>http://localhost:8100</code>.
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- SECTION 2: READER GUIDE -->
+                <section class="docs-content-section" id="doc-section-reader" style="display: none;">
+                  <div class="docs-section-header">
+                    <div class="docs-badge-category">Chương 2 • Trải Nghiệm Người Dùng</div>
+                    <h2 class="docs-section-title">📖 Hướng Dẫn Sử Dụng Dành Cho Độc Giả</h2>
+                    <p class="docs-section-desc">Các tính năng tối ưu trải nghiệm đọc sách, truyện chữ, truyện tranh trên Web và App di động.</p>
+                  </div>
+
+                  <div class="docs-feature-showcase">
+                    <div class="feature-item-box">
+                      <div class="feature-icon-badge">📑</div>
+                      <div class="feature-details">
+                        <h4>1. Trình Đọc Truyện Chữ (Novel Reader)</h4>
+                        <p>Hỗ trợ tùy biến chuyên sâu: Thay đổi kích thước chữ (A-/A+), khoảng cách dòng, chọn font chữ đọc sách (Literata, Merriweather, Roboto), chuyển đổi 3 chế độ nền: <strong>Tối (Dark)</strong>, <strong>Sáng (Light)</strong>, <strong>Vàng Dịu Mắt (Sepia)</strong>.</p>
+                        <div class="feature-tags-list">
+                          <span class="feat-tag">Tự Động Cuộn</span>
+                          <span class="feat-tag">Lưu Vị Trí % Đoạn Đọc</span>
+                          <span class="feat-tag">Chế Độ Đọc Toàn Màn Hình</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="feature-item-box">
+                      <div class="feature-icon-badge">🎨</div>
+                      <div class="feature-details">
+                        <h4>2. Trình Đọc Truyện Tranh (Comic & Webtoon Viewer)</h4>
+                        <p>Hỗ trợ 2 chế độ đọc: <strong>Cuộn Dọc Vô Tận (Webtoon Scroll)</strong> và <strong>Lật Từng Trang (Page-by-Page)</strong>. Tự động tải trước (preload) 3 trang kế tiếp để trải nghiệm không bị gián đoạn.</p>
+                        <div class="feature-tags-list">
+                          <span class="feat-tag">Đổi Server CDN (Server 1 / Server 2)</span>
+                          <span class="feat-tag">Nén Ảnh WebP Siêu Nhẹ</span>
+                          <span class="feat-tag">Phóng To Kính Lúp (Zoom)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="feature-item-box">
+                      <div class="feature-icon-badge">🔄</div>
+                      <div class="feature-details">
+                        <h4>3. Đồng Bộ Tiến Độ Đọc (Auto-Sync Progress)</h4>
+                        <p>Hệ thống tự động ghi nhớ chương truyện và phần trăm trang bạn đang đọc. Khi bạn chuyển đổi từ Web sang Điện thoại hoặc máy tính bảng, tiến độ sẽ tự động cập nhật ngay lập tức.</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- SECTION 3: CREATOR & PUBLISHER GUIDE -->
+                <section class="docs-content-section" id="doc-section-creator" style="display: none;">
+                  <div class="docs-section-header">
+                    <div class="docs-badge-category">Chương 3 • Xuất Bản & Biên Tập</div>
+                    <h2 class="docs-section-title">✍️ Hướng Dẫn Tác Giả & Nhóm Dịch Thuật</h2>
+                    <p class="docs-section-desc">Quy trình đăng truyện mới, quản lý danh sách chương, tải ảnh truyện tranh và upload tệp sách 500MB.</p>
+                  </div>
+
+                  <div class="docs-steps-timeline">
+                    <div class="timeline-step">
+                      <div class="timeline-num">1</div>
+                      <div class="timeline-body">
+                        <h4>Tạo Bộ Truyện / Ấn Phẩm Mới (Create Publication)</h4>
+                        <p>Truy cập mục <em>Quản Lý Truyện ➔ Thêm Mới</em>. Điền Tên truyện, Tác giả, Tóm tắt nội dung, chọn Thể loại (Tiên Hiệp, Kiếm Hiệp, Ngôn Tình, Trinh Thám...) và tải lên Ảnh bìa (Cover Image kích thước khuyến nghị 600x900px).</p>
+                      </div>
+                    </div>
+
+                    <div class="timeline-step">
+                      <div class="timeline-num">2</div>
+                      <div class="timeline-body">
+                        <h4>Tạo Chương Truyện Chữ (Text Chapters)</h4>
+                        <p>Nhập số thứ tự chương (STT), Tiêu đề chương và nội dung. Trình soạn thảo hỗ trợ phím tắt, phân tách đoạn thông minh và chế độ <strong>Lưu Bản Nháp (Draft)</strong> hoặc <strong>Xuất Bản Ngay (Published)</strong>.</p>
+                      </div>
+                    </div>
+
+                    <div class="timeline-step">
+                      <div class="timeline-num">3</div>
+                      <div class="timeline-body">
+                        <h4>Tải Lên Chương Truyện Tranh Hàng Loạt (Comic Pages Upload)</h4>
+                        <p>Kéo và thả đồng thời 50+ tệp ảnh vào khu vực Upload. Hệ thống tự động sắp xếp thứ tự trang theo tên file (<code>01.jpg</code>, <code>02.jpg</code>...) và cho phép kéo thả hoán đổi vị trí trang trước khi bấm Lưu.</p>
+                      </div>
+                    </div>
+
+                    <div class="timeline-step">
+                      <div class="timeline-num">4</div>
+                      <div class="timeline-body">
+                        <h4>Tải Lên Tệp Sách Lớn 500MB (Chunked Book Upload & Worker)</h4>
+                        <p>Hỗ trợ tệp <code>.zip</code>, <code>.epub</code>, <code>.cbz</code>. Hệ thống chia nhỏ tệp thành các chunk 5MB để upload an toàn không bao giờ bị đứt gãy kết nối. Tiến trình ngầm (Background Worker) sẽ tự động giải nén và tạo các trang truyện tương ứng.</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- SECTION 4: ADMIN GUIDE -->
+                <section class="docs-content-section" id="doc-section-admin" style="display: none;">
+                  <div class="docs-section-header">
+                    <div class="docs-badge-category">Chương 4 • Quản Trị Hệ Thống</div>
+                    <h2 class="docs-section-title">🛡️ Hướng Dẫn Dành Cho Quản Trị Viên (Admin Portal)</h2>
+                    <p class="docs-section-desc">Sử dụng bảng quản trị AG-Grid Enterprise, quản lý tài khoản, phân quyền Role và kiểm duyệt nội dung.</p>
+                  </div>
+
+                  <div class="docs-grid-cards">
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag" style="background: rgba(168,85,247,0.2); color: var(--purple-glow); border-color: var(--purple-glow);">Bảo Mật</span>
+                        <h4 class="guide-card-title">Quản Lý Người Dùng & Phân Quyền</h4>
+                      </div>
+                      <p class="guide-card-desc">Quản lý toàn bộ danh sách tài khoản. Phân cấp 4 quyền: <code>Admin</code>, <code>Moderator</code>, <code>Creator</code>, <code>Member</code>. Cho phép Khóa tài khoản (Lockout) hoặc Kích hoạt tài khoản ngay tức thì.</p>
+                    </div>
+
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag" style="background: rgba(0,255,136,0.2); color: var(--green-glow); border-color: var(--green-glow);">Năng Suất</span>
+                        <h4 class="guide-card-title">Tạo Nhanh Thể Loại & Tác Giả Trực Tiếp</h4>
+                      </div>
+                      <p class="guide-card-desc">Tính năng <strong>Inline Quick Create</strong> cho phép tạo ngay Thể loại hoặc Tác giả mới trực tiếp trên ô chọn của Form mà không cần mở tab quản trị khác hay tải lại trang.</p>
+                    </div>
+
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag" style="background: rgba(255,183,3,0.2); color: var(--amber-glow); border-color: var(--amber-glow);">Kiểm Duyệt</span>
+                        <h4 class="guide-card-title">Phê Duyệt Nội Dung & Bình Luận</h4>
+                      </div>
+                      <p class="guide-card-desc">Khu vực kiểm duyệt giúp rà soát các truyện mới đăng tải, kiểm tra từ khóa nhạy cảm trong bình luận của độc giả và ẩn các bình luận vi phạm tiêu chuẩn cộng đồng.</p>
+                    </div>
+
+                    <div class="docs-guide-card">
+                      <div class="guide-card-header">
+                        <span class="guide-step-tag" style="background: rgba(0,229,255,0.2); color: var(--cyan-glow); border-color: var(--cyan-glow);">Giám Sát</span>
+                        <h4 class="guide-card-title">Theo Dõi Hàng Đợi Worker (Queue Monitor)</h4>
+                      </div>
+                      <p class="guide-card-desc">Xem trạng thái các tác vụ ngầm: Giải nén tệp sách 500MB, chuyển đổi định dạng ảnh, gửi email xác thực và các tác vụ tính toán thống kê lượt đọc.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- SECTION 5: ARCHITECTURE & DATABASE -->
+                <section class="docs-content-section" id="doc-section-architecture" style="display: none;">
+                  <div class="docs-section-header">
+                    <div class="docs-badge-category">Chương 5 • Kiến Trúc Kỹ Thuật</div>
+                    <h2 class="docs-section-title">⚙️ Cơ Sở Dữ Liệu PostgreSQL & API Backend</h2>
+                    <p class="docs-section-desc">Cấu trúc 18 bảng CSDL PostgreSQL và chuẩn kết nối RESTful API của hệ sinh thái Xóm Truyện.</p>
+                  </div>
+
+                  <div class="docs-table-container">
+                    <table class="cyber-table doc-spec-table">
+                      <thead>
+                        <tr>
+                          <th style="width: 180px;">Bảng CSDL (DbSet)</th>
+                          <th style="width: 240px;">Khóa Chính & Quan Hệ</th>
+                          <th>Chức Năng & Mục Đích Lưu Trữ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong style="color: var(--cyan-glow);">Users</strong></td>
+                          <td><code>Id (Guid PK)</code>, <code>RoleId (FK)</code></td>
+                          <td>Lưu thông tin tài khoản, mật khẩu băm, email, số dư tiền tệ, trạng thái khóa.</td>
+                        </tr>
+                        <tr>
+                          <td><strong style="color: var(--cyan-glow);">Publications</strong></td>
+                          <td><code>Id (Guid PK)</code>, <code>AuthorId (FK)</code></td>
+                          <td>Thông tin bộ truyện, tên tác phẩm, ảnh bìa, loại truyện (chữ/tranh), số lượt xem.</td>
+                        </tr>
+                        <tr>
+                          <td><strong style="color: var(--cyan-glow);">Chapters</strong></td>
+                          <td><code>Id (Guid PK)</code>, <code>PublicationId (FK)</code></td>
+                          <td>Chương truyện, số thứ tự, tiêu đề, nội dung text hoặc đánh dấu chương tranh.</td>
+                        </tr>
+                        <tr>
+                          <td><strong style="color: var(--cyan-glow);">ComicPages</strong></td>
+                          <td><code>Id (Guid PK)</code>, <code>ChapterId (FK)</code></td>
+                          <td>Danh sách các trang ảnh truyện tranh, URL CDN chính, URL CDN dự phòng, số trang (PageNumber).</td>
+                        </tr>
+                        <tr>
+                          <td><strong style="color: var(--cyan-glow);">ReadingProgress</strong></td>
+                          <td><code>UserId (FK)</code>, <code>ChapterId (FK)</code></td>
+                          <td>Lưu vết tiến độ đọc sách của từng người dùng, phần trăm cuộn trang và thời gian đọc cuối.</td>
+                        </tr>
+                        <tr>
+                          <td><strong style="color: var(--cyan-glow);">UploadSessions</strong></td>
+                          <td><code>Id (Guid PK)</code>, <code>UserId (FK)</code></td>
+                          <td>Quản lý phiên tải lên tệp 500MB, lưu danh sách các chunks đã hoàn thành để ghép tệp.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+
+                <!-- SECTION 6: TROUBLESHOOTING -->
+                <section class="docs-content-section" id="doc-section-troubleshooting" style="display: none;">
+                  <div class="docs-section-header">
+                    <div class="docs-badge-category">Chương 6 • Xử Lý Sự Cố</div>
+                    <h2 class="docs-section-title">❓ Xử Lý Sự Cố & Câu Hỏi Thường Gặp (Troubleshooting)</h2>
+                    <p class="docs-section-desc">Tổng hợp các giải pháp khắc phục sự cố kỹ thuật thường gặp khi phát triển và vận hành.</p>
+                  </div>
+
+                  <div class="troubleshoot-faq-list">
+                    <div class="faq-card">
+                      <div class="faq-question">
+                        <span class="faq-icon">⚠️</span>
+                        <h4>Lỗi CORS khi gọi API từ Web Client (Port 3000) hoặc Admin (Port 5173)</h4>
+                      </div>
+                      <div class="faq-answer">
+                        <p><strong>Nguyên nhân:</strong> Backend API chặn các tên miền không được khai báo trong CORS Policy.</p>
+                        <p><strong>Khắc phục:</strong> Mở <code>xmtruyen.API/Program.cs</code>, kiểm tra chính sách CORS đã bổ sung nguồn gốc máy khách:</p>
+                        <div class="guide-code-terminal">
+                          <code>builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", policy => {
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8100")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});</code>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="faq-card">
+                      <div class="faq-question">
+                        <span class="faq-icon">⚠️</span>
+                        <h4>Lỗi không kết nối được Cơ Sở Dữ Liệu PostgreSQL (Connection Refused)</h4>
+                      </div>
+                      <div class="faq-answer">
+                        <p><strong>Nguyên nhân:</strong> Dịch vụ PostgreSQL chưa chạy hoặc chuỗi kết nối (Connection String) trong <code>appsettings.json</code> sai mật khẩu.</p>
+                        <p><strong>Khắc phục:</strong> Kiểm tra dịch vụ PostgreSQL đang chạy ở cổng <code>5432</code> và kiểm tra chuỗi kết nối trong <code>xmtruyen.API/appsettings.json</code>:</p>
+                        <div class="guide-code-terminal">
+                          <code>"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Port=5432;Database=xmtruyen_db;Username=postgres;Password=YourSecurePassword"
+}</code>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="faq-card">
+                      <div class="faq-question">
+                        <span class="faq-icon">⚠️</span>
+                        <h4>Lỗi 413 (Payload Too Large) khi tải lên tệp sách hoặc ảnh truyện</h4>
+                      </div>
+                      <div class="faq-answer">
+                        <p><strong>Nguyên nhân:</strong> Giới hạn dung lượng yêu cầu mặc định của máy chủ Kestrel hoặc IIS bị vượt quá.</p>
+                        <p><strong>Khắc phục:</strong> Trong <code>Program.cs</code> đã cấu hình tăng giới hạn lên 500MB:</p>
+                        <div class="guide-code-terminal">
+                          <code>builder.Services.Configure&lt;FormOptions&gt;(options => {
+    options.MultipartBodyLengthLimit = 524288000; // 500 MB
+});
+builder.WebHost.ConfigureKestrel(serverOptions => {
+    serverOptions.Limits.MaxRequestBodySize = 524288000;
+});</code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+              </main>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 2. Interactive Canvas Viewport (Diagram Mode) -->
+      <main class="canvas-viewport" id="canvas-viewport" style="display: none;">
+        <!-- Return to Table View Button -->
+        <button class="btn-back-to-table" id="btn-back-to-table">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Quay Lại Bảng Danh Sách</span>
+        </button>
+
+        <!-- Floating Workflow Explainer Banner -->
+        <div class="workflow-info-bar" id="workflow-info-bar" style="display: none;">
+          <div class="workflow-info-icon" id="workflow-icon">📖</div>
+          <div class="workflow-info-content">
+            <div class="workflow-info-title" id="workflow-title">Luồng Xử Lý Nghiệp Vụ</div>
+            <div class="workflow-info-desc" id="workflow-desc">Mô tả cách thức dữ liệu di chuyển qua các tầng Client -> API -> Worker -> DB</div>
+          </div>
+        </div>
+
+        <div class="diagram-canvas" id="diagram-canvas">
+          <!-- SVG Connections Layer -->
+          <svg class="connections-layer" id="connections-layer"></svg>
+          
+          <!-- Nodes Layer -->
+          <div class="nodes-layer" id="nodes-layer"></div>
+        </div>
+      </main>
+
+      <!-- Bottom Floating Status Bar -->
+      <div class="bottom-controls">
+        <div class="control-group" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 8px;">
+          <span style="color: var(--cyan-glow);">●</span>
+          <span>Cuộn chuột: <strong>Zoom In/Out</strong></span>
+          <span style="opacity: 0.4;">|</span>
+          <span>Kéo chuột: <strong>Di chuyển Canvas</strong></span>
+          <span style="opacity: 0.4;">|</span>
+          <span>Nhấp thẻ: <strong>Xem Mã Nguồn & Chi Tiết</strong></span>
+        </div>
+      </div>
+
+      <!-- Sidebar Inspector Drawer -->
+      <aside class="inspector-drawer" id="inspector-drawer">
+        <div class="drawer-header">
+          <div class="drawer-title-group">
+            <h2 id="drawer-title">Tên Ứng Dụng</h2>
+            <span id="drawer-subtitle">Phân loại & Module</span>
+          </div>
+          <button class="drawer-close-btn" id="drawer-close-btn" title="Đóng">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="drawer-body">
+          <!-- Category -->
+          <div class="drawer-section">
+            <h3>Phân Hệ</h3>
+            <div id="drawer-category" style="font-size: 13px; color: var(--cyan-glow); font-weight: 600;">Frontend</div>
+          </div>
+
+          <!-- Real Code Snippet Section -->
+          <div class="drawer-section">
+            <div class="drawer-code-header">
+              <h3>💻 Mã Nguồn Thực Tế (Source Code)</h3>
+              <button class="code-copy-btn" id="drawer-code-copy-btn" title="Sao chép code">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                </svg>
+                <span>Sao Chép</span>
+              </button>
+            </div>
+            <div class="code-file-badge" id="drawer-code-filename">ReadingController.cs</div>
+            <pre class="code-editor-box" id="drawer-code-box"><code id="drawer-code-content">// Loading code snippet...</code></pre>
+            <div class="code-explanation-box" id="drawer-code-expl">
+              Mô tả hoạt động của đoạn mã nguồn trong luồng xử lý.
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="drawer-section">
+            <h3>Mô Tả Chức Năng</h3>
+            <div class="info-card" id="drawer-desc">
+              Mô tả chi tiết về vai trò của ứng dụng này trong toàn bộ hệ thống Xóm Truyện.
+            </div>
+          </div>
+
+          <!-- Tech Stack -->
+          <div class="drawer-section">
+            <h3>Công Nghệ Sử Dụng (Tech Stack)</h3>
+            <div class="tag-list" id="drawer-tech-tags"></div>
+          </div>
+
+          <!-- Path in Workspace -->
+          <div class="drawer-section">
+            <h3>Đường Dẫn Trong Workspace</h3>
+            <div class="code-block">
+              <span id="drawer-path" style="word-break: break-all;">c:\Users\Cilse\...</span>
+              <button class="copy-btn" data-target="drawer-path" title="Sao chép đường dẫn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Run Command -->
+          <div class="drawer-section">
+            <h3>Lệnh Chạy (Terminal Command)</h3>
+            <div class="code-block">
+              <span id="drawer-run-cmd">npm run dev</span>
+              <button class="copy-btn" data-target="drawer-run-cmd" title="Sao chép lệnh">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Ports & Endpoints -->
+          <div class="drawer-section">
+            <h3>Cổng Port / Địa Chỉ Truy Cập</h3>
+            <div id="drawer-ports" style="font-family: var(--font-mono); font-size: 12px; color: var(--amber-glow);">
+              http://localhost:5173
+            </div>
+          </div>
+
+          <!-- Key Files & Modules -->
+          <div class="drawer-section">
+            <h3>Tệp Tin & Phân Hệ Trọng Tâm</h3>
+            <ul class="files-list" id="drawer-files-list"></ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+    </div>
+
+          <!-- TAB 5: AI CONVERSATION HISTORY -->
+          <div class="tab-view-pane" id="pane-history" style="display: none;">
+             <div class="table-hero-banner" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(30, 41, 59, 0.8) 100%);">
+              <div class="table-hero-left">
+                <span class="table-hero-tag" style="color: #a78bfa;">🤖 Nhật Ký Tương Tác AI</span>
+                <h1 class="table-hero-title">Lịch Sử Trò Chuyện Lập Trình</h1>
+                <p class="table-hero-desc">Bản lưu trữ lịch sử trò chuyện và sửa lỗi trực tiếp giữa User và AI Assistant.</p>
+              </div>
+            </div>
+
+            <div class="settings-container" style="padding: 24px; color: #fff; overflow-y: auto; flex: 1;">
+                
+                <div class="settings-card" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #f87171;">User (17:00 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5;">1. Hiện tại tôi đang vào truyện tranh tại sao lại ra truyện chữ sửa lại cho tôi.<br/>2. Khi upload các chapter như thế này thì có lưu database không và khi đang đọc truyện tranh thì load chap tương ứng theo sách.</p>
+                </div>
+
+                <div class="settings-card" style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #a78bfa;">Antigravity AI (17:24 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5; margin-bottom: 10px;">Chào bạn, mình xin trả lời các câu hỏi của bạn như sau:</p>
+                    <p style="color: #e2e8f0; line-height: 1.5; margin-bottom: 10px;"><strong>1. "Khi upload các chapter như thế này thì có lưu database không?"</strong><br/>Có lưu vào database bạn nhé. Trong API Backend, tính năng Upload Chapter không chỉ giải nén file .zip/.cbz để trích xuất ảnh vào thư mục tĩnh, mà còn quét và insert các bản ghi vào Database (bảng Chapter và ComicPages).</p>
+                    <p style="color: #e2e8f0; line-height: 1.5;"><strong>2. "Khi đang đọc truyện tranh thì load chap tương ứng theo sách"</strong><br/>Mình đã tiến hành sửa code ở Client (<code>bookService.ts</code>, <code>ReadingPage.tsx</code>, <code>ComicReadingContent.tsx</code>) để tự động gọi API fetch danh sách chương, truyền URL ảnh thực tế vào UI thay vì ảnh giả lập. Đã thêm tính năng "Chương trước / Chương sau".</p>
+                </div>
+
+                <div class="settings-card" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #f87171;">User (17:24 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5;">Bị lỗi load (kèm hình ảnh báo các ảnh bị lỗi 404/không tải được URL do ảnh đang ở dạng relative).</p>
+                </div>
+
+                <div class="settings-card" style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                    <h3 style="margin-bottom: 10px; font-size: 16px; color: #a78bfa;">Antigravity AI (17:27 10/08/2026)</h3>
+                    <p style="color: #e2e8f0; line-height: 1.5;">Lỗi này xảy ra là do đường dẫn ảnh mà backend trả về đang ở dạng tương đối (ví dụ: <code>uploads/chapters/...</code>). Trình duyệt tự ghép đường dẫn đó vào URL Web Client (port 5174) thay vì API (port 5172).</p>
+                    <p style="color: #e2e8f0; line-height: 1.5;">Mình đã sửa <code>bookService.ts</code> để tự động bắt và chèn <code>API_BASE_URL</code> vào đầu các đường dẫn ảnh bị thiếu domain. Bạn tải lại trang là ảnh sẽ hiển thị bình thường!</p>
+                </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Global Code Modal Viewer -->
+  <div class="code-modal-overlay" id="code-modal" style="display: none;">
+    <div class="code-modal-window">
+      <div class="code-modal-header">
+        <div class="code-modal-title-group">
+          <span class="code-modal-icon">💻</span>
+          <div>
+            <h2 id="modal-code-title">Xem Mã Nguồn Phân Hệ</h2>
+            <span id="modal-code-subtitle" class="code-modal-sub">ReadingController.cs - C# ASP.NET Core 9</span>
+          </div>
+        </div>
+        <div class="code-modal-actions">
+          <button class="code-copy-btn" id="modal-code-copy-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+            </svg>
+            <span>Sao Chép Code</span>
+          </button>
+          <button class="modal-close-btn" id="modal-code-close-btn">✕</button>
+        </div>
+      </div>
+      <div class="code-modal-tabs" id="modal-code-tabs">
+        <!-- Dynamic tabs for multiple files -->
+      </div>
+      <div class="code-modal-body">
+        <pre class="code-editor-box modal-code-view" id="modal-code-box"><code id="modal-code-content"></code></pre>
+      </div>
+      <div class="code-modal-footer">
+        <div class="code-expl-text" id="modal-code-expl"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Feature Documentation Modal Viewer -->
+  <div class="code-modal-overlay" id="doc-modal" style="display: none;">
+    <div class="code-modal-window doc-modal-window">
+      <div class="code-modal-header">
+        <div class="code-modal-title-group">
+          <span class="code-modal-icon" id="doc-modal-icon">📖</span>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 id="doc-modal-title">Tài Liệu Chi Tiết Tính Năng</h2>
+              <span class="commit-tag-badge" id="doc-modal-version">v1.2.5</span>
+              <span class="change-type-badge" id="doc-modal-type">Tính Năng Mới</span>
+            </div>
+            <span id="doc-modal-subtitle" class="code-modal-sub">Cập nhật ngày: 05/08/2026</span>
+          </div>
+        </div>
+        <div class="code-modal-actions">
+          <button class="modal-close-btn" id="doc-modal-close-btn">✕</button>
+        </div>
+      </div>
+
+      <!-- Documentation Tabs -->
+      <div class="code-modal-tabs" id="doc-modal-tabs">
+        <button class="code-tab-btn active" data-tab="spec" data-doc-tab="spec"><span>📖</span> Đặc Tả & Hướng Dẫn Kỹ Thuật</button>
+        <button class="code-tab-btn" data-tab="files" data-doc-tab="files"><span>📁</span> Danh Sách Tệp Đã Sửa (Files Changed)</button>
+        <button class="code-tab-btn" data-tab="code" data-doc-tab="code"><span>💻</span> Mã Nguồn Triển Khai (Source Code)</button>
+        <button class="code-tab-btn" data-tab="test" data-doc-tab="test"><span>🧪</span> Hướng Dẫn Kiểm Thử (Testing Guide)</button>
+      </div>
+
+      <!-- Documentation Tab Panes -->
+      <div class="code-modal-body doc-modal-body">
+        <!-- Tab 1: Spec -->
+        <div class="doc-tab-pane active" id="doc-pane-spec">
+          <div class="doc-section">
+            <h3 class="doc-heading">🚀 Luồng Dữ Liệu & Phân Hệ Thực Thi (Feature Architecture Pipeline)</h3>
+            <div class="doc-flow-preview-card" id="doc-spec-flow-chips"></div>
+          </div>
+          <div class="doc-section">
+            <h3 class="doc-heading">🎯 Mục Đích & Bối Cảnh Nghiệp Vụ</h3>
+            <div class="doc-text-card" id="doc-spec-purpose">...</div>
+          </div>
+          <div class="doc-section">
+            <h3 class="doc-heading">⚙️ Cơ Chế Hoạt Động & Quy Trình Xử Lý</h3>
+            <div class="doc-text-card" id="doc-spec-mechanism">...</div>
+          </div>
+          <div class="doc-section" id="doc-endpoints-section">
+            <h3 class="doc-heading">🌐 Giao Diện API / Endpoints Liên Quan</h3>
+            <div class="doc-endpoints-list" id="doc-spec-endpoints">...</div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Files Changed -->
+        <div class="doc-tab-pane" id="doc-pane-files" style="display: none;">
+          <div class="doc-section">
+            <h3 class="doc-heading">📁 Các Tệp Tin Đã Được Thay Đổi / Thêm Mới</h3>
+            <ul class="doc-files-tree" id="doc-files-list">...</ul>
+          </div>
+        </div>
+
+        <!-- Tab 3: Code Implementation -->
+        <div class="doc-tab-pane" id="doc-pane-code" style="display: none;">
+          <div class="drawer-code-header">
+            <span class="code-file-badge" id="doc-code-filename">Source Code</span>
+            <button class="code-copy-btn" id="doc-code-copy-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+              <span>Sao Chép Code</span>
+            </button>
+          </div>
+          <pre class="code-editor-box modal-code-view" style="max-height: 440px;"><code id="doc-code-content"></code></pre>
+          <div class="code-explanation-box" id="doc-code-expl" style="margin-top: 12px;"></div>
+        </div>
+
+        <!-- Tab 4: Testing Guide -->
+        <div class="doc-tab-pane" id="doc-pane-test" style="display: none;">
+          <div class="doc-section">
+            <h3 class="doc-heading">🧪 Các Bước Kích Hoạt & Kiểm Thử Tính Năng</h3>
+            <div class="doc-test-steps" id="doc-test-steps">...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-modal-footer">
+        <div class="doc-footer-meta" id="doc-footer-meta">
+          <span>Phân hệ: <strong>Web Client / Backend API</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div class="toast-notice" id="toast-notice">Thông báo hệ thống</div>
+
+  <!-- Logic Script -->
+  <script src="app.js"></script>
+</body>
+</html>

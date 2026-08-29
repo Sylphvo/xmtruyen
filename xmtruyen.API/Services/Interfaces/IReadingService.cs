@@ -1,0 +1,11 @@
+using Xmtruyen.API.Models.Responses;
+
+namespace Xmtruyen.API.Services.Interfaces;
+
+public interface IReadingService
+{
+    Task<ChapterContentResponse> GetChapterContentAsync(Guid chapterId, Guid? userId, CancellationToken cancellationToken = default);
+    Task<bool> PurchaseChapterAsync(Guid chapterId, Guid userId, CancellationToken cancellationToken = default);
+}
+
+

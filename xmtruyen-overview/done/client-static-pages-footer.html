@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xmtruyen Client — Các Trang Thông Tin Tĩnh & Footer (Waka-style)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.8; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; font-size: 2.2em; margin-bottom: 10px; }
+        h2 { color: #ff6b9d; font-size: 1.5em; margin-top: 50px; margin-bottom: 15px; border-left: 4px solid #ff6b9d; padding-left: 15px; }
+        h3 { color: #ffd93d; font-size: 1.15em; margin-top: 25px; margin-bottom: 10px; }
+        h4 { color: #a78bfa; font-size: 1em; margin-top: 20px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 1em; margin-bottom: 30px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; margin-right: 8px; }
+        .badge-new { background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid #00d4ff; }
+        .badge-plan { background: rgba(168,85,247,0.15); color: #a78bfa; border: 1px solid #a78bfa; }
+        .toc { background: #1a1a2e; padding: 25px; border-radius: 12px; margin: 30px 0; }
+        .toc h3 { margin-top: 0; color: #00d4ff; }
+        .toc a { display: block; margin: 6px 0; color: #00d4ff; text-decoration: none; font-size: 0.95em; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.88em; }
+        th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; }
+        th { background: #1a1a2e; color: #00d4ff; }
+        td { background: #12121f; }
+        pre { background: #0d1117; border: 1px solid #333; border-radius: 8px; padding: 18px; overflow-x: auto; font-size: 0.85em; margin: 15px 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .code-title { color: #888; font-size: 0.8em; margin-bottom: 5px; font-style: italic; }
+        .note { background: rgba(0,212,255,0.08); border-left: 3px solid #00d4ff; padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .warn { background: rgba(255,107,157,0.08); border-left: 3px solid #ff6b9d; padding: 12px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .flow-diagram { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.82em; overflow-x: auto; }
+        .section-card { background: #1a1a2e; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #2a2a3e; }
+        ul, ol { padding-left: 25px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>📄 Các Trang Thông Tin Tĩnh & Footer (Waka-style)</h1>
+    <p class="subtitle">
+        <span class="badge badge-new">Tính Năng Mới</span>
+        <span class="badge badge-plan">Chưa Triển Khai</span>
+        Thêm các trang pháp lý, chính sách, giới thiệu + Footer đầy đủ cho Web Client — theo chuẩn Waka.vn
+    </p>
+
+    <div class="toc">
+        <h3>📋 Mục Lục</h3>
+        <a href="#overview">1. Danh Sách Trang Cần Thêm</a>
+        <a href="#footer">2. Footer Layout (4 cột — Waka-style)</a>
+        <a href="#about">3. Trang "Về Chúng Tôi" (Giới thiệu)</a>
+        <a href="#terms">4. Trang "Thỏa Thuận Sử Dụng Dịch Vụ"</a>
+        <a href="#privacy">5. Trang "Quy Định Riêng Tư"</a>
+        <a href="#faq">6. Trang "Câu Hỏi Thường Gặp"</a>
+        <a href="#refund">7. Trang "Chính Sách Đổi Trả / Thanh Toán"</a>
+        <a href="#contact">8. Trang "Liên Hệ"</a>
+        <a href="#news">9. Trang "Tin Tức / Blog"</a>
+        <a href="#routing">10. Routes & Sidebar/Footer Links</a>
+        <a href="#admin">11. Quản Lý Nội Dung Tĩnh (Admin CMS)</a>
+        <a href="#implementation">12. Triển Khai Code</a>
+    </div>
+
+    <!-- 1. DANH SÁCH -->
+    <h2 id="overview">1. Danh Sách Trang Cần Thêm</h2>
+
+    <div class="note">
+        <strong>Tham khảo:</strong> Footer của Waka.vn có 4 nhóm link: Về chúng tôi, Thông tin hữu ích, Hỗ trợ khách hàng, Tin tức. Mỗi link dẫn đến 1 trang nội dung tĩnh.
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Nhóm</th><th>Trang</th><th>Route</th><th>Mô tả</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+            <tr><td rowspan="6"><strong>Về Chúng Tôi</strong></td><td>Giới thiệu</td><td><code>/about</code></td><td>Giới thiệu Xóm Truyện, sứ mệnh, tầm nhìn</td><td>Cao</td></tr>
+            <tr><td>Cơ cấu tổ chức</td><td><code>/about/organization</code></td><td>Đội ngũ, cấu trúc công ty</td><td>Thấp</td></tr>
+            <tr><td>Lĩnh vực hoạt động</td><td><code>/about/services</code></td><td>Các dịch vụ cung cấp</td><td>Thấp</td></tr>
+            <tr><td>Cơ hội đầu tư</td><td><code>/about/invest</code></td><td>Thông tin cho nhà đầu tư</td><td>Thấp</td></tr>
+            <tr><td>Tuyển dụng</td><td><code>/careers</code></td><td>Vị trí đang tuyển</td><td>Trung bình</td></tr>
+            <tr><td>Liên hệ</td><td><code>/contact</code></td><td>Form liên hệ + thông tin liên lạc</td><td>Cao</td></tr>
+            <tr><td rowspan="5"><strong>Thông Tin Hữu Ích</strong></td><td>Thỏa thuận sử dụng dịch vụ</td><td><code>/terms</code></td><td>Điều khoản sử dụng (ToS)</td><td>Cao</td></tr>
+            <tr><td>Quyền lợi</td><td><code>/benefits</code></td><td>Quyền lợi hội viên VIP</td><td>Cao</td></tr>
+            <tr><td>Quy định riêng tư</td><td><code>/privacy</code></td><td>Chính sách bảo mật thông tin</td><td>Cao</td></tr>
+            <tr><td>Câu hỏi thường gặp</td><td><code>/faq</code></td><td>FAQ — hỏi đáp</td><td>Cao</td></tr>
+            <tr><td>Quy chế hoạt động sàn TMĐT</td><td><code>/marketplace-rules</code></td><td>Quy chế nếu có giao dịch</td><td>Trung bình</td></tr>
+            <tr><td rowspan="5"><strong>Hỗ Trợ Khách Hàng</strong></td><td>Chính sách đổi trả</td><td><code>/refund-policy</code></td><td>Quy định hoàn xu, hủy gói VIP</td><td>Cao</td></tr>
+            <tr><td>Chính sách thanh toán</td><td><code>/payment-policy</code></td><td>Các phương thức thanh toán, bảo mật</td><td>Cao</td></tr>
+            <tr><td>Giải quyết khiếu nại</td><td><code>/complaints</code></td><td>Quy trình khiếu nại</td><td>Trung bình</td></tr>
+            <tr><td>Quy định hàng hóa cấm</td><td><code>/prohibited-content</code></td><td>Nội dung không được phép đăng</td><td>Trung bình</td></tr>
+            <tr><td>Chính sách bảo mật thông tin</td><td><code>/security-policy</code></td><td>An toàn dữ liệu người dùng</td><td>Cao</td></tr>
+            <tr><td rowspan="3"><strong>Tin Tức</strong></td><td>Tin dịch vụ</td><td><code>/news</code></td><td>Tin tức cập nhật dịch vụ</td><td>Trung bình</td></tr>
+            <tr><td>Review sách</td><td><code>/blog/reviews</code></td><td>Bài review sách hay</td><td>Trung bình</td></tr>
+            <tr><td>Lịch phát hành</td><td><code>/schedule</code></td><td>Lịch ra chương/sách mới</td><td>Trung bình</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 2. FOOTER -->
+    <h2 id="footer">2. Footer Layout (4 Cột — Waka-style)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FOOTER — LAYOUT 4 CỘT (Dark background, full-width)                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Background: #1a1a2e (dark) hoặc #111827
+  Padding: 60px 0 40px
+  Border-top: 1px solid rgba(255,255,255,0.1)
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  max-width: 1200px, margin: 0 auto                                      │
+  │                                                                          │
+  │  ┌── CỘT 1 ──────────┐ ┌── CỘT 2 ──────────┐ ┌── CỘT 3 ────────┐ ┌── CỘT 4 ──┐│
+  │  │                    │ │                    │ │                  │ │            ││
+  │  │  🏠 XÓM TRUYỆN    │ │  📄 Về Chúng Tôi  │ │  ℹ️ Thông Tin    │ │  📞 Hỗ Trợ ││
+  │  │                    │ │                    │ │    Hữu Ích      │ │            ││
+  │  │  Logo + Slogan     │ │  • Giới thiệu     │ │  • Điều khoản   │ │  • Đổi trả ││
+  │  │                    │ │  • Liên hệ        │ │  • Quyền lợi    │ │  • Thanh toán││
+  │  │  📞 Hotline:       │ │  • Tuyển dụng     │ │  • Riêng tư     │ │  • Khiếu nại││
+  │  │  0877.736.289      │ │  • Cơ hội đầu tư  │ │  • FAQ          │ │  • Bảo mật  ││
+  │  │                    │ │                    │ │  • Quy chế TMĐT │ │            ││
+  │  │  📧 Email:         │ │                    │ │                  │ │  📰 Tin Tức ││
+  │  │  support@xom...    │ │                    │ │                  │ │  • Tin DV   ││
+  │  │                    │ │                    │ │                  │ │  • Review   ││
+  │  │  📱 Download:      │ │                    │ │                  │ │  • Lịch PH  ││
+  │  │  [App Store]       │ │                    │ │                  │ │            ││
+  │  │  [Google Play]     │ │                    │ │                  │ │            ││
+  │  │                    │ │                    │ │                  │ │            ││
+  │  └────────────────────┘ └────────────────────┘ └──────────────────┘ └────────────┘│
+  │                                                                          │
+  │  ─────────────────────────────────────────────────────────────────────  │
+  │                                                                          │
+  │  ┌── BOTTOM BAR ──────────────────────────────────────────────────────┐ │
+  │  │                                                                      │ │
+  │  │  © 2026 Xóm Truyện. Nền tảng đọc truyện trực tuyến.               │ │
+  │  │  ĐKKD số: XXXXXXXXXX do Sở KHĐT TP.HCM cấp ngày XX/XX/2024.      │ │
+  │  │                                                                      │ │
+  │  │  [🏛️ Logo BCT]  [🔒 Logo DMCA]                                     │ │
+  │  │                                                                      │ │
+  │  └──────────────────────────────────────────────────────────────────────┘│
+  └─────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>2.1 Footer Component Code</h3>
+    <div class="code-title">📁 xom-truyen/src/components/Layout/Footer.tsx</div>
+    <pre><code>import React from 'react';
+import { Link } from 'react-router-dom';
+
+const FOOTER_LINKS = {
+    about: {
+        title: 'Về Chúng Tôi',
+        links: [
+            { label: 'Giới thiệu', path: '/about' },
+            { label: 'Liên hệ', path: '/contact' },
+            { label: 'Tuyển dụng', path: '/careers' },
+            { label: 'Cơ hội đầu tư', path: '/about/invest' },
+        ]
+    },
+    info: {
+        title: 'Thông Tin Hữu Ích',
+        links: [
+            { label: 'Thỏa thuận sử dụng', path: '/terms' },
+            { label: 'Quyền lợi hội viên', path: '/benefits' },
+            { label: 'Quy định riêng tư', path: '/privacy' },
+            { label: 'Câu hỏi thường gặp', path: '/faq' },
+            { label: 'Quy chế hoạt động', path: '/marketplace-rules' },
+        ]
+    },
+    support: {
+        title: 'Hỗ Trợ Khách Hàng',
+        links: [
+            { label: 'Chính sách đổi trả', path: '/refund-policy' },
+            { label: 'Chính sách thanh toán', path: '/payment-policy' },
+            { label: 'Giải quyết khiếu nại', path: '/complaints' },
+            { label: 'Bảo mật thông tin', path: '/security-policy' },
+        ]
+    },
+    news: {
+        title: 'Tin Tức',
+        links: [
+            { label: 'Tin dịch vụ', path: '/news' },
+            { label: 'Review sách', path: '/blog/reviews' },
+            { label: 'Lịch phát hành', path: '/schedule' },
+        ]
+    }
+};
+
+export default function Footer() {
+    return (
+        &lt;footer style={{
+            backgroundColor: '#111827',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            padding: '60px 0 40px',
+            marginTop: 'auto'
+        }}&gt;
+            &lt;div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 30px' }}&gt;
+                {/* 4 Columns */}
+                &lt;div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 40, marginBottom: 40 }}&gt;
+                    {/* Column 1: Brand */}
+                    &lt;div&gt;
+                        &lt;h3 style={{ fontSize: 20, fontWeight: 800, color: '#00d4ff', marginBottom: 12 }}&gt;
+                            XÓM TRUYỆN
+                        &lt;/h3&gt;
+                        &lt;p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20, lineHeight: 1.6 }}&gt;
+                            Nền tảng đọc truyện trực tuyến hàng đầu Việt Nam. Sách nói, ebook, truyện tranh với hàng ngàn đầu sách chất lượng.
+                        &lt;/p&gt;
+                        &lt;div style={{ fontSize: 13, color: '#9ca3af', display: 'flex', flexDirection: 'column', gap: 8 }}&gt;
+                            &lt;div&gt;📞 Hotline: &lt;strong style={{ color: '#e5e7eb' }}&gt;0877.736.289&lt;/strong&gt;&lt;/div&gt;
+                            &lt;div&gt;📧 Email: &lt;strong style={{ color: '#e5e7eb' }}&gt;support@xmtruyen.com&lt;/strong&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                        {/* App download badges */}
+                        &lt;div style={{ display: 'flex', gap: 10, marginTop: 20 }}&gt;
+                            &lt;img src="/badges/appstore.svg" alt="App Store" style={{ height: 36 }} /&gt;
+                            &lt;img src="/badges/googleplay.svg" alt="Google Play" style={{ height: 36 }} /&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+
+                    {/* Columns 2-4: Link groups */}
+                    {Object.values(FOOTER_LINKS).map(group => (
+                        &lt;div key={group.title}&gt;
+                            &lt;h4 style={{ fontSize: 14, fontWeight: 700, color: '#e5e7eb', marginBottom: 16 }}&gt;
+                                {group.title}
+                            &lt;/h4&gt;
+                            &lt;ul style={{ listStyle: 'none', padding: 0 }}&gt;
+                                {group.links.map(link => (
+                                    &lt;li key={link.path} style={{ marginBottom: 10 }}&gt;
+                                        &lt;Link to={link.path} style={{
+                                            fontSize: 13, color: '#9ca3af', textDecoration: 'none',
+                                            transition: 'color 200ms'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
+                                        onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                                        &gt;
+                                            {link.label}
+                                        &lt;/Link&gt;
+                                    &lt;/li&gt;
+                                ))}
+                            &lt;/ul&gt;
+                        &lt;/div&gt;
+                    ))}
+                &lt;/div&gt;
+
+                {/* Bottom bar */}
+                &lt;div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, textAlign: 'center' }}&gt;
+                    &lt;p style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.8 }}&gt;
+                        © 2026 Xóm Truyện. Nền tảng đọc truyện trực tuyến.&lt;br/&gt;
+                        Giấy xác nhận đăng ký hoạt động TMĐT số XXXXXXXX.&lt;br/&gt;
+                        Địa chỉ: Thành phố Hồ Chí Minh, Việt Nam.
+                    &lt;/p&gt;
+                    {/* Trust badges */}
+                    &lt;div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 16 }}&gt;
+                        &lt;img src="/badges/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" style={{ height: 40 }} /&gt;
+                        &lt;img src="/badges/dmca.png" alt="DMCA Protected" style={{ height: 40 }} /&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/footer&gt;
+    );
+}</code></pre>
+
+    <!-- 3. ABOUT -->
+    <h2 id="about">3. Trang "Về Chúng Tôi" (/about)</h2>
+
+    <div class="section-card">
+        <h4>Nội dung trang Giới thiệu:</h4>
+        <ul>
+            <li>Hero banner với slogan</li>
+            <li>Sứ mệnh & Tầm nhìn</li>
+            <li>Con số ấn tượng (số sách, số user, số chương...)</li>
+            <li>Đội ngũ (nếu muốn hiện)</li>
+            <li>Timeline phát triển</li>
+            <li>Đối tác / NXB hợp tác</li>
+        </ul>
+    </div>
+
+    <!-- 4. TERMS -->
+    <h2 id="terms">4. Trang "Thỏa Thuận Sử Dụng Dịch Vụ" (/terms)</h2>
+
+    <div class="section-card">
+        <h4>Cấu trúc nội dung Điều khoản:</h4>
+        <ol>
+            <li>Định nghĩa thuật ngữ</li>
+            <li>Phạm vi áp dụng</li>
+            <li>Đăng ký tài khoản & quyền truy cập</li>
+            <li>Quy tắc sử dụng dịch vụ (không sao chép, không phân phối lại...)</li>
+            <li>Nội dung người dùng đăng tải (reviews, comments)</li>
+            <li>Sở hữu trí tuệ & bản quyền</li>
+            <li>Thanh toán & gói dịch vụ</li>
+            <li>Giới hạn trách nhiệm</li>
+            <li>Chấm dứt tài khoản</li>
+            <li>Luật áp dụng & giải quyết tranh chấp</li>
+            <li>Thay đổi điều khoản</li>
+        </ol>
+    </div>
+
+    <!-- 5. PRIVACY -->
+    <h2 id="privacy">5. Trang "Quy Định Riêng Tư" (/privacy)</h2>
+
+    <div class="section-card">
+        <h4>Cấu trúc Privacy Policy:</h4>
+        <ol>
+            <li>Thông tin thu thập (email, tên, lịch sử đọc, IP...)</li>
+            <li>Mục đích thu thập</li>
+            <li>Chia sẻ thông tin với bên thứ ba</li>
+            <li>Bảo mật dữ liệu (mã hóa, JWT, HTTPS)</li>
+            <li>Cookie & tracking</li>
+            <li>Quyền của người dùng (xem, sửa, xóa dữ liệu cá nhân)</li>
+            <li>Lưu trữ & thời gian giữ dữ liệu</li>
+            <li>Thay đổi chính sách</li>
+            <li>Liên hệ bộ phận bảo mật</li>
+        </ol>
+    </div>
+
+    <!-- 6. FAQ -->
+    <h2 id="faq">6. Trang "Câu Hỏi Thường Gặp" (/faq)</h2>
+
+    <div class="section-card">
+        <h4>Các nhóm câu hỏi:</h4>
+        <table>
+            <thead><tr><th>Nhóm</th><th>Câu hỏi mẫu</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Tài khoản</strong></td><td>Cách đăng ký? Quên mật khẩu? Đổi email? Xóa tài khoản?</td></tr>
+                <tr><td><strong>Đọc sách</strong></td><td>Cách đọc offline? Lưu bookmark? Đổi font/cỡ chữ? Lỗi ảnh?</td></tr>
+                <tr><td><strong>Thanh toán</strong></td><td>Mua xu bằng gì? Giá gói VIP? Hoàn xu khi nào? Thanh toán lỗi?</td></tr>
+                <tr><td><strong>VIP & Hội viên</strong></td><td>Quyền lợi VIP? Hủy gói? Gia hạn tự động? Nâng cấp gói?</td></tr>
+                <tr><td><strong>Nội dung</strong></td><td>Cập nhật chương bao lâu? Report truyện vi phạm? Đề xuất sách?</td></tr>
+                <tr><td><strong>Kỹ thuật</strong></td><td>Trình duyệt hỗ trợ? Lỗi không load? App bị crash?</td></tr>
+            </tbody>
+        </table>
+        <h4>UI: Accordion expandable (click câu hỏi → mở câu trả lời)</h4>
+    </div>
+
+    <!-- 7. REFUND -->
+    <h2 id="refund">7. Trang "Chính Sách Đổi Trả / Thanh Toán"</h2>
+
+    <div class="section-card">
+        <h4>Nội dung chính sách:</h4>
+        <ul>
+            <li><strong>Phương thức thanh toán:</strong> VNPay, MoMo, chuyển khoản ngân hàng, thẻ quốc tế</li>
+            <li><strong>Mua xu:</strong> Bảng giá xu (VD: 50K = 100 xu, 100K = 220 xu...)</li>
+            <li><strong>Gói VIP:</strong> Tháng / Quý / Năm — giá + quyền lợi</li>
+            <li><strong>Hoàn xu:</strong> Điều kiện hoàn (mua nhầm chương, lỗi kỹ thuật). Thời hạn yêu cầu hoàn: 7 ngày.</li>
+            <li><strong>Hủy VIP:</strong> Quy trình hủy, thời điểm có hiệu lực, hoàn tiền tỷ lệ</li>
+            <li><strong>Bảo mật thanh toán:</strong> SSL, không lưu thẻ, PCI DSS compliance</li>
+        </ul>
+    </div>
+
+    <!-- 8. CONTACT -->
+    <h2 id="contact">8. Trang "Liên Hệ" (/contact)</h2>
+
+    <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│  TRANG LIÊN HỆ — LAYOUT                                         │
+└─────────────────────────────────────────────────────────────────┘
+
+  ┌── 2 CỘT ──────────────────────────────────────────────────────┐
+  │                                                                │
+  │  ┌── TRÁI: Thông tin ────┐  ┌── PHẢI: Form liên hệ ────────┐ │
+  │  │                        │  │                                │ │
+  │  │  📞 Hotline            │  │  Họ tên: [_______________]    │ │
+  │  │  0877.736.289          │  │  Email:  [_______________]    │ │
+  │  │                        │  │  Chủ đề: [Chọn ▼]            │ │
+  │  │  📧 Email              │  │           • Hỗ trợ kỹ thuật  │ │
+  │  │  support@xmtruyen.com │  │           • Góp ý/phản hồi   │ │
+  │  │                        │  │           • Hợp tác kinh doanh│ │
+  │  │  🏢 Văn phòng          │  │           • Khiếu nại         │ │
+  │  │  TP. Hồ Chí Minh      │  │  Nội dung:                    │ │
+  │  │                        │  │  [________________________]   │ │
+  │  │  ⏰ Giờ làm việc       │  │  [________________________]   │ │
+  │  │  T2-T6: 8:30-17:30    │  │  [________________________]   │ │
+  │  │                        │  │                                │ │
+  │  │  🌐 Mạng xã hội       │  │  [  📨 Gửi liên hệ  ]        │ │
+  │  │  [FB] [Zalo] [TikTok] │  │                                │ │
+  │  │                        │  │                                │ │
+  │  └────────────────────────┘  └────────────────────────────────┘│
+  └────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <!-- 9. NEWS -->
+    <h2 id="news">9. Trang "Tin Tức / Blog" (/news)</h2>
+
+    <div class="section-card">
+        <h4>Loại bài viết:</h4>
+        <ul>
+            <li><strong>Tin dịch vụ:</strong> Cập nhật tính năng mới, bảo trì, sự kiện khuyến mãi</li>
+            <li><strong>Review sách:</strong> Bài giới thiệu/review sách hay do team biên soạn</li>
+            <li><strong>Lịch phát hành:</strong> Lịch ra chương mới hàng tuần</li>
+        </ul>
+        <h4>Layout: Grid cards (ảnh + tiêu đề + ngày + excerpt). Click → trang chi tiết bài viết.</h4>
+    </div>
+
+    <!-- 10. ROUTES -->
+    <h2 id="routing">10. Routes & Footer Links</h2>
+
+    <div class="code-title">📁 xom-truyen/src/App.tsx — Thêm routes mới</div>
+    <pre><code>// Static pages (lazy loaded):
+const AboutPage = lazy(() => import('./pages/static/AboutPage'));
+const TermsPage = lazy(() => import('./pages/static/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/static/PrivacyPage'));
+const FaqPage = lazy(() => import('./pages/static/FaqPage'));
+const ContactPage = lazy(() => import('./pages/static/ContactPage'));
+const RefundPolicyPage = lazy(() => import('./pages/static/RefundPolicyPage'));
+const PaymentPolicyPage = lazy(() => import('./pages/static/PaymentPolicyPage'));
+const BenefitsPage = lazy(() => import('./pages/static/BenefitsPage'));
+const NewsPage = lazy(() => import('./pages/static/NewsPage'));
+const CareersPage = lazy(() => import('./pages/static/CareersPage'));
+
+// Routes:
+&lt;Route path="/about" element={&lt;AboutPage /&gt;} /&gt;
+&lt;Route path="/terms" element={&lt;TermsPage /&gt;} /&gt;
+&lt;Route path="/privacy" element={&lt;PrivacyPage /&gt;} /&gt;
+&lt;Route path="/faq" element={&lt;FaqPage /&gt;} /&gt;
+&lt;Route path="/contact" element={&lt;ContactPage /&gt;} /&gt;
+&lt;Route path="/refund-policy" element={&lt;RefundPolicyPage /&gt;} /&gt;
+&lt;Route path="/payment-policy" element={&lt;PaymentPolicyPage /&gt;} /&gt;
+&lt;Route path="/benefits" element={&lt;BenefitsPage /&gt;} /&gt;
+&lt;Route path="/news" element={&lt;NewsPage /&gt;} /&gt;
+&lt;Route path="/careers" element={&lt;CareersPage /&gt;} /&gt;</code></pre>
+
+    <!-- 11. ADMIN CMS -->
+    <h2 id="admin">11. Quản Lý Nội Dung Tĩnh (Admin CMS)</h2>
+
+    <div class="note">
+        <strong>Vấn đề:</strong> Nội dung các trang tĩnh (Terms, Privacy, FAQ...) cần thay đổi thường xuyên mà không cần deploy lại code. → Cần CMS đơn giản trong Admin để quản lý.
+    </div>
+
+    <div class="section-card">
+        <h4>Giải pháp: Trang "Quản Lý Nội Dung" trong Admin Portal</h4>
+        <ul>
+            <li><strong>Admin trang:</strong> <code>/admin/static-pages</code></li>
+            <li><strong>CRUD:</strong> Tạo/sửa/xóa trang tĩnh</li>
+            <li><strong>Rich text editor:</strong> Soạn nội dung HTML (tiêu đề, đoạn văn, list, link, ảnh)</li>
+            <li><strong>SEO fields:</strong> Meta title, meta description, slug</li>
+            <li><strong>Publish/Draft:</strong> Lưu nháp trước khi xuất bản</li>
+            <li><strong>API:</strong> <code>GET /api/pages/{slug}</code> → client fetch content động</li>
+        </ul>
+    </div>
+
+    <h3>11.1 Database Schema</h3>
+    <pre><code>CREATE TABLE "StaticPages" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Slug" VARCHAR(100) UNIQUE NOT NULL,      -- 'terms', 'privacy', 'faq', 'about'
+    "Title" VARCHAR(200) NOT NULL,             -- Tiêu đề hiển thị
+    "Content" TEXT NOT NULL,                   -- HTML content (rich text)
+    "MetaTitle" VARCHAR(200),                  -- SEO title
+    "MetaDescription" VARCHAR(500),            -- SEO description
+    "Status" VARCHAR(20) DEFAULT 'Published', -- 'Published' | 'Draft'
+    "UpdatedBy" UUID,
+    "CreatedAt" TIMESTAMPTZ DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- FAQ riêng (structured data):
+CREATE TABLE "FaqItems" (
+    "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Category" VARCHAR(50) NOT NULL,           -- 'account', 'reading', 'payment', 'vip'
+    "Question" TEXT NOT NULL,
+    "Answer" TEXT NOT NULL,
+    "OrderIndex" INT DEFAULT 0,
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "CreatedAt" TIMESTAMPTZ DEFAULT NOW()
+);</code></pre>
+
+    <h3>11.2 API Endpoints</h3>
+    <table>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td>GET</td><td>/api/pages/{slug}</td><td>Lấy nội dung trang tĩnh (public, cho client)</td></tr>
+            <tr><td>GET</td><td>/api/admin/pages</td><td>Danh sách tất cả trang (admin)</td></tr>
+            <tr><td>POST</td><td>/api/admin/pages</td><td>Tạo trang mới</td></tr>
+            <tr><td>PUT</td><td>/api/admin/pages/{id}</td><td>Cập nhật nội dung</td></tr>
+            <tr><td>DELETE</td><td>/api/admin/pages/{id}</td><td>Xóa trang</td></tr>
+            <tr><td>GET</td><td>/api/faq</td><td>Danh sách FAQ (public)</td></tr>
+            <tr><td>GET</td><td>/api/admin/faq</td><td>CRUD FAQ items (admin)</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 12. IMPLEMENTATION -->
+    <h2 id="implementation">12. Triển Khai Code</h2>
+
+    <h3>12.1 Generic Static Page Component</h3>
+    <div class="code-title">📁 xom-truyen/src/pages/static/StaticPage.tsx</div>
+    <pre><code>import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
+/**
+ * Generic component cho tất cả trang tĩnh.
+ * Fetch nội dung từ API theo slug → render HTML.
+ */
+export default function StaticPage() {
+    const { slug } = useParams&lt;{ slug: string }&gt;();
+    const [page, setPage] = useState&lt;{ title: string; content: string } | null&gt;(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setLoading(true);
+        axios.get(`/api/pages/${slug}`)
+            .then(res => setPage(res.data))
+            .catch(() => setPage(null))
+            .finally(() => setLoading(false));
+    }, [slug]);
+
+    if (loading) return &lt;div style={{ padding: 60, textAlign: 'center' }}&gt;Đang tải...&lt;/div&gt;;
+    if (!page) return &lt;div style={{ padding: 60, textAlign: 'center' }}&gt;Trang không tồn tại&lt;/div&gt;;
+
+    return (
+        &lt;div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px' }}&gt;
+            &lt;h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24 }}&gt;{page.title}&lt;/h1&gt;
+            &lt;div 
+                className="static-page-content"
+                style={{ fontSize: 15, lineHeight: 1.8, color: '#374151' }}
+                dangerouslySetInnerHTML={{ __html: page.content }}
+            /&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+
+    <h3>12.2 Tổng hợp files cần tạo</h3>
+    <table>
+        <thead><tr><th>File</th><th>App</th><th>Mô tả</th></tr></thead>
+        <tbody>
+            <tr><td><code>src/components/Layout/Footer.tsx</code></td><td>Client</td><td>✏️ Sửa Footer thành 4 cột (Waka-style)</td></tr>
+            <tr><td><code>src/pages/static/StaticPage.tsx</code></td><td>Client</td><td>🆕 Generic page render HTML từ API</td></tr>
+            <tr><td><code>src/pages/static/FaqPage.tsx</code></td><td>Client</td><td>🆕 FAQ accordion (fetch từ /api/faq)</td></tr>
+            <tr><td><code>src/pages/static/ContactPage.tsx</code></td><td>Client</td><td>🆕 Trang liên hệ (info + form)</td></tr>
+            <tr><td><code>src/pages/static/AboutPage.tsx</code></td><td>Client</td><td>🆕 Trang giới thiệu (hero + stats)</td></tr>
+            <tr><td><code>public/badges/appstore.svg</code></td><td>Client</td><td>🆕 Badge App Store download</td></tr>
+            <tr><td><code>public/badges/googleplay.svg</code></td><td>Client</td><td>🆕 Badge Google Play download</td></tr>
+            <tr><td><code>public/badges/bocongthuong.png</code></td><td>Client</td><td>🆕 Logo Bộ Công Thương</td></tr>
+            <tr><td><code>src/pages/StaticPages.tsx</code></td><td>Admin</td><td>🆕 Trang quản lý nội dung tĩnh (CRUD)</td></tr>
+            <tr><td><code>src/pages/FaqManagement.tsx</code></td><td>Admin</td><td>🆕 Trang quản lý FAQ items</td></tr>
+            <tr><td><code>src/api/staticPageApi.ts</code></td><td>Admin</td><td>🆕 API module CRUD static pages</td></tr>
+            <tr><td><code>Controllers/StaticPageController.cs</code></td><td>Backend</td><td>🆕 CRUD static pages + public GET</td></tr>
+            <tr><td><code>Controllers/FaqController.cs</code></td><td>Backend</td><td>🆕 CRUD FAQ items + public GET</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn">
+        <strong>⚠️ Ưu tiên thực hiện:</strong>
+        <ol>
+            <li><strong>Ngay:</strong> Sửa Footer component (4 cột + links) — 1 giờ</li>
+            <li><strong>Ngày 1:</strong> Tạo DB tables + API endpoints + generic StaticPage — 2 giờ</li>
+            <li><strong>Ngày 2:</strong> Admin CMS (CRUD static pages + rich text editor) — 3 giờ</li>
+            <li><strong>Ngày 3:</strong> Soạn nội dung: Terms, Privacy, FAQ, About — 2 giờ (content writing)</li>
+            <li><strong>Sau:</strong> Trang Contact (form + email gửi), News/Blog</li>
+        </ol>
+    </div>
+
+    <hr style="border-color: #333; margin: 50px 0;">
+    <p style="color: #666; text-align: center; font-size: 0.85em;">
+        📄 Tài liệu Trang Thông Tin Tĩnh & Footer — Xóm Truyện Web Client<br>
+        Tham khảo: Waka.vn footer layout<br>
+        Trạng thái: <span style="color: #f59e0b;">🟡 Chưa triển khai (Pending)</span><br>
+        Cập nhật: Tháng 8/2026
+    </p>
+
+</div>
+</body>
+</html>
