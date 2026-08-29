@@ -1,0 +1,2 @@
+bigint tự tăng làm khóa chính trong database: nhanh, nhẹ, index tốt.
+UUID v4 làm ID công khai trên URL/API nếu không muốn người dùng đoán số lượng bản ghi.
