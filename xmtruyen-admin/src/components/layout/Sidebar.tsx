@@ -24,46 +24,46 @@ const DEFAULT_MENU_DATA = {
     { id: 'authors', path: '/authors', icon: Users, title: 'Tác giả', subtitle: '(Authors)' },
     { id: 'categories', path: '/categories', icon: List, title: 'Thể loại', subtitle: '(Categories)' },
     { id: 'topics', path: '/topics', icon: Tag, title: 'Chủ đề', subtitle: '(Topics)' },
-    { id: 'import', path: '/import', icon: Database, title: 'Import Dữ Liệu', subtitle: '(CSV/JSON)' },
-    { id: 'crawlers', path: '/crawlers', icon: Bot, title: 'Crawler Pipeline', subtitle: '(Bot)' }
+    { id: 'import', path: '/import', icon: Database, title: 'Import Dữ Liệu', subtitle: '(CSV/JSON)' , status: 'empty' },
+    { id: 'crawlers', path: '/crawlers', icon: Bot, title: 'Crawler Pipeline', subtitle: '(Bot)' , status: 'error' }
   ],
   translation: [
-    { id: 'translation', path: '/translation', icon: Languages, title: 'Dashboard Dịch thuật' },
-    { id: 'translation-upload', path: '/translation/upload', icon: Languages, title: 'Upload RAW' },
-    { id: 'translation-glossary', path: '/translation/glossary', icon: BookOpen, title: 'Từ điển (Glossary)' }
+    { id: 'translation', path: '/translation', icon: Languages, title: 'Dashboard Dịch thuật' , status: 'empty' },
+    { id: 'translation-upload', path: '/translation/upload', icon: Languages, title: 'Upload RAW' , status: 'empty' },
+    { id: 'translation-glossary', path: '/translation/glossary', icon: BookOpen, title: 'Từ điển (Glossary)' , status: 'empty' }
   ],
   media: [
-    { id: 'audio', path: '/audio', icon: LayoutDashboard, title: 'Tổng quan Audio' },
-    { id: 'audio-voices', path: '/audio/voices', icon: Users, title: 'Quản lý Giọng đọc' },
-    { id: 'book-video', path: '/book-video', icon: LayoutDashboard, title: 'Video Truyện Chữ' },
-    { id: 'comic-video', path: '/comic-video', icon: LayoutDashboard, title: 'Video Truyện Tranh' },
+    { id: 'audio', path: '/audio', icon: LayoutDashboard, title: 'Tổng quan Audio' , status: 'empty' },
+    { id: 'audio-voices', path: '/audio/voices', icon: Users, title: 'Quản lý Giọng đọc' , status: 'error' },
+    { id: 'book-video', path: '/book-video', icon: LayoutDashboard, title: 'Video Truyện Chữ' , status: 'error' },
+    { id: 'comic-video', path: '/comic-video', icon: LayoutDashboard, title: 'Video Truyện Tranh' , status: 'error' },
     { id: 'print-pipeline', path: '/print-pipeline', icon: BookOpen, title: 'Xuất bản PDF / CMYK' }
   ],
   community: [
     { id: 'users', path: '/users', icon: Users, title: 'Người dùng', subtitle: '(Users)' },
     { id: 'reviews', path: '/reviews', icon: MessageSquare, title: 'Đánh giá', subtitle: '(Reviews)' },
-    { id: 'reports', path: '/reports', icon: ShieldAlert, title: 'Báo cáo vi phạm', subtitle: '(Reports)' },
-    { id: 'notifications', path: '/notifications', icon: Bell, title: 'Thông báo', subtitle: '(Notifications)' }
+    { id: 'reports', path: '/reports', icon: ShieldAlert, title: 'Báo cáo vi phạm', subtitle: '(Reports)' , status: 'empty' },
+    { id: 'notifications', path: '/notifications', icon: Bell, title: 'Thông báo', subtitle: '(Notifications)' , status: 'empty' }
   ],
   commerce: [
-    { id: 'plans', path: '/plans', icon: TableProperties, title: 'Gói VIP', subtitle: '(Subscription)' },
-    { id: 'coin-packages', path: '/coin-packages', icon: Tag, title: 'Gói Xu', subtitle: '(Coin Packages)' },
-    { id: 'transactions', path: '/transactions', icon: Tag, title: 'Giao dịch', subtitle: '(Transactions)' },
-    { id: 'promotions', path: '/promotions', icon: Ticket, title: 'Khuyến mãi', subtitle: '(Promotions)' }
+    { id: 'plans', path: '/plans', icon: TableProperties, title: 'Gói VIP', subtitle: '(Subscription)' , status: 'empty' },
+    { id: 'coin-packages', path: '/coin-packages', icon: Tag, title: 'Gói Xu', subtitle: '(Coin Packages)' , status: 'empty' },
+    { id: 'transactions', path: '/transactions', icon: Tag, title: 'Giao dịch', subtitle: '(Transactions)' , status: 'empty' },
+    { id: 'promotions', path: '/promotions', icon: Ticket, title: 'Khuyến mãi', subtitle: '(Promotions)' , status: 'empty' }
   ],
   cms: [
-    { id: 'banners', path: '/banners', icon: LayoutDashboard, title: 'Quản lý Banner' },
-    { id: 'home-sections', path: '/home-sections', icon: LayoutDashboard, title: 'Trang chủ (Home CMS)' },
-    { id: 'static-pages', path: '/static-pages', icon: FileText, title: 'Trang Tĩnh', subtitle: '(CMS)' },
-    { id: 'faq-management', path: '/faq-management', icon: HelpCircle, title: 'FAQ', subtitle: '(Hỏi đáp)' },
-    { id: 'help-articles', path: '/help-articles', icon: HelpCircle, title: 'Trợ giúp', subtitle: '(Help Center)' },
-    { id: 'email-templates', path: '/email-templates', icon: FileText, title: 'Mẫu Email', subtitle: '(Templates)' }
+    { id: 'banners', path: '/banners', icon: LayoutDashboard, title: 'Quản lý Banner' , status: 'empty' },
+    { id: 'home-sections', path: '/home-sections', icon: LayoutDashboard, title: 'Trang chủ (Home CMS)' , status: 'empty' },
+    { id: 'static-pages', path: '/static-pages', icon: FileText, title: 'Trang Tĩnh', subtitle: '(CMS)' , status: 'empty' },
+    { id: 'faq-management', path: '/faq-management', icon: HelpCircle, title: 'FAQ', subtitle: '(Hỏi đáp)' , status: 'empty' },
+    { id: 'help-articles', path: '/help-articles', icon: HelpCircle, title: 'Trợ giúp', subtitle: '(Help Center)' , status: 'empty' },
+    { id: 'email-templates', path: '/email-templates', icon: FileText, title: 'Mẫu Email', subtitle: '(Templates)' , status: 'error' }
   ],
   analytics: [
-    { id: 'system-reports', path: '/system-reports', icon: BarChart2, title: 'Báo cáo (Reports)' },
-    { id: 'reading-analytics', path: '/reading-analytics', icon: BarChart2, title: 'Phân tích Lượt đọc', subtitle: '(Analytics)' },
-    { id: 'test-cases', path: '/test-cases', icon: ClipboardCheck, title: 'Test Cases', subtitle: '(QA & Bug Log)' },
-    { id: 'build-process', path: '/build-process', icon: GitBranch, title: 'Build Process', subtitle: '(CI/CD)' }
+    { id: 'system-reports', path: '/system-reports', icon: BarChart2, title: 'Báo cáo (Reports)' , status: 'error' },
+    { id: 'reading-analytics', path: '/reading-analytics', icon: BarChart2, title: 'Phân tích Lượt đọc', subtitle: '(Analytics)' , status: 'empty' },
+    { id: 'test-cases', path: '/test-cases', icon: ClipboardCheck, title: 'Test Cases', subtitle: '(QA & Bug Log)' , status: 'error' },
+    { id: 'build-process', path: '/build-process', icon: GitBranch, title: 'Build Process', subtitle: '(CI/CD)' , status: 'error' }
   ]
 };
 

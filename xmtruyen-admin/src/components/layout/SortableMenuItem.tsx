@@ -2,7 +2,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { NavLink } from 'react-router-dom';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, XCircle, AlertCircle } from 'lucide-react';
 
 interface SortableMenuItemProps {
   id: string;
@@ -13,6 +13,7 @@ interface SortableMenuItemProps {
   isActive?: boolean;
   end?: boolean;
   isDivider?: boolean;
+  status?: 'error' | 'empty';
 }
 
 export const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
@@ -23,7 +24,8 @@ export const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
   subtitle,
   isActive,
   end,
-  isDivider
+  isDivider,
+  status
 }) => {
   const {
     attributes,
@@ -65,12 +67,20 @@ export const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
       </div>
       <NavLink 
         to={path} 
-        className={({ isActive: defaultActive }) => `menu-link flex-grow-1${isActive || defaultActive ? ' active' : ''}`} 
+        className={({ isActive: defaultActive }) => `menu-link flex-grow-1${isActive || defaultActive ? ' active' : ''} d-flex align-items-center justify-content-between`} 
         end={end}
         style={{ paddingLeft: '5px' }}
       >
-        <Icon size={18} />
-        <span>{title} {subtitle && <span className="text-secondary small" style={{ fontSize: '12px' }}>{subtitle}</span>}</span>
+        <div className="d-flex align-items-center">
+          <Icon size={18} className="me-2" />
+          <span>{title} {subtitle && <span className="text-secondary small" style={{ fontSize: '12px' }}>{subtitle}</span>}</span>
+        </div>
+        {status === 'error' && (
+          <XCircle size={16} className="text-danger" style={{ opacity: 0.8 }} title="Trang đang bị lỗi" />
+        )}
+        {status === 'empty' && (
+          <AlertCircle size={16} className="text-primary" style={{ opacity: 0.8 }} title="Trang chưa có dữ liệu" />
+        )}
       </NavLink>
     </div>
   );
