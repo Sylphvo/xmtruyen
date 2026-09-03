@@ -200,7 +200,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
 
     if (path.startsWith('/all-books') || path.startsWith('/books') || path.startsWith('/comics') || path.startsWith('/book-chapters') || path.startsWith('/book-files') || path.startsWith('/authors') || path.startsWith('/categories') || path.startsWith('/topics') || path.startsWith('/import') || path.startsWith('/crawlers') || path.startsWith('/audio') || path.startsWith('/book-video') || path.startsWith('/comic-video') || path.startsWith('/print-pipeline') || path.startsWith('/translation')) {
       setActiveMenu('content');
-    } else if (path.startsWith('/users') || path.startsWith('/reviews') || path.startsWith('/reports') || path.startsWith('/notifications') || path.startsWith('/plans') || path.startsWith('/coin-packages') || path.startsWith('/transactions') || path.startsWith('/promotions') || path.startsWith('/system-reports') || path.startsWith('/reading-analytics') || path.startsWith('/test-cases') || path.startsWith('/build-process')) {
+    } else if (path.startsWith('/users') || path.startsWith('/reviews') || path.startsWith('/reports') || path.startsWith('/notifications') || path.startsWith('/plans') || path.startsWith('/coin-packages') || path.startsWith('/transactions') || path.startsWith('/promotions') || path.startsWith('/system-reports') || path.startsWith('/reading-analytics') || path.startsWith('/test-cases') || path.startsWith('/build-process') || path.startsWith('/migration-progress')) {
       setActiveMenu('community');
     } else if (path.startsWith('/database') || path.startsWith('/system-configs')) {
       setActiveMenu('system');
