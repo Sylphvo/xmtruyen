@@ -63,7 +63,8 @@ const DEFAULT_MENU_DATA = {
     { id: 'system-reports', path: '/system-reports', icon: BarChart2, title: 'Báo cáo (Reports)' , status: 'error' },
     { id: 'reading-analytics', path: '/reading-analytics', icon: BarChart2, title: 'Phân tích Lượt đọc', subtitle: '(Analytics)' , status: 'empty' },
     { id: 'test-cases', path: '/test-cases', icon: ClipboardCheck, title: 'Test Cases', subtitle: '(QA & Bug Log)' , status: 'error' },
-    { id: 'build-process', path: '/build-process', icon: GitBranch, title: 'Build Process', subtitle: '(CI/CD)' , status: 'error' }
+    { id: 'build-process', path: '/build-process', icon: GitBranch, title: 'Build Process', subtitle: '(CI/CD)' , status: 'error' },
+    { id: 'migration-progress', path: '/migration-progress', icon: ListChecks, title: 'Tiến độ triển khai', subtitle: '(Progress)' }
   ]
 };
 
